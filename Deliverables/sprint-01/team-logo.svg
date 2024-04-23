@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2229.866 1316.497">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#Unbenannter_Verlauf_5-5);
+      }
+
+      .cls-1, .cls-2, .cls-3, .cls-4, .cls-5, .cls-6, .cls-7, .cls-8, .cls-9, .cls-10, .cls-11 {
+        stroke: #000;
+        stroke-linejoin: round;
+        stroke-width: 4px;
+      }
+
+      .cls-2 {
+        fill: url(#Unbenannter_Verlauf_23);
+      }
+
+      .cls-3 {
+        fill: url(#Unbenannter_Verlauf_5-7);
+      }
+
+      .cls-4 {
+        fill: url(#Unbenannter_Verlauf_5-2);
+      }
+
+      .cls-4, .cls-5 {
+        stroke-linecap: round;
+      }
+
+      .cls-5 {
+        fill: url(#Unbenannter_Verlauf_5);
+      }
+
+      .cls-6 {
+        fill: url(#Unbenannter_Verlauf_13);
+      }
+
+      .cls-12 {
+        letter-spacing: .004em;
+      }
+
+      .cls-7 {
+        fill: url(#Unbenannter_Verlauf_13-2);
+      }
+
+      .cls-8 {
+        fill: url(#Unbenannter_Verlauf_5-6);
+      }
+
+      .cls-9 {
+        fill: url(#Unbenannter_Verlauf_5-3);
+      }
+
+      .cls-10 {
+        fill: url(#Unbenannter_Verlauf_22);
+      }
+
+      .cls-13 {
+        fill: #fff;
+        font-family: Bebas-Regular, Bebas;
+        font-size: 519px;
+      }
+
+      .cls-11 {
+        fill: url(#Unbenannter_Verlauf_5-4);
+      }
+    </style>
+    <linearGradient id="Unbenannter_Verlauf_5" data-name="Unbenannter Verlauf 5" x1="54.352" y1="620.771" x2="1182.023" y2="620.771" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#89c271"/>
+      <stop offset=".359" stop-color="#7fbf79"/>
+      <stop offset=".966" stop-color="#64b88e"/>
+      <stop offset="1" stop-color="#63b890"/>
+    </linearGradient>
+    <linearGradient id="Unbenannter_Verlauf_5-2" data-name="Unbenannter Verlauf 5" y1="606.583" x2="1121.568" y2="606.583" xlink:href="#Unbenannter_Verlauf_5"/>
+    <linearGradient id="Unbenannter_Verlauf_23" data-name="Unbenannter Verlauf 23" x1="1073.365" y1="772.858" x2="1100.752" y2="548.76" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#466b47"/>
+      <stop offset=".163" stop-color="#4b7450"/>
+      <stop offset=".439" stop-color="#5a8c6b"/>
+      <stop offset=".618" stop-color="#66a080"/>
+      <stop offset="1" stop-color="#6fba8d"/>
+    </linearGradient>
+    <linearGradient id="Unbenannter_Verlauf_5-3" data-name="Unbenannter Verlauf 5" x1="112.54" y1="828.078" x2="1004.673" y2="605.181" xlink:href="#Unbenannter_Verlauf_5"/>
+    <linearGradient id="Unbenannter_Verlauf_5-4" data-name="Unbenannter Verlauf 5" x1="4.401" y1="855.997" x2="1045.156" y2="689.357" xlink:href="#Unbenannter_Verlauf_5"/>
+    <linearGradient id="Unbenannter_Verlauf_22" data-name="Unbenannter Verlauf 22" x1="1013.047" y1="828.336" x2="1078.421" y2="636.631" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#466b47"/>
+      <stop offset=".201" stop-color="#4b7450"/>
+      <stop offset=".54" stop-color="#5a8c6b"/>
+      <stop offset=".76" stop-color="#66a080"/>
+    </linearGradient>
+    <linearGradient id="Unbenannter_Verlauf_5-5" data-name="Unbenannter Verlauf 5" x1="1205.352" y1="398.143" x2="1366.522" y2="398.143" xlink:href="#Unbenannter_Verlauf_5"/>
+    <linearGradient id="Unbenannter_Verlauf_5-6" data-name="Unbenannter Verlauf 5" x1="1390.241" y1="259.275" x2="1532.207" y2="259.275" xlink:href="#Unbenannter_Verlauf_5"/>
+    <linearGradient id="Unbenannter_Verlauf_5-7" data-name="Unbenannter Verlauf 5" x1="1565.176" y1="136.514" x2="1663.746" y2="136.514" xlink:href="#Unbenannter_Verlauf_5"/>
+    <linearGradient id="Unbenannter_Verlauf_13" data-name="Unbenannter Verlauf 13" x1="1588.401" y1="128.107" x2="1612.696" y2="135.616" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#618e77"/>
+      <stop offset=".422" stop-color="#63977b"/>
+      <stop offset=".667" stop-color="#66a080"/>
+      <stop offset="1" stop-color="#6fba8d"/>
+    </linearGradient>
+    <linearGradient id="Unbenannter_Verlauf_13-2" data-name="Unbenannter Verlauf 13" x1="1390.06" y1="236.5" x2="1412.366" y2="236.5" xlink:href="#Unbenannter_Verlauf_13"/>
+  </defs>
+  <g id="Ebene_4" data-name="Ebene 4">
+    <path class="cls-5" d="m1116.633,762.655c-69.091-108.572,65.39-283.768,65.39-283.768L54.352,755.253"/>
+    <path class="cls-4" d="m54.352,755.253l1067.216-304.742s-75.26,223.313-4.935,312.145"/>
+    <path class="cls-2" d="m1116.633,762.655c-51.819-38.247-48.117-250.456-48.117-250.456l-38.864,274.515"/>
+    <polyline class="cls-9" points="1043.839 682.46 1068.515 512.199 54.318 755.561"/>
+    <g id="Ebene_6" data-name="Ebene 6">
+      <text class="cls-13" transform="translate(266.147 1223.796)"><tspan x="0" y="0">.ING</tspan></text>
+    </g>
+    <text class="cls-13" transform="translate(78.366 748.299)"><tspan class="cls-12" x="0" y="0">C</tspan><tspan x="220.055" y="0">ODE</tspan></text>
+    <polygon class="cls-11" points="2 841 940.456 841 1024.099 557.849 54.318 755.561 2 841"/>
+    <path class="cls-10" d="m1056.795,778.077l-32.695-220.229-83.643,283.151s77.474-61.072,176.176-78.345"/>
+  </g>
+  <g id="Ebene_5" data-name="Ebene 5">
+    <path class="cls-1" d="m1210.586,463.22s63.034-36.77,154.433-4.202c0,0,11.556-84.045-29.416-116.612,0,0-16.77-21.011-130.25,0,0,0,34.649,18.91,5.233,120.815Z"/>
+    <path class="cls-8" d="m1434.862,325.646s-38.865-49.857-44.496-83.646c0,0-6.188-39.442,68.631-49.096,0,0,4.023,21.722,73.21,79.646,0,0-99.758,36.203-97.345,53.097Z"/>
+    <path class="cls-3" d="m1565.176,198.407s47.566-21.204,90.547-18.339c0,0-45.273-52.723,8.023-105.447,0,0-74.5,23.496-98.57,123.785Z"/>
+    <path class="cls-6" d="m1565.445,197.784c2.788-7.836,8.996-21.9,22.466-34.72,9.625-9.161,19.46-14.358,26.256-17.265-1.395-12.384.787-21.406,3.358-27.666,11.093-27.012,46.221-43.511,46.221-43.512-15.125,7.035-40.38,16.378-69.708,57.808-18.019,25.368-25.353,50.1-28.593,65.355Z"/>
+    <path class="cls-7" d="m1412.366,207s-16.85,16.323-8,30c0,0-10,14-6,29,0,0-26-39,14-59Z"/>
+  </g>
+</svg>
