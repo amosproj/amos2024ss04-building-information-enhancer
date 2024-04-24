@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+  # Frontend container
+  react-frontend:
+    build:
+      context: ./
+      dockerfile: ./frontend/Dockerfile
+    container_name: react-frontend
+    environment:
+      - HOST=${REACT_FRONTEND_HOST}
+      - PORT=${REACT_FRONTEND_PORT}
+    ports:
+      - "${REACT_FRONTEND_PORT}:${REACT_FRONTEND_PORT}"
+
+  # Backend container
+  express-backend:
+    build:
+      context: ./
+      dockerfile: ./backend/Dockerfile
+    container_name: backend
+    environment:
+      - HOST=${BACKEND_HOST}
+      - PORT=${BACKEND_PORT}
+    ports:
+      - "${BACKEND_PORT}:${BACKEND_PORT}"

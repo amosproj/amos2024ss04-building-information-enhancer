@@ -1,0 +1,12 @@
+{
+  "name": "amos2024ss04-building-information-enhancer",
+  "version": "1.0.0",
+  "description": "Main package file for the AMOS 2024 - Building Information Enhander Project.",
+  "author": "See repository README",
+  "scripts": {
+    "setup": "npm run setup:frontend && npm run setup:backend",
+    "setup:frontend": "cd frontend/",
+    "setup:backend": "cd backend/public-api",
+    "deploy": "docker compose up --build -d"
+  }
+}
