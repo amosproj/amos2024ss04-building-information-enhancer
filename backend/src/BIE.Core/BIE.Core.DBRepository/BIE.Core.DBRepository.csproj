@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BIE.Core.BaseRepository\BIE.Core.BaseRepository.csproj" />
+    <ProjectReference Include="..\BIE.Data\BIE.Data.csproj" />
+    <ProjectReference Include="..\BIE.Core.BaseRepository\BIE.Core.BaseRepository.csproj" />
+    <ProjectReference Include="..\BIE.Data\BIE.Data.csproj" />
+  </ItemGroup>
+
+</Project>

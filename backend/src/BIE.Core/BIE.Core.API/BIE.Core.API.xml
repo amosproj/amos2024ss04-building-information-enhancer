@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BIE.Core.API</name>
+    </assembly>
+    <members>
+        <member name="T:BIE.Core.API.Controllers.InfrastructureController">
+            <summary>
+            Batch controller
+            </summary>
+        </member>
+        <member name="M:BIE.Core.API.Controllers.InfrastructureController.#ctor(Parbat.Core.Services.InfrastructureService)">
+            <summary>
+            Constructor 
+            </summary>
+            <param name="service">IRepositoryFactory</param>
+        </member>
+        <member name="M:BIE.Core.API.Controllers.InfrastructureController.Get(System.Int64)">
+            <summary>
+            Get a record
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BIE.Core.API.Controllers.InfrastructureController.List">
+            <summary>
+            List all batch
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:BIE.Core.API.Controllers.InfrastructureController.Update(BIE.Core.DataObjects.Infrastructure)">
+            <summary>
+            Update a batch
+            </summary>
+            <param name="b"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BIE.Core.API.Controllers.InfrastructureController.Create(BIE.Core.DataObjects.Infrastructure)">
+            <summary>
+            Create 
+            </summary>
+            <param name="b"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BIE.Core.API.Controllers.InfrastructureController.Delete(System.Int64)">
+            <summary>
+            Delete
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="T:BIE.Core.API.Global">
+            <summary>
+            Global constatns
+            </summary>
+        </member>
+        <member name="F:BIE.Core.API.Global.API_VER">
+            <summary>
+            Route Constant variable
+             API Version
+            </summary>
+        </member>
+        <member name="F:BIE.Core.API.Global.API_CONTROLLER">
+            <summary>
+            Default Route prefix
+            </summary>
+        </member>
+        <member name="T:BIE.Core.API.MaintainCorsExtension">
+            <summary>
+            To handle CORS issue in case of exception
+            </summary>
+        </member>
+        <member name="M:BIE.Core.API.MaintainCorsExtension.MaintainCorsHeadersOnError(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Method to be called in Startup 
+            </summary>
+            <param name="builder"></param>
+            <returns></returns>
+        </member>
+        <member name="T:BIE.Core.API.Program">
+            <summary>
+            Main Program
+            </summary>
+        </member>
+        <member name="M:BIE.Core.API.Program.Main(System.String[])">
+            <summary>
+            Main method
+            </summary>
+            <param name="args"></param>
+        </member>
+        <member name="M:BIE.Core.API.Program.CreateHostBuilder(System.String[])">
+            <summary>
+            startup building
+            </summary>
+            <param name="args"></param>
+            <returns></returns>
+        </member>
+        <member name="T:BIE.Core.API.Startup">
+            <summary>
+            Startup class
+            </summary>
+        </member>
+        <member name="M:BIE.Core.API.Startup.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Startup constructor
+            </summary>
+            <param name="configuration"></param>
+        </member>
+        <member name="P:BIE.Core.API.Startup.Configuration">
+            <summary>
+            /Configuration property
+            </summary>
+        </member>
+        <member name="M:BIE.Core.API.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            This method gets called by the runtime. Use this method to add services to the container.
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="M:BIE.Core.API.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment)">
+            <summary>
+            This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+            </summary>
+            <param name="app"></param>
+            <param name="env"></param>
+        </member>
+    </members>
+</doc>

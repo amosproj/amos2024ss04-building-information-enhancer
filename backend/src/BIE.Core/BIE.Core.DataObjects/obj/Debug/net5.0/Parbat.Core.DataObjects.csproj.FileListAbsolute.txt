@@ -1,0 +1,11 @@
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Core.DataObjects\bin\Debug\net5.0\Parbat.Core.DataObjects.deps.json
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Core.DataObjects\bin\Debug\net5.0\Parbat.Core.DataObjects.dll
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Core.DataObjects\bin\Debug\net5.0\Parbat.Core.DataObjects.pdb
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Core.DataObjects\obj\Debug\net5.0\Parbat.Core.DataObjects.GeneratedMSBuildEditorConfig.editorconfig
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Core.DataObjects\obj\Debug\net5.0\Parbat.Core.DataObjects.AssemblyInfoInputs.cache
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Core.DataObjects\obj\Debug\net5.0\Parbat.Core.DataObjects.AssemblyInfo.cs
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Core.DataObjects\obj\Debug\net5.0\Parbat.Core.DataObjects.csproj.CoreCompileInputs.cache
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Core.DataObjects\obj\Debug\net5.0\Parbat.Core.DataObjects.dll
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Core.DataObjects\obj\Debug\net5.0\ref\Parbat.Core.DataObjects.dll
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Core.DataObjects\obj\Debug\net5.0\Parbat.Core.DataObjects.pdb
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Core.DataObjects\obj\Debug\net5.0\refint\Parbat.Core.DataObjects.dll

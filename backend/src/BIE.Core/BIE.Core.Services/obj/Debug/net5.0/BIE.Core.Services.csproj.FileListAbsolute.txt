@@ -1,0 +1,5 @@
+E:\amos-project\code\backend\BIE.Core\BIE.Core.Services\obj\Debug\net5.0\BIE.Core.Services.csproj.AssemblyReference.cache
+E:\amos-project\code\backend\BIE.Core\BIE.Core.Services\obj\Debug\net5.0\BIE.Core.Services.GeneratedMSBuildEditorConfig.editorconfig
+E:\amos-project\code\backend\BIE.Core\BIE.Core.Services\obj\Debug\net5.0\BIE.Core.Services.AssemblyInfoInputs.cache
+E:\amos-project\code\backend\BIE.Core\BIE.Core.Services\obj\Debug\net5.0\BIE.Core.Services.AssemblyInfo.cs
+E:\amos-project\code\backend\BIE.Core\BIE.Core.Services\obj\Debug\net5.0\BIE.Core.Services.csproj.CoreCompileInputs.cache
