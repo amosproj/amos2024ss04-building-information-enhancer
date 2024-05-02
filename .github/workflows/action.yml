@@ -2,7 +2,13 @@ name: publish_sprint_release
 
 on:
   push:
-    branches: ["sprint_release"]
+    branches:
+      - sprint-release
+      - main
+  pull_request:
+    branches:
+      - sprint-release
+      - main
 
 env:
   REGISTRY: ghcr.io
