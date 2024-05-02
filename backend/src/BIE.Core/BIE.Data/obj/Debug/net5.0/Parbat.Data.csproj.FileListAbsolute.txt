@@ -1,0 +1,12 @@
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\bin\Debug\net5.0\Parbat.Data.deps.json
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\bin\Debug\net5.0\Parbat.Data.dll
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\bin\Debug\net5.0\Parbat.Data.pdb
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\obj\Debug\net5.0\Parbat.Data.csproj.AssemblyReference.cache
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\obj\Debug\net5.0\Parbat.Data.GeneratedMSBuildEditorConfig.editorconfig
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\obj\Debug\net5.0\Parbat.Data.AssemblyInfoInputs.cache
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\obj\Debug\net5.0\Parbat.Data.AssemblyInfo.cs
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\obj\Debug\net5.0\Parbat.Data.csproj.CoreCompileInputs.cache
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\obj\Debug\net5.0\Parbat.Data.dll
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\obj\Debug\net5.0\refint\Parbat.Data.dll
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\obj\Debug\net5.0\Parbat.Data.pdb
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\obj\Debug\net5.0\ref\Parbat.Data.dll

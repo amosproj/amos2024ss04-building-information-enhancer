@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "ebwJi7vwpbFPxF5mn8WNEG2NFB1VSAx1h1h07Q+xsWUgnMG+LmP3bAonVjPWvSE1xTzyzcYzrSG0xCrlHWlGsg==",
+  "success": true,
+  "projectFilePath": "E:\\amos-project\\code\\backend\\src\\BIE.Core\\BIE.Core.Services\\BIE.Core.Services.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Ahsan.Khan\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\5.0.0\\microsoft.extensions.dependencyinjection.abstractions.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
