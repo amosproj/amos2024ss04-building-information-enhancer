@@ -6,7 +6,7 @@ EXPOSE 80
 EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-WORKDIR /src2
+WORKDIR /src
 COPY ["BIE.Core.API/BIE.Core.API.csproj", "BIE.Core.API/"]
 COPY ["BIE.Core.DataObjects/BIE.Core.DataObjects.csproj", "BIE.Core.DataObjects/"]
 COPY ["BIE.Core.Services/BIE.Core.Services.csproj", "BIE.Core.Services/"]

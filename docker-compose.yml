@@ -13,10 +13,10 @@ services:
       - "${REACT_FRONTEND_PORT}:${REACT_FRONTEND_PORT}"
 
   # Backend container
-  express-backend:
+  backend:
     build:
-      context: ./
-      dockerfile: ./backend/Dockerfile
+      context: ./backend/src/BIE.Core
+      dockerfile: Dockerfile
     container_name: backend
     environment:
       - HOST=${BACKEND_HOST}
