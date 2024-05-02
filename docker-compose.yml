@@ -6,6 +6,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: react-frontend
+    image: ghcr.io/corgam/bie-frontend
     environment:
       - HOST=${REACT_FRONTEND_HOST}
       - PORT=${REACT_FRONTEND_PORT}
@@ -18,6 +19,7 @@ services:
       context: ./backend/src/BIE.Core
       dockerfile: Dockerfile
     container_name: backend
+    image: ghcr.io/corgam/bie-backend
     environment:
       - HOST=${BACKEND_HOST}
       - PORT=${BACKEND_PORT}
