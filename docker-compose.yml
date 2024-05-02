@@ -3,8 +3,8 @@ services:
   # Frontend container
   react-frontend:
     build:
-      context: ./
-      dockerfile: ./frontend/Dockerfile
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: react-frontend
     environment:
       - HOST=${REACT_FRONTEND_HOST}

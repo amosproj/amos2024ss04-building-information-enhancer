@@ -7,13 +7,13 @@ WORKDIR /app
 ### Install dependencies ###
 
 # Copy package.json and package-lock.json to the working directory
-COPY frontend/package*.json ./
+COPY package*.json ./
 
 # Install dependencies
 RUN npm ci
 
 # Upload the files
-ADD ./frontend .
+ADD . .
 
 RUN npm run build
 
