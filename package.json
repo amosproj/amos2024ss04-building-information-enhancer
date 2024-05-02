@@ -7,6 +7,7 @@
     "setup": "npm run setup:frontend && npm run setup:backend",
     "setup:frontend": "cd frontend/",
     "setup:backend": "cd backend/public-api",
-    "deploy": "docker compose up --build -d"
+    "deploy": "docker compose up --build -d",
+    "push": "docker compose push"
   }
 }
