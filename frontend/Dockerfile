@@ -1,22 +1,37 @@
 # Load the node image from Docker Hub
-FROM node:16 as builder
+FROM node:20-slim as builder
 
-# Create app directory
-WORKDIR /usr/src/frontend
+# Create app work directory
+WORKDIR /app
 
-### Install dependencies ### TO-DO
+### Install dependencies ###
 
 # Copy package.json and package-lock.json to the working directory
-# COPY frontend/package*.json ./
-# RUN npm ci
+COPY frontend/package*.json ./
 
+# Install dependencies
+RUN npm ci
+
+# Upload the files
 ADD ./frontend .
 
-### Build ### TO-DO
+RUN npm run build
 
-# RUN npm run build
+COPY . .
+
+### Deploy the server ### 
+
+# Use Nginx as lightweight production web server
+FROM nginx:stable-alpine
+
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+## Environment variables
+ENV NODE_ENV production
+ENV PORT=80
 
 # Expose the port
 EXPOSE "${PORT}"
 
-### Start the server ### TO-DO
+# Start NGINX server in the background
+CMD ["nginx", "-g", "daemon off;"]
