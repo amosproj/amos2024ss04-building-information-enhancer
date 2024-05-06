@@ -1,0 +1,39 @@
+name: Deploy Production Service
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    name: Publish Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Login
+        run: |
+          echo ${{secrets.PAT}} | docker login ghcr.io -u ${{github.actor}} --password-stdin
+      - name: Build and Publish
+        run: |
+          docker compose build --pull
+          docker-compose push
+      - name: Logout
+        run: docker logout
+
+  deploy:
+    needs: publish
+    name: Deploy Image on the Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install SSH keys
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{secrets.PROD_ENV_SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{secrets.PROD_ENV_SSH_HOST}} > ~/.ssh/known_hosts
+      - name: Connect and Pull
+        run: ssh ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}} "cd /var/lib/bie && docker compose pull && docker compose up -d && exit"
+      - name: Cleanup
+        run: rm -rf ~/.ssh

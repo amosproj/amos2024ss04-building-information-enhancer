@@ -1,0 +1,33 @@
+name: Backend - Tests
+
+on:
+  pull_request:
+    branches:
+      - sprint-release
+      - main
+    paths:
+      - "backend/**"
+  push:
+    branches:
+      - sprint-release
+      - main
+    paths:
+      - "backend/**"
+
+jobs:
+  linting:
+    name: Check linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Echo Linting
+        run: echo "linting"
+
+  tests:
+    needs: linting
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Echo Test
+        run: echo "test"

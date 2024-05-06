@@ -1,12 +1,9 @@
-name: publish_sprint_release
+name: Deploy Test Service
 
 on:
   push:
-    branches: ["sprint_release"]
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{github.actor}}/building-information-enhancer
+    branches:
+      - sprint-release
 
 jobs:
   publish:
@@ -17,7 +14,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Login
         run: |
-          echo ${{secrets.PAT}} | docker login ghcr.io -u ${{github.actor}}--password-stdin
+          echo ${{secrets.PAT}} | docker login ghcr.io -u ${{github.actor}} --password-stdin
       - name: Build and Publish
         run: |
           docker compose build --pull
@@ -27,16 +24,16 @@ jobs:
 
   deploy:
     needs: publish
-    name: Deploy Image on Server
+    name: Deploy Image on the Server
     runs-on: ubuntu-latest
 
     steps:
       - name: Install SSH keys
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "${{secrets.SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa
-          ssh-keyscan -H ${{secrets.SSH_HOST}} > ~/.ssh/known_hosts
+          echo "${{secrets.TEST_ENV_SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{secrets.TEST_ENV_SSH_HOST}} > ~/.ssh/known_hosts
       - name: Connect and Pull
-        run: ssh ${{secrets.SSH_USER}}@${{secrets.SSH_HOST}} "cd ${{secrets.WORK_DIR}} && docker compose pull && docker compose up -d && exit"
+        run: ssh ${{secrets.TEST_ENV_SSH_USER}}@${{secrets.TEST_ENV_SSH_HOST}} "cd /var/lib/bie && docker compose pull && docker compose up -d && exit"
       - name: Cleanup
         run: rm -rf ~/.ssh
