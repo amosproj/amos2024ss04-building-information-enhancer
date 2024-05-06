@@ -1,18 +1,18 @@
-name: Build and Publish Docker Image
+name: Run Tests - Backend
 
 on:
-  push:
-    branches:
-      - sprint-release
-      - main
   pull_request:
     branches:
       - sprint-release
       - main
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{github.actor}}/building-information-enhancer
+    paths:
+      - "backend/**"
+  push:
+    branches:
+      - sprint-release
+      - main
+    paths:
+      - "backend/**"
 
 jobs:
   publish:
