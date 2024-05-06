@@ -8,13 +8,6 @@ on:
     paths:
       - "backend/**"
       - "frontend/**"
-  push:
-    branches:
-      - sprint-release
-      - main
-    paths:
-      - "backend/**"
-      - "frontend/**"
 
 jobs:
   build:

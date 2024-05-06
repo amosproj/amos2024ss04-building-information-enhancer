@@ -7,12 +7,6 @@ on:
       - main
     paths:
       - "frontend/**"
-  push:
-    branches:
-      - sprint-release
-      - main
-    paths:
-      - "frontend/**"
 
 jobs:
   linting:
