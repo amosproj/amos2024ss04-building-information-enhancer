@@ -1,4 +1,4 @@
-name: Build Docker Images
+name: Build Docker Compose
 
 on:
   pull_request:
