@@ -11,10 +11,10 @@ on:
 
 jobs:
   build:
-    name: Build the Docker Image
+    name: Build Images
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
-      - name: Build Image
+      - name: Build Images
         run: docker compose build --pull

@@ -1,4 +1,4 @@
-name: Frontend - Tests
+name: Backend - CI
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
       - sprint-release
       - main
     paths:
-      - "frontend/**"
+      - "backend/**"
 
 jobs:
   linting:
