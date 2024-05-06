@@ -1,12 +1,12 @@
-name: Deploy Production Service
+name: Deploy - Test Env.
 
 on:
   push:
     branches:
-      - main
+      - sprint-release
 
 jobs:
-  publish:
+  PublishImages:
     name: Publish Docker Image
     runs-on: ubuntu-latest
 
@@ -22,18 +22,18 @@ jobs:
       - name: Logout
         run: docker logout
 
-  deploy:
-    needs: publish
-    name: Deploy Image on the Server
+  DeployTestEnv:
+    needs: PublishImages
+    name: Deploy Image in the Test Environment
     runs-on: ubuntu-latest
 
     steps:
       - name: Install SSH keys
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "${{secrets.PROD_ENV_SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa
-          ssh-keyscan -H ${{secrets.PROD_ENV_SSH_HOST}} > ~/.ssh/known_hosts
+          echo "${{secrets.TEST_ENV_SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{secrets.TEST_ENV_SSH_HOST}} > ~/.ssh/known_hosts
       - name: Connect and Pull
-        run: ssh ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}} "cd /var/lib/bie && docker compose pull && docker compose up -d && exit"
+        run: ssh ${{secrets.TEST_ENV_SSH_USER}}@${{secrets.TEST_ENV_SSH_HOST}} "cd /var/lib/bie && docker compose pull && docker compose up -d && exit"
       - name: Cleanup
         run: rm -rf ~/.ssh

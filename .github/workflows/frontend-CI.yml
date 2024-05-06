@@ -1,0 +1,32 @@
+name: Frontend - CI
+
+on:
+  pull_request:
+    branches:
+      - sprint-release
+      - main
+    paths:
+      - "frontend/**"
+
+jobs:
+  RunChecks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-
+
+      - name: Setup frontend
+        run: npm ci
+        working-directory: frontend
+
+      - name: Run linting checks
+        run: npm run lint
+        working-directory: frontend
