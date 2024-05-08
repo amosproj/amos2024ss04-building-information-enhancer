@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BEI.DataPipeline", "BEI.DataPipeline.csproj", "{D06A5038-4FC1-44AF-940A-2481C6AE846B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIE.DataPipeline", "BIE.DataPipeline.csproj", "{D06A5038-4FC1-44AF-940A-2481C6AE846B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
