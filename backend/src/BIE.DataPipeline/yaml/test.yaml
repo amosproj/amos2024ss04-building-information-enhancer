@@ -1,7 +1,7 @@
 # describe the source
 source:
   # link | filepath
-  type: link
+  type: URL
   location: https://data.bundesnetzagentur.de/Bundesnetzagentur/SharedDocs/Downloads/DE/Sachgebiete/Energie/Unternehmen_Institutionen/E_Mobilitaet/Ladesaeulenregister.csv
 options:
   # skip lines at the beginning
