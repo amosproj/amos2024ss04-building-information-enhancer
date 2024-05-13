@@ -13,17 +13,24 @@ namespace BEI.DataPipeline.Import
     {
         private string mFileName;
         private TextFieldParser parser;
-        public CsvImporter(string filepath)
+        public CsvImporter(string filePath)
         {
             //YAML Arguments:
             string delimiter = ";";
+            int headerRow = 11; //The row with the column titels
             //TODO checkPath
 
             //Setup Parser
-            parser = new TextFieldParser(filepath);
-            parser.TextFieldType = FieldType.Delimited;
-            parser.SetDelimiters(delimiter);
+            SetupParser(filePath, delimiter);
 
+            //Skip lines until header
+            SkipNlines(headerRow - 1);
+
+            //read header
+            string[] header = ReadHeader();
+            PrintRow(header);
+
+            /*
             //Test Read File
             int noLines = 10;
             int line = 0;
@@ -38,11 +45,62 @@ namespace BEI.DataPipeline.Import
                 }
                 line++;
             }
+            */
         }
 
         public async Task<ITableData> GetData()
         {
             throw new NotImplementedException();
+        }
+
+        private void SetupParser(string path, string delimiter)
+        {
+            parser = new TextFieldParser(path);
+            parser.TextFieldType = FieldType.Delimited;
+            parser.SetDelimiters(delimiter);
+        }
+
+        private void SkipNlines(int noLines)
+        {
+            for (int i = 0; i < noLines; i++)
+            {
+                //check if parser has reached end of the file
+                if (parser.EndOfData)
+                {
+                    // Handle case where file has less than 10 lines
+                    Console.WriteLine(string.Format("File has less than {0} lines", noLines));
+                    return;
+                }
+
+                parser.ReadLine(); // Read and discard line
+            }
+        }
+
+        private string[] ReadHeader()
+        {
+            //check if parser has reached end of the file
+            if (parser.EndOfData)
+            {
+                //Handel case of no data
+                throw new Exception("No header found");
+            }
+
+            return parser.ReadFields();
+        }
+
+        private void PrintRow(string[] row, string[] header = null)
+        {
+            for (int i = 0; i < row.Length; i++)
+            {
+                if (header != null)
+                {
+                    Console.WriteLine(string.Format("{0}: {1}", header[i], row[i]));
+                }
+                else
+                {
+                    Console.WriteLine(string.Format("{0}: {1}", i, row[i]));
+                }
+            }
         }
     }
 }
