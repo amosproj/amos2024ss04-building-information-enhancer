@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,14 +12,17 @@ namespace BEI.DataPipeline.Import
 {
     internal class CsvImporter : IImporter
     {
-        private string mFileName;
         private TextFieldParser parser;
+        private string[] header;
+        private Type[] columnTypes;
         public CsvImporter(string filePath)
         {
             //YAML Arguments:
+            string path = "";
             string delimiter = ";";
             int headerRow = 11; //The row with the column titels
-            //TODO checkPath
+            columnTypes = new Type[]{ typeof(string), typeof(string), typeof(string), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(float), typeof(float), typeof(string), typeof(float), typeof(string), typeof(int), typeof(string), typeof(float), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string) };
+
 
             //Setup Parser
             SetupParser(filePath, delimiter);
@@ -27,10 +31,10 @@ namespace BEI.DataPipeline.Import
             SkipNlines(headerRow - 1);
 
             //read header
-            string[] header = ReadHeader();
+            header = ReadHeader();
             PrintRow(header);
 
-            /*
+            
             //Test Read File
             int noLines = 10;
             int line = 0;
@@ -38,24 +42,71 @@ namespace BEI.DataPipeline.Import
             {
                 //Processing row
                 string[] fields = parser.ReadFields();
-                foreach (string field in fields)
-                {
-                    //TODO: Process field
-                    Console.WriteLine(string.Format("Filed {0}", field));
-                }
+                PrintRow(fields, header);
                 line++;
             }
-            */
         }
 
-        public async Task<ITableData> GetData()
+        public Dictionary<string, object> ReadLine()
         {
-            throw new NotImplementedException();
+            if (parser.EndOfData)
+            {
+                return null;
+            }
+            Dictionary<string, object> res = new Dictionary<string, object>();
+            string[] line = parser.ReadFields();
+            if(line.Length == 0)
+            {
+                Console.WriteLine("Empty");
+            }
+            else
+            {
+                for(int i = 0; i < line.Length; i++)
+                {
+                    try
+                    {
+                        res.Add(header[i], Convert.ChangeType(line[i], columnTypes[i]));
+                    }
+                    catch (System.FormatException ex)
+                    {
+                        Console.Error.WriteLine(string.Format("{3} Fauld parsing {0} to type {1} in column {2}", line[i], columnTypes[i], header[i], i));
+                    }
+                }
+            }
+
+            return res;
+        }
+
+        private bool ValidateFilePath(string path)
+        {
+            bool isLocalFile = new Uri(path).IsFile;
+            if (isLocalFile)
+            {
+                if (!File.Exists(path))
+                {
+                    throw new FileNotFoundException("The given file is not found");
+                }
+            }
+            return isLocalFile;
         }
 
         private void SetupParser(string path, string delimiter)
         {
-            parser = new TextFieldParser(path);
+            bool isLocalFile = ValidateFilePath(path);
+
+            if (isLocalFile)
+            {
+                //local path
+                parser = new TextFieldParser(path);
+            }
+            else
+            {
+                //Http path
+                WebClient client = new WebClient();
+                Stream stream = client.OpenRead(path);
+                parser = new TextFieldParser(stream);
+            }
+
             parser.TextFieldType = FieldType.Delimited;
             parser.SetDelimiters(delimiter);
         }

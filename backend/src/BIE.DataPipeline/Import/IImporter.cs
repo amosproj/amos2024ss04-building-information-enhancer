@@ -9,7 +9,6 @@ namespace BEI.DataPipeline.Import
 {
     internal interface IImporter
     {
-        // this we can implement as async
-        public Task<ITableData> GetData();
+        public Dictionary<string, object> ReadLine();
     }
 }
