@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\BIE.Core.API.props" />
+</Project>
