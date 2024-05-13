@@ -88,14 +88,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{github.ref_name}}
       - name: Install SSH keys
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
           echo "${{secrets.PROD_ENV_SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa
           ssh-keyscan -H ${{secrets.PROD_ENV_SSH_HOST}} > ~/.ssh/known_hosts
-          - name: Copy necessary files
-          run: scp ./docker-compose.yml ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}}:/var/lib/bie && scp ./.env ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}}:/var/lib/bie
+      - name: Copy necessary files
+        run: |
+          scp ./docker-compose.yml ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}}:/var/lib/bie
+          scp ./.env ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}}:/var/lib/bie
       - name: Connect and Pull
-        run: ssh ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}} "cd /var/lib/bie && docker compose pull && docker compose up -d && exit"
+        run: ssh ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}} "cd /var/lib/bie && docker compose pull && docker compose up -d --remove-orphans && exit"
       - name: Cleanup
         run: rm -rf ~/.ssh
