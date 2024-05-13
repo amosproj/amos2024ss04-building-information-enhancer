@@ -1,4 +1,5 @@
-﻿using YamlDotNet.Serialization;
+﻿using System.ComponentModel;
+using YamlDotNet.Serialization;
 
 namespace BIE.DataPipeline.Import
 {
@@ -15,7 +16,7 @@ namespace BIE.DataPipeline.Import
 
             if (!path.EndsWith(".yaml"))
             {
-                throw new FormatException(path + "is not a yaml file");
+                throw new FormatException(path + " is not a yaml file");
             }
 
             var yaml = File.ReadAllText(path);
@@ -97,6 +98,11 @@ namespace BIE.DataPipeline.Import
             /// The data type of the column.
             /// </summary>
             public string type;
+
+            /// <summary>
+            /// True if the column is nullable in the database.
+            /// </summary>
+            public bool is_nullable;
         }
     }
 

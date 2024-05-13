@@ -3,7 +3,7 @@
     "BIE.DataPipeline": {
       "commandName": "Project",
       "commandLineArgs": "test.yaml",
-      "workingDirectory": ".\\yaml"
+      "workingDirectory": "C:\\Users\\Leon\\Documents\\Uni_C\\SS24\\AMOS\\amos2024ss04-building-information-enhancer\\backend\\src\\BIE.DataPipeline\\yaml"
     }
   }
 }
