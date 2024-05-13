@@ -40,7 +40,7 @@ jobs:
       - name: Build and Publish Docker Images
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./frontend
           file: ./frontend/Dockerfile
           push: true
           tags: ${{steps.meta.outputs.tags}}
@@ -76,7 +76,7 @@ jobs:
       - name: Build and Publish Docker Images
         uses: docker/build-push-action@v5
         with:
-          context: .
+          context: ./backend/src/BIE.Core
           file: ./backend/src/BIE.Core/Dockerfile
           push: true
           tags: ${{steps.meta.outputs.tags}}
