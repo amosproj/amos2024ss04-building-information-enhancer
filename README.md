@@ -6,6 +6,11 @@
     <h1 style="padding:15px;border-bottom: 0;">Building Information Enhancer (AMOS SS 2024)</h1>
 </div>
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+![GitHub language count](https://img.shields.io/github/languages/count/amosproj/amos2024ss04-building-information-enhancer)
+![GitHub last commit](https://img.shields.io/github/last-commit/amosproj/amos2024ss04-building-information-enhancer)
+![GitHub issues](https://img.shields.io/github/issues/amosproj/amos2024ss04-building-information-enhancer)
+
 ## 📢 About the Project
 
 Welcome to the official repository for the `CODE.ING` group, developing an open-source `Building Information Enhancer` software for the `BUILD.ING` partner and the `AMOS 2024` project. Together, we create a Building information system for potential energy savings. To read about the architecture of our service visit our GitHub [wiki](https://github.com/Corgam/SS23_ADSP_TCF/wiki).
