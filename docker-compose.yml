@@ -1,17 +1,16 @@
-version: "3.8"
 services:
   # Frontend container
-  react-frontend:
+  frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: react-frontend
-    image: ghcr.io/corgam/bie-frontend
+    container_name: frontend
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-frontend
     environment:
-      - HOST=${REACT_FRONTEND_HOST}
-      - PORT=${REACT_FRONTEND_PORT}
+      - HOST=${FRONTEND_HOST}
+      - PORT=${FRONTEND_PORT}
     ports:
-      - "${REACT_FRONTEND_PORT}:${REACT_FRONTEND_PORT}"
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
 
   # Backend container
   backend:
@@ -19,7 +18,7 @@ services:
       context: ./backend/src/BIE.Core
       dockerfile: Dockerfile
     container_name: backend
-    image: ghcr.io/corgam/bie-backend
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-backend
     environment:
       - HOST=${BACKEND_HOST}
       - PORT=${BACKEND_PORT}

@@ -2,12 +2,13 @@
 FROM node:20-slim as builder
 
 # Create app work directory
-WORKDIR /app
+WORKDIR /usr/src/app
 
 ### Install dependencies ###
 
 # Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
+COPY package.json ./
+COPY package-lock.json ./
 
 # Install dependencies
 RUN npm ci
@@ -17,21 +18,19 @@ ADD . .
 
 RUN npm run build
 
-COPY . .
-
 ### Deploy the server ### 
 
-# Use Nginx as lightweight production web server
-FROM nginx:stable-alpine
+# Use Apache HTTP server
+FROM httpd:2.4
 
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /usr/src/app/dist /usr/local/apache2/htdocs/
 
 ## Environment variables
-ENV NODE_ENV production
+ENV NODE_ENV=production
 ENV PORT=80
 
 # Expose the port
 EXPOSE "${PORT}"
 
-# Start NGINX server in the background
-CMD ["nginx", "-g", "daemon off;"]
+# Start web server
+CMD ["httpd-foreground"]
