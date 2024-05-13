@@ -2,8 +2,8 @@ name: Deploy - Production Env.
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - sprint-**-release
 
 jobs:
   PublishImages:
