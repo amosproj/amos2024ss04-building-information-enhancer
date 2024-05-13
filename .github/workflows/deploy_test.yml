@@ -2,12 +2,12 @@ name: Deploy - Test Env.
 
 on:
   push:
-    branches:
-      - sprint-release
+    tags:
+      - sprint-**-release-candidate
 
 jobs:
   PublishImages:
-    name: Publish Docker Image
+    name: Publish Docker Images
     runs-on: ubuntu-latest
 
     steps:
