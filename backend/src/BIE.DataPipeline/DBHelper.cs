@@ -14,38 +14,36 @@ namespace BIE.DataPipeline
 {
     internal class DBHelper
     {
-       
+        /// <summary>
+        /// To create connection with DB
+        /// </summary>
         internal static void CreateDBConnection()
         {
-            if(Convert.ToBoolean(ConfigurationManager.AppSettings["Local_server"])==true) 
-            {
-                var dbServer = ConfigurationManager.AppSettings["DB_SERVER"];
-                var dbName = ConfigurationManager.AppSettings["DB_NAME"];
-                var dbUser = ConfigurationManager.AppSettings["DB_USERNAME"];
-                var dbPassword = ConfigurationManager.AppSettings["DB_PASSWORD"];
-                DatabaseType dbType = (DatabaseType)Enum.Parse(typeof(DatabaseType),
-                ConfigurationManager.AppSettings["DB_TYPE"]);
-                Database.Instance.SetConnectionString((DatabaseType)Enum.Parse(typeof(DatabaseType),ConfigurationManager.AppSettings["DB_TYPE"]), "Data Source="+dbServer+";Initial Catalog="+dbName+";User Id="+dbUser+";Password="+dbPassword+ ";TrustServerCertificate=True;");
-            }
-            else
-            {
-                ConfigureEnviornmentVaraiables();
-            }
+           ConfigureEnviornmentVaraiables();
         }
+        /// <summary>
+        /// To create table in DB
+        /// </summary>
+        /// <param name="description"></param>
         internal static void CreateTable(DataSourceDescription description)
         {
             var db = Database.Instance;
-            string query = "CREATE TABLE "+description.table_name;
+            string query = "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'EV_charging_stations')\r\nBEGIN CREATE TABLE " + description.table_name;
             query += " (";
             foreach ( var column in description.table_cols)
             {
                 query += " " + column.name +" " + column.type + ", ";
             }
-            query += ");";
+            query += "); END";
             DbCommand cmd = db.CreateCommand(query);
             db.Execute(cmd);
         }
-
+        /// <summary>
+        /// To insert data into DB
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="columnNames"></param>
+        /// <param name="values"></param>
         internal static void InsertData(string tableName, string columnNames ,string values)
         {
             var db = Database.Instance;
@@ -53,7 +51,9 @@ namespace BIE.DataPipeline
             DbCommand cmd = db.CreateCommand(query);
             db.Execute(cmd);
         }
-
+        /// <summary>
+        /// To set enviornment variables
+        /// </summary>
         private static void ConfigureEnviornmentVaraiables()
         {
             var dbServer = Environment.GetEnvironmentVariable("DB_SERVER");
