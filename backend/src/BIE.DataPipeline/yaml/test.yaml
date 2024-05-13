@@ -16,5 +16,4 @@ table_cols:
     type: string
   - name: Bundesland
     name_in_table: state
-    type: string
 
