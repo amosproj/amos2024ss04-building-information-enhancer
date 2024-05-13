@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using YamlDotNet.Serialization;
+﻿using YamlDotNet.Serialization;
 
 namespace BIE.DataPipeline.Import
 {
-    internal class YamlImporter
+    internal static class YamlImporter
     {
         public static DataSourceDescription GetSourceDescription(string path)
         {
@@ -49,6 +44,11 @@ namespace BIE.DataPipeline.Import
         /// The name of the database table associated with the data source.
         /// </summary>
         public string table_name;
+
+        /// <summary>
+        /// the delimiter used in the csv datasource.
+        /// </summary>
+        public char delimiter;
 
         /// <summary>
         /// The relevant columns that should be imported from the datasource.

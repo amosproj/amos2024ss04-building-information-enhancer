@@ -9,6 +9,7 @@ options:
   # discard any rows that have null values
   discard_null_rows: false
 table_name: EV_charging_stations
+delimiter: ";"
 table_cols:
   - name: Betreiber
     name_in_table: operator
