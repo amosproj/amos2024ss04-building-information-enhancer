@@ -16,31 +16,31 @@ namespace Parbat.Core.Services
 
         public void Create(Infrastructure service)
         {
-            _factory.BatchRepository.Add(service);
+            _factory.InfrastructureRepository.Add(service);
         }
 
         public void Delete(long id)
         {
-            var found = _factory.BatchRepository.GetById(id);
+            var found = _factory.InfrastructureRepository.GetById(id);
 
             if (found == null)
             {
                 throw new ServiceException(Errors.NotExistsError);
             }
 
-            _factory.BatchRepository.Delete(found);
+            _factory.InfrastructureRepository.Delete(found);
         }
 
         public Infrastructure FindByID(long id)
         {
-            var found = _factory.BatchRepository.GetById(id);
+            var found = _factory.InfrastructureRepository.GetById(id);
 
             return found;
         }
 
         public IEnumerable<Infrastructure> GetAll()
         {
-            return _factory.BatchRepository.GetAll();
+            return _factory.InfrastructureRepository.GetAll();
         }
 
         public void Update(Infrastructure service)
@@ -50,14 +50,14 @@ namespace Parbat.Core.Services
                 throw new ServiceException(Errors.NotExistsError);
             }
 
-            var found = _factory.BatchRepository.GetById(service.InfrastructureID.Value);
+            var found = _factory.InfrastructureRepository.GetById(service.InfrastructureID.Value);
 
             if (found == null)
             {
                 throw new ServiceException(Errors.NotExistsError);
             }
 
-            _factory.BatchRepository.Update(service);
+            _factory.InfrastructureRepository.Update(service);
         }
     }
 }

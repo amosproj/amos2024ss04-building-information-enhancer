@@ -86,7 +86,7 @@ namespace BIE.Core.API
         private static void InjectInstances(IServiceCollection services)
         {
             // Repository Factor
-            services.AddTransient<IRepositoryFactory, DBRepositoryFactroy>();
+            services.AddTransient<IRepositoryFactory, DBRepositoryFactory>();
             //services.AddTransient<CourseService>();
 
 
