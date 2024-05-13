@@ -15,6 +15,8 @@ const TestAreaLn: React.FC = ({}) => {
 
   const [favorites, setFavorites] = useState<string[]>(["Hans", "Kunibert"]);
   const [options, setOptions] = useState<string[]>([
+    "Hans",
+    "Kunibert",
     "Hansiii",
     "Kunibertaaaa",
     "Alfred",
