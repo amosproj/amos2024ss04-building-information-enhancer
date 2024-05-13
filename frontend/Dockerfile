@@ -25,7 +25,7 @@ COPY . .
 # Use Nginx as lightweight production web server
 FROM nginx:stable-alpine
 
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
 
 ## Environment variables
 ENV NODE_ENV production
