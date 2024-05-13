@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "BIE.DataPipeline": {
+      "commandName": "Project",
+      "commandLineArgs": "test.yaml",
+      "workingDirectory": ".\\yaml"
+    }
+  }
+}
