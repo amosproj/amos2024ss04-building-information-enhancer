@@ -35,7 +35,7 @@ To deploy one or more services of the system separately, follow the instructions
 1. Clone this repository (https://github.com/amosproj/amos2024ss04-building-information-enhancer).
 2. Before deploying the project be sure you have installed the [Node.js](https://nodejs.org/en) ( >= 20.12.2) and a running [Docker Deamon](https://docs.docker.com/engine/install/).
 3. Run the `npm run setup` command to install all necessary packages.
-4. To deploy the frontend use the `npm run deploy:dev:frontend` command, or to deploy the backend use the `npm run deploy:dev:backend` command.
+4. To deploy the developement frontend server use the `npm run deploy:dev:frontend` command, or if you want to develop the backend go to the `backend/src/BIE.Core` folder and open the `BIE.Core.sln` file using Visual Studio IDE.
 
 ## 👥 The Team
 
