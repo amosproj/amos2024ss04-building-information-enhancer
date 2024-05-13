@@ -11,7 +11,7 @@ env:
 
 jobs:
   build-and-push-frontend:
-    name: Builds and publishes the Frontend image
+    name: Build and publish the Frontend image
     runs-on: ubuntu-latest
 
     steps:
@@ -47,7 +47,7 @@ jobs:
           labels: ${{steps.meta.outputs.labels}}
 
   build-and-push-backend:
-    name: Builds and publishes the Backend image
+    name: Build and publish the Backend image
     runs-on: ubuntu-latest
 
     steps:
@@ -77,7 +77,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./backend/Dockerfile
+          file: ./backend/src/BIE.Core/Dockerfile
           push: true
           tags: ${{steps.meta.outputs.tags}}
           labels: ${{steps.meta.outputs.labels}}

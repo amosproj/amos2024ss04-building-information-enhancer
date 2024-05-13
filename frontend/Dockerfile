@@ -2,12 +2,13 @@
 FROM node:20-slim as builder
 
 # Create app work directory
-WORKDIR /app
+WORKDIR /usr/src/app
 
 ### Install dependencies ###
 
 # Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
+COPY package.json ./
+COPY package-lock.json ./
 
 # Install dependencies
 RUN npm ci
