@@ -92,7 +92,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{github.ref_name}}
-      - name: Install SSH keysf
+      - name: Install SSH key
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
           echo "${{secrets.TEST_ENV_SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa
