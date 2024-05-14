@@ -2,7 +2,7 @@
 {
     public interface IRepositoryFactory
     {
-        IInfrastructureRepository BatchRepository { get; }
+        IInfrastructureRepository InfrastructureRepository { get; }
 
     }
 }
