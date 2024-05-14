@@ -16,13 +16,18 @@ import {
 } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
 
+interface FavorableItem {
+  id: string; // Unique identifier for the item
+  displayValue: string; // Display value shown in the list
+}
+
 interface SearchWithFavoritesDlgProps {
   openDialog: boolean;
   onClose: () => void;
   title: string;
-  favorites: string[];
-  setFavorites: Dispatch<SetStateAction<string[]>>;
-  options: string[];
+  favorites: FavorableItem[];
+  setFavorites: Dispatch<SetStateAction<FavorableItem[]>>;
+  options: FavorableItem[];
   onCurrentSearchChanged: (currentSearch: string) => void;
 }
 
@@ -37,12 +42,15 @@ const SearchWithFavoritesDlg: React.FC<SearchWithFavoritesDlgProps> = ({
 }) => {
   const [searchText, setSearchText] = useState("");
 
-  const filterBySearchtxt = (txt: string) => {
-    return txt.includes(searchText);
+  const filterBySearchText = (item: FavorableItem) => {
+    return item.displayValue.toLowerCase().includes(searchText.toLowerCase());
   };
 
-  const filterBySearchtxtAndIfInFavorites = (txt: string) => {
-    return txt.includes(searchText) && !favorites.includes(txt);
+  const filterBySearchtxtAndIfInFavorites = (item: FavorableItem) => {
+    return (
+      item.displayValue.toLowerCase().includes(searchText.toLowerCase()) &&
+      !favorites.some((fav) => fav.id === item.id)
+    );
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,12 +58,16 @@ const SearchWithFavoritesDlg: React.FC<SearchWithFavoritesDlgProps> = ({
     onCurrentSearchChanged(e.target.value);
   };
 
-  const addToFavorite = (txt: string) => {
-    if (!favorites.includes(txt)) setFavorites([...favorites, txt]);
+  const addToFavorite = (item: FavorableItem) => {
+    if (!favorites.some((fav) => fav.id === item.id)) {
+      setFavorites([...favorites, item]);
+    }
   };
 
-  const removeFromFavorite = (itemToRemove: string) => {
-    const updatedFavorites = favorites.filter((item) => item !== itemToRemove);
+  const removeFromFavorite = (itemToRemove: FavorableItem) => {
+    const updatedFavorites = favorites.filter(
+      (item) => item.id !== itemToRemove.id
+    );
     setFavorites(updatedFavorites);
   };
 
@@ -84,7 +96,7 @@ const SearchWithFavoritesDlg: React.FC<SearchWithFavoritesDlgProps> = ({
           fullWidth
         />
         <List dense={false}>
-          {favorites.filter(filterBySearchtxt).map((item, index) => (
+          {favorites.filter(filterBySearchText).map((item, index) => (
             <ListItem
               key={index}
               secondaryAction={
@@ -99,7 +111,17 @@ const SearchWithFavoritesDlg: React.FC<SearchWithFavoritesDlgProps> = ({
               disablePadding
             >
               <ListItemButton key={index}>
-                <ListItemText primary={item} />
+                <ListItemText
+                  primary={item.displayValue}
+                  sx={{
+                    "& .MuiDialog-container": {
+                      "& .MuiPaper-root": {
+                        width: "100%",
+                        maxWidth: "500px", // Set your width here
+                      },
+                    },
+                  }}
+                />
               </ListItemButton>
             </ListItem>
           ))}
@@ -123,7 +145,17 @@ const SearchWithFavoritesDlg: React.FC<SearchWithFavoritesDlgProps> = ({
                 disablePadding
               >
                 <ListItemButton key={index}>
-                  <ListItemText primary={item} />
+                  <ListItemText
+                    primary={item.displayValue}
+                    sx={{
+                      "& .MuiDialog-container": {
+                        "& .MuiPaper-root": {
+                          width: "100%",
+                          maxWidth: "500px", // Set your width here
+                        },
+                      },
+                    }}
+                  />
                 </ListItemButton>
               </ListItem>
             ))}
