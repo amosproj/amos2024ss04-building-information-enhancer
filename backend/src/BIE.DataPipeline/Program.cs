@@ -5,8 +5,8 @@ using BIE.DataPipeline.Import;
 
 
 Console.WriteLine("Hello, World!");
+DataSourceDescription description = YamlImporter.GetSourceDescription(args[0]);
 /*
-var description = YamlImporter.GetSourceDescription(args[0]);
 
 DBHelper.CreateDBConnection();
 DBHelper.CreateTable(description);
@@ -18,7 +18,8 @@ Console.WriteLine(description.table_cols[0].type);
 Console.ReadKey();
 */
 
-CsvImporter csvImporter = new CsvImporter(@"C:\Users\nicol\Desktop\uni\M3\AMOS\Datasources\Ladesaeulenregister.csv");
+CsvImporter csvImporter = new CsvImporter(description);
+//CsvImporter csvImporter = new CsvImporter(@"C:\Users\nicol\Desktop\uni\M3\AMOS\Datasources\Ladesaeulenregister.csv");
 //CsvImporter csvImporter = new CsvImporter(@"https://data.bundesnetzagentur.de/Bundesnetzagentur/SharedDocs/Downloads/DE/Sachgebiete/Energie/Unternehmen_Institutionen/E_Mobilitaet/Ladesaeulenregister.csv");
 Console.WriteLine(csvImporter.GetHeaderString());
 string line = "";

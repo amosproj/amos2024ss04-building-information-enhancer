@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection.PortableExecutable;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BIE.DataPipeline.Data;
 using Microsoft.VisualBasic.FileIO;
@@ -14,22 +15,21 @@ namespace BIE.DataPipeline.Import
     {
         private TextFieldParser parser;
         private string[] header;
+        private DataSourceDescription dataSourceDescription;
         private Type[] columnTypes;
         private string tableName;
-        public CsvImporter(string filePath)
+        public CsvImporter(DataSourceDescription dataSourceDescription)
         {
             //YAML Arguments:
-            string path = "";
-            string delimiter = ";";
-            int headerRow = 11; //The row with the column titels
+            this.dataSourceDescription = dataSourceDescription;
+            //columnTypes = ParseColumnTypes();
             columnTypes = new Type[] { typeof(string), typeof(string), typeof(string), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(float), typeof(float), typeof(string), typeof(float), typeof(string), typeof(int), typeof(string), typeof(float), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string) };
-            this.tableName = "testTable";
 
             //Setup Parser
-            SetupParser(filePath, delimiter);
+            SetupParser();
 
             //Skip lines until header
-            SkipNlines(headerRow - 1);
+            SkipNlines(dataSourceDescription.options.skip_lines);
 
             //read header
             header = ReadHeader();
@@ -39,7 +39,7 @@ namespace BIE.DataPipeline.Import
         //tablename = name
         public string GetTableName()
         {
-            return this.tableName;
+            return this.dataSourceDescription.table_name;
         }
 
         public string GetHeaderString()
@@ -95,39 +95,86 @@ namespace BIE.DataPipeline.Import
 
             return true;
         }
-
-        private bool ValidateFilePath(string path)
+        
+        private Type[] ParseColumnTypes()
         {
-            bool isLocalFile = new Uri(path).IsFile;
-            if (isLocalFile)
+            Type[] res = new Type[dataSourceDescription.table_cols.Count];
+            for(int i = 0; i < dataSourceDescription.table_cols.Count; i++)
             {
-                if (!File.Exists(path))
-                {
-                    throw new FileNotFoundException("The given file is not found");
-                }
+                res[i] = SQLTypeToCSharpType(dataSourceDescription.table_cols[i].type);
             }
-            return isLocalFile;
+
+            return res;
         }
 
-        private void SetupParser(string path, string delimiter)
+        private static Type SQLTypeToCSharpType(string sqlType)
         {
-            bool isLocalFile = ValidateFilePath(path);
+            string shortType = RemoveLastBrackets(sqlType); //Makes VARCHAR(50) -> VARCHAR
+            Console.WriteLine(string.Format("shorten {0} to {1}", sqlType, shortType));
+            switch (shortType)
+            {
+                case "VARCHAR":
+                    return typeof(string);
+                case "BOOL":
+                    return typeof(bool);
+                case "BOOLEAN":
+                    return typeof(bool);
+                case "INT":
+                    return typeof(int);
+                case "INTEGER":
+                    return typeof(int);
+                case "FLOAT":
+                    return typeof(float);
+                case "DOUBLE":
+                    return typeof(double);
+                default:
+                    throw new NotSupportedException(string.Format("The type {0} is currently not supporteted.", shortType));
+            }
+        }
 
-            if (isLocalFile)
+        private static string RemoveLastBrackets(string s)
+        {
+            int lastOpeningParenthesisIndex = s.LastIndexOf('(');
+            if (lastOpeningParenthesisIndex != -1)
+            {
+                return s.Substring(0, lastOpeningParenthesisIndex);
+            }
+            else
+            {
+                return s; // No opening parenthesis found, return original string
+            }
+        }
+
+        private void SetupParser()
+        {
+            ValidateFilePath(dataSourceDescription.source);
+
+            if (dataSourceDescription.source.type.Equals("filepath"))
             {
                 //local path
-                parser = new TextFieldParser(path);
+                parser = new TextFieldParser(dataSourceDescription.source.location);
             }
             else
             {
                 //Http path
                 WebClient client = new WebClient();
-                Stream stream = client.OpenRead(path);
+                Stream stream = client.OpenRead(dataSourceDescription.source.location);
                 parser = new TextFieldParser(stream);
             }
 
             parser.TextFieldType = FieldType.Delimited;
-            parser.SetDelimiters(delimiter);
+            parser.SetDelimiters(dataSourceDescription.delimiter.ToString());
+        }
+
+        private void ValidateFilePath(DataSourceDescription.DataSourceLocation sourceLocation)
+        {
+            if (sourceLocation.type.Equals("filepath"))
+            {
+                if (!File.Exists(sourceLocation.location))
+                {
+                    throw new FileNotFoundException("The given file is not found");
+                }
+            }
         }
 
         private void SkipNlines(int noLines)

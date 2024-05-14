@@ -5,7 +5,7 @@ source:
   location: https://data.bundesnetzagentur.de/Bundesnetzagentur/SharedDocs/Downloads/DE/Sachgebiete/Energie/Unternehmen_Institutionen/E_Mobilitaet/Ladesaeulenregister.csv
 options:
   # skip lines at the beginning
-  skip_lines: 0
+  skip_lines: 10
   # discard any rows that have null values
   discard_null_rows: false
 table_name: EV_charging_stations
