@@ -8,6 +8,8 @@ import MultiMap from "./components/multimap/multimap";
 import Button from "@mui/material/Button";
 import DataBox from "./components/DataView/DataBox";
 import Dataview from "./components/DataViewOld/dataview";
+import TestAreaLn from "./TestAreaLn";
+
 import { useState } from "react";
 
 function App() {
@@ -53,7 +55,7 @@ function App() {
         </div>
       )}
       {currentComp === 2 && <DataBox />}
-      {currentComp === 3 && <DataBox />}
+      {currentComp === 3 && <TestAreaLn />}
     </div>
   );
 }
