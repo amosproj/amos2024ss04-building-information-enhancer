@@ -13,9 +13,11 @@
     <None Remove="BIE.Data\**" />
   </ItemGroup>
 
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="3.1.5" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
+    <PackageReference Include="MySql.Data" Version="8.0.23" />
+    <PackageReference Include="System.Data.OracleClient" Version="1.0.8" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,9 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="BIE.Data">
-      <HintPath>BIE.Data\bin\Debug\net6.0\BIE.Data.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="BIE.Data\BIE.Data.csproj" />
   </ItemGroup>
 
 </Project>
