@@ -5,6 +5,8 @@ VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIE.DataPipeline", "BIE.DataPipeline.csproj", "{D06A5038-4FC1-44AF-940A-2481C6AE846B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIE.Data", "BIE.Data\BIE.Data.csproj", "{B0EB8B59-C3A5-40B3-BBF4-FD93CC248F4D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{D06A5038-4FC1-44AF-940A-2481C6AE846B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D06A5038-4FC1-44AF-940A-2481C6AE846B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D06A5038-4FC1-44AF-940A-2481C6AE846B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0EB8B59-C3A5-40B3-BBF4-FD93CC248F4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0EB8B59-C3A5-40B3-BBF4-FD93CC248F4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0EB8B59-C3A5-40B3-BBF4-FD93CC248F4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0EB8B59-C3A5-40B3-BBF4-FD93CC248F4D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
