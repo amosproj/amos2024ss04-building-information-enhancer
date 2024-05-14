@@ -16,15 +16,15 @@
   ! If you use this component you have to pass a unique ID to it. This is needed so the filterbar is assigned to the correct Data Grid
 */
 
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { styled } from '@mui/material/styles';
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import { styled } from "@mui/material/styles";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import FilterBar from "./FilterBar";
 import MapIcon from "@mui/icons-material/Map";
-import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
+import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
 
 // Black design for tooltip of the map icon
 const BootstrapTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -39,20 +39,20 @@ const BootstrapTooltip = styled(({ className, ...props }: TooltipProps) => (
 }));
 
 // Returns a button if the "button" value is set to 1
-const renderDetailsButton = (params: any) => {
+const renderDetailsButton = (params: GridRenderCellParams) => {
   const value = params.value;
   if (value === 1) {
     return (
       <strong>
         <BootstrapTooltip title="Open as Map">
-        <IconButton color="secondary" aria-label="open as map" size="small">
-          <MapIcon />
-        </IconButton>
+          <IconButton color="secondary" aria-label="open as map" size="small">
+            <MapIcon />
+          </IconButton>
         </BootstrapTooltip>
       </strong>
     );
   } else {
-    return null; 
+    return null;
   }
 };
 
@@ -68,26 +68,26 @@ const columns: GridColDef[] = [
   { field: "value", headerName: "value", type: "number", width: 150 },
 ];
 
-// Data 
+// Data
 const rows = [
   { id: 1, key: "sun hours", value: "20.5", button: 0 },
   { id: 2, key: "height", value: "100", button: 1 },
   { id: 3, key: "distance to X", value: "200" },
   { id: 4, key: "sun hours", value: "21.5" },
-  { id: 5, key: "height", value: "300" , button: 1},
+  { id: 5, key: "height", value: "300", button: 1 },
   { id: 6, key: "distance to X", value: "400" },
   { id: 7, key: "sun hours", value: "20.5", button: 0 },
   { id: 8, key: "height", value: "100", button: 1 },
-  { id: 9, key: "distance to X", value: "200" , button: 1},
+  { id: 9, key: "distance to X", value: "200", button: 1 },
   { id: 10, key: "sun hours", value: "21.5" },
   { id: 11, key: "height", value: "300" },
   { id: 12, key: "distance to X", value: "400" },
-  { id: 13, key: "sun hours", value: "20.5",  button: 1},
+  { id: 13, key: "sun hours", value: "20.5", button: 1 },
   { id: 14, key: "height", value: "100", button: 1 },
-  { id: 15, key: "distance to X", value: "200" , button: 1},
+  { id: 15, key: "distance to X", value: "200", button: 1 },
   { id: 16, key: "sun hours", value: "21.5" },
   { id: 17, key: "height", value: "300" },
-  { id: 18, key: "distance to X", value: "400" , button: 1},
+  { id: 18, key: "distance to X", value: "400", button: 1 },
   { id: 19, key: "sun hours", value: "20.5", button: 0 },
   { id: 20, key: "height", value: "100", button: 1 },
   { id: 21, key: "distance to X", value: "200" },
@@ -102,7 +102,9 @@ function KeyValuesList({ filterPanelId }: { filterPanelId: number }) {
   const filterPanelIdString = `filter-panel-${filterPanelId}`;
   return (
     <>
-      <Typography align="left" variant="h6" gutterBottom>KeyValuesList</Typography>
+      <Typography align="left" variant="h6" gutterBottom>
+        KeyValuesList
+      </Typography>
       <Grid container spacing={2}>
         <Grid item>
           <Box id={filterPanelIdString} />
@@ -114,7 +116,9 @@ function KeyValuesList({ filterPanelId }: { filterPanelId: number }) {
             rows={rows}
             columns={columns}
             slots={{
-              toolbar: (slotProps) => <FilterBar {...slotProps} filterPanelId={filterPanelId} />, // Pass props here
+              toolbar: (slotProps) => (
+                <FilterBar {...slotProps} filterPanelId={filterPanelId} />
+              ), // Pass props here
             }}
             slotProps={{
               toolbar: {
