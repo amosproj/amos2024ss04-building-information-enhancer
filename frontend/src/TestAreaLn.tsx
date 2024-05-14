@@ -23,7 +23,7 @@ const TestAreaLn: React.FC = ({}) => {
     { id: "1", displayValue: "Nuremberg" },
     { id: "2", displayValue: "Munich" },
   ]);
-  const [options, setOptions] = useState<OptionItem[]>([
+  const [options] = useState<OptionItem[]>([
     { id: "1", displayValue: "Nuremberg" },
     { id: "2", displayValue: "Munich" },
     {

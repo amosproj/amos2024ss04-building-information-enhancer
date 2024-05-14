@@ -1,36 +1,14 @@
-import { SetStateAction, useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { MapContainer } from "react-leaflet/MapContainer";
 import { Marker } from "react-leaflet/Marker";
 import { Popup } from "react-leaflet/Popup";
 import { TileLayer } from "react-leaflet/TileLayer";
 import "leaflet/dist/leaflet.css";
 import { useMap, useMapEvents } from "react-leaflet/hooks";
-import L, { LatLng, LatLngExpression, LatLngTuple } from "leaflet";
+import L, { LatLng } from "leaflet";
 import Button from "@mui/material/Button";
-import { createControlComponent } from "@react-leaflet/core";
-import { Control, DomUtil } from "leaflet";
-
-function TestLocationMarker() {
-  const [position, setPosition] = useState<LatLngExpression>([51.505, -0.09]);
-  const map = useMapEvents({
-    click() {
-      map.locate();
-    },
-    locationfound(e) {
-      setPosition(e.latlng);
-      map.flyTo(e.latlng, map.getZoom());
-    },
-  });
-
-  return position === null ? null : (
-    <Marker position={position}>
-      <Popup>You are here</Popup>
-    </Marker>
-  );
-}
 
 const MapView: React.FC = ({}) => {
-  const [map, setMap] = useState(null);
   const center: LatLng = L.latLng([49.5732, 11.0288]); // Initial center coordinates
   const [markerPosition, setMarkerPosition] = useState<LatLng>(center);
 
