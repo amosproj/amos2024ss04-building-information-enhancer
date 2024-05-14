@@ -3,6 +3,10 @@ workdir /app
 
 expose 445
 
+USER root
+
+RUN apt-get update && apt-get install -y dos2unix
+
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 workdir /app
 
@@ -16,4 +20,6 @@ from base as final
 workdir /app
 copy --from=build /app .
 
-entrypoint ["dotnet","BIE.DataPipeline.dll"]
+RUN dos2unix entrypoint.sh
+
+ENTRYPOINT ["/bin/bash","entrypoint.sh"]
