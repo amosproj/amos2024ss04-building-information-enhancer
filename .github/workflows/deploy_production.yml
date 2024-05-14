@@ -1,39 +1,107 @@
-name: Deploy - Production Env.
+name: Publish and deploy - Production Env.
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - sprint-**-release
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: amosproj/amos2024ss04-building-information-enhancer
 
 jobs:
-  PublishImages:
-    name: Publish Docker Images
+  build-and-push-frontend:
+    name: Build and publish the Frontend image
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Login
-        run: |
-          echo ${{secrets.PAT}} | docker login ghcr.io -u ${{github.actor}} --password-stdin
-      - name: Build and Publish
-        run: |
-          docker compose build --pull
-          docker-compose push
-      - name: Logout
-        run: docker logout
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{github.ref_name}}
 
-  DeployProductionEnv:
-    needs: PublishImages
+      - name: Log in to the container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{env.REGISTRY}}
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend
+          tags: |
+            type=ref,event=tag
+            type=sha
+            latest
+
+      - name: Build and Publish Docker Images
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: ${{steps.meta.outputs.tags}}
+          labels: ${{steps.meta.outputs.labels}}
+
+  build-and-push-backend:
+    name: Build and publish the Backend image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{github.ref_name}}
+
+      - name: Log in to the container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{env.REGISTRY}}
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend
+          tags: |
+            type=ref,event=tag
+            type=sha
+            latest
+
+      - name: Build and Publish Docker Images
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/src/BIE.Core
+          file: ./backend/src/BIE.Core/Dockerfile
+          push: true
+          tags: ${{steps.meta.outputs.tags}}
+          labels: ${{steps.meta.outputs.labels}}
+
+  deploy-prod-env:
+    needs: [build-and-push-frontend, build-and-push-backend]
     name: Deploy Image in the Production Environment
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install SSH keys
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{github.ref_name}}
+      - name: Install SSH key
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
           echo "${{secrets.PROD_ENV_SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa
           ssh-keyscan -H ${{secrets.PROD_ENV_SSH_HOST}} > ~/.ssh/known_hosts
+      - name: Copy necessary files
+        run: |
+          scp ./docker-compose.yml ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}}:/var/lib/bie
+          scp ./.env ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}}:/var/lib/bie
       - name: Connect and Pull
-        run: ssh ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}} "cd /var/lib/bie && docker compose pull && docker compose up -d && exit"
+        run: ssh ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}} "cd /var/lib/bie && docker compose pull && docker compose up -d --remove-orphans && exit"
       - name: Cleanup
         run: rm -rf ~/.ssh
