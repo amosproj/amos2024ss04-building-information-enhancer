@@ -1,6 +1,7 @@
 .multimap-container {
   height: 100%;
   width: 50%;
+  max-width: 50%;
   display: flex;
   flex-direction: column;
 }
@@ -8,22 +9,27 @@
 .tab-list-container {
   display: flex;
   justify-content: space-between;
+  transform: translateY(1px);
 }
 
 .tab {
   border: 1px solid gray;
   height: 100%;
-  z-index: -3;
 }
 
 .add-tab-button {
   background-color: white;
   border-color: black;
   color: black;
-  padding: 0rem 0.4rem;
+  padding: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   margin: 0.4rem;
+  min-width: 2rem;
+  min-height: 2rem;
+  width: 2rem;
+  height: 2rem;
 }
 
 .add-tab-button:hover {
@@ -40,24 +46,24 @@
 }
 
 .MuiTab-root {
-  border-top: 1px solid gray !important;
-  border-left: 1px solid gray !important;
-  border-right: 1px solid gray !important;
+  border: 1px solid gray !important;
+  background-color: white !important;
   text-transform: none !important;
-  position: relative !important;
+}
+
+.MuiTab-root:hover {
+  background-color: rgb(245, 245, 245) !important;
+  transition: all 0.2s ease-in-out;
 }
 
 .Mui-selected {
   border-color: black !important;
   color: black !important;
-  position: relative !important;
-  box-shadow: 0px -2px 0px 0px white inset !important;
-  z-index: 10;
+  border-bottom: none !important;
 }
 
-.MuiTab-root:hover {
-  background-color: rgb(245, 245, 245);
-  transition: all 0.2s ease-in-out;
+.Mui-selected:hover {
+  background-color: white !important;
 }
 
 .Mui-selected:focus {
