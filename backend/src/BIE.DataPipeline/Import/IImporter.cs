@@ -9,6 +9,6 @@ namespace BEI.DataPipeline.Import
 {
     internal interface IImporter
     {
-        public Dictionary<string, object> ReadLine();
+        public bool ReadLine(out string nextLine);
     }
 }

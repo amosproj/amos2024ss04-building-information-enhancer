@@ -15,14 +15,15 @@ namespace BEI.DataPipeline.Import
         private TextFieldParser parser;
         private string[] header;
         private Type[] columnTypes;
+        private string tableName;
         public CsvImporter(string filePath)
         {
             //YAML Arguments:
             string path = "";
             string delimiter = ";";
             int headerRow = 11; //The row with the column titels
-            columnTypes = new Type[]{ typeof(string), typeof(string), typeof(string), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(float), typeof(float), typeof(string), typeof(float), typeof(string), typeof(int), typeof(string), typeof(float), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string) };
-
+            columnTypes = new Type[] { typeof(string), typeof(string), typeof(string), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(float), typeof(float), typeof(string), typeof(float), typeof(string), typeof(int), typeof(string), typeof(float), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string) };
+            this.tableName = "testTable";
 
             //Setup Parser
             SetupParser(filePath, delimiter);
@@ -33,30 +34,40 @@ namespace BEI.DataPipeline.Import
             //read header
             header = ReadHeader();
             PrintRow(header);
-
-            
-            //Test Read File
-            int noLines = 10;
-            int line = 0;
-            while (!parser.EndOfData && line < noLines)
-            {
-                //Processing row
-                string[] fields = parser.ReadFields();
-                PrintRow(fields, header);
-                line++;
-            }
         }
 
-        public Dictionary<string, object> ReadLine()
+        //tablename = name
+        public string GetTableName()
         {
+            return this.tableName;
+        }
+
+        public string GetHeaderString()
+        {
+            string res = "";
+            foreach(string field in header)
+            {
+                res += field + ",";
+            }
+
+            //remove last ,
+            res.Remove(res.Length - 1);
+            return res;
+        }
+
+        //column = col1,col2
+        //string = 'name',1,'string2';
+        public bool ReadLine(out string nextLine)
+        {
+            nextLine = "";
             if (parser.EndOfData)
             {
-                return null;
+                return false;
             }
-            Dictionary<string, object> res = new Dictionary<string, object>();
             string[] line = parser.ReadFields();
             if(line.Length == 0)
             {
+                //TODO what to do with empty lines
                 Console.WriteLine("Empty");
             }
             else
@@ -65,16 +76,24 @@ namespace BEI.DataPipeline.Import
                 {
                     try
                     {
-                        res.Add(header[i], Convert.ChangeType(line[i], columnTypes[i]));
+                        if (columnTypes[i] == typeof(string))
+                        {
+                            nextLine += string.Format("'{0}',", line[i]);
+                        }
+                        else
+                        {
+                            nextLine += string.Format("{0},", Convert.ChangeType(line[i], columnTypes[i]));
+                        }
                     }
                     catch (System.FormatException ex)
                     {
                         Console.Error.WriteLine(string.Format("{3} Fauld parsing {0} to type {1} in column {2}", line[i], columnTypes[i], header[i], i));
+                        return false;
                     }
                 }
             }
 
-            return res;
+            return true;
         }
 
         private bool ValidateFilePath(string path)
