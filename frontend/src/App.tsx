@@ -1,6 +1,7 @@
 import "./App.css";
 import Dataview from "./components/dataview/dataview";
 import MultiMap from "./components/multimap/multimap";
+import Button from "@mui/material/Button";
 
 function App() {
   return (
@@ -10,7 +11,10 @@ function App() {
       </div>
       <div className="content-container">
         <MultiMap></MultiMap>
-        <Dataview></Dataview>
+        <div className="dataview-container">
+          <Dataview></Dataview>
+          <Button variant="outlined">Load data</Button>
+        </div>
       </div>
     </div>
   );
