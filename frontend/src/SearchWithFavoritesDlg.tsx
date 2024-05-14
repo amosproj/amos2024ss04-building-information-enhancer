@@ -29,6 +29,7 @@ interface SearchWithFavoritesDlgProps {
   setFavorites: Dispatch<SetStateAction<FavorableItem[]>>;
   options: FavorableItem[];
   onCurrentSearchChanged: (currentSearch: string) => void;
+  onItemSelected: (selection: FavorableItem) => void;
 }
 
 const SearchWithFavoritesDlg: React.FC<SearchWithFavoritesDlgProps> = ({
@@ -39,6 +40,7 @@ const SearchWithFavoritesDlg: React.FC<SearchWithFavoritesDlgProps> = ({
   setFavorites,
   options,
   onCurrentSearchChanged,
+  onItemSelected,
 }) => {
   const [searchText, setSearchText] = useState("");
 
@@ -110,7 +112,7 @@ const SearchWithFavoritesDlg: React.FC<SearchWithFavoritesDlgProps> = ({
               }
               disablePadding
             >
-              <ListItemButton key={index}>
+              <ListItemButton key={index} onClick={() => onItemSelected(item)}>
                 <ListItemText
                   primary={item.displayValue}
                   sx={{
@@ -144,7 +146,10 @@ const SearchWithFavoritesDlg: React.FC<SearchWithFavoritesDlgProps> = ({
                 }
                 disablePadding
               >
-                <ListItemButton key={index}>
+                <ListItemButton
+                  key={index}
+                  onClick={() => onItemSelected(item)}
+                >
                   <ListItemText
                     primary={item.displayValue}
                     sx={{

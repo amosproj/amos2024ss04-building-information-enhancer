@@ -44,13 +44,19 @@ const TestAreaLn: React.FC = ({}) => {
         Open Dialog
       </Button>
       <SearchWithFavoritesDlg
-        title="Search names"
+        title="Locations"
         favorites={favorites}
         setFavorites={setFavorites}
         onClose={handleCloseDialog}
         openDialog={openDialog}
         onCurrentSearchChanged={onCurrentSearchChanged}
         options={options}
+        onItemSelected={(item) => {
+          handleCloseDialog();
+          setTimeout(() => {
+            alert(item.displayValue);
+          }, 400);
+        }}
       ></SearchWithFavoritesDlg>
       <MapView />
     </div>
