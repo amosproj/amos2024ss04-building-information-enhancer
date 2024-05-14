@@ -7,7 +7,7 @@ import "./App.css";
 import MultiMap from "./components/multimap/multimap";
 import Button from "@mui/material/Button";
 import DataBox from "./components/DataView/DataBox";
-import Dataview from "./components/DataView/dataview";
+import Dataview from "./components/DataViewOld/dataview";
 import { useState } from "react";
 
 function App() {
