@@ -11,8 +11,6 @@ options:
 table_name: EV_charging_stations
 delimiter: ";"
 
-#Betreiber,Straﬂe,Hausnummer,Adresszusatz,Postleitzahl,Ort,Bundesland,Kreis/kreisfreie Stadt,Breitengrad,L‰ngengrad,Inbetriebnahmedatum,Nennleistung Ladeeinrichtung [kW],Art der Ladeeinrichung,Anzahl Ladepunkte,Steckertypen1,P1 [kW],Public Key1,Steckertypen2,P2 [kW],Public Key2,Steckertypen3,P3 [kW],Public Key3,Steckertypen4,P4 [kW],Public Key4,
-
 table_cols:
   - name: Betreiber
     name_in_table: operator
