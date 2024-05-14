@@ -52,6 +52,10 @@ const MultiMap = () => {
   const closeTab = (id: string) => {
     // Check if this is the last tab
     if (openedTabs.length === 1) {
+      alert("The last tab can not be closed.");
+      return;
+    } else if (pinnedTabs.indexOf(id) !== -1) {
+      alert("You can not close a pinned tab.");
       return;
     }
     // Close the tab
@@ -121,26 +125,28 @@ const MultiMap = () => {
                             }}
                           />
                         </Tooltip>
-                        {pinnedTabs.indexOf(tab.id) === -1 ? (
-                          <Tooltip title="Pin Tab" arrow>
-                            <PushPin
-                              className="pin-tab-icon"
-                              onClick={() => {
-                                togglePinTabs(tab.id);
-                              }}
-                            />
-                          </Tooltip>
-                        ) : (
-                          <Tooltip title="Unpin Tab" arrow>
-                            <PushPinSlash
-                              weight="fill"
-                              className="unpin-tab-icon"
-                              onClick={() => {
-                                togglePinTabs(tab.id);
-                              }}
-                            />
-                          </Tooltip>
-                        )}
+                        <Tooltip
+                          title={
+                            pinnedTabs.indexOf(tab.id) === -1
+                              ? "Pin Tab"
+                              : "Unpin Tab"
+                          }
+                          arrow
+                          onClick={() => {
+                            togglePinTabs(tab.id);
+                          }}
+                        >
+                          <div className="pin-tab-container">
+                            {pinnedTabs.indexOf(tab.id) === -1 ? (
+                              <PushPin className="pin-tab-icon" />
+                            ) : (
+                              <PushPinSlash
+                                weight="fill"
+                                className="unpin-tab-icon"
+                              />
+                            )}
+                          </div>
+                        </Tooltip>
                       </div>
                     </div>
                   }
