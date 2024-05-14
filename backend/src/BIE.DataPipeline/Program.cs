@@ -6,17 +6,17 @@ using BIE.DataPipeline.Import;
 
 Console.WriteLine("Hello, World!");
 DataSourceDescription description = YamlImporter.GetSourceDescription(args[0]);
-/*
+
 
 DBHelper.CreateDBConnection();
 DBHelper.CreateTable(description);
 
-Console.WriteLine(description.source.location);
-Console.WriteLine(description.table_name);
-Console.WriteLine(description.table_cols[0].type);
+//Console.WriteLine(description.source.location);
+//Console.WriteLine(description.table_name);
+//Console.WriteLine(description.table_cols[0].type);
 
-Console.ReadKey();
-*/
+//Console.ReadKey();
+
 
 CsvImporter csvImporter = new CsvImporter(description);
 //CsvImporter csvImporter = new CsvImporter(@"C:\Users\nicol\Desktop\uni\M3\AMOS\Datasources\Ladesaeulenregister.csv");
@@ -27,6 +27,7 @@ bool notEOF = csvImporter.ReadLine(out line);
 int row = 0;
 while  (notEOF && row < 10)
 {
+    DBHelper.InsertData(csvImporter.GetTableName(),csvImporter.GetHeaderString(),line);
     Console.WriteLine(line);
     row++;
     notEOF = csvImporter.ReadLine(out line);

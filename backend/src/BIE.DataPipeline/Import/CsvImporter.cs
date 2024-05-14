@@ -6,7 +6,7 @@ using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using BIE.DataPipeline.Data;
+using BIE.DataPipeline;
 using Microsoft.VisualBasic.FileIO;
 
 namespace BIE.DataPipeline.Import
@@ -22,9 +22,8 @@ namespace BIE.DataPipeline.Import
         {
             //YAML Arguments:
             this.dataSourceDescription = dataSourceDescription;
-            //columnTypes = ParseColumnTypes();
-            columnTypes = new Type[] { typeof(string), typeof(string), typeof(string), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(float), typeof(float), typeof(string), typeof(float), typeof(string), typeof(int), typeof(string), typeof(float), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string) };
-
+            columnTypes = ParseColumnTypes();
+            //columnTypes = new Type[] { typeof(string), typeof(string), typeof(string), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string) };
             //Setup Parser
             SetupParser();
 
@@ -45,13 +44,13 @@ namespace BIE.DataPipeline.Import
         public string GetHeaderString()
         {
             string res = "";
-            foreach(string field in header)
+            foreach (DataSourceDescription.DataSourceColumn col in this.dataSourceDescription.table_cols)
             {
-                res += field + ",";
+                res += col.name_in_table + ",";
             }
 
             //remove last ,
-            res.Remove(res.Length - 1);
+            res=res.Remove(res.Length - 1);
             return res;
         }
 
@@ -92,6 +91,7 @@ namespace BIE.DataPipeline.Import
                     }
                 }
             }
+            nextLine = nextLine.Remove(nextLine.Length - 1);
 
             return true;
         }

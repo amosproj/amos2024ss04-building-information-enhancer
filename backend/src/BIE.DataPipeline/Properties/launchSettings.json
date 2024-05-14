@@ -3,7 +3,15 @@
     "BIE.DataPipeline": {
       "commandName": "Project",
       "commandLineArgs": "test.yaml",
-      "workingDirectory": "C:\\Users\\nicol\\Desktop\\uni\\M3\\AMOS\\Git\\amos2024ss04-building-information-enhancer\\backend\\src\\BIE.DataPipeline\\yaml"
+      "workingDirectory": ".\\yaml",
+      "environmentVariables": {
+        "DB_SERVER": "LPTP-308\\SQLEXPRESS",
+        "DB_NAME": "BIEDB",
+        "DB_PASSWORD": "1234",
+        "DB_USERNAME": "Ahsan",
+        "DB_TYPE": "SQL",
+        "TRUSTED": "False"
+      }
     }
   }
 }

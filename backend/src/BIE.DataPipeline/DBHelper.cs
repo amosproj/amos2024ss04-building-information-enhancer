@@ -32,7 +32,7 @@ namespace BIE.DataPipeline
             query += " (";
             foreach ( var column in description.table_cols)
             {
-                query += " " + column.name +" " + column.type + ", ";
+                query += " " + column.name_in_table +" " + column.type + ", ";
             }
             query += "); END";
             DbCommand cmd = db.CreateCommand(query);
@@ -47,7 +47,7 @@ namespace BIE.DataPipeline
         internal static void InsertData(string tableName, string columnNames ,string values)
         {
             var db = Database.Instance;
-            string query = "INSERT INTO " + tableName + "("+columnNames+")" +"VALUES"+ "(" + values + ")";
+            string query = "INSERT INTO " + tableName + " ( "+columnNames+" ) " +" VALUES "+ " ( " + values + " );";
             DbCommand cmd = db.CreateCommand(query);
             db.Execute(cmd);
         }
