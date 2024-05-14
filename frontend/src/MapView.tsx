@@ -10,7 +10,7 @@ import Button from "@mui/material/Button";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 
-let DefaultIcon = L.icon({
+const DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow,
   iconAnchor: [12, 40],
@@ -18,7 +18,23 @@ let DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-const MapView: React.FC = ({}) => {
+function Btn() {
+  const map = useMap();
+  return (
+    <Button
+      variant="text"
+      onClick={() => {
+        map.locate().on("locationfound", function (e) {
+          map.flyTo(e.latlng, map.getZoom());
+        });
+      }}
+    >
+      Text
+    </Button>
+  );
+}
+
+const MapView: React.FC = () => {
   const center: LatLng = L.latLng([49.5732, 11.0288]); // Initial center coordinates
   const [markerPosition, setMarkerPosition] = useState<LatLng>(center);
 
@@ -68,18 +84,7 @@ const MapView: React.FC = ({}) => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <Button
-          variant="text"
-          onClick={() => {
-            const map = useMap();
-            map.locate().on("locationfound", function (e) {
-              setPosition(e.latlng);
-              map.flyTo(e.latlng, map.getZoom());
-            });
-          }}
-        >
-          Text
-        </Button>
+        <Btn />
       </MapContainer>
     </div>
   );

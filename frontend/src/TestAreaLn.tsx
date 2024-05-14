@@ -8,7 +8,7 @@ interface OptionItem {
   displayValue: string;
 }
 
-const TestAreaLn: React.FC = ({}) => {
+const TestAreaLn: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
 
   const handleOpenDialog = () => {
