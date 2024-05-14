@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BEI.DataPipeline.Data;
+using BIE.DataPipeline.Data;
 
-namespace BEI.DataPipeline.Import
+namespace BIE.DataPipeline.Import
 {
     internal interface IImporter
     {

@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "BIE.DataPipeline": {
+      "commandName": "Project",
+      "commandLineArgs": "test.yaml",
+      "workingDirectory": "C:\\Users\\nicol\\Desktop\\uni\\M3\\AMOS\\Git\\amos2024ss04-building-information-enhancer\\backend\\src\\BIE.DataPipeline\\yaml"
+    }
+  }
+}

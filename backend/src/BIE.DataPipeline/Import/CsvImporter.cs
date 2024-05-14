@@ -5,10 +5,10 @@ using System.Net;
 using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
-using BEI.DataPipeline.Data;
+using BIE.DataPipeline.Data;
 using Microsoft.VisualBasic.FileIO;
 
-namespace BEI.DataPipeline.Import
+namespace BIE.DataPipeline.Import
 {
     internal class CsvImporter : IImporter
     {

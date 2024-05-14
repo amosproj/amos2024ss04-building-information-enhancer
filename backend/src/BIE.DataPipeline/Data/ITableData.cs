@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BEI.DataPipeline.Data
+namespace BIE.DataPipeline.Data
 {
     internal interface ITableData
     {
