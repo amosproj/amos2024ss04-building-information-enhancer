@@ -5,8 +5,10 @@
   "author": "See repository README",
   "scripts": {
     "setup": "npm run setup:frontend && npm run setup:backend",
-    "setup:frontend": "cd frontend/",
-    "setup:backend": "cd backend/public-api",
-    "deploy": "docker compose up --build -d"
+    "setup:frontend": "cd frontend/ && npm ci",
+    "setup:backend": "cd backend/",
+    "deploy": "docker compose up --build -d",
+    "deploy:dev:frontend": "cd frontend/ && npm run dev",
+    "deploy:dev:backend": "cd backend/"
   }
 }

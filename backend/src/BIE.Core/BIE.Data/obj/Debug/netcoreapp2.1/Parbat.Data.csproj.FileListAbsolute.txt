@@ -1,0 +1,10 @@
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\bin\Debug\netcoreapp2.1\Parbat.Data.deps.json
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\bin\Debug\netcoreapp2.1\Parbat.Data.dll
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\bin\Debug\netcoreapp2.1\Parbat.Data.pdb
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\obj\Debug\netcoreapp2.1\Parbat.Data.GeneratedMSBuildEditorConfig.editorconfig
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\obj\Debug\netcoreapp2.1\Parbat.Data.AssemblyInfoInputs.cache
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\obj\Debug\netcoreapp2.1\Parbat.Data.AssemblyInfo.cs
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\obj\Debug\netcoreapp2.1\Parbat.Data.csproj.CoreCompileInputs.cache
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\obj\Debug\netcoreapp2.1\Parbat.Data.dll
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\obj\Debug\netcoreapp2.1\Parbat.Data.pdb
+D:\parbatpk\parbat\src\Parbat.Core\Parbat.Data\obj\Debug\netcoreapp2.1\Parbat.Data.csproj.AssemblyReference.cache
