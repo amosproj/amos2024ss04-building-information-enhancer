@@ -17,6 +17,32 @@
   height: 100%;
 }
 
+.tab-title-container {
+  display: flex;
+  align-items: center;
+}
+
+.tabs-icons-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  align-items: center;
+  vertical-align: middle;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  height: 0.8rem;
+}
+
+.tab-icons-container svg {
+  height: 0.8rem;
+  display: flex;
+  position: absolute;
+  top: 0.2rem;
+  right: -0.2rem;
+  visibility: hidden;
+}
+
 .add-tab-button {
   background-color: white;
   border-color: black;
@@ -41,10 +67,6 @@
   opacity: 0.3 !important;
 }
 
-.MuiBox-root {
-  border: none !important;
-}
-
 .MuiTab-root {
   border: 1px solid gray !important;
   background-color: white !important;
@@ -54,6 +76,10 @@
 .MuiTab-root:hover {
   background-color: rgb(245, 245, 245) !important;
   transition: all 0.2s ease-in-out;
+}
+
+.MuiTab-root:hover .tab-icons-container svg {
+  visibility: visible !important;
 }
 
 .Mui-selected {
