@@ -8,10 +8,10 @@ Console.WriteLine("Parser Started");
 DataSourceDescription description = YamlImporter.GetSourceDescription(args[0]);
 
 
+CsvImporter csvImporter = new CsvImporter(description);
+
 DBHelper.CreateDBConnection();
 DBHelper.CreateTable(description);
-
-CsvImporter csvImporter = new CsvImporter(description);
 
 Console.WriteLine(csvImporter.GetHeaderString());
 string line = "";
