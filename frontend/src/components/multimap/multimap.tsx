@@ -1,10 +1,16 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import "./multimap.css";
 import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
-import { Add, Close } from "@mui/icons-material";
+import {
+  Plus,
+  X,
+  PushPin,
+  PushPinSlash,
+  PushPinSimple,
+} from "@phosphor-icons/react";
 import Tooltip from "@mui/material/Tooltip";
 
 // Tab
@@ -24,6 +30,8 @@ const MultiMap = () => {
   const [currentTab, setCurrentTab] = useState<string>("1");
   // Keeps track of the opened tabs
   const [openedTabs, setOpenedTabs] = useState<TabType[]>(defaultTabs);
+  // Keeps track of the pinned tabs
+  const [pinnedTabs, setPinnedTabs] = useState<string[]>([]);
 
   // Handles the change of the current tab
   const handleChange = (_event: React.SyntheticEvent, newTab: number) => {
@@ -42,6 +50,10 @@ const MultiMap = () => {
 
   // Closes a specific tab
   const closeTab = (id: string) => {
+    // Check if this is the last tab
+    if (openedTabs.length === 1) {
+      return;
+    }
     // Close the tab
     const newOpenedTabs = openedTabs.filter((tab) => tab.id !== id);
     // Reorder the tabs IDs
@@ -58,6 +70,16 @@ const MultiMap = () => {
     // Update the newest current tab
     if (Number(currentTab) > openedTabs.length - 1) {
       setCurrentTab((openedTabs.length - 1).toString());
+    }
+  };
+
+  // Toggle pinning of a specific tab
+  const togglePinTabs = (tabID: string) => {
+    if (pinnedTabs.indexOf(tabID) === -1) {
+      setPinnedTabs([...pinnedTabs, tabID]);
+    } else {
+      const updatedTabs = pinnedTabs.filter((tab) => tab !== tabID);
+      setPinnedTabs(updatedTabs);
     }
   };
 
@@ -79,13 +101,46 @@ const MultiMap = () => {
                     <div className="tab-title-container">
                       <span>{tab.title}</span>
                       <div className="tab-icons-container">
-                        <Tooltip title="Close Tab">
-                          <Close
+                        {pinnedTabs.indexOf(tab.id) !== -1 ? (
+                          <PushPinSimple
+                            weight="fill"
+                            className="pinned-tab-icon"
+                            onClick={() => {
+                              closeTab(tab.id);
+                            }}
+                          />
+                        ) : (
+                          <Fragment />
+                        )}
+
+                        <Tooltip title="Close Tab" arrow>
+                          <X
+                            className="close-tab-icon"
                             onClick={() => {
                               closeTab(tab.id);
                             }}
                           />
                         </Tooltip>
+                        {pinnedTabs.indexOf(tab.id) === -1 ? (
+                          <Tooltip title="Pin Tab" arrow>
+                            <PushPin
+                              className="pin-tab-icon"
+                              onClick={() => {
+                                togglePinTabs(tab.id);
+                              }}
+                            />
+                          </Tooltip>
+                        ) : (
+                          <Tooltip title="Unpin Tab" arrow>
+                            <PushPinSlash
+                              weight="fill"
+                              className="unpin-tab-icon"
+                              onClick={() => {
+                                togglePinTabs(tab.id);
+                              }}
+                            />
+                          </Tooltip>
+                        )}
                       </div>
                     </div>
                   }
@@ -95,9 +150,9 @@ const MultiMap = () => {
               );
             })}
           </TabList>
-          <Tooltip title="Add a new dataset">
+          <Tooltip title="Add a new dataset" arrow>
             <button className="add-tab-button" onClick={openNewTab}>
-              <Add />
+              <Plus />
             </button>
           </Tooltip>
         </div>

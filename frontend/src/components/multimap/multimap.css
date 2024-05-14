@@ -34,12 +34,38 @@
   height: 0.8rem;
 }
 
-.tab-icons-container svg {
+.tab-icons-container .pinned-tab-icon {
   height: 0.8rem;
   display: flex;
   position: absolute;
   top: 0.2rem;
-  right: -0.2rem;
+  right: 0.1rem;
+}
+
+.tab-icons-container .close-tab-icon {
+  height: 0.8rem;
+  display: flex;
+  position: absolute;
+  top: 0.2rem;
+  right: 0.1rem;
+  visibility: hidden;
+}
+
+.tab-icons-container .pin-tab-icon {
+  height: 0.8rem;
+  display: flex;
+  position: absolute;
+  top: 0.2rem;
+  right: 1rem;
+  visibility: hidden;
+}
+
+.tab-icons-container .unpin-tab-icon {
+  height: 0.8rem;
+  display: flex;
+  position: absolute;
+  top: 0.2rem;
+  right: 1rem;
   visibility: hidden;
 }
 
@@ -71,6 +97,7 @@
   border: 1px solid gray !important;
   background-color: white !important;
   text-transform: none !important;
+  padding: 1.1rem 1rem 0.8rem 1rem !important;
 }
 
 .MuiTab-root:hover {
@@ -80,6 +107,10 @@
 
 .MuiTab-root:hover .tab-icons-container svg {
   visibility: visible !important;
+}
+
+.MuiTab-root:hover .tab-icons-container .pinned-tab-icon {
+  visibility: hidden !important;
 }
 
 .Mui-selected {
