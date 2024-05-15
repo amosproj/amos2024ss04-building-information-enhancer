@@ -2,17 +2,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIE.Core.API", "Parbat.Core.API\BIE.Core.API.csproj", "{260315A2-68EB-4C72-836A-854997DC202A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIE.Core.API", "BIE.Core.API\BIE.Core.API.csproj", "{260315A2-68EB-4C72-836A-854997DC202A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIE.Core.DataObjects", "Parbat.Core.DataObjects\BIE.Core.DataObjects.csproj", "{5480AEDF-A656-44D5-A968-8CC8CF2C8E92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIE.Core.DataObjects", "BIE.Core.DataObjects\BIE.Core.DataObjects.csproj", "{5480AEDF-A656-44D5-A968-8CC8CF2C8E92}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIE.Core.Services", "Parbat.Core.Services\BIE.Core.Services.csproj", "{09360B08-0D01-4FF7-84E9-2627FEE7C953}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIE.Core.Services", "BIE.Core.Services\BIE.Core.Services.csproj", "{09360B08-0D01-4FF7-84E9-2627FEE7C953}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIE.Core.BaseRepository", "Parbat.Core.BaseRepository\BIE.Core.BaseRepository.csproj", "{90BE0CC8-2E16-451B-8D23-81B180DCDEA2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIE.Core.BaseRepository", "BIE.Core.BaseRepository\BIE.Core.BaseRepository.csproj", "{90BE0CC8-2E16-451B-8D23-81B180DCDEA2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIE.Core.DBRepository", "Parbat.Core.DBRepository\BIE.Core.DBRepository.csproj", "{82B1F764-CD16-4AA3-B5C7-0A1E74FE04B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIE.Core.DBRepository", "BIE.Core.DBRepository\BIE.Core.DBRepository.csproj", "{82B1F764-CD16-4AA3-B5C7-0A1E74FE04B1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIE.Data", "Parbat.Data\BIE.Data.csproj", "{64ED7ACC-E6F7-49F6-8B72-687694D7149C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIE.Data", "BIE.Data\BIE.Data.csproj", "{64ED7ACC-E6F7-49F6-8B72-687694D7149C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
