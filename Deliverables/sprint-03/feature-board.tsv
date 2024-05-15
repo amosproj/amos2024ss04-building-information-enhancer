@@ -17,10 +17,16 @@ Implement search by coordinate	https://github.com/amosproj/amos2024ss04-building
 Solar potential assessment tool	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/104		P0		backend, feature, frontend		
 Compose and finish the UI of the FE	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/113		P0		feature, frontend		
 Fix pinning of the tabs going crazy after deleting some tabs	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/112		P0		bug, frontend		
-Automated district energy assessment tool	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/103		P1		backend, feature, frontend		
 Search bar: Cache and bookmarking	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/62		P1		feature, frontend		
+Automated district energy assessment tool	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/103		P1		backend, feature, frontend		
 Implement basic BE CI	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/52		P2		backend, devops, feature		
-Discuss Labels and Milestones	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/19	dancingsushii, op-hub	P2		organizational		
+Improve searching by adding suggestions	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/115		P2		backend, feature, frontend		
+Additional map controls	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/116		P2		backend, feature, frontend		
+FE filtering changes data entries	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/117		P2		bug, frontend		
+Pinning of the tabs behave wierd after deleting some tabs	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/118		P2		bug, frontend		
+Compose different frontend views into one	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/120		P1		feature, frontend		
+Add support for satellite image in map	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/119		P1		feature, frontend	Building time machine 	
+Discuss Labels and Milestones	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/19	dancingsushii, op-hub	P1		organizational		
 Setup deployment pipeline/branches	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/30	Corgam	P0	3	devops, feature		
 Create multimap view component	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/60	Corgam	P0	3	feature, frontend		
 Create basic layout for main UI interface	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/73	Corgam	P0	2	feature, frontend		
@@ -70,5 +76,3 @@ Get Backend container running	https://github.com/amosproj/amos2024ss04-building-
 Documentation -  CI/CD technology	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/23	Corgam	P1	1	devops, feature		1
 Get FE container running	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/26	Corgam	P0	2	devops, feature, frontend		2
 Initialize Github Wiki	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/20	Corgam	P0	1	feature		1
-Backend datapipeline initial db connection	https://github.com/amosproj/amos2024ss04-building-information-enhancer/pull/105	Ahsankkhan, nicolasbandel, Superschnizel			backend, feature		
-Backend DB Dockerfile	https://github.com/amosproj/amos2024ss04-building-information-enhancer/pull/107	Ahsankkhan, nicolasbandel, Superschnizel			backend		
