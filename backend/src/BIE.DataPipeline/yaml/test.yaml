@@ -14,7 +14,7 @@ delimiter: ";"
 table_cols:
   - name: Betreiber
     name_in_table: operator
-    type: VARCHAR(50)
+    type: VARCHAR(500)
   - name: Straﬂe
     name_in_table: street
     type: VARCHAR(100)
