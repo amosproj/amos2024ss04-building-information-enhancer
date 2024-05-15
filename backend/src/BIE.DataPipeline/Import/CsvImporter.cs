@@ -92,6 +92,7 @@ namespace BIE.DataPipeline.Import
                         }
                         try
                         {
+                            line[i] = line[i].Replace("'", "''");
                             if (columnTypes[yamlIndex] == typeof(string))
                             {
                                 nextLine += string.Format("'{0}',", line[i]);
