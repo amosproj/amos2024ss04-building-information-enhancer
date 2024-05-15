@@ -15,6 +15,7 @@ table_cols:
   - name: Betreiber
     name_in_table: operator
     type: VARCHAR(500)
+    is_not_nullable: true
   - name: Straﬂe
     name_in_table: street
     type: VARCHAR(100)

@@ -73,6 +73,9 @@ namespace BIE.DataPipeline.Import
             {
                 //TODO what to do with empty lines
                 Console.WriteLine("Empty");
+                //Read next line
+                return ReadLine(out nextLine);
+
             }
             else
             {
@@ -81,6 +84,12 @@ namespace BIE.DataPipeline.Import
                 {
                     if (fileHeader[i].Equals(yamlHeader[yamlIndex]))
                     {
+                        if (dataSourceDescription.table_cols[yamlIndex].is_not_nullable && line[i] == "")
+                        {
+                            //This could lead to an stack overflow if loads of rows are skipped (maybe change it to a loop)
+                            //Read next line
+                            return ReadLine(out nextLine);
+                        }
                         try
                         {
                             if (columnTypes[yamlIndex] == typeof(string))

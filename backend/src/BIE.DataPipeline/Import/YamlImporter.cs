@@ -101,9 +101,9 @@ namespace BIE.DataPipeline.Import
             public string type;
 
             /// <summary>
-            /// True if the column is nullable in the database.
+            /// True if the column is not nullable in the database.
             /// </summary>
-            public bool is_nullable;
+            public bool is_not_nullable;
         }
     }
 
