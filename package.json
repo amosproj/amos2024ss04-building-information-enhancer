@@ -6,9 +6,9 @@
   "scripts": {
     "setup": "npm run setup:frontend && npm run setup:backend",
     "setup:frontend": "cd frontend/ && npm ci",
-    "setup:backend": "cd backend/",
+    "setup:backend": "cd backend/src/BIE.DataPipeline && dotnet restore && dotnet build",
     "deploy": "docker compose up --build -d",
     "deploy:dev:frontend": "cd frontend/ && npm run dev",
-    "deploy:dev:backend": "cd backend/"
+    "deploy:dev:backend": "cd backend/src/BIE.DataPipeline  && dotnet run yaml/test.yaml"
   }
 }
