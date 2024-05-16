@@ -6,9 +6,11 @@
   "scripts": {
     "setup": "npm run setup:frontend && npm run setup:backend",
     "setup:frontend": "cd frontend/ && npm ci",
-    "setup:backend": "cd backend/src/BIE.DataPipeline && dotnet restore && dotnet build",
+    "setup:backend:windows": "cd backend/src/BIE.DataPipeline/bin && rmdir /s /q build && cd .. && dotnet publish BIE.DataPipeline.csproj -c Release --self-contained true -o ./bin/build",
+    "setup:backend:linux": "cd backend/src/BIE.DataPipeline && rm -r ./bin/build && dotnet publish BIE.DataPipeline.csproj -c Release --self-contained true -o ./bin/build",
+    "setup:backend": "npm run setup:backend:linux || npm run setup:backend:windows",
     "deploy": "docker compose up --build -d",
     "deploy:dev:frontend": "cd frontend/ && npm run dev",
-    "deploy:dev:backend": "cd backend/src/BIE.DataPipeline  && dotnet run yaml/test.yaml"
+    "deploy:dev:backend": "npm run setup:backend && cd backend/src/BIE.DataPipeline && ./bin/build/BIE.DataPipeline ./yaml/test.yaml || bin\\build\\BIE.DataPipeline yaml\\test.yaml"
   }
 }

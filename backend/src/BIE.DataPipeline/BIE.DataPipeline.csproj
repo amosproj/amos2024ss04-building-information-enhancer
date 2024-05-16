@@ -28,4 +28,8 @@
     <ProjectReference Include="BIE.Data\BIE.Data.csproj" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <PublishSingleFile>true</PublishSingleFile>
+  </PropertyGroup>    
+
 </Project>
