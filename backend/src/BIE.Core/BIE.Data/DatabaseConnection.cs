@@ -139,6 +139,20 @@ namespace BIE.Data
             return r;
         }
 
+        public DbDataReader ExecuteReader(DbCommand command)
+        {
+            DbDataReader r;
+            using (DbConnection con = this.CreateConnection())
+            {
+                con.Open();
+                command.Connection = con;
+                r = command.ExecuteReader();
+                con.Close();
+            }
+
+            return r;
+        }
+
         public void Execute(DbCommand command)
         {
             using (DbConnection con = this.CreateConnection())

@@ -28,7 +28,7 @@ namespace BIE.DataPipeline
         internal static void CreateTable(DataSourceDescription description)
         {
             var db = Database.Instance;
-            string query = "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'EV_charging_stations')\r\nBEGIN CREATE TABLE " + description.table_name;
+            string query = "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '"+description.table_name+"')\r\nBEGIN CREATE TABLE " + description.table_name;
             query += " (";
             foreach ( var column in description.table_cols)
             {
@@ -48,6 +48,7 @@ namespace BIE.DataPipeline
         {
             var db = Database.Instance;
             string query = "INSERT INTO " + tableName + " ( "+columnNames+" ) " +" VALUES "+ " ( " + values + " );";
+            Console.WriteLine(query);
             DbCommand cmd = db.CreateCommand(query);
             db.Execute(cmd);
         }

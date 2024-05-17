@@ -71,10 +71,14 @@ namespace BIE.DataPipeline.Import
             }
             else
             {
+
                 for(int i = 0; i < line.Length; i++)
                 {
                     try
                     {
+                        line[i] = line[i].Replace("'", "''");
+                        line[i] = line[i].Replace(",", ".");
+
                         if (columnTypes[i] == typeof(string))
                         {
                             nextLine += string.Format("'{0}',", line[i]);
@@ -82,6 +86,7 @@ namespace BIE.DataPipeline.Import
                         else
                         {
                             nextLine += string.Format("{0},", Convert.ChangeType(line[i], columnTypes[i]));
+                            //nextLine += string.Format("{0},", line[i]);
                         }
                     }
                     catch (System.FormatException ex)
@@ -126,6 +131,9 @@ namespace BIE.DataPipeline.Import
                 case "FLOAT":
                     return typeof(float);
                 case "DOUBLE":
+                case "DECIMAL":
+                case "DECIMAL(8,6)":
+                case "DECIMAL(9,6)":
                     return typeof(double);
                 default:
                     throw new NotSupportedException(string.Format("The type {0} is currently not supporteted.", shortType));
