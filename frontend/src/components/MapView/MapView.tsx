@@ -4,11 +4,13 @@ import { Marker } from "react-leaflet/Marker";
 import { Popup } from "react-leaflet/Popup";
 import { TileLayer } from "react-leaflet/TileLayer";
 import "leaflet/dist/leaflet.css";
+import "./MapView.css";
 import { useMap, useMapEvents } from "react-leaflet/hooks";
 import L, { LatLng } from "leaflet";
 import Button from "@mui/material/Button";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
+import MapOptions from "./MapOptions";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -77,8 +79,10 @@ const MapView: React.FC = () => {
   }
 
   return (
-    <div className="map-container" style={{ height: "400px" }}>
-      <MapContainer center={center} zoom={13} style={{ height: "400px" }}>
+    <div className="tab-map-container">
+      <MapOptions />
+
+      <MapContainer center={center} zoom={13} className="map">
         <MapEventsHandler />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

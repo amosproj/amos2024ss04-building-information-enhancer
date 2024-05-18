@@ -1,0 +1,18 @@
+.data-panel-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.data-panel-title {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem;
+  border: 1px solid gray;
+}
+
+.data-panel-grid {
+  border: 1px solid gray;
+  padding: 1rem;
+  max-width: 100%;
+  margin: 0 !important;
+}

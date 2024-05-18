@@ -1,5 +1,5 @@
 import { Fragment, useState } from "react";
-import "./multimap.css";
+import "./MultiMap.css";
 import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
@@ -12,17 +12,22 @@ import {
   PushPinSimple,
 } from "@phosphor-icons/react";
 import Tooltip from "@mui/material/Tooltip";
+import MapView from "../MapView/MapView";
 
 // Tab
 type TabType = {
   id: string;
   title: string;
-  content: string;
+  description: string;
 };
 
 // Default tabs array to show at the start of the website
 const defaultTabs = [
-  { id: "1", title: "Charging Stations", content: "Charging Stations Map" },
+  {
+    id: "1",
+    title: "Charging Stations",
+    description: "Here is the short description of the Charging Stations Map.",
+  },
 ];
 
 const MultiMap = () => {
@@ -43,7 +48,7 @@ const MultiMap = () => {
     const newTab: TabType = {
       id: (openedTabs.length + 1).toString(),
       title: `New Tab ${openedTabs.length + 1}`,
-      content: `Content for Tab ${openedTabs.length + 1}`,
+      description: `Description for Tab ${openedTabs.length + 1}`,
     };
     setOpenedTabs([...openedTabs, newTab]);
   };
@@ -165,7 +170,12 @@ const MultiMap = () => {
         {openedTabs.map((tab: TabType) => {
           return (
             <TabPanel value={tab.id.toString()} className="tab" key={tab.id}>
-              {tab.content}
+              <span className="tab-description-container">
+                {tab.description}
+              </span>
+              <div className="tab-map-container">
+                <MapView />
+              </div>
             </TabPanel>
           );
         })}

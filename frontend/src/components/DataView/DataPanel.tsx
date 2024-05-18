@@ -24,7 +24,7 @@ import IconButton from "@mui/material/IconButton";
 import FilterBar from "./FilterBar";
 import MapIcon from "@mui/icons-material/Map";
 import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
+import "./DataPanel.css";
 
 // Black design for tooltip of the map icon
 const BootstrapTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -98,14 +98,18 @@ const rows = [
 
 // Pass a unique filterPanelId so the FilterBar component is located next to the correct Data Grid
 // All DataGrid options explained https://mui.com/x/api/data-grid/data-grid/
-function KeyValuesList({ filterPanelId }: { filterPanelId: number }) {
+function DataPanel({
+  filterPanelId,
+  listTitle,
+}: {
+  filterPanelId: number;
+  listTitle: string;
+}) {
   const filterPanelIdString = `filter-panel-${filterPanelId}`;
   return (
-    <>
-      <Typography align="left" variant="h6" gutterBottom>
-        KeyValuesList
-      </Typography>
-      <Grid container spacing={2}>
+    <div className="data-panel-container">
+      <div className="data-panel-title">{listTitle}</div>
+      <Grid container spacing={2} className="data-panel-grid">
         <Grid item>
           <Box id={filterPanelIdString} />
         </Grid>
@@ -148,8 +152,8 @@ function KeyValuesList({ filterPanelId }: { filterPanelId: number }) {
           />
         </Grid>
       </Grid>
-    </>
+    </div>
   );
 }
 
-export default KeyValuesList;
+export default DataPanel;
