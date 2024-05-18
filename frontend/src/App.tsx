@@ -4,7 +4,6 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import "./App.css";
 
-import Button from "@mui/material/Button";
 import DataView from "./components/DataView/DataView";
 import MultiMap from "./components/MultiMap/MultiMap";
 
@@ -13,11 +12,8 @@ function App() {
     <div className="app-container">
       <div className="header">Building Information Enhancer</div>
       <div className="content-container">
-        <MultiMap></MultiMap>
-        <div className="dataview-container">
-          <DataView />
-          <Button variant="outlined">Load data</Button>
-        </div>
+        <MultiMap />
+        <DataView />
       </div>
     </div>
   );
