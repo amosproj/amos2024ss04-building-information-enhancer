@@ -12,3 +12,16 @@
 .dataview-tab {
   padding: 0 !important;
 }
+
+.dataview-title-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.favourite-icon-container {
+  width: 1rem;
+}
+
+.location-icon {
+  margin-left: 0.5rem;
+}
