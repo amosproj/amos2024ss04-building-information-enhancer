@@ -1,6 +1,7 @@
 .data-panel-container {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .data-panel-title {
@@ -12,7 +13,10 @@
 
 .data-panel-grid {
   border: 1px solid gray;
-  padding: 1rem;
   max-width: 100%;
   margin: 0 !important;
+}
+
+.MuiGrid-item {
+  padding: 1rem !important;
 }

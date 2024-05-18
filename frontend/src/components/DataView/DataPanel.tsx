@@ -113,7 +113,7 @@ function DataPanel({
         <Grid item>
           <Box id={filterPanelIdString} />
         </Grid>
-        <Grid item style={{ height: 400, width: "100%" }}>
+        <Grid item style={{ width: "100%" }}>
           <DataGrid
             disableColumnMenu
             columnHeaderHeight={0}

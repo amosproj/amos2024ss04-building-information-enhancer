@@ -11,9 +11,7 @@ import MultiMap from "./components/MultiMap/MultiMap";
 function App() {
   return (
     <div className="app-container">
-      <div className="header">
-        <div className="title">Building Information Enhancer</div>
-      </div>
+      <div className="header">Building Information Enhancer</div>
       <div className="content-container">
         <MultiMap></MultiMap>
         <div className="dataview-container">

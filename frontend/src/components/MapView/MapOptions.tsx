@@ -1,8 +1,8 @@
 import { useState } from "react";
-import PopUp from "./Popup";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 import "./MapOptions.css";
 import { Tooltip } from "@mui/material";
+import PopUp from "../Popup/Popup";
 
 interface OptionItem {
   id: string;
