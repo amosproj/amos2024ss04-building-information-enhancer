@@ -166,10 +166,10 @@ const MultiMap = () => {
         {openedTabs.map((tab: TabProps) => {
           return (
             <TabPanel value={tab.id.toString()} className="tab" key={tab.id}>
-              <span className="tab-description-container">
-                {tab.description}
-              </span>
-              <div className="tab-map-container">
+              <div className="tab-context-container">
+                <span className="tab-description-container">
+                  {tab.description}
+                </span>
                 <MapView />
               </div>
             </TabPanel>

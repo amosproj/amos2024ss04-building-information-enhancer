@@ -15,12 +15,17 @@
 .tab {
   border: 1px solid gray;
   height: 100%;
+}
+
+.tab-context-container {
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
 
 .tab-description-container {
   padding-bottom: 1rem;
+  text-wrap: nowrap;
 }
 
 .tab-title-container {
