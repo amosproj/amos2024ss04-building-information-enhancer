@@ -1,11 +1,4 @@
 /*
-  Required installation steps:
-    cd frontend
-    npm install @mui/material @emotion/react @emotion/styled
-    npm install @mui/x-data-grid
-    npm install @mui/icons-material
-
-
   This component displays a mui DataGrid with a Filterbar.
   Depending on the value of the "button" column, a map icon with the hover "open as map" is shown
   
@@ -17,26 +10,13 @@
 */
 
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
-import { styled } from "@mui/material/styles";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import FilterBar from "./FilterBar";
-import MapIcon from "@mui/icons-material/Map";
-import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
+import { MapTrifold } from "@phosphor-icons/react";
 import "./DataPanel.css";
-
-// Black design for tooltip of the map icon
-const BootstrapTooltip = styled(({ className, ...props }: TooltipProps) => (
-  <Tooltip {...props} arrow classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.arrow}`]: {
-    color: theme.palette.common.black,
-  },
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: theme.palette.common.black,
-  },
-}));
+import { Tooltip } from "@mui/material";
 
 // Returns a button if the "button" value is set to 1
 const renderDetailsButton = (params: GridRenderCellParams) => {
@@ -44,11 +24,11 @@ const renderDetailsButton = (params: GridRenderCellParams) => {
   if (value === 1) {
     return (
       <strong>
-        <BootstrapTooltip title="Open as Map">
-          <IconButton color="secondary" aria-label="open as map" size="small">
-            <MapIcon />
+        <Tooltip arrow title="Open as a map">
+          <IconButton aria-label="open as map" size="small">
+            <MapTrifold />
           </IconButton>
-        </BootstrapTooltip>
+        </Tooltip>
       </strong>
     );
   } else {

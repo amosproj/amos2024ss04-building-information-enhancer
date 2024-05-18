@@ -40,7 +40,7 @@ const MapOptions: React.FC = () => {
 
   return (
     <div className="map-options-container">
-      <Tooltip title="Search Address">
+      <Tooltip arrow title="Search for an address">
         <MagnifyingGlass
           weight="duotone"
           className="search-map-icon"
