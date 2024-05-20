@@ -1,7 +1,38 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
 }
 
+.header {
+  height: 10svh;
+  display: flex;
+  vertical-align: middle;
+}
+
+.title {
+  padding: 1rem 2rem;
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.content-container {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  padding: 0rem 2rem 1rem 2rem;
+  gap: 1rem;
+}
+
+.dataview-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.toggle-work {
+  display: flex;
+  flex-direction: row;
+}

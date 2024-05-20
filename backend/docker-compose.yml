@@ -1,0 +1,40 @@
+version: "3.8"
+
+  # Frontend container
+
+
+networks:
+  bie-network:
+
+services:
+  # Backend container
+  backend:
+    build:
+      context: ./src/BIE.DataPipeline
+      dockerfile: Dockerfile
+    environment:
+    - ASPNETCORE_ENVIRONMENT=Development
+    - DB_NAME=BIEDB
+    - DB_PASSWORD=MyPass@1234
+    - DB_SERVER=db
+    - DB_USERNAME=sa
+    - DB_TYPE=SQL
+    - TRUSTED=False
+    container_name: backend
+    networks:
+      - bie-network
+    depends_on:
+    - db
+  db:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+      #ports:
+      #  - "1433:1433"
+    networks:
+      - bie-network
+    volumes:
+      - bie-mssqldata:/var/opt/mssql
+
+volumes:
+    bie-mssqldata:

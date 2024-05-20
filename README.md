@@ -17,25 +17,26 @@ Welcome to the official repository for the `CODE.ING` group, developing an open-
 
 ## 🚀 Setup & Deployment
 
-This project is integrated with a full CI/CD pipeline, thus deployed automatically on the web. However, it is possible to deploy a production-ready system on a local machine using Docker or deploy each part of the system separately for further development. For further information on the `CI/CD` pipeline visit our GitHub [wiki](https://github.com/Corgam/SS23_ADSP_TCF/wiki) documentation.
+This project is integrated with a full CI/CD pipeline, thus deployed automatically on the web. However, it is possible to deploy a production-ready system on your local machine using Docker. For further information on the `CI/CD` pipeline visit our GitHub [wiki](https://github.com/Corgam/SS23_ADSP_TCF/wiki) documentation.
 
 ## 📦 Deployment using Docker
 
 To deploy the project on your local machine using Docker Engine, follow the instructions below:
 
 1. Clone this repository (https://github.com/amosproj/amos2024ss04-building-information-enhancer).
-2. Before deploying the project be sure you have installed the [Node.js](https://nodejs.org/en) ( >= 20.12.2) and a running [Docker Deamon](https://docs.docker.com/engine/install/).
+2. Before deploying the project be sure you have installed the [Node.js](https://nodejs.org/en) ( >= 20.12.2) and a running [Docker Engine](https://docs.docker.com/engine/install/).
 3. Run the `npm run deploy` command in the root folder of the repository.
-4. Connect to the Frontend located at port 80, usually `localhost:80`.
+4. Connect to the frontend at port 80 (`localhost:80`).
 
 ## 💻 Developement Deployment
 
-To deploy one or more services of the system separately, follow the instructions below:
+In order to deploy and/or develop one or more services without Docker, follow the instructions below:
 
 1. Clone this repository (https://github.com/amosproj/amos2024ss04-building-information-enhancer).
-2. Before deploying the project be sure you have installed the [Node.js](https://nodejs.org/en) ( >= 20.12.2) and a running [Docker Deamon](https://docs.docker.com/engine/install/).
-3. Run the `npm run setup` command to install all necessary packages.
-4. To deploy the developement frontend server use the `npm run deploy:dev:frontend` command, or if you want to develop the backend go to the `backend/src/BIE.Core` folder and open the `BIE.Core.sln` file using Visual Studio IDE.
+2. Before deploying the project make sure you have installed the [Node.js](https://nodejs.org/en) ( >= 20.12.2) and [Dotnet SDK](https://dotnet.microsoft.com/en-us/download) ( >= 8.0.3).
+3. Run the `npm run setup:<os>` command to download all necessary packages and build the services, replacing `<os>` with `windows`, `linux` or `macos` based on your operating system.
+4. If you want to develop the frontend service, run the `npm run deploy:backend:api` to deploy the backend and in a new terminal run the `npm run deploy:frontend:dev` command to deploy the frontend developement server.
+5. To develop one of the backend services using Visual Studio IDE (for other IDEs, search online), go to the service's subfolder in the `backend` folder and open the corresponding `.sln` file.
 
 ## 👥 The Team
 
