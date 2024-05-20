@@ -6,12 +6,12 @@ import { TileLayer } from "react-leaflet/TileLayer";
 import "leaflet/dist/leaflet.css";
 import "./MapView.css";
 import { useMap, useMapEvents } from "react-leaflet/hooks";
-import L, { LatLng } from "leaflet";
+import L, { LatLng, LatLngBounds } from "leaflet";
 import Button from "@mui/material/Button";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import MapOptions from "./MapOptions";
-import { fetchData } from "./DataFetch";
+import useGeoData, { fetchData } from "./DataFetch";
 import { GeoJSON } from "react-leaflet";
 
 const DefaultIcon = L.icon({
@@ -40,7 +40,22 @@ function Btn() {
 
 const MapView: React.FC = () => {
   const center: LatLng = L.latLng([49.5732, 11.0288]); // Initial center coordinates
+  const [bounds, setBounds] = useState<LatLngBounds>(
+    new LatLngBounds([0, 0], [0, 0])
+  );
+  const [zoom, setZoom] = useState<number>(13);
+  const geoData = useGeoData(bounds, zoom);
   const [markerPosition, setMarkerPosition] = useState<LatLng>(center);
+
+  const UpdateBounds = () => {
+    useMapEvents({
+      moveend: (event) => {
+        setBounds(event.target.getBounds());
+        setZoom(event.target.getZoom());
+      },
+    });
+    return null;
+  };
 
   const MapEventsHandler = () => {
     const map = useMap();
@@ -85,7 +100,8 @@ const MapView: React.FC = () => {
       <MapOptions />
 
       <MapContainer center={center} zoom={13} className="map">
-        <GeoJSON data={fetchData()} />
+        {geoData && <GeoJSON data={geoData} />}
+        <UpdateBounds />
 
         <MapEventsHandler />
         <TileLayer
