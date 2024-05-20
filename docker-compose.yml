@@ -1,3 +1,8 @@
+version: "3.8"
+
+networks:
+  bie-network:
+
 services:
   # Frontend container
   frontend:
@@ -7,20 +12,57 @@ services:
     container_name: frontend
     image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-frontend
     environment:
-      - HOST=${FRONTEND_HOST}
-      - PORT=${FRONTEND_PORT}
+      - HOST=frontend
+      - PORT=80
     ports:
-      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+      - 8080:80
 
-  # Backend container
-  backend:
+  # Backend containers
+  app:
     build:
       context: ./backend/src/BIE.Core
       dockerfile: Dockerfile
-    container_name: backend
-    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-backend
+    container_name: app
     environment:
-      - HOST=${BACKEND_HOST}
-      - PORT=${BACKEND_PORT}
+    - ASPNETCORE_ENVIRONMENT=Development #Need to be production for prod env
+    - DB_NAME=BIEDB
+    - DB_PASSWORD=MyPass@1234
+    - DB_SERVER=db
+    - DB_USERNAME=sa
+    - DB_TYPE=SQL
+    - TRUSTED=False
     ports:
-      - "${BACKEND_PORT}:${BACKEND_PORT}"
+      - 8081:80
+    networks:
+      - bie-network
+    depends_on:
+      - db
+
+
+  datapipeline:
+    build:
+      context: ./backend/src/BIE.DataPipeline
+      dockerfile: Dockerfile
+    environment:
+    - DB_NAME=BIEDB
+    - DB_PASSWORD=MyPass@1234
+    - DB_SERVER=db
+    - DB_USERNAME=sa
+    - DB_TYPE=SQL
+    - TRUSTED=False
+    container_name: datapipeline
+    networks:
+      - bie-network
+    depends_on:
+    - db
+  db:
+    build:
+      context: ./backend/database
+      dockerfile: Dockerfile
+    networks:
+      - bie-network
+    volumes:
+      - bie-mssqldata:/var/opt/mssql
+
+volumes:
+    bie-mssqldata:
