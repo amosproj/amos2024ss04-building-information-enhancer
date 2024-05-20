@@ -11,6 +11,8 @@ import Button from "@mui/material/Button";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import MapOptions from "./MapOptions";
+import { fetchData } from "./DataFetch";
+import { GeoJSON } from "react-leaflet";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -83,6 +85,8 @@ const MapView: React.FC = () => {
       <MapOptions />
 
       <MapContainer center={center} zoom={13} className="map">
+        <GeoJSON data={fetchData()} />
+
         <MapEventsHandler />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

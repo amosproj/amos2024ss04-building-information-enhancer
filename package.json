@@ -10,5 +10,9 @@
     "deploy": "docker compose up --build -d",
     "deploy:dev:frontend": "cd frontend/ && npm run dev",
     "deploy:dev:backend": "cd backend/"
+  },
+  "dependencies": {
+    "@types/geojson": "^7946.0.14",
+    "geojson": "^0.5.0"
   }
 }
