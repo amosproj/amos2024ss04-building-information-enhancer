@@ -10,9 +10,14 @@ namespace BIE.Data
     public interface IDatabase
     {
         void SetConnectionString(DatabaseType databaseType, string connectionString);
-        void SetConnectionString(DatabaseType dbType, string dbServer, string dbName,
-                                                string userId, string password,
-                                                bool trustedConnection);
+
+        void SetConnectionString(DatabaseType dbType,
+            string dbServer,
+            string dbName,
+            string userId,
+            string password,
+            bool trustedConnection);
+
         DbProviderFactory Factory { get; }
         DbCommand CreateSPCommand(string spName, List<DbParameter> parameters = null, DbTransaction trans = null);
         DbCommand CreateCommand(string query, DbTransaction trans = null);
@@ -21,6 +26,7 @@ namespace BIE.Data
         object ExecuteScalar(DbCommand command);
         void Execute(DbCommand command);
 
+        (DbDataReader reader, DbConnection connection) ExecuteReader(DbCommand command);
     }
 
     public class Database : IDatabase
@@ -32,7 +38,6 @@ namespace BIE.Data
 
         private Database()
         {
-
         }
 
         public static IDatabase Instance
@@ -48,9 +53,12 @@ namespace BIE.Data
             }
         }
 
-        public void SetConnectionString(DatabaseType dbType, string dbServer, string dbName,
-                                                string userId, string password,
-                                                bool trustedConnection)
+        public void SetConnectionString(DatabaseType dbType,
+            string dbServer,
+            string dbName,
+            string userId,
+            string password,
+            bool trustedConnection)
         {
             SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
             builder.DataSource = dbServer;
@@ -63,8 +71,10 @@ namespace BIE.Data
                 builder.UserID = userId;
                 builder.Password = password;
             }
+
             this.SetConnectionString(dbType, builder.ConnectionString);
         }
+
         public void SetConnectionString(DatabaseType dbType, string connectionString)
         {
             _dbType = dbType;
@@ -139,18 +149,15 @@ namespace BIE.Data
             return r;
         }
 
-        public DbDataReader ExecuteReader(DbCommand command)
+        public ( DbDataReader reader, DbConnection connection) ExecuteReader(DbCommand command)
         {
             DbDataReader r;
-            using (DbConnection con = this.CreateConnection())
-            {
-                con.Open();
-                command.Connection = con;
-                r = command.ExecuteReader();
-                con.Close();
-            }
+            var con = CreateConnection();
+            con.Open();
+            command.Connection = con;
+            r = command.ExecuteReader();
 
-            return r;
+            return ( r, con );
         }
 
         public void Execute(DbCommand command)

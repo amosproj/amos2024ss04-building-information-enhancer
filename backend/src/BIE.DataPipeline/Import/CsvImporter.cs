@@ -81,12 +81,12 @@ namespace BIE.DataPipeline.Import
 
                         if (columnTypes[i] == typeof(string))
                         {
-                            nextLine += string.Format("'{0}',", line[i]);
+                            nextLine += $"'{line[i]}',";
                         }
                         else
                         {
-                            nextLine += string.Format("{0},", Convert.ChangeType(line[i], columnTypes[i]));
-                            //nextLine += string.Format("{0},", line[i]);
+                            // nextLine += string.Format("{0},", Convert.ChangeType(line[i], columnTypes[i]));
+                            nextLine += $"{line[i]},";
                         }
                     }
                     catch (System.FormatException ex)

@@ -19,8 +19,9 @@ namespace BIE.DataPipeline
         /// </summary>
         internal static void CreateDBConnection()
         {
-           ConfigureEnviornmentVaraiables();
+            ConfigureEnviornmentVaraiables();
         }
+
         /// <summary>
         /// To create table in DB
         /// </summary>
@@ -28,30 +29,43 @@ namespace BIE.DataPipeline
         internal static void CreateTable(DataSourceDescription description)
         {
             var db = Database.Instance;
-            string query = "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '"+description.table_name+"')\r\nBEGIN CREATE TABLE " + description.table_name;
+            string query = "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '" +
+                           description.table_name + "')\r\nBEGIN CREATE TABLE " + description.table_name;
             query += " (";
-            foreach ( var column in description.table_cols)
+            foreach (var column in description.table_cols)
             {
-                query += " " + column.name_in_table +" " + column.type + ", ";
+                query += " " + column.name_in_table + " " + column.type + ", ";
             }
+
             query += "); END";
             DbCommand cmd = db.CreateCommand(query);
             db.Execute(cmd);
         }
+
         /// <summary>
         /// To insert data into DB
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="columnNames"></param>
         /// <param name="values"></param>
-        internal static void InsertData(string tableName, string columnNames ,string values)
+        internal static void InsertData(string tableName, string columnNames, string values)
         {
             var db = Database.Instance;
-            string query = "INSERT INTO " + tableName + " ( "+columnNames+" ) " +" VALUES "+ " ( " + values + " );";
-            Console.WriteLine(query);
-            DbCommand cmd = db.CreateCommand(query);
-            db.Execute(cmd);
+            string query = "INSERT INTO " + tableName + " ( " + columnNames + " ) " + " VALUES " + " ( " + values +
+                           " );";
+            // Console.WriteLine(query);
+            try
+            {
+                DbCommand cmd = db.CreateCommand(query);
+                db.Execute(cmd);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Failed at:\n" + query);
+                throw;
+            }
         }
+
         /// <summary>
         /// To set enviornment variables
         /// </summary>
@@ -63,10 +77,14 @@ namespace BIE.DataPipeline
             var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
             bool dbTrusted = Environment.GetEnvironmentVariable("TRUSTED").ToLower() == "true";
             DatabaseType dbType = (DatabaseType)Enum.Parse(typeof(DatabaseType),
-                Environment.GetEnvironmentVariable("DB_TYPE"));
+                                                           Environment.GetEnvironmentVariable("DB_TYPE"));
 
-            Database.Instance.SetConnectionString(dbType, dbServer,
-                dbName, dbUser, dbPassword, dbTrusted);
+            Database.Instance.SetConnectionString(dbType,
+                                                  dbServer,
+                                                  dbName,
+                                                  dbUser,
+                                                  dbPassword,
+                                                  dbTrusted);
         }
     }
 }
