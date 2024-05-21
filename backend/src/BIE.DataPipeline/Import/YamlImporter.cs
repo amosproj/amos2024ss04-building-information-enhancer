@@ -20,7 +20,8 @@ namespace BIE.DataPipeline.Import
                 throw new FormatException(path + " is not a yaml file");
             }
 
-            var yaml = File.ReadAllText(path, Encoding.GetEncoding("iso-8859-1"));
+            // var yaml = File.ReadAllText(path, Encoding.GetEncoding("iso-8859-1"));
+            var yaml = File.ReadAllText(path);
 
             var deserializer = new Deserializer();
 

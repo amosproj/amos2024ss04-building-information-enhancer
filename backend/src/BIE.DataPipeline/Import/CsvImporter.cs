@@ -82,47 +82,46 @@ namespace BIE.DataPipeline.Import
                     continue;
 
                 }
-                else
 
+                int yamlIndex = 0;
+                for(int i = 0; i < line.Length; i++)
                 {
-                    int yamlIndex = 0;
-                    for(int i = 0; i < line.Length; i++)
+
+                    //check if fileheader is equals to yaml header
+                    // TODO: this means yaml always needs to be in the same sequence as the headers in the file
+                    // also fails if there is an encoding error for a header.
+                    if (fileHeader[i].Equals(yamlHeader[yamlIndex]))
                     {
-
-                        //check if fileheader is equals to yaml header
-                        if (fileHeader[i].Equals(yamlHeader[yamlIndex]))
+                        //check if the value can be empty
+                        if (dataSourceDescription.table_cols[yamlIndex].is_not_nullable && line[i] == "")
                         {
-                            //check if the value can be empty
-                            if (dataSourceDescription.table_cols[yamlIndex].is_not_nullable && line[i] == "")
-                            {
-                                Console.WriteLine("Line does not match not null criteria");
-                                //Read next line
-                                nextLine = "";
-                                continue;
-                            }
-                            try
-                            {
-                                line[i] = line[i].Replace("'", "''");
-                                line[i] = line[i].Replace(",", ".");
-
-                                if (columnTypes[i] == typeof(string))
-                                {
-                                    nextLine += $"'{line[i]}',";
-                                }
-                                else
-                                {
-                                    // nextLine += string.Format("{0},", Convert.ChangeType(line[i], columnTypes[i]));
-                                    nextLine += $"{line[i]},";
-                                }
-                            }
-                            catch (System.FormatException ex)
-                            {
-                                Console.Error.WriteLine(string.Format("{3} Fauld parsing {0} to type {1} in column {2}", line[i], columnTypes[yamlIndex], fileHeader[i], i));
-                                return false;
-                            }
-                            yamlIndex++;
-
+                            Console.WriteLine("Line does not match not null criteria");
+                            //Read next line
+                            nextLine = "";
+                            continue;
                         }
+                        try
+                        {
+                            line[i] = line[i].Replace("'", "''");
+                            line[i] = line[i].Replace(",", ".");
+
+                            if (columnTypes[i] == typeof(string))
+                            {
+                                nextLine += $"'{line[i]}',";
+                            }
+                            else
+                            {
+                                // nextLine += string.Format("{0},", Convert.ChangeType(line[i], columnTypes[i]));
+                                nextLine += $"{line[i]},";
+                            }
+                        }
+                        catch (System.FormatException ex)
+                        {
+                            Console.Error.WriteLine(string.Format("{3} Fauld parsing {0} to type {1} in column {2}", line[i], columnTypes[yamlIndex], fileHeader[i], i));
+                            return false;
+                        }
+                        yamlIndex++;
+
                     }
                 }
             }
