@@ -57,20 +57,21 @@ const MultiMap = () => {
       (tab) => tab.id !== id
     );
     // Reorder the tabs IDs
-    let startingID = 0;
+    let tempID = 0;
     const updatedOpenedTabs = newOpenedTabs.map((tab) => {
-      startingID = startingID + 1;
+      tempID = tempID + 1;
       return {
         ...tab,
-        id: startingID.toString(),
+        id: tempID.toString(),
       };
     });
     // Check if the current tab ID does not have to change
     const newCurrentTabID =
       Number(currentTabsCache.currentTabID) > updatedOpenedTabs.length - 1
-        ? (updatedOpenedTabs.length - 1).toString()
+        ? updatedOpenedTabs.length.toString()
         : currentTabsCache.currentTabID;
 
+    console.log(newCurrentTabID);
     setCurrentTabsCache({
       ...currentTabsCache,
       openedTabs: updatedOpenedTabs,
