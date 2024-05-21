@@ -11,6 +11,8 @@ services:
       - PORT=${FRONTEND_PORT}
       - BACKEND_HOST=${BACKEND_HOST}
       - BACKEND_PORT=${BACKEND_PORT}
+    networks:
+      - bie-network
     ports:
       - ${FRONTEND_PORT}:${FRONTEND_PORT}
 
@@ -72,3 +74,4 @@ volumes:
 
 networks:
   bie-network:
+    driver: bridge
