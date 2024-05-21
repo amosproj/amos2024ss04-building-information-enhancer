@@ -45,7 +45,7 @@ const columns: GridColDef[] = [
     renderCell: renderDetailsButton,
   },
   { field: "key", headerName: "key", width: 150 },
-  { field: "value", headerName: "value", type: "number", width: 150 },
+  { field: "value", headerName: "value", type: "number", width: 150, getApplyQuickFilterFn: undefined },
 ];
 
 // Data
