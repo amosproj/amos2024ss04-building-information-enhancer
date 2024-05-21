@@ -66,6 +66,7 @@ namespace BIE.DataPipeline.Import
             nextLine = "";
             while(nextLine == "")
             {
+
                 if (parser.EndOfData)
                 {
                     return false;
@@ -82,10 +83,12 @@ namespace BIE.DataPipeline.Import
 
                 }
                 else
+
                 {
                     int yamlIndex = 0;
                     for(int i = 0; i < line.Length; i++)
                     {
+
                         //check if fileheader is equals to yaml header
                         if (fileHeader[i].Equals(yamlHeader[yamlIndex]))
                         {
@@ -100,13 +103,16 @@ namespace BIE.DataPipeline.Import
                             try
                             {
                                 line[i] = line[i].Replace("'", "''");
-                                if (columnTypes[yamlIndex] == typeof(string))
+                                line[i] = line[i].Replace(",", ".");
+
+                                if (columnTypes[i] == typeof(string))
                                 {
-                                    nextLine += string.Format("'{0}',", line[i]);
+                                    nextLine += $"'{line[i]}',";
                                 }
                                 else
                                 {
-                                    nextLine += string.Format("{0},", Convert.ChangeType(line[i], columnTypes[yamlIndex]));
+                                    // nextLine += string.Format("{0},", Convert.ChangeType(line[i], columnTypes[i]));
+                                    nextLine += $"{line[i]},";
                                 }
                             }
                             catch (System.FormatException ex)
@@ -115,6 +121,7 @@ namespace BIE.DataPipeline.Import
                                 return false;
                             }
                             yamlIndex++;
+
                         }
                     }
                 }
@@ -166,6 +173,9 @@ namespace BIE.DataPipeline.Import
                 case "FLOAT":
                     return typeof(float);
                 case "DOUBLE":
+                case "DECIMAL":
+                case "DECIMAL(8,6)":
+                case "DECIMAL(9,6)":
                     return typeof(double);
                 default:
                     throw new NotSupportedException(string.Format("The type {0} is currently not supporteted.", shortType));
