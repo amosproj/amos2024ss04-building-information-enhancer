@@ -1,10 +1,5 @@
-version: "3.8"
-
-networks:
-  bie-network:
-
 services:
-  # Frontend container
+  # Frontend - Apache HTTP server (React + Typescript)
   frontend:
     build:
       context: ./frontend
@@ -12,50 +7,55 @@ services:
     container_name: frontend
     image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-frontend
     environment:
-      - HOST=frontend
-      - PORT=80
+      - HOST=${FRONTEND_HOST}
+      - PORT=${FRONTEND_PORT}
+      - BACKEND_HOST=${BACKEND_HOST}
+      - BACKEND_PORT=${BACKEND_PORT}
     ports:
-      - 8080:80
+      - ${FRONTEND_PORT}:${FRONTEND_PORT}
 
-  # Backend containers
-  app:
+  # API Gateway for listening for FE requests
+  api-gateway:
     build:
       context: ./backend/src/BIE.Core
       dockerfile: Dockerfile
-    container_name: app
+    container_name: api-gateway
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-api-gateway
     environment:
-    - ASPNETCORE_ENVIRONMENT=Development #Need to be production for prod env
-    - DB_NAME=BIEDB
-    - DB_PASSWORD=MyPass@1234
-    - DB_SERVER=db
-    - DB_USERNAME=sa
-    - DB_TYPE=SQL
-    - TRUSTED=False
+      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT_STAGE} # Needs to be changed to `Production` for production env.
+      - DB_NAME=BIEDB
+      - DB_PASSWORD=MyPass@1234
+      - DB_SERVER=sql-db
+      - DB_USERNAME=sa
+      - DB_TYPE=SQL
+      - TRUSTED=False
     ports:
-      - 8081:80
+      - ${BACKEND_PORT}:80
     networks:
       - bie-network
     depends_on:
-      - db
+      - sql-db
 
-
+  ## Data Pipeline for ingesting the datasets
   datapipeline:
     build:
       context: ./backend/src/BIE.DataPipeline
       dockerfile: Dockerfile
     environment:
-    - DB_NAME=BIEDB
-    - DB_PASSWORD=MyPass@1234
-    - DB_SERVER=db
-    - DB_USERNAME=sa
-    - DB_TYPE=SQL
-    - TRUSTED=False
+      - DB_NAME=BIEDB
+      - DB_PASSWORD=MyPass@1234
+      - DB_SERVER=sql-db
+      - DB_USERNAME=sa
+      - DB_TYPE=SQL
+      - TRUSTED=False
     container_name: datapipeline
     networks:
       - bie-network
     depends_on:
-    - db
-  db:
+      - sql-db
+
+  ## Main SQL DB for storing the datasets
+  sql-db:
     build:
       context: ./backend/database
       dockerfile: Dockerfile
@@ -65,4 +65,7 @@ services:
       - bie-mssqldata:/var/opt/mssql
 
 volumes:
-    bie-mssqldata:
+  bie-mssqldata:
+
+networks:
+  bie-network:
