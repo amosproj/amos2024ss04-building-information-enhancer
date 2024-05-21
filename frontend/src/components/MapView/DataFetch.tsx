@@ -11,19 +11,27 @@ const useGeoData = (
   const [data, setData] = useState<FeatureCollection<Geometry>>();
 
   useEffect(() => {
-    /* eslint-disable */ const fetchData = async (_bounds: LatLngBounds) => {
-      /* eslint-enable */
-      // Uncomment and adjust the following lines to fetch data from an API
-      // const url = `https://example.com/api/geo?bounds=${bounds.toBBoxString()}&zoom=${zoom}`;
-      // const response = await fetch(url);
-      // const result = await response.json();
-      setData(geojsonData as FeatureCollection<Geometry>);
+    const fetchData = async () => {
+      try {
+        const bottomLat = bounds.getSouth();
+        const bottomLong = bounds.getWest();
+        const topLat = bounds.getNorth();
+        const topLong = bounds.getEast();
+
+        const url = `https://localhost:5001/api/v1.0/Dataset/1/data?bottomLat=${bottomLat}&bottomLong=${bottomLong}&topLat=${topLat}&topLong=${topLong}&zoomLevel=${zoom}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const result = await response.json();
+        setData(result as FeatureCollection<Geometry>);
+      } catch (error) {
+        console.error("Fetching data failed, using local GeoJSON data:", error);
+        setData(geojsonData as FeatureCollection<Geometry>);
+      }
     };
 
-    fetchData(bounds);
-    console.log(
-      `Data fetched for bounds: ${bounds.toBBoxString()} and zoom: ${zoom}`
-    );
+    fetchData();
   }, [bounds, zoom]);
 
   return data;
