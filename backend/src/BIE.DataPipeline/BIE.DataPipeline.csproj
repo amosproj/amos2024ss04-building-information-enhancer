@@ -35,9 +35,4 @@
     </Content>
   </ItemGroup>
 
-  <PropertyGroup>
-    <PublishSingleFile>true</PublishSingleFile>
-  </PropertyGroup>    
-
-
 </Project>

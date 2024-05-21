@@ -28,6 +28,8 @@ namespace BIE.DataPipeline
         /// <param name="description"></param>
         internal static void CreateTable(DataSourceDescription description)
         {
+            Console.WriteLine("Creating Table...");
+            
             var db = Database.Instance;
             string query = "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '" +
                            description.table_name + "')\r\nBEGIN CREATE TABLE " + description.table_name;
@@ -40,6 +42,8 @@ namespace BIE.DataPipeline
             query += "); END";
             DbCommand cmd = db.CreateCommand(query);
             db.Execute(cmd);
+            
+            Console.WriteLine("Table created.");
         }
 
         /// <summary>

@@ -1,5 +1,5 @@
 #!/bin/bash
 
-sleep 60s
+sleep 40s
 
 dotnet BIE.DataPipeline.dll ./yaml/test.yaml

@@ -66,6 +66,7 @@ namespace BIE.DataPipeline.Import
             nextLine = "";
             while(nextLine == "")
             {
+                // Console.Write($"trying to write");
 
                 if (parser.EndOfData)
                 {
@@ -100,6 +101,7 @@ namespace BIE.DataPipeline.Import
                             nextLine = "";
                             continue;
                         }
+
                         try
                         {
                             line[i] = line[i].Replace("'", "''");
@@ -117,12 +119,20 @@ namespace BIE.DataPipeline.Import
                         }
                         catch (System.FormatException ex)
                         {
-                            Console.Error.WriteLine(string.Format("{3} Fauld parsing {0} to type {1} in column {2}", line[i], columnTypes[yamlIndex], fileHeader[i], i));
+                            Console.Error.WriteLine(string.Format("{3} Fauld parsing {0} to type {1} in column {2}",
+                                                                  line[i],
+                                                                  columnTypes[yamlIndex],
+                                                                  fileHeader[i],
+                                                                  i));
                             return false;
                         }
+
                         yamlIndex++;
+                        continue;
 
                     }
+                    
+                    Console.WriteLine("line is: ");
                 }
             }
             nextLine = RemoveLastComma(nextLine);
@@ -206,9 +216,12 @@ namespace BIE.DataPipeline.Import
             else
             {
                 //Http path
+                Console.WriteLine($"Grabbing Webfile {dataSourceDescription.source.location}");
                 WebClient client = new WebClient();
                 Stream stream = client.OpenRead(dataSourceDescription.source.location);
                 parser = new TextFieldParser(stream);
+                
+                Console.WriteLine("File loaded.");
             }
 
             parser.TextFieldType = FieldType.Delimited;
