@@ -1,4 +1,4 @@
-import L, { LatLng } from "leaflet";
+import L, { LatLng, LatLngBounds } from "leaflet";
 import React, { createContext, useState, ReactNode } from "react";
 
 //// TYPES ////
@@ -11,6 +11,7 @@ export type CoordinatesProps = [number, number];
 export type MapCacheProps = {
   selectedCoordinates: LatLng;
   mapCenter: LatLng;
+  mapBounds: LatLngBounds;
   zoom: number;
 };
 
@@ -31,6 +32,7 @@ type MapContextProviderProps = {
 const defaultMapCache: MapCacheProps = {
   selectedCoordinates: L.latLng([49.5732, 11.0288]),
   mapCenter: L.latLng([49.5732, 11.0288]),
+  mapBounds: L.latLngBounds([49.5732, 11.0288], [49.5732, 11.0288]),
   zoom: 13,
 };
 

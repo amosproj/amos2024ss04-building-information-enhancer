@@ -6,12 +6,12 @@ import { TileLayer } from "react-leaflet/TileLayer";
 import "leaflet/dist/leaflet.css";
 import "./MapView.css";
 import { useMap, useMapEvents } from "react-leaflet/hooks";
-import L, { LatLng, LatLngBounds } from "leaflet";
+import L from "leaflet";
 import Button from "@mui/material/Button";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import MapOptions from "./MapOptions";
-import useGeoData, { fetchData } from "./DataFetch";
+import useGeoData from "./DataFetch";
 import { GeoJSON } from "react-leaflet";
 import { MapContext } from "../../contexts/MapContext";
 
@@ -41,16 +41,7 @@ function Btn() {
 
 const MapView: React.FC = () => {
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
-
-  const UpdateBounds = () => {
-    useMapEvents({
-      moveend: (event) => {
-        setBounds(event.target.getBounds());
-        setZoom(event.target.getZoom());
-      },
-    });
-    return null;
-  };
+  const geoData = useGeoData(currentMapCache.mapBounds, currentMapCache.zoom);
 
   const MapEventsHandler = () => {
     const map = useMap();
@@ -62,16 +53,12 @@ const MapView: React.FC = () => {
           selectedCoordinates: event.latlng,
         });
       },
-      zoomend: (event) => {
-        setCurrentMapCache({
-          ...currentMapCache,
-          zoom: event.target.getZoom(),
-        });
-      },
-      dragend: (event) => {
+      moveend: (event) => {
         setCurrentMapCache({
           ...currentMapCache,
           mapCenter: event.target.getCenter(),
+          mapBounds: event.target.getBounds(),
+          zoom: event.target.getZoom(),
         });
       },
     });
@@ -117,12 +104,13 @@ const MapView: React.FC = () => {
         zoom={currentMapCache.zoom}
         className="map"
       >
+        {geoData && <GeoJSON data={geoData} />}
+
         <MapEventsHandler />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <Btn />
       </MapContainer>
     </div>
   );
