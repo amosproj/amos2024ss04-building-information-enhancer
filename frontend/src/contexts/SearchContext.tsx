@@ -55,6 +55,26 @@ const defaultSearchCache: SearchCacheProps = {
       coordinates: L.latLng([49.5732, 17.0288]),
       displayName: "49°26'46.6\"N 11°04'33.7\"E",
     },
+    {
+      coordinates: L.latLng([41.40338, 2.17403]),
+      displayName: "41°24'12.2\"N 2°10'26.5\"E",
+    },
+    {
+      coordinates: L.latLng([34.05223, -118.24368]),
+      displayName: "34.05223, -118.24368",
+    },
+    {
+      coordinates: L.latLng([48.858844, 2.294351]),
+      displayName: "48.858844, 2.294351",
+    },
+    {
+      coordinates: L.latLng([40.748817, -73.985428]),
+      displayName: "40°44'55.7\"N 73°59'07.5\"W",
+    },
+    {
+      coordinates: L.latLng([51.500729, -0.124625]),
+      displayName: "51°30'02.6\"N 0°07'28.7\"W",
+    }
   ],
   favourites: [
     {
