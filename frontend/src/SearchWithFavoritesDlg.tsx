@@ -18,6 +18,9 @@ import {
 import StarIcon from "@mui/icons-material/Star";
 import EditLocationAltIcon from "@mui/icons-material/EditLocationAlt";
 
+import { OpenStreetMapProvider} from 'leaflet-geosearch';
+
+
 interface FavorableItem {
   id: string; // Unique identifier for the item
   displayValue: string; // Display value shown in the list
@@ -32,6 +35,12 @@ interface SearchWithFavoritesDlgProps {
   options: FavorableItem[];
   onCurrentSearchChanged: (currentSearch: string) => void;
   onItemSelected: (selection: FavorableItem) => void;
+}
+
+interface GeoSearchResult {
+  x: number;
+  y: number;
+  label: string;
 }
 
 const SearchWithFavoritesDlg: React.FC<SearchWithFavoritesDlgProps> = ({
@@ -51,9 +60,30 @@ const SearchWithFavoritesDlg: React.FC<SearchWithFavoritesDlgProps> = ({
   const [longitude, setLongitude] = useState("");
   const [latitudeError, setLatitudeError] = useState(false);
   const [longitudeError, setLongitudeError] = useState(false);
+  const [suggestions, setSuggestions] = useState<Array<GeoSearchResult>>([]);
+
+
+  const handleSearchSuggestions = async (input: string) => {
+    console.log(input);
+    if (input === "") {
+      setSuggestions(new Array());
+      return;
+    }
+    const provider = new OpenStreetMapProvider();
+    const results = await provider.search({ query: input });
+    const transformedResults: GeoSearchResult[] = results.map(result => ({
+      x: result.x,
+      y: result.y,
+      label: result.label
+    }));
+    setSuggestions(transformedResults);
+  };
+
+
 
   const handleModeSwitch = () => {
     if (searchMode === "single") {
+      setSuggestions(new Array());
       setSearchMode("coordinates");
     } else {
       setSearchMode("single");
@@ -91,6 +121,7 @@ const SearchWithFavoritesDlg: React.FC<SearchWithFavoritesDlgProps> = ({
   ) => {
     setSearchText(e.target.value);
     onCurrentSearchChanged(e.target.value);
+    handleSearchSuggestions(e.target.value);
   };
 
   const validateLongitude = (value: string) => {
@@ -223,6 +254,31 @@ const SearchWithFavoritesDlg: React.FC<SearchWithFavoritesDlgProps> = ({
         )}
 
         <List dense={false}>
+        {suggestions.map((item, index) => (
+              <ListItem
+                key={index}
+                disablePadding
+                sx={{ fontSize: "0.2rem", backgroundColor: "#f5f5f5" }}
+              >
+                <ListItemButton
+                  key={index}
+                  onClick={() => onItemSelected({ id: `${item.x}-${item.y}`, displayValue: item.label })}
+                >
+                  <ListItemText
+                    primary={item.label}
+                    sx={{
+                      "& .MuiDialog-container": {
+                        "& .MuiPaper-root": {
+                          width: "100%",
+                          maxWidth: "500px", // Set your width here
+                        },
+                      },
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
+        <Divider /> 
           {favorites.filter(filterByCoordinates).map((item, index) => (
             <ListItem
               key={index}
