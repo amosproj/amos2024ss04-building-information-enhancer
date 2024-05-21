@@ -1,35 +1,43 @@
 .app-container {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
+  height: 100svh;
+  max-height: 100vh;
 }
 
 .header {
-  height: 10svh;
   display: flex;
   vertical-align: middle;
-}
-
-.title {
+  height: 10vh;
   padding: 1rem 2rem;
   margin: 0;
   font-size: 1.2rem;
   font-weight: 500;
-  display: flex;
   align-items: center;
 }
 
 .content-container {
   display: flex;
   flex-direction: row;
-  height: 100%;
+  height: 90vh;
   padding: 0rem 2rem 1rem 2rem;
   gap: 1rem;
 }
 
 .dataview-container {
+  width: 50%;
   display: flex;
   flex-direction: column;
+  height: 100%;
+}
+
+.datapanels-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  gap: 1rem;
 }
 
 .toggle-work {
