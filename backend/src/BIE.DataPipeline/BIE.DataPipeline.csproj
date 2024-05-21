@@ -28,8 +28,11 @@
     <ProjectReference Include="BIE.Data\BIE.Data.csproj" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <PublishSingleFile>true</PublishSingleFile>
-  </PropertyGroup>    
+
+  <ItemGroup>
+    <Content Include="yaml\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
 </Project>

@@ -5,7 +5,6 @@ import React, { createContext, useState, ReactNode } from "react";
 
 // Map Selection Type
 export type MapSelection = {
-  id: string;
   coordinates: LatLng;
   displayName: string;
 };
@@ -33,45 +32,57 @@ type SearchContextProviderProps = {
 const defaultSearchCache: SearchCacheProps = {
   searchHistory: [
     {
-      id: "1",
-      coordinates: L.latLng([49.5732, 11.0288]),
+      coordinates: L.latLng([49.5732, 12.0288]),
       displayName: "Nuremberg",
     },
     {
-      id: "2",
-      coordinates: L.latLng([49.5732, 11.0288]),
+      coordinates: L.latLng([49.5732, 13.0288]),
       displayName: "Munich",
     },
     {
-      id: "3",
-      coordinates: L.latLng([49.5732, 11.0288]),
+      coordinates: L.latLng([49.5732, 14.0288]),
       displayName: "Andreij Sacharow Platz 1, 90402 Nuremberg",
     },
     {
-      id: "4",
-      coordinates: L.latLng([49.5732, 11.0288]),
+      coordinates: L.latLng([49.5732, 15.0288]),
       displayName: "Main train station Nuremberg",
     },
     {
-      id: "5",
-      coordinates: L.latLng([49.5732, 11.0288]),
+      coordinates: L.latLng([49.5732, 16.0288]),
       displayName: "Walter-Meckauer-Street 20",
     },
     {
-      id: "6",
-      coordinates: L.latLng([49.5732, 11.0288]),
+      coordinates: L.latLng([49.5732, 17.0288]),
       displayName: "49°26'46.6\"N 11°04'33.7\"E",
     },
+    {
+      coordinates: L.latLng([41.40338, 2.17403]),
+      displayName: "41°24'12.2\"N 2°10'26.5\"E",
+    },
+    {
+      coordinates: L.latLng([34.05223, -118.24368]),
+      displayName: "34.05223, -118.24368",
+    },
+    {
+      coordinates: L.latLng([48.858844, 2.294351]),
+      displayName: "48.858844, 2.294351",
+    },
+    {
+      coordinates: L.latLng([40.748817, -73.985428]),
+      displayName: "40°44'55.7\"N 73°59'07.5\"W",
+    },
+    {
+      coordinates: L.latLng([51.500729, -0.124625]),
+      displayName: "51°30'02.6\"N 0°07'28.7\"W",
+    }
   ],
   favourites: [
     {
-      id: "1",
-      coordinates: L.latLng([49.5732, 11.0288]),
+      coordinates: L.latLng([49.5732, 12.0288]),
       displayName: "Nuremberg",
     },
     {
-      id: "2",
-      coordinates: L.latLng([49.5732, 11.0288]),
+      coordinates: L.latLng([49.5732, 13.0288]),
       displayName: "Munich",
     },
   ],

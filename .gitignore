@@ -51,6 +51,9 @@ bin/
 *.userosscache
 *.sln.docstates
 
+# also adding launchsettings here
+launchsettings.json
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

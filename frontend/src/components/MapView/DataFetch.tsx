@@ -32,9 +32,6 @@ const useGeoData = (
     };
 
     fetchData(bounds);
-    console.log(
-      `Data fetched for bounds: ${bounds.toBBoxString()} and zoom: ${zoom}`
-    );
   }, [bounds, zoom]);
 
   return data;
