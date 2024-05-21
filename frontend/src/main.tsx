@@ -4,12 +4,15 @@ import App from "./App.tsx";
 import "./index.css";
 import { TabsContextProvider } from "./contexts/TabsContext.tsx";
 import { MapContextProvider } from "./contexts/MapContext.tsx";
+import { SearchContextProvider } from "./contexts/SearchContext.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <TabsContextProvider>
       <MapContextProvider>
-        <App />
+        <SearchContextProvider>
+          <App />
+        </SearchContextProvider>
       </MapContextProvider>
     </TabsContextProvider>
   </React.StrictMode>

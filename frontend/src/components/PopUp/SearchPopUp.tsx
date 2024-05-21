@@ -32,7 +32,9 @@ const SearchPopUp: React.FC<SearchPopUpProps> = ({
   const filterBySearchtxtAndIfInFavorites = (item: MapSelection) => {
     return (
       item.displayName.toLowerCase().includes(searchText.toLowerCase()) &&
-      !currentSearchCache.favourites.some((fav) => fav.id === item.id)
+      !currentSearchCache.favourites.some((fav) =>
+        fav.coordinates.equals(item.coordinates)
+      )
     );
   };
 
@@ -41,19 +43,24 @@ const SearchPopUp: React.FC<SearchPopUpProps> = ({
   };
 
   // Adds an item to the favourites
-  const addToFavourites = (item: MapSelection) => {
-    if (!currentSearchCache.favourites.some((fav) => fav.id === item.id)) {
+  const addToFavourites = (newLocation: MapSelection) => {
+    if (
+      !currentSearchCache.favourites.some((fav) =>
+        fav.coordinates.equals(newLocation.coordinates)
+      )
+    ) {
+      const newFav = [...currentSearchCache.favourites, newLocation];
       setCurrentSearchCache({
         ...currentSearchCache,
-        favourites: [...currentSearchCache.favourites, item],
+        favourites: newFav,
       });
     }
   };
 
   // Removes an item from the favourites
-  const removeFromFavourites = (itemToRemove: MapSelection) => {
+  const removeFromFavourites = (locationToRemove: MapSelection) => {
     const updatedFavorites = currentSearchCache.favourites.filter(
-      (item) => item.id !== itemToRemove.id
+      (item) => !item.coordinates.equals(locationToRemove.coordinates)
     );
     setCurrentSearchCache({
       ...currentSearchCache,
@@ -107,7 +114,7 @@ const SearchPopUp: React.FC<SearchPopUpProps> = ({
                     "& .MuiDialog-container": {
                       "& .MuiPaper-root": {
                         width: "100%",
-                        maxWidth: "500px", // Set your width here
+                        maxWidth: "500px",
                       },
                     },
                   }}

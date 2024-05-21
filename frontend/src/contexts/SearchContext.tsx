@@ -5,7 +5,6 @@ import React, { createContext, useState, ReactNode } from "react";
 
 // Map Selection Type
 export type MapSelection = {
-  id: string;
   coordinates: LatLng;
   displayName: string;
 };
@@ -33,45 +32,37 @@ type SearchContextProviderProps = {
 const defaultSearchCache: SearchCacheProps = {
   searchHistory: [
     {
-      id: "1",
-      coordinates: L.latLng([49.5732, 11.0288]),
+      coordinates: L.latLng([49.5732, 12.0288]),
       displayName: "Nuremberg",
     },
     {
-      id: "2",
-      coordinates: L.latLng([49.5732, 11.0288]),
+      coordinates: L.latLng([49.5732, 13.0288]),
       displayName: "Munich",
     },
     {
-      id: "3",
-      coordinates: L.latLng([49.5732, 11.0288]),
+      coordinates: L.latLng([49.5732, 14.0288]),
       displayName: "Andreij Sacharow Platz 1, 90402 Nuremberg",
     },
     {
-      id: "4",
-      coordinates: L.latLng([49.5732, 11.0288]),
+      coordinates: L.latLng([49.5732, 15.0288]),
       displayName: "Main train station Nuremberg",
     },
     {
-      id: "5",
-      coordinates: L.latLng([49.5732, 11.0288]),
+      coordinates: L.latLng([49.5732, 16.0288]),
       displayName: "Walter-Meckauer-Street 20",
     },
     {
-      id: "6",
-      coordinates: L.latLng([49.5732, 11.0288]),
+      coordinates: L.latLng([49.5732, 17.0288]),
       displayName: "49°26'46.6\"N 11°04'33.7\"E",
     },
   ],
   favourites: [
     {
-      id: "1",
-      coordinates: L.latLng([49.5732, 11.0288]),
+      coordinates: L.latLng([49.5732, 12.0288]),
       displayName: "Nuremberg",
     },
     {
-      id: "2",
-      coordinates: L.latLng([49.5732, 11.0288]),
+      coordinates: L.latLng([49.5732, 13.0288]),
       displayName: "Munich",
     },
   ],
