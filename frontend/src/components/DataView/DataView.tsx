@@ -7,42 +7,29 @@ import TabContext from "@mui/lab/TabContext/TabContext";
 import Tab from "@mui/material/Tab/Tab";
 import TabList from "@mui/lab/TabList/TabList";
 import { CaretDown } from "@phosphor-icons/react";
-import PopUp from "../Popup/Popup";
-import { useState } from "react";
-
-interface OptionItem {
-  id: string;
-  displayValue: string;
-}
+import { useContext, useState } from "react";
+import { TabsContext } from "../../contexts/TabsContext";
+import SearchPopUp from "../PopUp/SearchPopUp";
 
 function DataView() {
-  const [openDialog, setOpenDialog] = useState(false);
+  // Access the tabs context
+  const { currentTabsCache } = useContext(TabsContext);
 
-  const handleOpenDialog = () => {
-    setOpenDialog(true);
+  // Function to always return the title of the currently opened tab
+  const getCurrentTabTitle = (): string => {
+    const currentTabID = currentTabsCache.currentTabID.toString();
+    const currentTab = currentTabsCache.openedTabs.find(
+      (tab) => tab.id === currentTabID
+    );
+
+    return currentTab ? currentTab.title : "No map loaded";
   };
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
+  // Stores the state of if the search popup is open
+  const [ifOpenedDialog, setIfOpenedDialog] = useState(false);
+  const toggleIfOpenedDialog = () => {
+    setIfOpenedDialog(!ifOpenedDialog);
   };
-
-  const [favorites, setFavorites] = useState<OptionItem[]>([
-    { id: "1", displayValue: "Nuremberg" },
-    { id: "2", displayValue: "Munich" },
-  ]);
-  const [options] = useState<OptionItem[]>([
-    { id: "1", displayValue: "Nuremberg" },
-    { id: "2", displayValue: "Munich" },
-    {
-      id: "3",
-      displayValue: "Andreij Sacharow Platz 1, 90402 Nuremberg",
-    },
-    { id: "4", displayValue: "Main train station Nuremberg" },
-    { id: "5", displayValue: "Walter-Meckauer-Street 20" },
-    { id: "6", displayValue: "49°26'46.6\"N 11°04'33.7\"E" },
-  ]);
-
-  const onCurrentSearchChanged = () => {};
 
   return (
     <div className="dataview-container">
@@ -63,23 +50,12 @@ function DataView() {
                     <CaretDown
                       weight="bold"
                       className="location-icon"
-                      onClick={handleOpenDialog}
+                      onClick={toggleIfOpenedDialog}
                     />
-                    <PopUp
-                      title="Locations"
-                      favorites={favorites}
-                      setFavorites={setFavorites}
-                      onClose={handleCloseDialog}
-                      openDialog={openDialog}
-                      onCurrentSearchChanged={onCurrentSearchChanged}
-                      options={options}
-                      onItemSelected={(item) => {
-                        handleCloseDialog();
-                        setTimeout(() => {
-                          alert(item.displayValue);
-                        }, 400);
-                      }}
-                    ></PopUp>
+                    <SearchPopUp
+                      onToggleIfOpenedDialog={toggleIfOpenedDialog}
+                      ifOpenedDialog={ifOpenedDialog}
+                    ></SearchPopUp>
                   </div>
                 </div>
               }
@@ -91,7 +67,7 @@ function DataView() {
         <TabPanel value="1" className="tab dataview-tab">
           <div className="datapanels-container">
             <div className="data-panels-container">
-              <DataPanel listTitle="Map Name" filterPanelId={1} />
+              <DataPanel listTitle={getCurrentTabTitle()} filterPanelId={1} />
               <DataPanel listTitle="General Data" filterPanelId={2} />
               <DataPanel listTitle="Extra Capabilities" filterPanelId={3} />
             </div>

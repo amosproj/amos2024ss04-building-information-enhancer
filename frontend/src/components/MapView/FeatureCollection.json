@@ -1,0 +1,121 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Berlin",
+        "amenity": "Capital City",
+        "popupContent": "This is Berlin, the capital of Germany!"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [13.4050, 52.5200]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Munich",
+        "amenity": "City",
+        "popupContent": "This is Munich, known for Oktoberfest!"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [11.5820, 48.1351]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Hamburg",
+        "amenity": "City",
+        "popupContent": "This is Hamburg, a major port city in northern Germany!"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [9.9937, 53.5511]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Frankfurt",
+        "amenity": "City",
+        "popupContent": "This is Frankfurt, a major financial hub in Germany!"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [8.6821, 50.1109]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Dortmund",
+        "amenity": "City",
+        "popupContent": "This is Dortmund, known for its football team!"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [7.4660, 51.5149]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Cologne",
+        "amenity": "City",
+        "popupContent": "This is Cologne, known for its impressive cathedral!"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Leipzig",
+        "amenity": "City",
+        "popupContent": "This is Leipzig, known for its vibrant cultural scene!"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [12.3731, 51.3397]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Hannover",
+        "amenity": "City",
+        "popupContent": "This is Hannover, known for its trade fairs!"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [9.7320, 52.3759]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Würzburg",
+        "amenity": "City",
+        "popupContent": "This is Würzburg, known for its baroque and rococo architecture!"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [9.9937, 49.7945]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Augsburg",
+        "amenity": "City",
+        "popupContent": "This is Augsburg, one of Germany's oldest cities!"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [10.8983, 48.3715]
+      }
+    }
+  ]
+}
