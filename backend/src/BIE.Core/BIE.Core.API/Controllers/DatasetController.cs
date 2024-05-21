@@ -22,26 +22,49 @@ namespace BIE.Core.API.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("1/data/{bottomLat}/{bottomLong}/{topLat}/{topLong}/{zoomLevel}")]
-        public ActionResult Get(float bottomLat, float bottomLong, float topLat, float topLong, int zoomLevel)
+        [HttpGet("1/data")]
+        public ActionResult Get(
+            [FromQuery] float bottomLat,
+            [FromQuery] float bottomLong,
+            [FromQuery] float topLat,
+            [FromQuery] float topLong,
+            [FromQuery] int zoomLevel)
         {
             try
             {
                 DbHelper.CreateDbConnection();
 
                 var command =
-                    "SELECT * " + 
-                    "FROM dbo.EV_charging_stations" + 
-                    $" WHERE latitude > {bottomLat} AND latitude < {topLat} AND"+
+                    "SELECT * " +
+                    "FROM dbo.EV_charging_stations" +
+                    $" WHERE latitude > {bottomLat} AND latitude < {topLat} AND" +
                     $" longitude > {bottomLong} AND longitude < {topLong};";
 
                 command = command.Replace(",", ".");
                 // Console.WriteLine(command);
-                var response = "";
+                var response = "{\"type\": \"FeatureCollection\",\n\"features\": [";
                 foreach (var row in DbHelper.GetData(command))
                 {
-                    response += row["operator"];
+                    response += $@"
+{{
+  ""type"": ""Feature"",
+  ""geometry"": {{
+    ""type"": ""Point"",
+    ""coordinates"": [{row["longitude"]}, {row["latitude"]}]
+  }},
+  ""properties"": {{
+    ""name"": ""{row["operator"]}""
+}}
+}},";
                 }
+
+                if (response.Last() == ',')
+                {
+                    // chop of last ,
+                    response = response[..^1];
+                }
+
+                response += "]}";
 
                 return Ok(response);
             }
