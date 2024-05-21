@@ -7,7 +7,6 @@ import "leaflet/dist/leaflet.css";
 import "./MapView.css";
 import { useMap, useMapEvents } from "react-leaflet/hooks";
 import L from "leaflet";
-import Button from "@mui/material/Button";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import MapOptions from "./MapOptions";
@@ -22,22 +21,6 @@ const DefaultIcon = L.icon({
 });
 
 L.Marker.prototype.options.icon = DefaultIcon;
-
-function Btn() {
-  const map = useMap();
-  return (
-    <Button
-      variant="text"
-      onClick={() => {
-        map.locate().on("locationfound", function (e) {
-          map.flyTo(e.latlng, map.getZoom());
-        });
-      }}
-    >
-      Text
-    </Button>
-  );
-}
 
 const MapView: React.FC = () => {
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
