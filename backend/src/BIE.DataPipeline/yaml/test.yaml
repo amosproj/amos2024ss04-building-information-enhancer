@@ -15,57 +15,58 @@ table_cols:
   - name: Betreiber
     name_in_table: operator
     type: VARCHAR(500)
+    is_not_nullable: true
   - name: Straﬂe
     name_in_table: street
-    type: VARCHAR(100)
+    type: VARCHAR(500)
   - name: Hausnummer
     name_in_table: house_number
-    type: VARCHAR(10)
+    type: VARCHAR(500)
   - name: Adresszusatz
     name_in_table: address_additional
-    type: VARCHAR(100)
+    type: VARCHAR(500)
   - name: Postleitzahl
     name_in_table: postal_code
     type: INT
   - name: Ort
     name_in_table: city
-    type: VARCHAR(100)
+    type: VARCHAR(500)
   - name: Bundesland
     name_in_table: state
-    type: VARCHAR(50)
+    type: VARCHAR(500)
   - name: Kreis/kreisfreie Stadt
     name_in_table: district
-    type: VARCHAR(100)
+    type: VARCHAR(500)
   - name: Breitengrad
     name_in_table: latitude
-    type: VARCHAR(50)
+    type: VARCHAR(500)
   - name: L‰ngengrad
     name_in_table: longitude
-    type: VARCHAR(50)
+    type: VARCHAR(500)
   - name: Inbetriebnahmedatum
     name_in_table: commissioning_date
-    type: VARCHAR(50)
+    type: VARCHAR(500)
   - name: Nennleistung Ladeeinrichtung [kW]
     name_in_table: rated_power_kw
-    type: VARCHAR(50)
+    type: VARCHAR(500)
   - name: Art der Ladeeinrichung
     name_in_table: charging_equipment_type
-    type: VARCHAR(50)
+    type: VARCHAR(500)
   - name: Anzahl Ladepunkte
     name_in_table: number_of_charging_points
     type: INT
   - name: Steckertypen1
     name_in_table: plug_type_1
-    type: VARCHAR(50)
+    type: VARCHAR(500)
   - name: P1 [kW]
     name_in_table: power_1_kw
-    type: VARCHAR(50)
+    type: VARCHAR(500)
   - name: Public Key1
     name_in_table: public_key_1
     type: VARCHAR(500)
   - name: Steckertypen2
     name_in_table: plug_type_2
-    type: VARCHAR(50)
+    type: VARCHAR(500)
   - name: P2 [kW]
     name_in_table: power_2_kw
     type: VARCHAR(50)
@@ -74,19 +75,19 @@ table_cols:
     type: VARCHAR(500)
   - name: Steckertypen3
     name_in_table: plug_type_3
-    type: VARCHAR(50)
+    type: VARCHAR(500)
   - name: P3 [kW]
     name_in_table: power_3_kw
-    type: VARCHAR(50)
+    type: VARCHAR(500)
   - name: Public Key3
     name_in_table: public_key_3
     type: VARCHAR(500)
   - name: Steckertypen4
     name_in_table: plug_type_4
-    type: VARCHAR(50)
+    type: VARCHAR(500)
   - name: P4 [kW]
     name_in_table: power_4_kw
-    type: VARCHAR(50)
+    type: VARCHAR(500)
   - name: Public Key4
     name_in_table: public_key_4
     type: VARCHAR(500)

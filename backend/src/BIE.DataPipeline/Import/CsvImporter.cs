@@ -14,16 +14,16 @@ namespace BIE.DataPipeline.Import
     internal class CsvImporter : IImporter
     {
         private TextFieldParser parser;
-        private string[] header;
         private DataSourceDescription dataSourceDescription;
         private Type[] columnTypes;
-        private string tableName;
+        private string[] fileHeader;
+        private string[] yamlHeader;
+        private string headerString = "";
         public CsvImporter(DataSourceDescription dataSourceDescription)
         {
             //YAML Arguments:
             this.dataSourceDescription = dataSourceDescription;
             columnTypes = ParseColumnTypes();
-            //columnTypes = new Type[] { typeof(string), typeof(string), typeof(string), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(int), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string) };
             //Setup Parser
             SetupParser();
 
@@ -31,8 +31,10 @@ namespace BIE.DataPipeline.Import
             SkipNlines(dataSourceDescription.options.skip_lines);
 
             //read header
-            header = ReadHeader();
-            PrintRow(header);
+            fileHeader = ReadFileHeader();
+            yamlHeader = ReadYamlHeader();
+            //PrintRow(fileHeader);
+            //PrintRow(yamlHeader);
         }
 
         //tablename = name
@@ -43,15 +45,18 @@ namespace BIE.DataPipeline.Import
 
         public string GetHeaderString()
         {
-            string res = "";
-            foreach (DataSourceDescription.DataSourceColumn col in this.dataSourceDescription.table_cols)
+            if (headerString.Equals(""))
             {
-                res += col.name_in_table + ",";
+                foreach (DataSourceDescription.DataSourceColumn col in this.dataSourceDescription.table_cols)
+                {
+                    headerString += col.name_in_table + ",";
+                }
+
+                //remove last ,
+                headerString = RemoveLastComma(headerString);
             }
 
-            //remove last ,
-            res=res.Remove(res.Length - 1);
-            return res;
+            return headerString;
         }
 
         //column = col1,col2
@@ -59,43 +64,79 @@ namespace BIE.DataPipeline.Import
         public bool ReadLine(out string nextLine)
         {
             nextLine = "";
-            if (parser.EndOfData)
+            while(nextLine == "")
             {
-                return false;
-            }
-            string[] line = parser.ReadFields();
-            if(line.Length == 0)
-            {
-                //TODO what to do with empty lines
-                Console.WriteLine("Empty");
-            }
-            else
-            {
-                for(int i = 0; i < line.Length; i++)
+                if (parser.EndOfData)
                 {
-                    try
+                    return false;
+                }
+                string[] line = parser.ReadFields();
+
+                if(line.Length == 0)
+                {
+                    //TODO what to do with empty lines
+                    Console.WriteLine("Line is empty");
+                    //Read next line
+                    nextLine = "";
+                    continue;
+
+                }
+                else
+                {
+                    int yamlIndex = 0;
+                    for(int i = 0; i < line.Length; i++)
                     {
-                        if (columnTypes[i] == typeof(string))
+                        //check if fileheader is equals to yaml header
+                        if (fileHeader[i].Equals(yamlHeader[yamlIndex]))
                         {
-                            nextLine += string.Format("'{0}',", line[i]);
+                            //check if the value can be empty
+                            if (dataSourceDescription.table_cols[yamlIndex].is_not_nullable && line[i] == "")
+                            {
+                                Console.WriteLine("Line does not match not null criteria");
+                                //Read next line
+                                nextLine = "";
+                                continue;
+                            }
+                            try
+                            {
+                                line[i] = line[i].Replace("'", "''");
+                                if (columnTypes[yamlIndex] == typeof(string))
+                                {
+                                    nextLine += string.Format("'{0}',", line[i]);
+                                }
+                                else
+                                {
+                                    nextLine += string.Format("{0},", Convert.ChangeType(line[i], columnTypes[yamlIndex]));
+                                }
+                            }
+                            catch (System.FormatException ex)
+                            {
+                                Console.Error.WriteLine(string.Format("{3} Fauld parsing {0} to type {1} in column {2}", line[i], columnTypes[yamlIndex], fileHeader[i], i));
+                                return false;
+                            }
+                            yamlIndex++;
                         }
-                        else
-                        {
-                            nextLine += string.Format("{0},", Convert.ChangeType(line[i], columnTypes[i]));
-                        }
-                    }
-                    catch (System.FormatException ex)
-                    {
-                        Console.Error.WriteLine(string.Format("{3} Fauld parsing {0} to type {1} in column {2}", line[i], columnTypes[i], header[i], i));
-                        return false;
                     }
                 }
             }
-            nextLine = nextLine.Remove(nextLine.Length - 1);
+            nextLine = RemoveLastComma(nextLine);
 
             return true;
         }
-        
+
+        private static string RemoveLastComma(string input)
+        {
+            int lastCommaIndex = input.LastIndexOf(',');
+            if (lastCommaIndex != -1)
+            {
+                return input.Remove(lastCommaIndex, 1);
+            }
+            else
+            {
+                return input; // No comma found, return original string
+            }
+        }
+
         private Type[] ParseColumnTypes()
         {
             Type[] res = new Type[dataSourceDescription.table_cols.Count];
@@ -110,7 +151,6 @@ namespace BIE.DataPipeline.Import
         private static Type SQLTypeToCSharpType(string sqlType)
         {
             string shortType = RemoveLastBrackets(sqlType); //Makes VARCHAR(50) -> VARCHAR
-            Console.WriteLine(string.Format("shorten {0} to {1}", sqlType, shortType));
             switch (shortType)
             {
                 case "VARCHAR":
@@ -193,7 +233,7 @@ namespace BIE.DataPipeline.Import
             }
         }
 
-        private string[] ReadHeader()
+        private string[] ReadFileHeader()
         {
             //check if parser has reached end of the file
             if (parser.EndOfData)
@@ -203,6 +243,17 @@ namespace BIE.DataPipeline.Import
             }
 
             return parser.ReadFields();
+        }
+
+        private string[] ReadYamlHeader()
+        {
+            string[] res = new string[dataSourceDescription.table_cols.Count];
+            for(int i = 0; i < dataSourceDescription.table_cols.Count; i++)
+            {
+                res[i] = dataSourceDescription.table_cols[i].name;
+            }
+
+            return res;
         }
 
         private void PrintRow(string[] row, string[] header = null)
