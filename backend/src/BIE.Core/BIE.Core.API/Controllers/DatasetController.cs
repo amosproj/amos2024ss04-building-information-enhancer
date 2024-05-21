@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BIE.Core.DBRepository;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace BIE.Core.API.Controllers
 {
@@ -23,15 +24,15 @@ namespace BIE.Core.API.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("1/data")]
-        public ActionResult Get(
-            [FromQuery] float bottomLat,
-            [FromQuery] float bottomLong,
-            [FromQuery] float topLat,
-            [FromQuery] float topLong,
-            [FromQuery] int zoomLevel)
+        public ActionResult Get( [FromQuery] QueryParameters parameters)
         {
             try
             {
+                var bottomLat = parameters.BottomLat;
+                var bottomLong = parameters.BottomLong;
+                var topLat = parameters.TopLat;
+                var topLong = parameters.TopLong;
+                
                 DbHelper.CreateDbConnection();
 
                 var command =
@@ -72,6 +73,16 @@ namespace BIE.Core.API.Controllers
             {
                 return BadRequest(se.Message);
             }
+        }
+
+        public class QueryParameters
+        {
+            [BindRequired] public float BottomLat { get; set; }
+            [BindRequired] public float BottomLong { get; set; }
+            [BindRequired] public float TopLat { get; set; }
+            [BindRequired] public float TopLong { get; set; }
+            
+            public float ZoomLevel { get; set; }
         }
     }
 }
