@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Text;
 using YamlDotNet.Serialization;
 
 namespace BIE.DataPipeline.Import
@@ -19,7 +20,7 @@ namespace BIE.DataPipeline.Import
                 throw new FormatException(path + " is not a yaml file");
             }
 
-            var yaml = File.ReadAllText(path);
+            var yaml = File.ReadAllText(path, Encoding.GetEncoding("iso-8859-1"));
 
             var deserializer = new Deserializer();
 
@@ -100,9 +101,9 @@ namespace BIE.DataPipeline.Import
             public string type;
 
             /// <summary>
-            /// True if the column is nullable in the database.
+            /// True if the column is not nullable in the database.
             /// </summary>
-            public bool is_nullable;
+            public bool is_not_nullable;
         }
     }
 

@@ -39,7 +39,7 @@ namespace BIE.Core.DBRepository
 
             DbCommand cmd = db.CreateSPCommand(Procds.GetAll);
             var result = Convert.ToString(db.ExecuteScalar(cmd));
-            Infrastructures = DBHelper.Convert<List<Infrastructure>>(result);
+            Infrastructures = DbHelper.Convert<List<Infrastructure>>(result);
 
             return Infrastructures;
         }
@@ -49,7 +49,7 @@ namespace BIE.Core.DBRepository
             DbCommand cmd = db.CreateSPCommand(Procds.Find);
             db.AddParameter(cmd, Params.InfrastructureID, id);
             string result = Convert.ToString(db.ExecuteScalar(cmd));
-            Infrastructure found = DBHelper.Convert<Infrastructure>(result);
+            Infrastructure found = DbHelper.Convert<Infrastructure>(result);
 
             return found;
         }

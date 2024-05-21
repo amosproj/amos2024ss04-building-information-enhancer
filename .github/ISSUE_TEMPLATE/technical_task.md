@@ -1,16 +1,14 @@
 ---
-name: Feature request
-about: Suggest new feature (using user story)
+name: Technical task
+about: Suggest new technical task
 title: ''
-labels: 'business value feature'
+labels: 'technical feature'
 assignees: ''
 
 ---
 
-## User story
-1. As a {}
-2. I want / need {}
-3. So that {}
+## Description
+
 
 ## Acceptance criteria
 * Criterion 1
