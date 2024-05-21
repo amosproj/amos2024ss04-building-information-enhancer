@@ -60,6 +60,7 @@ services:
     build:
       context: ./backend/database
       dockerfile: Dockerfile
+    container_name: sql-db
     image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-sql-database
     networks:
       - bie-network
