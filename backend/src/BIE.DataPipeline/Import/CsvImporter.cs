@@ -33,8 +33,8 @@ namespace BIE.DataPipeline.Import
             //read header
             fileHeader = ReadFileHeader();
             yamlHeader = ReadYamlHeader();
-            PrintRow(fileHeader);
-            PrintRow(yamlHeader);
+            //PrintRow(fileHeader);
+            //PrintRow(yamlHeader);
         }
 
         //tablename = name
@@ -64,50 +64,58 @@ namespace BIE.DataPipeline.Import
         public bool ReadLine(out string nextLine)
         {
             nextLine = "";
-            if (parser.EndOfData)
+            while(nextLine == "")
             {
-                return false;
-            }
-            string[] line = parser.ReadFields();
-            if(line.Length == 0)
-            {
-                //TODO what to do with empty lines
-                Console.WriteLine("Empty");
-                //Read next line
-                return ReadLine(out nextLine);
-
-            }
-            else
-            {
-                int yamlIndex = 0;
-                for(int i = 0; i < line.Length; i++)
+                if (parser.EndOfData)
                 {
-                    if (fileHeader[i].Equals(yamlHeader[yamlIndex]))
+                    return false;
+                }
+                string[] line = parser.ReadFields();
+
+                if(line.Length == 0)
+                {
+                    //TODO what to do with empty lines
+                    Console.WriteLine("Line is empty");
+                    //Read next line
+                    nextLine = "";
+                    continue;
+
+                }
+                else
+                {
+                    int yamlIndex = 0;
+                    for(int i = 0; i < line.Length; i++)
                     {
-                        if (dataSourceDescription.table_cols[yamlIndex].is_not_nullable && line[i] == "")
+                        //check if fileheader is equals to yaml header
+                        if (fileHeader[i].Equals(yamlHeader[yamlIndex]))
                         {
-                            //This could lead to an stack overflow if loads of rows are skipped (maybe change it to a loop)
-                            //Read next line
-                            return ReadLine(out nextLine);
-                        }
-                        try
-                        {
-                            line[i] = line[i].Replace("'", "''");
-                            if (columnTypes[yamlIndex] == typeof(string))
+                            //check if the value can be empty
+                            if (dataSourceDescription.table_cols[yamlIndex].is_not_nullable && line[i] == "")
                             {
-                                nextLine += string.Format("'{0}',", line[i]);
+                                Console.WriteLine("Line does not match not null criteria");
+                                //Read next line
+                                nextLine = "";
+                                continue;
                             }
-                            else
+                            try
                             {
-                                nextLine += string.Format("{0},", Convert.ChangeType(line[i], columnTypes[yamlIndex]));
+                                line[i] = line[i].Replace("'", "''");
+                                if (columnTypes[yamlIndex] == typeof(string))
+                                {
+                                    nextLine += string.Format("'{0}',", line[i]);
+                                }
+                                else
+                                {
+                                    nextLine += string.Format("{0},", Convert.ChangeType(line[i], columnTypes[yamlIndex]));
+                                }
                             }
+                            catch (System.FormatException ex)
+                            {
+                                Console.Error.WriteLine(string.Format("{3} Fauld parsing {0} to type {1} in column {2}", line[i], columnTypes[yamlIndex], fileHeader[i], i));
+                                return false;
+                            }
+                            yamlIndex++;
                         }
-                        catch (System.FormatException ex)
-                        {
-                            Console.Error.WriteLine(string.Format("{3} Fauld parsing {0} to type {1} in column {2}", line[i], columnTypes[yamlIndex], fileHeader[i], i));
-                            return false;
-                        }
-                        yamlIndex++;
                     }
                 }
             }
@@ -143,7 +151,6 @@ namespace BIE.DataPipeline.Import
         private static Type SQLTypeToCSharpType(string sqlType)
         {
             string shortType = RemoveLastBrackets(sqlType); //Makes VARCHAR(50) -> VARCHAR
-            Console.WriteLine(string.Format("shorten {0} to {1}", sqlType, shortType));
             switch (shortType)
             {
                 case "VARCHAR":
