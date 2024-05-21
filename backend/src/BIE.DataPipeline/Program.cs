@@ -13,7 +13,7 @@ CsvImporter csvImporter = new CsvImporter(description);
 DBHelper.CreateDBConnection();
 DBHelper.CreateTable(description);
 
-Console.WriteLine(csvImporter.GetHeaderString());
+//Console.WriteLine(csvImporter.GetHeaderString());
 string line = "";
 bool notEOF = csvImporter.ReadLine(out line);
 
