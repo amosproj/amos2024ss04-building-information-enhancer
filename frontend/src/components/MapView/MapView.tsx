@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext } from "react";
 import { MapContainer } from "react-leaflet/MapContainer";
 import { Marker } from "react-leaflet/Marker";
 import { Popup } from "react-leaflet/Popup";
@@ -13,6 +13,7 @@ import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import MapOptions from "./MapOptions";
 import useGeoData, { fetchData } from "./DataFetch";
 import { GeoJSON } from "react-leaflet";
+import { MapContext } from "../../contexts/MapContext";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -39,13 +40,7 @@ function Btn() {
 }
 
 const MapView: React.FC = () => {
-  const center: LatLng = L.latLng([49.5732, 11.0288]); // Initial center coordinates
-  const [bounds, setBounds] = useState<LatLngBounds>(
-    new LatLngBounds([0, 0], [0, 0])
-  );
-  const [zoom, setZoom] = useState<number>(13);
-  const geoData = useGeoData(bounds, zoom);
-  const [markerPosition, setMarkerPosition] = useState<LatLng>(center);
+  const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
 
   const UpdateBounds = () => {
     useMapEvents({
@@ -60,31 +55,50 @@ const MapView: React.FC = () => {
   const MapEventsHandler = () => {
     const map = useMap();
     useMapEvents({
-      click: (e) => {
-        setMarkerPosition(e.latlng);
+      click: (event) => {
+        console.log(event);
+        setCurrentMapCache({
+          ...currentMapCache,
+          selectedCoordinates: event.latlng,
+        });
+      },
+      zoomend: (event) => {
+        setCurrentMapCache({
+          ...currentMapCache,
+          zoom: event.target.getZoom(),
+        });
+      },
+      dragend: (event) => {
+        setCurrentMapCache({
+          ...currentMapCache,
+          mapCenter: event.target.getCenter(),
+        });
       },
     });
     return (
-      <Marker position={markerPosition}>
+      <Marker position={currentMapCache.selectedCoordinates}>
         <Popup>
           <span
+            // Get the current location of the user
             onClick={() => {
               map
                 .locate({ setView: true })
-                .on("locationfound", function (e) {
-                  setPosition(e.latlng);
-                  map.flyTo(e.latlng, map.getZoom(), {
+                .on("locationfound", function (event) {
+                  setPosition(event.latlng);
+                  map.flyTo(event.latlng, map.getZoom(), {
                     animate: true,
                     duration: 50,
                   });
                 })
-                .on("locationerror", function (e) {
-                  console.log(e);
+                // If access to the location was denied
+                .on("locationerror", function (event) {
+                  console.log(event);
                   alert("Location access denied.");
                 });
             }}
           >
-            {markerPosition.lat.toFixed(4)}; | {markerPosition.lng.toFixed(4)};
+            {currentMapCache.selectedCoordinates.lat.toFixed(4)},{" "}
+            {currentMapCache.selectedCoordinates.lng.toFixed(4)}
           </span>
         </Popup>
       </Marker>
@@ -92,17 +106,17 @@ const MapView: React.FC = () => {
   };
 
   function setPosition(latlng: L.LatLng) {
-    setPosition(latlng);
+    setCurrentMapCache({ ...currentMapCache, selectedCoordinates: latlng });
   }
 
   return (
     <div className="tab-map-container">
       <MapOptions />
-
-      <MapContainer center={center} zoom={13} className="map">
-        {geoData && <GeoJSON data={geoData} />}
-        <UpdateBounds />
-
+      <MapContainer
+        center={currentMapCache.mapCenter}
+        zoom={currentMapCache.zoom}
+        className="map"
+      >
         <MapEventsHandler />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

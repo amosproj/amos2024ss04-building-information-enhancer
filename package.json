@@ -4,15 +4,15 @@
   "description": "Main package file for the AMOS 2024 - Building Information Enhander Project.",
   "author": "See repository README",
   "scripts": {
-    "setup": "npm run setup:frontend && npm run setup:backend",
+    "setup:windows": "npm run setup:frontend && npm run setup:backend:windows",
+    "setup:linux": "npm run setup:frontend && npm run setup:backend:linux",
+    "setup:macos": "npm run setup:frontend && npm run setup:backend:macos",
     "setup:frontend": "cd frontend/ && npm ci",
-    "setup:backend": "cd backend/",
+    "setup:backend:windows": "backend_build.bat",
+    "setup:backend:linux": "./backend_build.sh linux-x64",
+    "setup:backend:macos": "./backend_build.sh osx-x64",
     "deploy": "docker compose up --build -d",
-    "deploy:dev:frontend": "cd frontend/ && npm run dev",
-    "deploy:dev:backend": "cd backend/"
-  },
-  "dependencies": {
-    "@types/geojson": "^7946.0.14",
-    "geojson": "^0.5.0"
+    "deploy:frontend:dev": "cd frontend/ && npm run dev",
+    "deploy:backend:api": "cd backend/src/BIE.Core/BIE.Core.API/bin/build && BIE.Core.API"
   }
 }

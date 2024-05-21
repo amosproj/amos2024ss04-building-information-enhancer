@@ -1,0 +1,78 @@
+Title	URL	Assignees	Priority	Estimate Size	Labels	Milestone	Actual Size
+Upload imp-squared board sprint 1	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/4	Battlemech	P0		organizational		
+Design Team Logo	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/7	Superschnizel	P0		organizational		
+Watch getting started with amos Videos	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/6	dancingsushii, op-hub	P1		organizational		
+Ask Chris to provide prioritised list of sources and papers	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/41	dancingsushii	P0		feature		
+Set up Team Contract	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/13	dancingsushii, op-hub	P0		organizational		
+Define division and team distribution	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/11	dancingsushii, op-hub	P0		organizational		
+Upload planning document Sprint 2	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/64	dancingsushii	P0		organizational		
+Upload Imp-Squared board Sprint 2	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/65	Battlemech	P0		organizational		
+Upload Snapshot Feature Board Sprint 2	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/63	dancingsushii	P0		organizational		
+Upload Snapshot feature board sprint 1	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/2	dancingsushii, op-hub	P0		organizational		
+Upload Planning document pdf sprint 1	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/3	dancingsushii, op-hub	P0		organizational		
+Research on how should data pipeline work	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/40	Ahsankkhan, nicolasbandel, Superschnizel	P0	1	backend, feature		
+Team Logo and Tshirt	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/5	Superschnizel	P1		organizational		
+Adopt sustainability data for user view	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/102		P0		backend, feature, frontend		
+Implement search by coordinate	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/101		P0		backend, feature, frontend		
+Solar potential assessment tool	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/104		P0		backend, feature, frontend		
+Compose and finish the UI of the FE	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/113		P0		feature, frontend		
+Fix pinning of the tabs going crazy after deleting some tabs	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/112		P0		bug, frontend		
+Search bar: Cache and bookmarking	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/62		P1		feature, frontend		
+Automated district energy assessment tool	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/103		P1		backend, feature, frontend		
+Implement basic BE CI	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/52		P2		backend, devops, feature		
+Improve searching by adding suggestions	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/115		P2		backend, feature, frontend		
+Additional map controls	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/116		P2		backend, feature, frontend		
+FE filtering changes data entries	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/117		P2		bug, frontend		
+Pinning of the tabs behave wierd after deleting some tabs	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/118		P2		bug, frontend		
+Compose different frontend views into one	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/120		P1		feature, frontend		
+Add support for satellite image in map	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/119		P1		feature, frontend	Building time machine 	
+Discuss Labels and Milestones	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/19	dancingsushii, op-hub	P1		organizational		
+Setup deployment pipeline/branches	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/30	Corgam	P0	3	devops, feature		
+Create multimap view component	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/60	Corgam	P0	3	feature, frontend		
+Create basic layout for main UI interface	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/73	Corgam	P0	2	feature, frontend		
+Create basic data view component	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/61	CelineMP	P0	3	feature, frontend		
+Tag sprint candidate	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/68	Corgam	P0	2	devops, feature		
+Simplify .env file	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/69	Corgam	P1	1	devops, feature		
+Research Github Actions constraints	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/29	Corgam	P0	2	devops, feature		
+Create video recording and documentation about build process	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/81	Corgam	P0	2	devops, organizational		
+Automate workflow with GitHub Actions	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/28	Corgam	P0	3	devops, feature		
+Design Data Pipeline CLI Application	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/55	Superschnizel	P0	3	backend, feature		0
+Develop YAML Parser	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/56	Superschnizel	P0	5	backend, feature		
+Develop CSV parser	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/57	nicolasbandel	P0	5	backend, feature		
+Dockefile for data pipeline	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/71	Ahsankkhan	P0	3	backend, feature		
+Configure database connection	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/58	Ahsankkhan	P0	3	backend, feature		
+Dockerfile for database	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/70	Ahsankkhan	P2	3	backend, feature		
+Clarify preferred storage for meeting notes with Prof. Riehle	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/59	op-hub	P2	1	organizational		
+Upload deliverables Sprint 3	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/75	op-hub	P0		organizational		
+Create generic pop-up container	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/79	Lucas-Nan	P0	1	feature, frontend		
+Technology Research (Map APIs)	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/15	CelineMP	P0	3	feature, frontend		
+Create pop-up with favourites	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/80	Lucas-Nan	P0	2	feature, frontend		
+Create map component from OSM	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/77	Lucas-Nan	P0	3	feature, frontend		
+Trigger Data view only on button press	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/66	Lucas-Nan	P0	1	feature, frontend		
+Decide on API endpoints	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/17		P2	5	backend, feature, frontend		
+Watch a video provided by AMOS team about  well-run team meeting	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/83	dancingsushii, op-hub	P2	1	organizational		
+Documentation - BE technology	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/22	Ahsankkhan, nicolasbandel, Superschnizel	P1	1	backend, feature		
+Row mapping/filtering	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/74	nicolasbandel	P0	3	backend, feature		
+Update GitHub README.md	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/85		P0		organizational		
+Create build process video and upload to Deliverables folder	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/84		P0		devops, organizational		
+Create mid-project release plan	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/90		P0		devops, organizational		
+Agree on product vision and mission	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/88	dancingsushii, op-hub	P0		organizational		
+Agree on project-specific definition of done for feature, sprint, and project release	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/89	dancingsushii, op-hub	P0		organizational		
+Clarify open source scope of the project with Prof. Riele	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/31	dancingsushii	P1		organizational		
+Review notes from IP meeting and develop PO's concept	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/82	dancingsushii	P0	2	organizational		
+Create 3d view component	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/78	CelineMP	P0	5	feature, frontend		
+Transfer all meeting notes and other relevant documentation to GitHub	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/25	dancingsushii	P0	2	organizational		
+Documentation - FE technology	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/21	Lucas-Nan	P0	1	feature, frontend		1
+Research on FE RestAPI requirements	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/16	Lucas-Nan	P1	3	feature, frontend		2
+Setup basic React + NodeJS frontend	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/14	CelineMP	P0	2	feature, frontend		1
+Create FE Concept	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/18	CelineMP, dancingsushii, Lucas-Nan, op-hub	P0	3	feature, frontend		5
+Create boilerplate API project	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/38	Ahsankkhan	P0	5	backend, feature		3
+Ingest Data [2]	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/35	Ahsankkhan, Superschnizel	P0	3	backend, feature		3
+Request Deutsche Bahn dataset	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/37	Superschnizel	P0	1	backend, bug, feature		1
+API project docker file	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/54	Ahsankkhan	P0	3	backend, devops, feature		3
+Ingest data [3]	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/36	nicolasbandel	P0	3	backend, feature		3
+Ingest Data [1]	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/34	Superschnizel	P0	3	backend, feature		2
+Get Backend container running	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/27	Corgam	P0	2	backend, devops, feature		2
+Documentation -  CI/CD technology	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/23	Corgam	P1	1	devops, feature		1
+Get FE container running	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/26	Corgam	P0	2	devops, feature, frontend		2
+Initialize Github Wiki	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/20	Corgam	P0	1	feature		1
