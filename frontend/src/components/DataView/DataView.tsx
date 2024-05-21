@@ -7,14 +7,9 @@ import TabContext from "@mui/lab/TabContext/TabContext";
 import Tab from "@mui/material/Tab/Tab";
 import TabList from "@mui/lab/TabList/TabList";
 import { CaretDown } from "@phosphor-icons/react";
-import PopUp from "../Popup/Popup";
 import { useContext, useState } from "react";
 import { TabsContext } from "../../contexts/TabsContext";
-
-interface OptionItem {
-  id: string;
-  displayValue: string;
-}
+import SearchPopUp from "../PopUp/SearchPopUp";
 
 function DataView() {
   // Access the tabs context
@@ -30,33 +25,11 @@ function DataView() {
     return currentTab ? currentTab.title : "No map loaded";
   };
 
-  const [openDialog, setOpenDialog] = useState(false);
-
-  const handleOpenDialog = () => {
-    setOpenDialog(true);
+  // Stores the state of if the search popup is open
+  const [ifOpenedDialog, setIfOpenedDialog] = useState(false);
+  const toggleIfOpenedDialog = () => {
+    setIfOpenedDialog(!ifOpenedDialog);
   };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
-
-  const [favorites, setFavorites] = useState<OptionItem[]>([
-    { id: "1", displayValue: "Nuremberg" },
-    { id: "2", displayValue: "Munich" },
-  ]);
-  const [options] = useState<OptionItem[]>([
-    { id: "1", displayValue: "Nuremberg" },
-    { id: "2", displayValue: "Munich" },
-    {
-      id: "3",
-      displayValue: "Andreij Sacharow Platz 1, 90402 Nuremberg",
-    },
-    { id: "4", displayValue: "Main train station Nuremberg" },
-    { id: "5", displayValue: "Walter-Meckauer-Street 20" },
-    { id: "6", displayValue: "49°26'46.6\"N 11°04'33.7\"E" },
-  ]);
-
-  const onCurrentSearchChanged = () => {};
 
   return (
     <div className="dataview-container">
@@ -77,23 +50,12 @@ function DataView() {
                     <CaretDown
                       weight="bold"
                       className="location-icon"
-                      onClick={handleOpenDialog}
+                      onClick={toggleIfOpenedDialog}
                     />
-                    <PopUp
-                      title="Locations"
-                      favorites={favorites}
-                      setFavorites={setFavorites}
-                      onClose={handleCloseDialog}
-                      openDialog={openDialog}
-                      onCurrentSearchChanged={onCurrentSearchChanged}
-                      options={options}
-                      onItemSelected={(item) => {
-                        handleCloseDialog();
-                        setTimeout(() => {
-                          alert(item.displayValue);
-                        }, 400);
-                      }}
-                    ></PopUp>
+                    <SearchPopUp
+                      onToggleIfOpenedDialog={toggleIfOpenedDialog}
+                      ifOpenedDialog={ifOpenedDialog}
+                    ></SearchPopUp>
                   </div>
                 </div>
               }

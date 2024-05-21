@@ -3,10 +3,6 @@ import React, { createContext, useState, ReactNode } from "react";
 
 //// TYPES ////
 
-// Coordinates Type
-
-export type CoordinatesProps = [number, number];
-
 // Map Cache Type
 export type MapCacheProps = {
   selectedCoordinates: LatLng;
@@ -28,7 +24,7 @@ type MapContextProviderProps = {
 
 //// CONTEXT ////
 
-// Default Tabs Cache
+// Default Map Cache
 const defaultMapCache: MapCacheProps = {
   selectedCoordinates: L.latLng([49.5732, 11.0288]),
   mapCenter: L.latLng([49.5732, 11.0288]),

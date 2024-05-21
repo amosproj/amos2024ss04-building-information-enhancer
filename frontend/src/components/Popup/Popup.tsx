@@ -1,77 +1,30 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React from "react";
 import {
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
   Dialog,
   DialogActions,
   DialogTitle,
   DialogContent,
   Button,
-  Divider,
-  TextField,
 } from "@mui/material";
-import StarIcon from "@mui/icons-material/Star";
-
-interface FavorableItem {
-  id: string; // Unique identifier for the item
-  displayValue: string; // Display value shown in the list
-}
 
 interface PopUpProps {
-  openDialog: boolean;
+  ifOpenedDialog: boolean;
   onClose: () => void;
   title: string;
-  favorites: FavorableItem[];
-  setFavorites: Dispatch<SetStateAction<FavorableItem[]>>;
-  options: FavorableItem[];
-  onCurrentSearchChanged: (currentSearch: string) => void;
-  onItemSelected: (selection: FavorableItem) => void;
+  children: React.ReactNode;
 }
 
+// This is the partent component for all PopUps.
+// - ifOpenedDialog - a boolean storing if the popup is currently opened.
+// - onClose - on close function handler
+// - title - the title of the PopUp
+// - children - all children JSX components
 const PopUp: React.FC<PopUpProps> = ({
-  openDialog,
+  ifOpenedDialog,
   onClose,
   title,
-  favorites,
-  setFavorites,
-  options,
-  onCurrentSearchChanged,
-  onItemSelected,
+  children,
 }) => {
-  const [searchText, setSearchText] = useState("");
-
-  const filterBySearchText = (item: FavorableItem) => {
-    return item.displayValue.toLowerCase().includes(searchText.toLowerCase());
-  };
-
-  const filterBySearchtxtAndIfInFavorites = (item: FavorableItem) => {
-    return (
-      item.displayValue.toLowerCase().includes(searchText.toLowerCase()) &&
-      !favorites.some((fav) => fav.id === item.id)
-    );
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchText(e.target.value);
-    onCurrentSearchChanged(e.target.value);
-  };
-
-  const addToFavorite = (item: FavorableItem) => {
-    if (!favorites.some((fav) => fav.id === item.id)) {
-      setFavorites([...favorites, item]);
-    }
-  };
-
-  const removeFromFavorite = (itemToRemove: FavorableItem) => {
-    const updatedFavorites = favorites.filter(
-      (item) => item.id !== itemToRemove.id
-    );
-    setFavorites(updatedFavorites);
-  };
-
   return (
     <Dialog
       sx={{
@@ -82,89 +35,11 @@ const PopUp: React.FC<PopUpProps> = ({
           },
         },
       }}
-      open={openDialog}
+      open={ifOpenedDialog}
       onClose={onClose}
     >
       <DialogTitle>{title}</DialogTitle>
-      <DialogContent>
-        <TextField
-          value={searchText}
-          onChange={handleChange}
-          margin="dense"
-          id="outlined-basic"
-          label="Search"
-          variant="outlined"
-          fullWidth
-        />
-        <List dense={false}>
-          {favorites.filter(filterBySearchText).map((item, index) => (
-            <ListItem
-              key={index}
-              secondaryAction={
-                <IconButton
-                  edge="end"
-                  aria-label="unfavorite"
-                  onClick={() => removeFromFavorite(item)}
-                >
-                  <StarIcon style={{ fill: "yellow", stroke: "black" }} />
-                </IconButton>
-              }
-              disablePadding
-            >
-              <ListItemButton key={index} onClick={() => onItemSelected(item)}>
-                <ListItemText
-                  primary={item.displayValue}
-                  sx={{
-                    "& .MuiDialog-container": {
-                      "& .MuiPaper-root": {
-                        width: "100%",
-                        maxWidth: "500px", // Set your width here
-                      },
-                    },
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
-          <Divider />
-          {options
-            .filter(filterBySearchtxtAndIfInFavorites)
-            .map((item, index) => (
-              <ListItem
-                key={index}
-                secondaryAction={
-                  <IconButton
-                    edge="end"
-                    aria-label="favorite"
-                    onClick={() => addToFavorite(item)}
-                  >
-                    <StarIcon
-                      style={{ fill: "transparent", stroke: "black" }}
-                    />
-                  </IconButton>
-                }
-                disablePadding
-              >
-                <ListItemButton
-                  key={index}
-                  onClick={() => onItemSelected(item)}
-                >
-                  <ListItemText
-                    primary={item.displayValue}
-                    sx={{
-                      "& .MuiDialog-container": {
-                        "& .MuiPaper-root": {
-                          width: "100%",
-                          maxWidth: "500px", // Set your width here
-                        },
-                      },
-                    }}
-                  />
-                </ListItemButton>
-              </ListItem>
-            ))}
-        </List>
-      </DialogContent>
+      <DialogContent>{children}</DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="primary">
           Close
