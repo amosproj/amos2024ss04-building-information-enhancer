@@ -8,7 +8,8 @@ import Tab from "@mui/material/Tab/Tab";
 import TabList from "@mui/lab/TabList/TabList";
 import { CaretDown } from "@phosphor-icons/react";
 import PopUp from "../Popup/Popup";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { TabsContext } from "../../contexts/TabsContext";
 
 interface OptionItem {
   id: string;
@@ -16,6 +17,19 @@ interface OptionItem {
 }
 
 function DataView() {
+  // Access the tabs context
+  const { currentTabsCache } = useContext(TabsContext);
+
+  // Function to always return the title of the currently opened tab
+  const getCurrentTabTitle = (): string => {
+    const currentTabID = currentTabsCache.currentTabID.toString();
+    const currentTab = currentTabsCache.openedTabs.find(
+      (tab) => tab.id === currentTabID
+    );
+
+    return currentTab ? currentTab.title : "No map loaded";
+  };
+
   const [openDialog, setOpenDialog] = useState(false);
 
   const handleOpenDialog = () => {
@@ -91,7 +105,7 @@ function DataView() {
         <TabPanel value="1" className="tab dataview-tab">
           <div className="datapanels-container">
             <div className="data-panels-container">
-              <DataPanel listTitle="Map Name" filterPanelId={1} />
+              <DataPanel listTitle={getCurrentTabTitle()} filterPanelId={1} />
               <DataPanel listTitle="General Data" filterPanelId={2} />
               <DataPanel listTitle="Extra Capabilities" filterPanelId={3} />
             </div>

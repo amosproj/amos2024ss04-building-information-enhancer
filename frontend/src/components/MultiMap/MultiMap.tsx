@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useContext } from "react";
 import "./MultiMap.css";
 import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
@@ -13,59 +13,49 @@ import {
 } from "@phosphor-icons/react";
 import Tooltip from "@mui/material/Tooltip";
 import MapView from "../MapView/MapView";
-
-// Tab
-type TabProps = {
-  id: string;
-  title: string;
-  description: string;
-  ifPinned: boolean;
-};
-
-// Default tabs array to show at the start of the website
-const defaultTabs = [
-  {
-    id: "1",
-    title: "Charging Stations",
-    description: "Here is the short description of the Charging Stations Map.",
-    ifPinned: false,
-  },
-];
+import { TabProps, TabsContext } from "../../contexts/TabsContext";
 
 const MultiMap = () => {
-  // Keeps track of the current tab focused
-  const [currentTab, setCurrentTab] = useState<string>("1");
-  // Keeps track of the opened tabs
-  const [openedTabs, setOpenedTabs] = useState<TabProps[]>(defaultTabs);
+  // Access the tabs context
+  const { currentTabsCache, setCurrentTabsCache } = useContext(TabsContext);
 
-  // Handles the change of the current tab
-  const handleChange = (_event: React.SyntheticEvent, newTab: number) => {
-    setCurrentTab(newTab.toString());
+  // Handles the change of the current tab id
+  const handleChange = (_event: React.SyntheticEvent, newTabID: string) => {
+    setCurrentTabsCache({ ...currentTabsCache, currentTabID: newTabID });
   };
 
   // Opens a new tab
   const openNewTab = () => {
+    const newTabID = currentTabsCache.openedTabs.length + 1;
     const newTab: TabProps = {
-      id: (openedTabs.length + 1).toString(),
-      title: `New Tab ${openedTabs.length + 1}`,
-      description: `Description for Tab ${openedTabs.length + 1}`,
+      id: newTabID.toString(),
+      title: `New Tab ${newTabID.toString()}`,
+      description: `Description for Tab ${newTabID.toString()}`,
       ifPinned: false,
     };
-    setOpenedTabs([...openedTabs, newTab]);
+    setCurrentTabsCache({
+      ...currentTabsCache,
+      openedTabs: [...currentTabsCache.openedTabs, newTab],
+    });
   };
 
   // Closes a specific tab
   const closeTab = (id: string) => {
     // Check if this is the last tab
-    if (openedTabs.length === 1) {
+    if (currentTabsCache.openedTabs.length === 1) {
       alert("The last tab can not be closed.");
       return;
-    } else if (openedTabs.find((tab) => tab.id === id)?.ifPinned === true) {
+    } else if (
+      currentTabsCache.openedTabs.find((tab) => tab.id === id)?.ifPinned ===
+      true
+    ) {
       alert("You can not close a pinned tab.");
       return;
     }
     // Close the tab
-    const newOpenedTabs = openedTabs.filter((tab) => tab.id !== id);
+    const newOpenedTabs = currentTabsCache.openedTabs.filter(
+      (tab) => tab.id !== id
+    );
     // Reorder the tabs IDs
     let startingID = 0;
     const updatedOpenedTabs = newOpenedTabs.map((tab) => {
@@ -75,26 +65,34 @@ const MultiMap = () => {
         id: startingID.toString(),
       };
     });
-    // Set the new tabs state
-    setOpenedTabs(updatedOpenedTabs);
-    // Update the newest current tab
-    if (Number(currentTab) > openedTabs.length - 1) {
-      setCurrentTab((openedTabs.length - 1).toString());
-    }
+    // Check if the current tab ID does not have to change
+    const newCurrentTabID =
+      Number(currentTabsCache.currentTabID) > updatedOpenedTabs.length - 1
+        ? (updatedOpenedTabs.length - 1).toString()
+        : currentTabsCache.currentTabID;
+
+    setCurrentTabsCache({
+      ...currentTabsCache,
+      openedTabs: updatedOpenedTabs,
+      currentTabID: newCurrentTabID,
+    });
   };
 
   // Toggle pinning of a specific tab
   const toggleTabPinned = (tabId: string) => {
-    setOpenedTabs((prevTabs) =>
-      prevTabs.map((tab) =>
-        tab.id === tabId ? { ...tab, ifPinned: !tab.ifPinned } : tab
-      )
+    const updatedOpenedTabs = currentTabsCache.openedTabs.map((tab) =>
+      tab.id === tabId ? { ...tab, ifPinned: !tab.ifPinned } : tab
     );
+
+    setCurrentTabsCache({
+      ...currentTabsCache,
+      openedTabs: updatedOpenedTabs,
+    });
   };
 
   return (
     <div className="multimap-container">
-      <TabContext value={currentTab}>
+      <TabContext value={currentTabsCache.currentTabID}>
         <div className="tab-list-container">
           <TabList
             variant="scrollable"
@@ -103,7 +101,7 @@ const MultiMap = () => {
             aria-label="lab API multimap tabs"
             selectionFollowsFocus
           >
-            {openedTabs.map((tab) => {
+            {currentTabsCache.openedTabs.map((tab) => {
               return (
                 <Tab
                   label={
@@ -163,7 +161,7 @@ const MultiMap = () => {
             </button>
           </Tooltip>
         </div>
-        {openedTabs.map((tab: TabProps) => {
+        {currentTabsCache.openedTabs.map((tab: TabProps) => {
           return (
             <TabPanel value={tab.id.toString()} className="tab" key={tab.id}>
               <div className="tab-context-container">
