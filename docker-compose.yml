@@ -41,6 +41,7 @@ services:
     build:
       context: ./backend/src/BIE.DataPipeline
       dockerfile: Dockerfile
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-datapipeline
     environment:
       - DB_NAME=BIEDB
       - DB_PASSWORD=MyPass@1234
@@ -59,6 +60,7 @@ services:
     build:
       context: ./backend/database
       dockerfile: Dockerfile
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-sql-database
     networks:
       - bie-network
     volumes:
