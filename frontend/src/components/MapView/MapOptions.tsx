@@ -1,14 +1,15 @@
-import { Button } from "@mui/material";
 import { useState } from "react";
-import SearchWithFavoritesDlg from "./SearchWithFavoritesDlg";
-import MapView from "./MapView";
+import { MagnifyingGlass } from "@phosphor-icons/react";
+import "./MapOptions.css";
+import { Tooltip } from "@mui/material";
+import PopUp from "../Popup/Popup";
 
 interface OptionItem {
   id: string;
   displayValue: string;
 }
 
-const TestAreaLn: React.FC = () => {
+const MapOptions: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
 
   const handleOpenDialog = () => {
@@ -38,12 +39,15 @@ const TestAreaLn: React.FC = () => {
   const onCurrentSearchChanged = () => {};
 
   return (
-    <div>
-      <p>Test area ln</p>
-      <Button variant="outlined" onClick={handleOpenDialog}>
-        Open Dialog
-      </Button>
-      <SearchWithFavoritesDlg
+    <div className="map-options-container">
+      <Tooltip arrow title="Search for an address">
+        <MagnifyingGlass
+          weight="duotone"
+          className="search-map-icon"
+          onClick={handleOpenDialog}
+        />
+      </Tooltip>
+      <PopUp
         title="Locations"
         favorites={favorites}
         setFavorites={setFavorites}
@@ -57,10 +61,9 @@ const TestAreaLn: React.FC = () => {
             alert(item.displayValue);
           }, 400);
         }}
-      ></SearchWithFavoritesDlg>
-      <MapView />
+      ></PopUp>
     </div>
   );
 };
 
-export default TestAreaLn;
+export default MapOptions;

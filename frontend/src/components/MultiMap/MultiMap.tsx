@@ -1,5 +1,5 @@
 import { Fragment, useState } from "react";
-import "./multimap.css";
+import "./MultiMap.css";
 import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
@@ -12,26 +12,31 @@ import {
   PushPinSimple,
 } from "@phosphor-icons/react";
 import Tooltip from "@mui/material/Tooltip";
+import MapView from "../MapView/MapView";
 
 // Tab
-type TabType = {
+type TabProps = {
   id: string;
   title: string;
-  content: string;
+  description: string;
+  ifPinned: boolean;
 };
 
 // Default tabs array to show at the start of the website
 const defaultTabs = [
-  { id: "1", title: "Charging Stations", content: "Charging Stations Map" },
+  {
+    id: "1",
+    title: "Charging Stations",
+    description: "Here is the short description of the Charging Stations Map.",
+    ifPinned: false,
+  },
 ];
 
 const MultiMap = () => {
   // Keeps track of the current tab focused
   const [currentTab, setCurrentTab] = useState<string>("1");
   // Keeps track of the opened tabs
-  const [openedTabs, setOpenedTabs] = useState<TabType[]>(defaultTabs);
-  // Keeps track of the pinned tabs
-  const [pinnedTabs, setPinnedTabs] = useState<string[]>([]);
+  const [openedTabs, setOpenedTabs] = useState<TabProps[]>(defaultTabs);
 
   // Handles the change of the current tab
   const handleChange = (_event: React.SyntheticEvent, newTab: number) => {
@@ -40,10 +45,11 @@ const MultiMap = () => {
 
   // Opens a new tab
   const openNewTab = () => {
-    const newTab: TabType = {
+    const newTab: TabProps = {
       id: (openedTabs.length + 1).toString(),
       title: `New Tab ${openedTabs.length + 1}`,
-      content: `Content for Tab ${openedTabs.length + 1}`,
+      description: `Description for Tab ${openedTabs.length + 1}`,
+      ifPinned: false,
     };
     setOpenedTabs([...openedTabs, newTab]);
   };
@@ -54,7 +60,7 @@ const MultiMap = () => {
     if (openedTabs.length === 1) {
       alert("The last tab can not be closed.");
       return;
-    } else if (pinnedTabs.indexOf(id) !== -1) {
+    } else if (openedTabs.find((tab) => tab.id === id)?.ifPinned === true) {
       alert("You can not close a pinned tab.");
       return;
     }
@@ -78,13 +84,12 @@ const MultiMap = () => {
   };
 
   // Toggle pinning of a specific tab
-  const togglePinTabs = (tabID: string) => {
-    if (pinnedTabs.indexOf(tabID) === -1) {
-      setPinnedTabs([...pinnedTabs, tabID]);
-    } else {
-      const updatedTabs = pinnedTabs.filter((tab) => tab !== tabID);
-      setPinnedTabs(updatedTabs);
-    }
+  const toggleTabPinned = (tabId: string) => {
+    setOpenedTabs((prevTabs) =>
+      prevTabs.map((tab) =>
+        tab.id === tabId ? { ...tab, ifPinned: !tab.ifPinned } : tab
+      )
+    );
   };
 
   return (
@@ -105,7 +110,7 @@ const MultiMap = () => {
                     <div className="tab-title-container">
                       <span>{tab.title}</span>
                       <div className="tab-icons-container">
-                        {pinnedTabs.indexOf(tab.id) !== -1 ? (
+                        {tab.ifPinned ? (
                           <PushPinSimple
                             weight="fill"
                             className="pinned-tab-icon"
@@ -126,18 +131,14 @@ const MultiMap = () => {
                           />
                         </Tooltip>
                         <Tooltip
-                          title={
-                            pinnedTabs.indexOf(tab.id) === -1
-                              ? "Pin Tab"
-                              : "Unpin Tab"
-                          }
+                          title={!tab.ifPinned ? "Pin Tab" : "Unpin Tab"}
                           arrow
                           onClick={() => {
-                            togglePinTabs(tab.id);
+                            toggleTabPinned(tab.id);
                           }}
                         >
                           <div className="pin-tab-container">
-                            {pinnedTabs.indexOf(tab.id) === -1 ? (
+                            {!tab.ifPinned ? (
                               <PushPin className="pin-tab-icon" />
                             ) : (
                               <PushPinSlash
@@ -162,10 +163,15 @@ const MultiMap = () => {
             </button>
           </Tooltip>
         </div>
-        {openedTabs.map((tab: TabType) => {
+        {openedTabs.map((tab: TabProps) => {
           return (
             <TabPanel value={tab.id.toString()} className="tab" key={tab.id}>
-              {tab.content}
+              <div className="tab-context-container">
+                <span className="tab-description-container">
+                  {tab.description}
+                </span>
+                <MapView />
+              </div>
             </TabPanel>
           );
         })}

@@ -20,7 +20,7 @@ interface FavorableItem {
   displayValue: string; // Display value shown in the list
 }
 
-interface SearchWithFavoritesDlgProps {
+interface PopUpProps {
   openDialog: boolean;
   onClose: () => void;
   title: string;
@@ -31,7 +31,7 @@ interface SearchWithFavoritesDlgProps {
   onItemSelected: (selection: FavorableItem) => void;
 }
 
-const SearchWithFavoritesDlg: React.FC<SearchWithFavoritesDlgProps> = ({
+const PopUp: React.FC<PopUpProps> = ({
   openDialog,
   onClose,
   title,
@@ -174,4 +174,4 @@ const SearchWithFavoritesDlg: React.FC<SearchWithFavoritesDlgProps> = ({
   );
 };
 
-export default SearchWithFavoritesDlg;
+export default PopUp;
