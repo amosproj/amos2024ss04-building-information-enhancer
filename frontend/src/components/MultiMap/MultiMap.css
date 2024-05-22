@@ -15,6 +15,18 @@
 .tab {
   border: 1px solid gray;
   height: 100%;
+  overflow: hidden;
+}
+
+.tab-context-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-description-container {
+  padding-bottom: 1rem;
+  text-wrap: nowrap;
 }
 
 .tab-title-container {
@@ -71,8 +83,8 @@
 
 .add-tab-button {
   background-color: white;
-  border-color: black;
-  color: black;
+  border-color: gray;
+  color: gray;
   padding: 0;
   display: flex;
   align-items: center;
@@ -87,6 +99,7 @@
 .add-tab-button:hover {
   background-color: rgb(245, 245, 245);
   border-color: black;
+  color: black;
 }
 
 .MuiTabs-scrollButtons.Mui-disabled {
@@ -95,13 +108,17 @@
 
 .MuiTab-root {
   border: 1px solid gray !important;
-  background-color: white !important;
+  background-color: rgb(238, 238, 238) !important;
   text-transform: none !important;
   padding: 1.1rem 1rem 0.8rem 1rem !important;
 }
 
+.MuiTab-root + .MuiTab-root {
+  border-left: none !important;
+}
+
 .MuiTab-root:hover {
-  background-color: rgb(245, 245, 245) !important;
+  background-color: rgb(228, 228, 228) !important;
   transition: all 0.2s ease-in-out;
 }
 
@@ -114,9 +131,9 @@
 }
 
 .Mui-selected {
-  border-color: black !important;
   color: black !important;
   border-bottom: none !important;
+  background-color: rgb(255, 255, 255) !important;
 }
 
 .Mui-selected:hover {

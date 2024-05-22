@@ -1,0 +1,10 @@
+.tab-map-container {
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+.map {
+  height: 100%;
+  z-index: 1;
+}

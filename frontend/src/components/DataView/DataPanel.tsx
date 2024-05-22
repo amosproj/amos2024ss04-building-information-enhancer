@@ -1,11 +1,4 @@
 /*
-  Required installation steps:
-    cd frontend
-    npm install @mui/material @emotion/react @emotion/styled
-    npm install @mui/x-data-grid
-    npm install @mui/icons-material
-
-
   This component displays a mui DataGrid with a Filterbar.
   Depending on the value of the "button" column, a map icon with the hover "open as map" is shown
   
@@ -17,26 +10,13 @@
 */
 
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
-import { styled } from "@mui/material/styles";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import FilterBar from "./FilterBar";
-import MapIcon from "@mui/icons-material/Map";
-import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
-
-// Black design for tooltip of the map icon
-const BootstrapTooltip = styled(({ className, ...props }: TooltipProps) => (
-  <Tooltip {...props} arrow classes={{ popper: className }} />
-))(({ theme }) => ({
-  [`& .${tooltipClasses.arrow}`]: {
-    color: theme.palette.common.black,
-  },
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: theme.palette.common.black,
-  },
-}));
+import { MapTrifold } from "@phosphor-icons/react";
+import "./DataPanel.css";
+import { Tooltip } from "@mui/material";
 
 // Returns a button if the "button" value is set to 1
 const renderDetailsButton = (params: GridRenderCellParams) => {
@@ -44,11 +24,11 @@ const renderDetailsButton = (params: GridRenderCellParams) => {
   if (value === 1) {
     return (
       <strong>
-        <BootstrapTooltip title="Open as Map">
-          <IconButton color="secondary" aria-label="open as map" size="small">
-            <MapIcon />
+        <Tooltip arrow title="Open as a map">
+          <IconButton aria-label="open as map" size="small">
+            <MapTrifold />
           </IconButton>
-        </BootstrapTooltip>
+        </Tooltip>
       </strong>
     );
   } else {
@@ -65,7 +45,7 @@ const columns: GridColDef[] = [
     renderCell: renderDetailsButton,
   },
   { field: "key", headerName: "key", width: 150 },
-  { field: "value", headerName: "value", type: "number", width: 150 },
+  { field: "value", headerName: "value", type: "number", width: 150, getApplyQuickFilterFn: undefined },
 ];
 
 // Data
@@ -98,18 +78,22 @@ const rows = [
 
 // Pass a unique filterPanelId so the FilterBar component is located next to the correct Data Grid
 // All DataGrid options explained https://mui.com/x/api/data-grid/data-grid/
-function KeyValuesList({ filterPanelId }: { filterPanelId: number }) {
+function DataPanel({
+  filterPanelId,
+  listTitle,
+}: {
+  filterPanelId: number;
+  listTitle: string;
+}) {
   const filterPanelIdString = `filter-panel-${filterPanelId}`;
   return (
-    <>
-      <Typography align="left" variant="h6" gutterBottom>
-        KeyValuesList
-      </Typography>
-      <Grid container spacing={2}>
+    <div className="data-panel-container">
+      <div className="data-panel-title">{listTitle}</div>
+      <Grid container spacing={2} className="data-panel-grid">
         <Grid item>
           <Box id={filterPanelIdString} />
         </Grid>
-        <Grid item style={{ height: 400, width: "100%" }}>
+        <Grid item style={{ width: "100%" }}>
           <DataGrid
             disableColumnMenu
             columnHeaderHeight={0}
@@ -148,8 +132,8 @@ function KeyValuesList({ filterPanelId }: { filterPanelId: number }) {
           />
         </Grid>
       </Grid>
-    </>
+    </div>
   );
 }
 
-export default KeyValuesList;
+export default DataPanel;

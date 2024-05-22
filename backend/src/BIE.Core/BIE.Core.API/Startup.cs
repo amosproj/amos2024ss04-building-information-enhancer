@@ -131,7 +131,7 @@ namespace BIE.Core.API
             });
 
 
-            //ConfigureEnviornmentVaraiables();
+            ConfigureEnviornmentVaraiables();
         }
 
         private static void ConfigureEnviornmentVaraiables()

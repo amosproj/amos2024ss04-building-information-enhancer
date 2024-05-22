@@ -13,6 +13,8 @@ copy ./scripts/CreateDB.sql /setup.sql
 RUN dos2unix /entrypoint.sh
 RUN dos2unix /run-script.sh
 
+RUN chmod +x /run-script.sh
+
 ENTRYPOINT ["/bin/bash","entrypoint.sh"]
 CMD ["/opt/mssql/bin/sqlservr"]
 

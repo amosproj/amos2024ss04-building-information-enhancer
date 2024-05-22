@@ -1,5 +1,5 @@
 services:
-  # Frontend container
+  # Frontend - Apache HTTP server (React + Typescript)
   frontend:
     build:
       context: ./frontend
@@ -9,18 +9,69 @@ services:
     environment:
       - HOST=${FRONTEND_HOST}
       - PORT=${FRONTEND_PORT}
+      - BACKEND_HOST=${BACKEND_HOST}
+      - BACKEND_PORT=${BACKEND_PORT}
+    networks:
+      - bie-network
     ports:
-      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+      - ${FRONTEND_PORT}:${FRONTEND_PORT}
 
-  # Backend container
-  backend:
+  # API Gateway for listening for FE requests
+  api-gateway:
     build:
       context: ./backend/src/BIE.Core
       dockerfile: Dockerfile
-    container_name: backend
-    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-backend
+    container_name: api-gateway
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-api-gateway
     environment:
-      - HOST=${BACKEND_HOST}
-      - PORT=${BACKEND_PORT}
+      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT_STAGE} # Needs to be changed to `Production` for production env.
+      - DB_NAME=BIEDB
+      - DB_PASSWORD=MyPass@1234
+      - DB_SERVER=sql-db
+      - DB_USERNAME=sa
+      - DB_TYPE=SQL
+      - TRUSTED=False
     ports:
-      - "${BACKEND_PORT}:${BACKEND_PORT}"
+      - ${BACKEND_PORT}:80
+    networks:
+      - bie-network
+    depends_on:
+      - sql-db
+
+  ## Data Pipeline for ingesting the datasets
+  datapipeline:
+    build:
+      context: ./backend/src/BIE.DataPipeline
+      dockerfile: Dockerfile
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-datapipeline
+    environment:
+      - DB_NAME=BIEDB
+      - DB_PASSWORD=MyPass@1234
+      - DB_SERVER=sql-db
+      - DB_USERNAME=sa
+      - DB_TYPE=SQL
+      - TRUSTED=False
+    container_name: datapipeline
+    networks:
+      - bie-network
+    depends_on:
+      - sql-db
+
+  ## Main SQL DB for storing the datasets
+  sql-db:
+    build:
+      context: ./backend/database
+      dockerfile: Dockerfile
+    container_name: sql-db
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-sql-database
+    networks:
+      - bie-network
+    volumes:
+      - bie-mssqldata:/var/opt/mssql
+
+volumes:
+  bie-mssqldata:
+
+networks:
+  bie-network:
+    driver: bridge
