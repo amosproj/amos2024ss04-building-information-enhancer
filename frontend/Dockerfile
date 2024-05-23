@@ -29,6 +29,13 @@ COPY --from=builder /usr/src/app/dist /usr/local/apache2/htdocs/
 ENV NODE_ENV=production
 ENV PORT=80
 
+# inject all environment vars we'll need
+ARG VITE_BACKEND_HOST
+ARG VITE_BACKEND_PORT
+# expose the variable to the finished cotainer
+ENV VITE_BACKEND_HOST=$VITE_BACKEND_HOST
+ENV VITE_BACKEND_HOST=$VITE_BACKEND_PORT
+
 # Expose the port
 EXPOSE "${PORT}"
 
