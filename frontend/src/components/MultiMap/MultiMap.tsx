@@ -9,10 +9,13 @@ import Tooltip from "@mui/material/Tooltip";
 import MapView from "../MapView/MapView";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
 import NewTabButton from "./NewTabButton";
+import { AlertContext } from "../../contexts/AlertContext";
 
 const MultiMap = () => {
   // Access the tabs context
   const { currentTabsCache, setCurrentTabsCache } = useContext(TabsContext);
+  // Alert
+  const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
 
   // Handles the change of the current tab id
   const handleChange = (_event: React.SyntheticEvent, newTabID: string) => {
@@ -26,7 +29,11 @@ const MultiMap = () => {
       currentTabsCache.openedTabs.find((tab) => tab.id === id)?.ifPinned ===
       true
     ) {
-      alert("You can not close a pinned tab.");
+      setCurrentAlertCache({
+        ...currentAlertCache,
+        isAlertOpened: true,
+        text: "A pinned tab cannot be closed.",
+      });
       return;
     }
     // Close the tab

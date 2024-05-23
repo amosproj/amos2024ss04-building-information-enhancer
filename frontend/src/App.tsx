@@ -9,6 +9,7 @@ import MultiMap from "./components/MultiMap/MultiMap";
 import { Fragment, useContext } from "react";
 import { TabsContext } from "./contexts/TabsContext";
 import MainMenu from "./components/MainMenu/MainMenu";
+import ErrorAlert from "./components/Alerts/ErrorAlert";
 
 function App() {
   const { currentTabsCache } = useContext(TabsContext);
@@ -26,6 +27,7 @@ function App() {
           </div>
         </Fragment>
       )}
+      <ErrorAlert />
     </div>
   );
 }
