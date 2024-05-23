@@ -45,7 +45,11 @@ const datasetsData: Dataset[] = [
   },
 ];
 
-const DatasetsList = () => {
+interface DatasetsListProps {
+  closeDialog: () => void;
+}
+
+const DatasetsList: React.FC<DatasetsListProps> = ({ closeDialog }) => {
   const { currentTabsCache, setCurrentTabsCache } = useContext(TabsContext);
   const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
 
@@ -71,6 +75,8 @@ const DatasetsList = () => {
       ...currentTabsCache,
       openedTabs: [...currentTabsCache.openedTabs, newTab],
     });
+    // Close the dialog if necessary
+    closeDialog();
   };
 
   return (

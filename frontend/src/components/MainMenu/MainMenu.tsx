@@ -21,7 +21,7 @@ const MainMenu = () => {
             Select one of the datasets below to load it on the map
           </span>
           <div className="menu-datasets-list-container">
-            <DatasetsList />
+            <DatasetsList closeDialog={() => {}} />
           </div>
         </div>
       </div>

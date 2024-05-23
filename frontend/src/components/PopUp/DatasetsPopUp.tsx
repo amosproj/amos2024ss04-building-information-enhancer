@@ -21,7 +21,7 @@ const DatasetsPopUp: React.FC<DatasetsPopUpProps> = ({
         <span className="secondary-text" style={{ paddingBottom: "1rem" }}>
           Select one of the datasets below to create a new map tab
         </span>
-        <DatasetsList />
+        <DatasetsList closeDialog={onToggleIfOpenedDialog} />
       </div>
     </PopUp>
   );
