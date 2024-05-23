@@ -16,25 +16,18 @@ RUN npm ci
 # Upload the files
 ADD . .
 
+# Set environment variables for build
+ENV VITE_BACKEND_HOST=localhost
+ENV VITE_BACKEND_PORT=8081
+
 RUN npm run build
 
-### Deploy the server ### 
+### Deploy the server ###
 
 # Use Apache HTTP server
 FROM httpd:2.4
 
 COPY --from=builder /usr/src/app/dist /usr/local/apache2/htdocs/
-
-## Environment variables
-ENV NODE_ENV=production
-ENV PORT=80
-
-# inject all environment vars we'll need
-ARG VITE_BACKEND_HOST
-ARG VITE_BACKEND_PORT
-# expose the variable to the finished cotainer
-ENV VITE_BACKEND_HOST=$VITE_BACKEND_HOST
-ENV VITE_BACKEND_HOST=$VITE_BACKEND_PORT
 
 # Expose the port
 EXPOSE "${PORT}"
