@@ -22,7 +22,7 @@ function DataView() {
       (tab) => tab.id === currentTabID
     );
 
-    return currentTab ? currentTab.title : "No map loaded";
+    return currentTab ? currentTab.dataset.displayName : "No map loaded";
   };
 
   // Stores the state of if the search popup is open

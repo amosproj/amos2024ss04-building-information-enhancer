@@ -1,12 +1,12 @@
 import React, { createContext, useState, ReactNode } from "react";
+import { Dataset } from "../components/DatasetsList/DatasetsList";
 
 //// TYPES ////
 
 // Tab Type
 export type TabProps = {
   id: string;
-  title: string;
-  description: string;
+  dataset: Dataset;
   ifPinned: boolean;
 };
 
@@ -32,15 +32,7 @@ type TabsContextProviderProps = {
 // Default Tabs Cache
 const defaultTabsCache: TabsCacheProps = {
   currentTabID: "1",
-  openedTabs: [
-    {
-      id: "1",
-      title: "Charging Stations",
-      description:
-        "Here is the short description of the Charging Stations Map.",
-      ifPinned: false,
-    },
-  ],
+  openedTabs: [],
 };
 
 // Actual value of the context
