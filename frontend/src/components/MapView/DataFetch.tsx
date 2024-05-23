@@ -1,7 +1,8 @@
 import { FeatureCollection, Geometry } from "geojson";
 import data from "./FeatureCollection.json";
 import { LatLngBounds } from "leaflet";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { AlertContext } from "../../contexts/AlertContext";
 const geojsonData: FeatureCollection = data as FeatureCollection;
 
 const useGeoData = (
@@ -9,6 +10,7 @@ const useGeoData = (
   zoom: number
 ): FeatureCollection<Geometry> | undefined => {
   const [data, setData] = useState<FeatureCollection<Geometry>>();
+  const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,7 +28,12 @@ const useGeoData = (
         const result = await response.json();
         setData(result as FeatureCollection<Geometry>);
       } catch (error) {
-        console.error("Fetching data failed, using local GeoJSON data:", error);
+        setCurrentAlertCache({
+          ...currentAlertCache,
+          isAlertOpened: true,
+          text: "Fetching data failed, using local GeoJSON data.",
+        });
+        console.error("Fetching data failed, using local GeoJSON data.", error);
         setData(geojsonData as FeatureCollection<Geometry>);
       }
     };
