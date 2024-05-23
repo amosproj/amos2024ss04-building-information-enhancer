@@ -18,7 +18,7 @@ const useGeoData = (
         // const topLat = bounds.getNorth();
         // const topLong = bounds.getEast();
         // TO-DO: Fix so it is not hardcoded
-        const url = `https://api-gateway:8081/api/v1.0/Dataset/1/data?BottomLat=9&BottomLong=10&TopLat=48&TopLong=49`;
+        const url = `http://localhost:8081/api/v1.0/Dataset/1/data?BottomLat=9&BottomLong=10&TopLat=48&TopLong=49`;
         const response = await fetch(url);
         if (!response.ok) {
           throw new Error("Network response was not ok");
