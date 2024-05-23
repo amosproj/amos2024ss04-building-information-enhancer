@@ -4,16 +4,11 @@ import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
-import {
-  Plus,
-  X,
-  PushPin,
-  PushPinSlash,
-  PushPinSimple,
-} from "@phosphor-icons/react";
+import { X, PushPin, PushPinSlash, PushPinSimple } from "@phosphor-icons/react";
 import Tooltip from "@mui/material/Tooltip";
 import MapView from "../MapView/MapView";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
+import NewTabButton from "./NewTabButton";
 
 const MultiMap = () => {
   // Access the tabs context
@@ -24,28 +19,10 @@ const MultiMap = () => {
     setCurrentTabsCache({ ...currentTabsCache, currentTabID: newTabID });
   };
 
-  // Opens a new tab
-  const openNewTab = () => {
-    const newTabID = currentTabsCache.openedTabs.length + 1;
-    const newTab: TabProps = {
-      id: newTabID.toString(),
-      title: `New Tab ${newTabID.toString()}`,
-      description: `Description for Tab ${newTabID.toString()}`,
-      ifPinned: false,
-    };
-    setCurrentTabsCache({
-      ...currentTabsCache,
-      openedTabs: [...currentTabsCache.openedTabs, newTab],
-    });
-  };
-
   // Closes a specific tab
   const closeTab = (id: string) => {
-    // Check if this is the last tab
-    if (currentTabsCache.openedTabs.length === 1) {
-      alert("The last tab can not be closed.");
-      return;
-    } else if (
+    // Check if the tab is pinned
+    if (
       currentTabsCache.openedTabs.find((tab) => tab.id === id)?.ifPinned ===
       true
     ) {
@@ -66,12 +43,14 @@ const MultiMap = () => {
       };
     });
     // Check if the current tab ID does not have to change
-    const newCurrentTabID =
+    let newCurrentTabID =
       Number(currentTabsCache.currentTabID) > updatedOpenedTabs.length - 1
         ? updatedOpenedTabs.length.toString()
         : currentTabsCache.currentTabID;
-
-    console.log(newCurrentTabID);
+    // Check if it is the last tab
+    if (currentTabsCache.openedTabs.length === 1) {
+      newCurrentTabID = "1";
+    }
     setCurrentTabsCache({
       ...currentTabsCache,
       openedTabs: updatedOpenedTabs,
@@ -107,7 +86,7 @@ const MultiMap = () => {
                 <Tab
                   label={
                     <div className="tab-title-container">
-                      <span>{tab.title}</span>
+                      <span>{tab.dataset.displayName}</span>
                       <div className="tab-icons-container">
                         {tab.ifPinned ? (
                           <PushPinSimple
@@ -156,18 +135,14 @@ const MultiMap = () => {
               );
             })}
           </TabList>
-          <Tooltip title="Add a new dataset" arrow>
-            <button className="add-tab-button" onClick={openNewTab}>
-              <Plus />
-            </button>
-          </Tooltip>
+          <NewTabButton />
         </div>
         {currentTabsCache.openedTabs.map((tab: TabProps) => {
           return (
             <TabPanel value={tab.id.toString()} className="tab" key={tab.id}>
               <div className="tab-context-container">
                 <span className="tab-description-container">
-                  {tab.description}
+                  {tab.dataset.description}
                 </span>
                 <MapView />
               </div>

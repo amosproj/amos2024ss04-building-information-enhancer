@@ -6,15 +6,26 @@ import "./App.css";
 
 import DataView from "./components/DataView/DataView";
 import MultiMap from "./components/MultiMap/MultiMap";
+import { Fragment, useContext } from "react";
+import { TabsContext } from "./contexts/TabsContext";
+import MainMenu from "./components/MainMenu/MainMenu";
 
 function App() {
+  const { currentTabsCache } = useContext(TabsContext);
+
   return (
     <div className="app-container">
-      <div className="header">Building Information Enhancer</div>
-      <div className="content-container">
-        <MultiMap />
-        <DataView />
-      </div>
+      {currentTabsCache.openedTabs.length === 0 ? (
+        <MainMenu />
+      ) : (
+        <Fragment>
+          <div className="header">Building Information Enhancer</div>
+          <div className="content-container">
+            <MultiMap />
+            <DataView />
+          </div>
+        </Fragment>
+      )}
     </div>
   );
 }
