@@ -7,8 +7,11 @@ import {
   ListItemText,
 } from "@mui/material";
 import { ChargingStation, Icon, Blueprint } from "@phosphor-icons/react";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
+
+import "./DatasetsList.css";
+import ErrorAlert from "../Alerts/ErrorAlert";
 
 // Dataset Type
 export type Dataset = {
@@ -44,9 +47,16 @@ const datasetsData: Dataset[] = [
 
 const DatasetsList = () => {
   const { currentTabsCache, setCurrentTabsCache } = useContext(TabsContext);
+  const [alertOpen, setAlertOpen] = useState(false);
 
   // Opens a new tab
   const openNewTab = (dataset: Dataset) => {
+    if (
+      currentTabsCache.openedTabs.some((tab) => tab.dataset.id === dataset.id)
+    ) {
+      setAlertOpen(true);
+      return;
+    }
     const newTabID = currentTabsCache.openedTabs.length + 1;
     const newTab: TabProps = {
       id: newTabID.toString(),
@@ -60,9 +70,9 @@ const DatasetsList = () => {
   };
 
   return (
-    <Fragment>
-      <Divider style={{ marginTop: 24 }} />
-      <List sx={{ width: "100%", bgcolor: "background.paper" }}>
+    <div className="datasets-list-container">
+      <Divider style={{ marginTop: "1rem" }} />
+      <List sx={{ width: "100%", bgcolor: "background.paper", padding: 0 }}>
         {datasetsData.map((dataset) => {
           return (
             <Fragment key={dataset.id}>
@@ -85,7 +95,12 @@ const DatasetsList = () => {
           );
         })}
       </List>
-    </Fragment>
+      <ErrorAlert
+        alertOpen={alertOpen}
+        setAlertOpen={setAlertOpen}
+        text="This dataset was already added."
+      />
+    </div>
   );
 };
 

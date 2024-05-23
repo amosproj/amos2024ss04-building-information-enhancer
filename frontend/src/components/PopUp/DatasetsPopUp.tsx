@@ -17,10 +17,12 @@ const DatasetsPopUp: React.FC<DatasetsPopUpProps> = ({
       onClose={onToggleIfOpenedDialog}
       ifOpenedDialog={ifOpenedDialog}
     >
-      <span className="secondary-text">
-        Select one of the datasets below to load it on the map
-      </span>
-      <DatasetsList />
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <span className="secondary-text" style={{ paddingBottom: "1rem" }}>
+          Select one of the datasets below to create a new map tab
+        </span>
+        <DatasetsList />
+      </div>
     </PopUp>
   );
 };

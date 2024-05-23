@@ -1,6 +1,7 @@
 import { Typography } from "@mui/material";
 import { Fragment } from "react/jsx-runtime";
 import bciLogo from "/bci_logo.png";
+import codeingLogo from "/codeing-logo.png";
 import DatasetsList from "../DatasetsList/DatasetsList";
 
 import "./MainMenu.css";
@@ -16,7 +17,7 @@ const MainMenu = () => {
               Building Information Enhancer
             </Typography>
           </div>
-          <span className="secondary-text">
+          <span className="secondary-text menu-subtitle">
             Select one of the datasets below to load it on the map
           </span>
           <div className="menu-datasets-list-container">
@@ -24,7 +25,14 @@ const MainMenu = () => {
           </div>
         </div>
       </div>
-      <span className="menu-credits">Created by: Code.ing</span>
+      <span className="menu-credits">
+        Created by:{" "}
+        <img
+          className="codeing-logo"
+          src={codeingLogo}
+          alt="Code.ing Logo"
+        ></img>
+      </span>
     </Fragment>
   );
 };
