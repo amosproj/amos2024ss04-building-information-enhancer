@@ -178,7 +178,7 @@ jobs:
       - name: Copy necessary files
         run: |
           scp ./docker-compose.yml ${{secrets.TEST_ENV_SSH_USER}}@${{secrets.TEST_ENV_SSH_HOST}}:/var/lib/bie
-          scp ./.env ${{secrets.TEST_ENV_SSH_USER}}@${{secrets.TEST_ENV_SSH_HOST}}:/var/lib/bie
+          scp ./.env.test ${{secrets.TEST_ENV_SSH_USER}}@${{secrets.TEST_ENV_SSH_HOST}}:/var/lib/bie/.env
       - name: Connect and Pull
         run: ssh ${{secrets.TEST_ENV_SSH_USER}}@${{secrets.TEST_ENV_SSH_HOST}} "cd /var/lib/bie && docker compose pull && docker compose up -d --remove-orphans && exit"
       - name: Cleanup
