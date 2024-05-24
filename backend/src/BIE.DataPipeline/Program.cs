@@ -7,11 +7,6 @@ using BIE.DataPipeline.Import;
 Console.WriteLine("Parser Started");
 DataSourceDescription description = YamlImporter.GetSourceDescription(args[0]);
 
-Console.WriteLine(description.table_cols[0].type);
-
-return 0;
-
-
 CsvImporter csvImporter = new CsvImporter(description);
 
 var dbHelper = new DBHelper();
