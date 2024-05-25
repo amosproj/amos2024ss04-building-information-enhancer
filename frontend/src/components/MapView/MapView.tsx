@@ -11,7 +11,7 @@ import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import MapOptions from "./MapOptions";
 import useGeoData from "./DataFetch";
-import { GeoJSON } from "react-leaflet";
+import { GeoJSON, WMSTileLayer } from "react-leaflet";
 import { MapContext } from "../../contexts/MapContext";
 
 const DefaultIcon = L.icon({
@@ -99,13 +99,19 @@ const MapView: React.FC = () => {
         center={currentMapCache.mapCenter}
         zoom={currentMapCache.zoom}
         className="map"
+        crs={L.CRS.EPSG4326}
       >
         {geoData && <GeoJSON data={geoData} />}
 
         <MapEventsHandler />
-        <TileLayer
+        {/* <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+  /> */}
+        <WMSTileLayer
+          url="https://tiles.maps.eox.at/wms"
+          layers="s2cloudless-2020"
+          format="image/jpeg"
         />
       </MapContainer>
     </div>

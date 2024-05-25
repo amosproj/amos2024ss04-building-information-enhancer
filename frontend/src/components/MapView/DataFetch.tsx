@@ -12,7 +12,8 @@ const useGeoData = (
 
   useEffect(() => {
     const fetchData = async (bounds: LatLngBounds) => {
-      try {
+      setData(geojsonData as FeatureCollection<Geometry>);
+      /*try {
         // const bottomLat = bounds.getSouth();
         // const bottomLong = bounds.getWest();
         // const topLat = bounds.getNorth();
@@ -28,7 +29,7 @@ const useGeoData = (
       } catch (error) {
         console.error("Fetching data failed, using local GeoJSON data:", error);
         setData(geojsonData as FeatureCollection<Geometry>);
-      }
+      }*/
     };
 
     fetchData(bounds);
