@@ -99,7 +99,6 @@ const MapView: React.FC = () => {
         center={currentMapCache.mapCenter}
         zoom={currentMapCache.zoom}
         className="map"
-        crs={L.CRS.EPSG4326}
       >
         {geoData && <GeoJSON data={geoData} />}
 
@@ -109,9 +108,10 @@ const MapView: React.FC = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
   /> */}
         <WMSTileLayer
-          url="https://tiles.maps.eox.at/wms"
-          layers="s2cloudless-2020"
-          format="image/jpeg"
+          url="https://sg.geodatenzentrum.de/wms_sentinel2_de"
+          layers="nir_2020" /*rgb*/
+          format="image/png"
+          attribution="&copy; © Europäische Union, enthält Copernicus Sentinel-2 Daten 2020, verarbeitet durch das Bundesamt für Kartographie und Geodäsie (BKG)"
         />
       </MapContainer>
     </div>
