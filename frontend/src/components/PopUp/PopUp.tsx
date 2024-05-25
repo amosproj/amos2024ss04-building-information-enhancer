@@ -38,7 +38,7 @@ const PopUp: React.FC<PopUpProps> = ({
       open={ifOpenedDialog}
       onClose={onClose}
     >
-      <DialogTitle>{title}</DialogTitle>
+      <DialogTitle style={{ paddingBottom: 8 }}>{title}</DialogTitle>
       <DialogContent>{children}</DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="primary">

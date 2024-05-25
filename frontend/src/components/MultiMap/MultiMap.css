@@ -102,6 +102,11 @@
   color: black;
 }
 
+.add-tab-button:focus {
+  color: black;
+  border-color: black;
+}
+
 .MuiTabs-scrollButtons.Mui-disabled {
   opacity: 0.3 !important;
 }
