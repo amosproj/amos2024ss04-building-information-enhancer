@@ -27,19 +27,19 @@ namespace BIE.DataPipeline.Import
         {
             //YAML Arguments:
             this.dataSourceDescription = dataSourceDescription;
-            columnTypes = ParseColumnTypes();
+            columnTypes = ImporterHelper.ParseColumnTypes(dataSourceDescription);
             //Setup Parser
             SetupParser();
 
             //Skip lines until header
-            SkipNlines(dataSourceDescription.options.skip_lines);
+            ImporterHelper.SkipNlines(parser, dataSourceDescription.options.skip_lines);
 
             // create the stringbuilder used for creating the strings.
             builder = new StringBuilder();
             
             //read header
-            fileHeader = ReadFileHeader();
-            yamlHeader = ReadYamlHeader();
+            fileHeader = ImporterHelper.ReadFileHeader(parser);
+            yamlHeader = ImporterHelper.ReadYamlHeader(dataSourceDescription);
             
             // get all the indexes and descriptions that interest us
             columnIndexes = new List<(int, int)>();
@@ -177,57 +177,6 @@ namespace BIE.DataPipeline.Import
             }
         }
 
-        private Type[] ParseColumnTypes()
-        {
-            Type[] res = new Type[dataSourceDescription.table_cols.Count];
-            for (int i = 0; i < dataSourceDescription.table_cols.Count; i++)
-            {
-                res[i] = SQLTypeToCSharpType(dataSourceDescription.table_cols[i].type);
-            }
-
-            return res;
-        }
-
-        private static Type SQLTypeToCSharpType(string sqlType)
-        {
-            string shortType = RemoveLastBrackets(sqlType); //Makes VARCHAR(50) -> VARCHAR
-            switch (shortType)
-            {
-                case "VARCHAR":
-                    return typeof(string);
-                case "BOOL":
-                    return typeof(bool);
-                case "BOOLEAN":
-                    return typeof(bool);
-                case "INT":
-                    return typeof(int);
-                case "INTEGER":
-                    return typeof(int);
-                case "FLOAT":
-                    return typeof(float);
-                case "DOUBLE":
-                case "DECIMAL":
-                case "DECIMAL(8,6)":
-                case "DECIMAL(9,6)":
-                    return typeof(double);
-                default:
-                    throw new NotSupportedException(string.Format("The type {0} is currently not supporteted.",
-                                                                  shortType));
-            }
-        }
-
-        private static string RemoveLastBrackets(string s)
-        {
-            int lastOpeningParenthesisIndex = s.LastIndexOf('(');
-            if (lastOpeningParenthesisIndex != -1)
-            {
-                return s.Substring(0, lastOpeningParenthesisIndex);
-            }
-            else
-            {
-                return s; // No opening parenthesis found, return original string
-            }
-        }
 
         private void SetupParser()
         {
@@ -263,45 +212,6 @@ namespace BIE.DataPipeline.Import
                     throw new FileNotFoundException("The given file is not found");
                 }
             }
-        }
-
-        private void SkipNlines(int noLines)
-        {
-            for (int i = 0; i < noLines; i++)
-            {
-                //check if parser has reached end of the file
-                if (parser.EndOfData)
-                {
-                    // Handle case where file has less than 10 lines
-                    Console.WriteLine(string.Format("File has less than {0} lines", noLines));
-                    return;
-                }
-
-                parser.ReadLine(); // Read and discard line
-            }
-        }
-
-        private string[] ReadFileHeader()
-        {
-            //check if parser has reached end of the file
-            if (parser.EndOfData)
-            {
-                //Handel case of no data
-                throw new Exception("No header found");
-            }
-
-            return parser.ReadFields();
-        }
-
-        private string[] ReadYamlHeader()
-        {
-            string[] res = new string[dataSourceDescription.table_cols.Count];
-            for (int i = 0; i < dataSourceDescription.table_cols.Count; i++)
-            {
-                res[i] = dataSourceDescription.table_cols[i].name;
-            }
-
-            return res;
         }
 
         private void PrintRow(string[] row, string[] header = null)
