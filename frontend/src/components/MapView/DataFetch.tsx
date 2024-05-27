@@ -1,6 +1,6 @@
 import { FeatureCollection, Geometry } from "geojson";
 import defaultCityLocationData from "./FeatureCollection.json";
-import defaultPolygonData from "./Bundeslaender.json";
+import defaultPolygonData from "./gemeinden_simplify20.json";
 import { LatLngBounds } from "leaflet";
 import { useEffect, useState } from "react";
 const geojsonCities: FeatureCollection =
