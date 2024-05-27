@@ -28,19 +28,6 @@ const DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-const svgIcon = L.divIcon({
-  html: `
-    <svg width="34" height="34" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="17" cy="17" r="14" stroke="white" stroke-width="2" fill="transparent"/>
-      <circle cx="17" cy="17" r="12" stroke="red" stroke-width="3" fill="transparent"/>
-      <circle cx="17" cy="17" r="9" stroke="white" stroke-width="1" fill="transparent"/>
-    </svg>
-  `,
-  className: "", // Optional: add a custom class name
-  iconSize: [34, 34],
-  iconAnchor: [17, 17], // Adjust the anchor point as needed
-});
-
 // Utility function to render a React component to HTML string
 const renderToHtml = (Component: React.FC) => {
   const div = document.createElement("div");

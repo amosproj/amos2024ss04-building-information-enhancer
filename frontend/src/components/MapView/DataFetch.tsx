@@ -17,17 +17,16 @@ const useGeoData = (
   const [data, setData] = useState<FeatureCollection<Geometry>>();
 
   useEffect(() => {
-    const fetchData = async (bounds: LatLngBounds) => {
-      if (id === "charging_stations") {
-        setData(geojsonCities as FeatureCollection<Geometry>);
-        onUpdate(geojsonCities);
-      } else if (id === "house_footprints") {
+    /* eslint-disable */
+    const fetchData = async (_bounds: LatLngBounds) => {
+      /* eslint-enable */
+      if (id === "house_footprints") {
         setData(geojsonGemeindenPolygons as FeatureCollection<Geometry>);
         onUpdate(geojsonGemeindenPolygons);
+        return;
       }
-      console.error(" Fetching data failed, using local GeoJSON data:" + id);
 
-      /*try {
+      try {
         // const bottomLat = bounds.getSouth();
         // const bottomLong = bounds.getWest();
         // const topLat = bounds.getNorth();
@@ -40,10 +39,12 @@ const useGeoData = (
         }
         const result = await response.json();
         setData(result as FeatureCollection<Geometry>);
+        onUpdate(result);
       } catch (error) {
         console.error("Fetching data failed, using local GeoJSON data:", error);
-        setData(geojsonData as FeatureCollection<Geometry>);
-      }*/
+        setData(geojsonCities as FeatureCollection<Geometry>);
+        onUpdate(geojsonCities);
+      }
     };
 
     fetchData(bounds);
