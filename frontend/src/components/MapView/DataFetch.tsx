@@ -1,18 +1,31 @@
 import { FeatureCollection, Geometry } from "geojson";
-import data from "./FeatureCollection.json";
+import defaultCityLocationData from "./FeatureCollection.json";
+import defaultPolygonData from "./Bundeslaender.json";
 import { LatLngBounds } from "leaflet";
 import { useEffect, useState } from "react";
-const geojsonData: FeatureCollection = data as FeatureCollection;
+const geojsonCities: FeatureCollection =
+  defaultCityLocationData as FeatureCollection;
+const geojsonGemeindenPolygons: FeatureCollection =
+  defaultPolygonData as FeatureCollection;
 
 const useGeoData = (
+  id: string,
   bounds: LatLngBounds,
-  zoom: number
+  zoom: number,
+  onUpdate: (data: FeatureCollection<Geometry>) => void
 ): FeatureCollection<Geometry> | undefined => {
   const [data, setData] = useState<FeatureCollection<Geometry>>();
 
   useEffect(() => {
     const fetchData = async (bounds: LatLngBounds) => {
-      setData(geojsonData as FeatureCollection<Geometry>);
+      if (id === "charging_stations") {
+        setData(geojsonCities as FeatureCollection<Geometry>);
+        onUpdate(geojsonCities);
+      } else if (id === "house_footprints") {
+        setData(geojsonGemeindenPolygons as FeatureCollection<Geometry>);
+        onUpdate(geojsonGemeindenPolygons);
+      }
+
       /*try {
         // const bottomLat = bounds.getSouth();
         // const bottomLong = bounds.getWest();

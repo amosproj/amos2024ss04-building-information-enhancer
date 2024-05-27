@@ -12,6 +12,7 @@ import { TabProps, TabsContext } from "../../contexts/TabsContext";
 
 import "./DatasetsList.css";
 import { AlertContext } from "../../contexts/AlertContext";
+import { FeatureCollection } from "geojson";
 
 // Dataset Type
 export type Dataset = {
@@ -21,7 +22,13 @@ export type Dataset = {
   type: string;
   datasetIcon: Icon;
   markerIcon: Icon | undefined;
-  data: JSON[];
+  data: FeatureCollection;
+};
+
+// Define an empty FeatureCollection
+const emptyFeatureCollection: FeatureCollection = {
+  type: "FeatureCollection",
+  features: [],
 };
 
 const datasetsData: Dataset[] = [
@@ -32,7 +39,7 @@ const datasetsData: Dataset[] = [
     type: "markers",
     datasetIcon: ChargingStation,
     markerIcon: ChargingStation,
-    data: [],
+    data: emptyFeatureCollection,
   },
   {
     id: "house_footprints",
@@ -41,7 +48,7 @@ const datasetsData: Dataset[] = [
     type: "areas",
     datasetIcon: Blueprint,
     markerIcon: undefined,
-    data: [],
+    data: emptyFeatureCollection,
   },
 ];
 

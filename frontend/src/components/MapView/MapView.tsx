@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useCallback, useContext } from "react";
 import { MapContainer } from "react-leaflet/MapContainer";
 import { Marker } from "react-leaflet/Marker";
 import { Popup } from "react-leaflet/Popup";
@@ -13,6 +13,8 @@ import MapOptions from "./MapOptions";
 import useGeoData from "./DataFetch";
 import { GeoJSON, WMSTileLayer } from "react-leaflet";
 import { MapContext } from "../../contexts/MapContext";
+import { TabProps, TabsContext } from "../../contexts/TabsContext";
+import { FeatureCollection } from "geojson";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -35,9 +37,46 @@ const svgIcon = L.divIcon({
   iconAnchor: [17, 17], // Adjust the anchor point as needed
 });
 
-const MapView: React.FC = () => {
+interface MapViewProps {
+  datasetId: string;
+}
+
+const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
+  const { currentTabsCache, setCurrentTabsCache } = useContext(TabsContext);
+
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
-  const geoData = useGeoData(currentMapCache.mapBounds, currentMapCache.zoom);
+
+  const updateDatasetData = useCallback(
+    (newData: FeatureCollection) => {
+      setCurrentTabsCache((prevCache) => {
+        const updatedTabs = prevCache.openedTabs.map((tab) => {
+          if (tab.dataset.id === datasetId) {
+            return {
+              ...tab,
+              dataset: {
+                ...tab.dataset,
+                data: newData,
+              },
+            };
+          }
+          return tab;
+        });
+
+        return {
+          ...prevCache,
+          openedTabs: updatedTabs,
+        };
+      });
+    },
+    [datasetId, setCurrentTabsCache]
+  );
+
+  const geoData = useGeoData(
+    datasetId,
+    currentMapCache.mapBounds,
+    currentMapCache.zoom,
+    updateDatasetData
+  );
 
   const MapEventsHandler = () => {
     const map = useMap();
@@ -92,6 +131,16 @@ const MapView: React.FC = () => {
     setCurrentMapCache({ ...currentMapCache, selectedCoordinates: latlng });
   }
 
+  // Get the feature collections from pinned tabs
+  const pinnedFeatureCollections = currentTabsCache.openedTabs
+    .filter((tab: TabProps) => tab.ifPinned)
+    .map((tab: TabProps) => tab.dataset.data);
+
+  // Check if the current geoData is in the pinnedFeatureCollections
+  const isCurrentDataPinned = pinnedFeatureCollections.some(
+    (featureCollection: FeatureCollection) => featureCollection === geoData
+  );
+
   return (
     <div className="tab-map-container">
       <MapOptions />
@@ -100,19 +149,25 @@ const MapView: React.FC = () => {
         zoom={currentMapCache.zoom}
         className="map"
       >
-        {geoData && <GeoJSON data={geoData} />}
+        {pinnedFeatureCollections.map(
+          (featureCollection: FeatureCollection, index: number) => (
+            <GeoJSON key={index} data={featureCollection} />
+          )
+        )}
+        {!isCurrentDataPinned && geoData && <GeoJSON data={geoData} />}
 
         <MapEventsHandler />
-        {/* <TileLayer
+        <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-  /> */}
+        />
+        {/*
         <WMSTileLayer
           url="https://sg.geodatenzentrum.de/wms_sentinel2_de"
-          layers="nir_2020" /*rgb*/
+          layers="nir_2020" 
           format="image/png"
           attribution="&copy; © Europäische Union, enthält Copernicus Sentinel-2 Daten 2020, verarbeitet durch das Bundesamt für Kartographie und Geodäsie (BKG)"
-        />
+        /> */}
       </MapContainer>
     </div>
   );
