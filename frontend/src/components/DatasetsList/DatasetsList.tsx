@@ -13,6 +13,9 @@ import { TabProps, TabsContext } from "../../contexts/TabsContext";
 import "./DatasetsList.css";
 import { AlertContext } from "../../contexts/AlertContext";
 import { FeatureCollection } from "geojson";
+import L, { Icon as LIcon, DivIcon } from "leaflet";
+import { createRoot } from "react-dom/client";
+import { flushSync } from "react-dom";
 
 // Dataset Type
 export type Dataset = {
@@ -21,7 +24,7 @@ export type Dataset = {
   description: string;
   type: string;
   datasetIcon: Icon;
-  markerIcon: Icon | undefined;
+  markerIcon: LIcon | DivIcon | undefined;
   data: FeatureCollection;
 };
 
@@ -31,6 +34,23 @@ const emptyFeatureCollection: FeatureCollection = {
   features: [],
 };
 
+// Utility function to render a React component to HTML string
+const renderToHtml = (Component: React.FC) => {
+  const div = document.createElement("div");
+  const root = createRoot(div);
+  flushSync(() => {
+    root.render(<Component />);
+  });
+  return div.innerHTML;
+};
+
+const divIconChargingStation: DivIcon = L.divIcon({
+  html: renderToHtml(() => <ChargingStation size={32} weight="duotone" />),
+  className: "", // Optional: add a custom class name
+  iconSize: [34, 34],
+  iconAnchor: [17, 17], // Adjust the anchor point as needed
+});
+
 const datasetsData: Dataset[] = [
   {
     id: "charging_stations",
@@ -38,7 +58,7 @@ const datasetsData: Dataset[] = [
     description: "Locations of all charging stations in Germany.",
     type: "markers",
     datasetIcon: ChargingStation,
-    markerIcon: ChargingStation,
+    markerIcon: divIconChargingStation,
     data: emptyFeatureCollection,
   },
   {

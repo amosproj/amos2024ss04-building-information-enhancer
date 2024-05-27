@@ -25,6 +25,7 @@ const useGeoData = (
         setData(geojsonGemeindenPolygons as FeatureCollection<Geometry>);
         onUpdate(geojsonGemeindenPolygons);
       }
+      console.error(" Fetching data failed, using local GeoJSON data:" + id);
 
       /*try {
         // const bottomLat = bounds.getSouth();
@@ -46,7 +47,7 @@ const useGeoData = (
     };
 
     fetchData(bounds);
-  }, [bounds, zoom]);
+  }, [bounds, zoom, id, onUpdate]);
 
   return data;
 };

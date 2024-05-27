@@ -1,4 +1,4 @@
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useState } from "react";
 import { MapContainer } from "react-leaflet/MapContainer";
 import { Marker } from "react-leaflet/Marker";
 import { Popup } from "react-leaflet/Popup";
@@ -6,7 +6,7 @@ import { TileLayer } from "react-leaflet/TileLayer";
 import "leaflet/dist/leaflet.css";
 import "./MapView.css";
 import { useMap, useMapEvents } from "react-leaflet/hooks";
-import L from "leaflet";
+import L, { LatLng } from "leaflet";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import MapOptions from "./MapOptions";
@@ -15,6 +15,7 @@ import { GeoJSON, WMSTileLayer } from "react-leaflet";
 import { MapContext } from "../../contexts/MapContext";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
 import { FeatureCollection } from "geojson";
+import { Dataset } from "../DatasetsList/DatasetsList";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -45,6 +46,10 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
   const { currentTabsCache, setCurrentTabsCache } = useContext(TabsContext);
 
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
+  const [showSatellite, setShowSatellite] = useState<boolean>(false);
+  const toggleShowSatellite = () => {
+    setShowSatellite((prevShowSatellite) => !prevShowSatellite);
+  };
 
   const updateDatasetData = useCallback(
     (newData: FeatureCollection) => {
@@ -134,40 +139,62 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
   // Get the feature collections from pinned tabs
   const pinnedFeatureCollections = currentTabsCache.openedTabs
     .filter((tab: TabProps) => tab.ifPinned)
-    .map((tab: TabProps) => tab.dataset.data);
+    .map((tab: TabProps) => tab.dataset);
+
+  const tabProps = currentTabsCache.openedTabs.find(
+    (tab: TabProps) => tab.dataset.id === datasetId
+  );
 
   // Check if the current geoData is in the pinnedFeatureCollections
   const isCurrentDataPinned = pinnedFeatureCollections.some(
-    (featureCollection: FeatureCollection) => featureCollection === geoData
+    (dataset: Dataset) => dataset.data === geoData
   );
 
   return (
     <div className="tab-map-container">
-      <MapOptions />
+      <MapOptions toggleShowSatellite={toggleShowSatellite} />
       <MapContainer
         center={currentMapCache.mapCenter}
         zoom={currentMapCache.zoom}
         className="map"
       >
-        {pinnedFeatureCollections.map(
-          (featureCollection: FeatureCollection, index: number) => (
-            <GeoJSON key={index} data={featureCollection} />
-          )
+        {pinnedFeatureCollections.map((dataset: Dataset, index: number) => (
+          <GeoJSON
+            key={index}
+            data={dataset.data}
+            pointToLayer={(_geoJsonPoint, latlng: LatLng) => {
+              if (dataset.markerIcon)
+                return L.marker(latlng, { icon: dataset.markerIcon });
+              else return L.marker(latlng);
+            }}
+          />
+        ))}
+        {!isCurrentDataPinned && geoData && (
+          <GeoJSON
+            data={geoData}
+            pointToLayer={(_geoJsonPoint, latlng: LatLng) => {
+              if (tabProps && tabProps.dataset.markerIcon)
+                return L.marker(latlng, { icon: tabProps.dataset.markerIcon });
+              else return L.marker(latlng);
+            }}
+          />
         )}
-        {!isCurrentDataPinned && geoData && <GeoJSON data={geoData} />}
 
         <MapEventsHandler />
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        {/*
-        <WMSTileLayer
-          url="https://sg.geodatenzentrum.de/wms_sentinel2_de"
-          layers="nir_2020" 
-          format="image/png"
-          attribution="&copy; © Europäische Union, enthält Copernicus Sentinel-2 Daten 2020, verarbeitet durch das Bundesamt für Kartographie und Geodäsie (BKG)"
-        /> */}
+
+        {showSatellite ? (
+          <WMSTileLayer
+            url="https://sg.geodatenzentrum.de/wms_sentinel2_de"
+            layers="rgb_2020"
+            format="image/png"
+            attribution="&copy; © Europäische Union, enthält Copernicus Sentinel-2 Daten 2020, verarbeitet durch das Bundesamt für Kartographie und Geodäsie (BKG)"
+          />
+        ) : (
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+        )}
       </MapContainer>
     </div>
   );
