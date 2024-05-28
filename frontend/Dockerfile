@@ -4,6 +4,10 @@ FROM node:20-slim as builder
 # Create app work directory
 WORKDIR /usr/src/app
 
+# Set environment variables 
+ARG STAGE
+ENV VITE_STAGE=${STAGE}
+
 ### Install dependencies ###
 
 # Copy package.json and package-lock.json to the working directory
@@ -15,10 +19,6 @@ RUN npm ci
 
 # Upload the files
 ADD . .
-
-# Set environment variables for build
-ENV VITE_BACKEND_HOST=localhost
-ENV VITE_BACKEND_PORT=8081
 
 RUN npm run build
 

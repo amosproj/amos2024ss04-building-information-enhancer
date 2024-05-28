@@ -11,9 +11,23 @@ const geojsonGemeindenPolygons: FeatureCollection =
   defaultPolygonData as FeatureCollection;
 
 // Define the base of the API URL
-const baseApiUrl = `http://${import.meta.env.VITE_BACKEND_HOST}:${
-  import.meta.env.VITE_BACKEND_PORT
-}`;
+const getBaseApiUrl = () => {
+  console.log("Checking base url: " + import.meta.env.VITE_STAGE);
+  switch (import.meta.env.VITE_STAGE) {
+    case "production":
+      return `http://${import.meta.env.VITE_API_HOST_PRODUCTION}:${
+        import.meta.env.VITE_API_PORT_PRODUCTION
+      }`;
+    case "test":
+      return `http://${import.meta.env.VITE_API_HOST_TEST}:${
+        import.meta.env.VITE_API_PORT_TEST
+      }`;
+    default:
+      return `http://${import.meta.env.VITE_API_HOST_DEV}:${
+        import.meta.env.VITE_API_PORT_DEV
+      }`;
+  }
+};
 
 const useGeoData = (
   id: string,
@@ -28,9 +42,9 @@ const useGeoData = (
   const getApiUrlForDataset = (): string => {
     switch (id) {
       case "charging_stations":
-        return baseApiUrl + "/api/v1.0/Dataset/1/data";
+        return getBaseApiUrl() + "/api/v1.0/Dataset/1/data";
       case "house_footprints":
-        return baseApiUrl + "";
+        return getBaseApiUrl() + "";
       default:
         // Display alert
         setCurrentAlertCache({
@@ -46,17 +60,17 @@ const useGeoData = (
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const fetchData = async (_bounds: LatLngBounds): Promise<void> => {
       try {
-        const bottomLat = bounds.getSouth();
-        const bottomLong = bounds.getWest();
-        const topLat = bounds.getNorth();
-        const topLong = bounds.getEast();
-        console.log(baseApiUrl);
+        // const bottomLat = bounds.getSouth();
+        // const bottomLong = bounds.getWest();
+        // const topLat = bounds.getNorth();
+        // const topLong = bounds.getEast();
+        console.log(getBaseApiUrl());
         // Define the query parameters
         const params = {
-          BottomLat: bottomLat,
-          BottomLong: bottomLong,
-          TopLat: topLat,
-          TopLong: topLong,
+          BottomLat: 9, // bottomLat,
+          BottomLong: 10, //bottomLong,
+          TopLat: 48, //topLat,
+          TopLong: 49, //topLong,
           ZoomLevel: zoom,
         };
         const response = await axios.get<FeatureCollection<Geometry>>(
