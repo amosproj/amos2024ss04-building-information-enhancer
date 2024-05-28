@@ -12,7 +12,7 @@ env:
 
 jobs:
   build-and-publish-frontend:
-    name: Build and publish the Frontend image
+    name: Build and publish - Frontend
     runs-on: ubuntu-latest
 
     steps:
@@ -49,7 +49,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            STAGE: ${{ env.STAGE }}
+            STAGE=${{ env.STAGE }}
 
   build-and-publish-backend-api-gateway:
     name: Build and publish - API Gateway
@@ -89,7 +89,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            STAGE: ${{ env.STAGE }}
+            STAGE=${{ env.STAGE }}
 
   build-and-publish-backend-datapipeline:
     name: Build and publish - Data Pipeline
@@ -129,7 +129,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            STAGE: ${{ env.STAGE }}
+            STAGE=${{ env.STAGE }}
 
   build-and-publish-backend-sql-database:
     name: Build and publish - SQL Database
@@ -169,7 +169,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            STAGE: ${{ env.STAGE }}
+            STAGE=${{ env.STAGE }}
 
   deploy-test-env:
     needs:
@@ -179,7 +179,7 @@ jobs:
         build-and-publish-backend-datapipeline,
         build-and-publish-backend-sql-database,
       ]
-    name: Deploy Docker Images in the Test Environment
+    name: Deploy - Test Environment
     runs-on: ubuntu-latest
 
     steps:
