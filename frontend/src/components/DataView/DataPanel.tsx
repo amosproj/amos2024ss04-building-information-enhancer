@@ -9,7 +9,7 @@ import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
-import { MapTrifold } from "@phosphor-icons/react";
+import { Funnel, MapTrifold } from "@phosphor-icons/react";
 import "./DataPanel.css";
 import { Tooltip, TextField } from "@mui/material";
 import { GridToolbar, GridToolbarProps } from "@mui/x-data-grid";
@@ -96,7 +96,11 @@ export default function DataPanel({ listTitle }: { listTitle: string }) {
       <Grid item>
         <Box id="filter-panel">
           <TextField
-            label="Filter"
+            label={
+              <div className="search-box-label">
+                <Funnel size={20} /> Search
+              </div>
+            }
             variant="outlined"
             size="small"
             value={filterValue}
