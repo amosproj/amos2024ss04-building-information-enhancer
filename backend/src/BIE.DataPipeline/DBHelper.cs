@@ -11,7 +11,7 @@ namespace BIE.DataPipeline
         private StringBuilder mStringBuilder;
 
         private int mCount;
-        private int maxCount = 5;
+        private int maxCount = 900;
 
         public DBHelper()
         {
@@ -27,7 +27,7 @@ namespace BIE.DataPipeline
         public void SetInfo(string tableName, string columnNames)
         {
             mInputQueryString = "INSERT INTO " + tableName + " ( " + columnNames + " ) " + " VALUES ";
-
+            mStringBuilder.Clear();
             mStringBuilder.Append(mInputQueryString);
         }
 
@@ -35,21 +35,34 @@ namespace BIE.DataPipeline
         /// To create table in DB
         /// </summary>
         /// <param name="description"></param>
-        internal void CreateTable(DataSourceDescription description)
+        internal void CreateTable(DataSourceDescription description,bool forshape=false)
         {
             Console.WriteLine("Creating Table...");
 
             var db = Database.Instance;
-            //string query = "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '" +
-            //               description.table_name + "')\r\nBEGIN CREATE TABLE " + description.table_name;
-            string query = "CREATE TABLE SpatialData (    Id INT PRIMARY KEY IDENTITY(1,1),    Location GEOGRAPHY );";
-            //query += " (";
-            //foreach (var column in description.table_cols)
-            //{
-            //    query += " " + column.name_in_table + " " + column.type + ", ";
-            //}
-
-            //query += "); END";
+            string query;
+            if (!forshape)
+            {
+                 query = "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '" +
+                               description.table_name + "')\r\nBEGIN CREATE TABLE " + description.table_name;
+                query += " (";
+                foreach (var column in description.table_cols)
+                {
+                    query += " " + column.name_in_table + " " + column.type + ", ";
+                }
+                query += "); END";
+            }
+            else
+            {
+                 query = @"
+            IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'SpatialData')
+            BEGIN
+                CREATE TABLE SpatialData (
+                    Id INT PRIMARY KEY IDENTITY(1,1),
+                    Location GEOGRAPHY
+                );
+            END";
+            }
             DbCommand cmd = db.CreateCommand(query);
             db.Execute(cmd);
 
