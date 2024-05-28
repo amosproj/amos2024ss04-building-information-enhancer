@@ -86,7 +86,7 @@ namespace BIE.DataPipeline
             }
 
             mStringBuilder.Append($"({values})");
-            values = string.Empty;
+
             mCount++;
             if (mCount >= maxCount)
             {
