@@ -1,5 +1,6 @@
 import DataPanel from "./DataPanel";
 import "./DataView.css";
+import FilterBar from "./FilterBar";
 
 import Button from "@mui/material/Button";
 import TabPanel from "@mui/lab/TabPanel/TabPanel";
@@ -31,6 +32,7 @@ function DataView() {
     setIfOpenedDialog(!ifOpenedDialog);
   };
 
+  
   return (
     <div className="dataview-container">
       <TabContext value="1">
@@ -67,9 +69,9 @@ function DataView() {
         <TabPanel value="1" className="tab dataview-tab">
           <div className="datapanels-container">
             <div className="data-panels-container">
-              <DataPanel listTitle={getCurrentTabTitle()} filterPanelId={1} />
-              <DataPanel listTitle="General Data" filterPanelId={2} />
-              <DataPanel listTitle="Extra Capabilities" filterPanelId={3} />
+
+              <DataPanel listTitle={getCurrentTabTitle()} />
+
             </div>
             <Button variant="outlined">Load data</Button>
           </div>
