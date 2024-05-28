@@ -32,13 +32,13 @@ namespace BIE.DataPipeline.Import
             SetupParser();
 
             //Skip lines until header
-            ImporterHelper.SkipNlines(parser, dataSourceDescription.options.skip_lines);
+            SkipNlines(dataSourceDescription.options.skip_lines);
 
             // create the stringbuilder used for creating the strings.
             builder = new StringBuilder();
             
             //read header
-            fileHeader = ImporterHelper.ReadFileHeader(parser);
+            fileHeader = ReadFileHeader();
             yamlHeader = ImporterHelper.ReadYamlHeader(dataSourceDescription);
             
             // get all the indexes and descriptions that interest us
@@ -214,18 +214,32 @@ namespace BIE.DataPipeline.Import
             }
         }
 
-        private void PrintRow(string[] row, string[] header = null)
+        private string[] ReadFileHeader()
         {
-            for (int i = 0; i < row.Length; i++)
+            //check if parser has reached end of the file
+            if (parser.EndOfData)
             {
-                if (header != null)
+                //Handel case of no data
+                throw new Exception("No header found");
+            }
+
+            return parser.ReadFields();
+        }
+
+
+        private void SkipNlines(int noLines)
+        {
+            for (int i = 0; i < noLines; i++)
+            {
+                //check if parser has reached end of the file
+                if (parser.EndOfData)
                 {
-                    Console.WriteLine(string.Format("{0}: {1}", header[i], row[i]));
+                    // Handle case where file has less than 10 lines
+                    Console.WriteLine(string.Format("File has less than {0} lines", noLines));
+                    return;
                 }
-                else
-                {
-                    Console.WriteLine(string.Format("{0}: {1}", i, row[i]));
-                }
+
+                parser.ReadLine(); // Read and discard line
             }
         }
     }

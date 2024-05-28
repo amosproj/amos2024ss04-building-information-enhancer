@@ -62,19 +62,6 @@ namespace BIE.DataPipeline.Import
             }
         }
 
-
-        public static string[] ReadFileHeader(TextFieldParser parser)
-        {
-            //check if parser has reached end of the file
-            if (parser.EndOfData)
-            {
-                //Handel case of no data
-                throw new Exception("No header found");
-            }
-
-            return parser.ReadFields();
-        }
-
         public static string[] ReadYamlHeader(DataSourceDescription dataSourceDescription)
         {
             string[] res = new string[dataSourceDescription.table_cols.Count];
@@ -86,20 +73,18 @@ namespace BIE.DataPipeline.Import
             return res;
         }
 
-
-        public static void SkipNlines(TextFieldParser parser, int noLines)
+        public static void PrintRow(string[] row, string[] header = null)
         {
-            for (int i = 0; i < noLines; i++)
+            for (int i = 0; i < row.Length; i++)
             {
-                //check if parser has reached end of the file
-                if (parser.EndOfData)
+                if (header != null)
                 {
-                    // Handle case where file has less than 10 lines
-                    Console.WriteLine(string.Format("File has less than {0} lines", noLines));
-                    return;
+                    Console.WriteLine(string.Format("{0}: {1}", header[i], row[i]));
                 }
-
-                parser.ReadLine(); // Read and discard line
+                else
+                {
+                    Console.WriteLine(string.Format("{0}: {1}", i, row[i]));
+                }
             }
         }
     }

@@ -9,39 +9,37 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Ubiety.Dns.Core;
+using YamlDotNet.Core;
 
 namespace BIE.DataPipeline.Import
 {
     internal class ShapeImporter : IImporter
     {
-        private TextFieldParser parser;
         private DataSourceDescription dataSourceDescription;
         private Type[] columnTypes;
         private string[] fileHeader;
         private string[] yamlHeader;
         private string headerString = "";
         private List<(int, int)> columnIndexes;
-        private StringBuilder builder;
-        private StringBuilder sqlInsert;
-        private ShapefileDataReader reader;
+        private ShapefileDataReader parser;
         DbaseFileHeader header;
+        StringBuilder builder;
         public ShapeImporter(DataSourceDescription dataSourceDescription)
         {
             //YAML Arguments:
             this.dataSourceDescription = dataSourceDescription;
             columnTypes = ImporterHelper.ParseColumnTypes(dataSourceDescription);
+            builder = new StringBuilder();
             //Setup Parser
             SetupParser();
 
             //Skip lines until header
-            ImporterHelper.SkipNlines(parser, dataSourceDescription.options.skip_lines);
-
-            // create the stringbuilder used for creating the strings.
-            builder = new StringBuilder();
+            SkipNlines(0);//(dataSourceDescription.options.skip_lines);
 
             //read header
-            fileHeader = ImporterHelper.ReadFileHeader(parser);
-            yamlHeader = ImporterHelper.ReadYamlHeader(dataSourceDescription);
+            fileHeader = ReadFileHeader();
+            //ImporterHelper.PrintRow(fileHeader);
+            /*yamlHeader = ImporterHelper.ReadYamlHeader(dataSourceDescription);
 
             // get all the indexes and descriptions that interest us
             columnIndexes = new List<(int, int)>();
@@ -56,68 +54,60 @@ namespace BIE.DataPipeline.Import
                         break;
                     }
                 }
-            }
+            }*/
             
         }
 
         public void SetupParser()
         {
-            reader = new ShapefileDataReader(dataSourceDescription.source.ToString(), NetTopologySuite.Geometries.GeometryFactory.Default);
-            header = reader.DbaseHeader;
-
-            sqlInsert = new StringBuilder();
+            parser = new ShapefileDataReader(@"C:\Users\nicol\Downloads\091_Oberbayern_Hausumringe\hausumringe", NetTopologySuite.Geometries.GeometryFactory.Default);
+            header = parser.DbaseHeader;
         }
 
 
         public bool ReadLine(out string nextLine)
         {
+            nextLine = "";
             try
             {
-                int fieldCount = header.NumFields;
-                sqlInsert.Clear();
-                /*sqlInsert.Append($"INSERT INTO {tableName} (");
-
-                // Append column names
-                for (int i = 0; i < fieldCount; i++)
+                if (!parser.Read())
                 {
-                    sqlInsert.Append(header.Fields[i].Name);
-                    if (i < fieldCount - 1)
-                        sqlInsert.Append(", ");
+                    Console.WriteLine("EOF");
+                    return false;
                 }
-                sqlInsert.Append(", Geometry) VALUES (");*/
 
-                // Append values
+                int fieldCount = header.NumFields;
                 for (int i = 0; i < fieldCount; i++)
                 {
-                    var value = reader.GetValue(i);
+                    var value = parser.GetValue(i);
                     if (value is string)
                     {
-                        sqlInsert.Append($"'{value.ToString().Replace("'", "''")}'");
+                        builder.Append($"'{value.ToString().Replace("'", "''")}'");
                     }
                     else if (value is DateTime dateTime)
                     {
-                        sqlInsert.Append($"'{dateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)}'");
+                        builder.Append($"'{dateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)}'");
                     }
                     else if (value is double || value is float)
                     {
-                        sqlInsert.Append($"{Convert.ToDouble(value).ToString(CultureInfo.InvariantCulture)}");
+                        builder.Append($"{Convert.ToDouble(value).ToString(CultureInfo.InvariantCulture)}");
                     }
                     else
                     {
-                        sqlInsert.Append(value);
+                        builder.Append(value);
                     }
                     if (i < fieldCount - 1)
-                        sqlInsert.Append(", ");
+                        builder.Append(", ");
                 }
 
                 // Append geometry as WKT (Well-Known Text)
-                Geometry geometry = reader.Geometry;
-                sqlInsert.Append($", '{geometry.AsText()}'");
-                sqlInsert.Append(");");
+                Geometry geometry = parser.Geometry;
+                builder.Append($", '{geometry.AsText()}'");
+                builder.Append(");");
 
                 // Print the SQL insert statement
-                Console.WriteLine(sqlInsert.ToString());
-                nextLine = sqlInsert.ToString();
+                Console.WriteLine(builder.ToString());
+                nextLine = builder.ToString();
                 return true;
             }catch(Exception ex)
             {
@@ -126,6 +116,42 @@ namespace BIE.DataPipeline.Import
             }
         }
 
-        
+        private string[] ReadFileHeader()
+        {
+            //check if parser has reached end of the file
+            if (!parser.Read())
+            {
+                //Handel case of no data
+                throw new Exception("No header found");
+            }
+
+            int fieldCount = header.NumFields;
+            string[] res = new string[fieldCount];
+
+            // Append column names
+            for (int i = 0; i < fieldCount; i++)
+            {
+                res[i] = header.Fields[i].Name;
+            }
+
+            return res;
+        }
+
+
+        private void SkipNlines(int noLines)
+        {
+            for (int i = 0; i < noLines; i++)
+            {
+                // Read and discard line
+                if (!parser.Read())
+                {
+                    // Handle case where file has less than 10 lines
+                    Console.WriteLine(string.Format("File has less than {0} lines", noLines));
+                    return;
+                }
+            }
+        }
+
+
     }
 }
