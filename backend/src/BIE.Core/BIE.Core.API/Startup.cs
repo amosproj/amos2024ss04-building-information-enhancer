@@ -136,13 +136,13 @@ namespace BIE.Core.API
 
         private static void ConfigureEnviornmentVaraiables()
         {
-            var dbServer = Environment.GetEnvironmentVariable("DB_SERVER");
-            var dbName = Environment.GetEnvironmentVariable("DB_NAME");
-            var dbUser = Environment.GetEnvironmentVariable("DB_USERNAME");
-            var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
-            bool dbTrusted = "true "; //Environment.GetEnvironmentVariable("TRUSTED").ToLower() == "true";
+            var dbServer = "sql-db"; //Environment.GetEnvironmentVariable("DB_SERVER");
+            var dbName = "BIEDB"; //Environment.GetEnvironmentVariable("DB_NAME");
+            var dbUser = "sa";//Environment.GetEnvironmentVariable("DB_USERNAME");
+            var dbPassword = "MyPass@1234"; //Environment.GetEnvironmentVariable("DB_PASSWORD");
+            bool dbTrusted = false; //Environment.GetEnvironmentVariable("TRUSTED").ToLower() == "true";
             DatabaseType dbType = (DatabaseType)Enum.Parse(typeof(DatabaseType),
-                Environment.GetEnvironmentVariable("DB_TYPE"));
+                "SQL");//Environment.GetEnvironmentVariable("DB_TYPE"));
 
             Database.Instance.SetConnectionString(dbType, dbServer,
                 dbName, dbUser, dbPassword, dbTrusted);
