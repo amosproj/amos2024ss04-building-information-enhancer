@@ -1,8 +1,5 @@
 ﻿using Microsoft.VisualBasic.FileIO;
 using MySql.Data.MySqlClient.X.XDevAPI.Common;
-using NetTopologySuite.Geometries;
-using NetTopologySuite.IO;
-using NetTopologySuite.Features;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,6 +8,18 @@ using System.Text;
 using System.Threading.Tasks;
 using Ubiety.Dns.Core;
 using YamlDotNet.Core;
+using System.Data.SqlClient;
+using NetTopologySuite.IO.ShapeFile.Extended;
+using Microsoft.SqlServer;
+using NetTopologySuite.Utilities;
+using System.Diagnostics.Metrics;
+using System.Security.Policy;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.IO;
+using ProjNet.IO.CoordinateSystems;
+using ProjNet.CoordinateSystems;
+using ProjNet.CoordinateSystems.Transformations;
+
 
 namespace BIE.DataPipeline.Import
 {
@@ -61,7 +70,7 @@ namespace BIE.DataPipeline.Import
 
         public void SetupParser()
         {
-            parser = new ShapefileDataReader(@"C:\Users\nicol\Downloads\091_Oberbayern_Hausumringe\hausumringe", NetTopologySuite.Geometries.GeometryFactory.Default);
+            parser = new ShapefileDataReader(@"D:\datasets\093_Oberpfalz_Hausumringe\hausumringe", NetTopologySuite.Geometries.GeometryFactory.Default);
             header = parser.DbaseHeader;
         }
 
@@ -103,8 +112,10 @@ namespace BIE.DataPipeline.Import
 
                 // Append geometry as WKT (Well-Known Text)
                 Geometry geometry = parser.Geometry;
-                builder.Append($", '{geometry.AsText()}'");
-                builder.Append(");");
+                geometry= Convert(geometry);
+
+                builder.Append($", geography::STGeomFromText('{geometry.AsText()}', 4326)");
+                builder.Append("");
 
                 // Print the SQL insert statement
                 Console.WriteLine(builder.ToString());
@@ -146,6 +157,67 @@ namespace BIE.DataPipeline.Import
             }
         }
 
+        public string GetTableName()
+        {
+            return this.dataSourceDescription.table_name;
+        }
 
+        public string GetHeaderString()
+        {
+            if (headerString.Equals(""))
+            {
+                foreach (DataSourceDescription.DataSourceColumn col in this.dataSourceDescription.table_cols)
+                {
+                    headerString += col.name_in_table + ",";
+                }
+
+                //remove last ,
+                headerString = RemoveLastComma(headerString);
+            }
+
+            return headerString;
+        }
+        private static string RemoveLastComma(string input)
+        {
+            int lastCommaIndex = input.LastIndexOf(',');
+            if (lastCommaIndex != -1)
+            {
+                return input.Remove(lastCommaIndex, 1);
+            }
+            else
+            {
+                return input; // No comma found, return original string
+            }
+        }
+        public static Geometry Convert(Geometry polygon)
+        {
+            // Define the source and target coordinate systems
+            IInfo utmZone32 = CoordinateSystemWktReader.Parse("PROJCS[\"WGS 84 / UTM zone 32N\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AUTHORITY[\"EPSG\",\"32632\"]]");
+            GeographicCoordinateSystem wgs84 = GeographicCoordinateSystem.WGS84;
+
+            // Create coordinate transformation
+            var transformation = new CoordinateTransformationFactory().CreateFromCoordinateSystems((CoordinateSystem)utmZone32, wgs84);
+
+
+
+            // Convert UTM coordinates to latitude and longitude
+            foreach (Coordinate coordinate in polygon.Coordinates)
+            {
+                double utmEasting = coordinate.X;
+                double utmNorthing = coordinate.Y;
+                double[] utmPoint = { utmEasting, utmNorthing };
+                double[] wgs84Point = transformation.MathTransform.Transform(utmPoint);
+
+                // Extract latitude and longitude
+                double latitude = wgs84Point[1];
+                double longitude = wgs84Point[0];
+                coordinate.X = latitude;
+                coordinate.Y = longitude;
+                //Console.WriteLine("Latitude: " + latitude);
+                //Console.WriteLine("Longitude: " + longitude);
+            }
+            return polygon;
+
+        }
     }
 }

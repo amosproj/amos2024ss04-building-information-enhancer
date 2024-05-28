@@ -11,7 +11,7 @@ namespace BIE.DataPipeline
         private StringBuilder mStringBuilder;
 
         private int mCount;
-        private int maxCount = 900;
+        private int maxCount = 1;
 
         public DBHelper()
         {
@@ -40,15 +40,16 @@ namespace BIE.DataPipeline
             Console.WriteLine("Creating Table...");
 
             var db = Database.Instance;
-            string query = "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '" +
-                           description.table_name + "')\r\nBEGIN CREATE TABLE " + description.table_name;
-            query += " (";
-            foreach (var column in description.table_cols)
-            {
-                query += " " + column.name_in_table + " " + column.type + ", ";
-            }
+            //string query = "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '" +
+            //               description.table_name + "')\r\nBEGIN CREATE TABLE " + description.table_name;
+            string query = "CREATE TABLE SpatialData (    Id INT PRIMARY KEY IDENTITY(1,1),    Location GEOGRAPHY );";
+            //query += " (";
+            //foreach (var column in description.table_cols)
+            //{
+            //    query += " " + column.name_in_table + " " + column.type + ", ";
+            //}
 
-            query += "); END";
+            //query += "); END";
             DbCommand cmd = db.CreateCommand(query);
             db.Execute(cmd);
 
