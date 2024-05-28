@@ -1,7 +1,5 @@
 import DataPanel from "./DataPanel";
 import "./DataView.css";
-import FilterBar from "./FilterBar";
-
 import Button from "@mui/material/Button";
 import TabPanel from "@mui/lab/TabPanel/TabPanel";
 import TabContext from "@mui/lab/TabContext/TabContext";

@@ -13,7 +13,7 @@ import IconButton from "@mui/material/IconButton";
 import { MapTrifold } from "@phosphor-icons/react";
 import "./DataPanel.css";
 import { Tooltip, TextField } from "@mui/material";
-import { GridToolbarQuickFilter, GridToolbar } from "@mui/x-data-grid";
+import { GridToolbar } from "@mui/x-data-grid";
 
 // Returns a button if the "button" value is set to 1
 const renderDetailsButton = (params: GridRenderCellParams) => {
