@@ -1,17 +1,31 @@
 import { FeatureCollection, Geometry } from "geojson";
-import data from "./FeatureCollection.json";
+import defaultCityLocationData from "./FeatureCollection.json";
+import defaultPolygonData from "./gemeinden_simplify20.json";
 import { LatLngBounds } from "leaflet";
 import { useEffect, useState } from "react";
-const geojsonData: FeatureCollection = data as FeatureCollection;
+const geojsonCities: FeatureCollection =
+  defaultCityLocationData as FeatureCollection;
+const geojsonGemeindenPolygons: FeatureCollection =
+  defaultPolygonData as FeatureCollection;
 
 const useGeoData = (
+  id: string,
   bounds: LatLngBounds,
-  zoom: number
+  zoom: number,
+  onUpdate: (data: FeatureCollection<Geometry>) => void
 ): FeatureCollection<Geometry> | undefined => {
   const [data, setData] = useState<FeatureCollection<Geometry>>();
 
   useEffect(() => {
-    const fetchData = async () => {
+    /* eslint-disable */
+    const fetchData = async (_bounds: LatLngBounds) => {
+      /* eslint-enable */
+      if (id === "house_footprints") {
+        setData(geojsonGemeindenPolygons as FeatureCollection<Geometry>);
+        onUpdate(geojsonGemeindenPolygons);
+        return;
+      }
+
       try {
         // const bottomLat = bounds.getSouth();
         // const bottomLong = bounds.getWest();
@@ -25,14 +39,16 @@ const useGeoData = (
         }
         const result = await response.json();
         setData(result as FeatureCollection<Geometry>);
+        onUpdate(result);
       } catch (error) {
         console.error("Fetching data failed, using local GeoJSON data:", error);
-        setData(geojsonData as FeatureCollection<Geometry>);
+        setData(geojsonCities as FeatureCollection<Geometry>);
+        onUpdate(geojsonCities);
       }
     };
 
-    fetchData();
-  }, [bounds, zoom]);
+    fetchData(bounds);
+  }, [bounds, zoom, id, onUpdate]);
 
   return data;
 };

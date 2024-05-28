@@ -1,10 +1,14 @@
 import { useState } from "react";
-import { MagnifyingGlass } from "@phosphor-icons/react";
+import { ArrowsClockwise, MagnifyingGlass } from "@phosphor-icons/react";
 import "./MapOptions.css";
 import { Tooltip } from "@mui/material";
 import SearchPopUp from "../PopUp/SearchPopUp";
 
-const MapOptions: React.FC = () => {
+interface MapOptionsProps {
+  toggleShowSatellite: () => void;
+}
+
+const MapOptions: React.FC<MapOptionsProps> = ({ toggleShowSatellite }) => {
   // Stores the state of if the search popup is open
   const [ifOpenedDialog, setIfOpenedDialog] = useState(false);
   const toggleIfOpenedDialog = () => {
@@ -18,6 +22,13 @@ const MapOptions: React.FC = () => {
           weight="duotone"
           className="search-map-icon"
           onClick={toggleIfOpenedDialog}
+        />
+      </Tooltip>
+      <Tooltip arrow title="Switch satellite / openstreetmap">
+        <ArrowsClockwise
+          weight="duotone"
+          className="switch-map-icon"
+          onClick={toggleShowSatellite}
         />
       </Tooltip>
       <SearchPopUp
