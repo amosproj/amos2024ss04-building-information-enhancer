@@ -1,9 +1,13 @@
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { MapContainer } from "react-leaflet/MapContainer";
 import { Marker } from "react-leaflet/Marker";
 import { Popup } from "react-leaflet/Popup";
 import { TileLayer } from "react-leaflet/TileLayer";
 import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+import "leaflet.markercluster";
+
 import "./MapView.css";
 import { useMap, useMapEvents } from "react-leaflet/hooks";
 import L, { DivIcon, LatLng } from "leaflet";
@@ -14,7 +18,7 @@ import useGeoData from "./DataFetch";
 import { GeoJSON, WMSTileLayer } from "react-leaflet";
 import { MapContext } from "../../contexts/MapContext";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
-import { FeatureCollection } from "geojson";
+import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { Dataset } from "../DatasetsList/DatasetsList";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
@@ -49,13 +53,50 @@ interface MapViewProps {
   datasetId: string;
 }
 
+interface TestProps {
+  id: string;
+  onUpdate1: (data: FeatureCollection<Geometry>) => void;
+}
+
+const Test: React.FC<TestProps> = ({ id, onUpdate1 }) => {
+  const map = useMap();
+  const { currentMapCache } = useContext(MapContext);
+
+  const geoData = useGeoData(
+    id,
+    currentMapCache.mapBounds,
+    currentMapCache.zoom,
+    onUpdate1
+  );
+
+  useEffect(() => {
+    if (!geoData) return;
+
+    const geojsonLayer = L.geoJson(geoData, {
+      pointToLayer: function (_feature, latlng) {
+        return L.marker(latlng, { icon: divIconMarker });
+      },
+    });
+    const markerClusterGroup = L.markerClusterGroup();
+
+    markerClusterGroup.addLayer(geojsonLayer);
+    map.addLayer(markerClusterGroup);
+
+    return () => {
+      map.removeLayer(markerClusterGroup);
+    };
+  }, [map, geoData]);
+
+  return null;
+};
+
 const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
   const { currentTabsCache, setCurrentTabsCache } = useContext(TabsContext);
 
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
   const [showSatellite, setShowSatellite] = useState<boolean>(false);
   const toggleShowSatellite = () => {
-    setShowSatellite((prevShowSatellite) => !prevShowSatellite);
+    setShowSatellite((prevShowSatellite: boolean) => !prevShowSatellite);
   };
 
   const updateDatasetData = useCallback(
@@ -168,7 +209,7 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
         zoom={currentMapCache.zoom}
         className="map"
       >
-        {pinnedFeatureCollections.map((dataset: Dataset, index: number) => (
+        {/*{pinnedFeatureCollections.map((dataset: Dataset, index: number) => (
           <GeoJSON
             style={{ fillOpacity: 0.1 }}
             key={index}
@@ -190,7 +231,8 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
               else return L.marker(latlng);
             }}
           />
-        )}
+        )}*/}
+        <Test id={datasetId} onUpdate1={updateDatasetData} />
 
         <MapEventsHandler />
 

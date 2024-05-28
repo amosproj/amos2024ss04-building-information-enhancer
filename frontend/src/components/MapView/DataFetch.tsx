@@ -12,7 +12,7 @@ const useGeoData = (
   id: string,
   bounds: LatLngBounds,
   zoom: number,
-  onUpdate: (data: FeatureCollection<Geometry>) => void
+  onUpdate?: (data: FeatureCollection<Geometry>) => void
 ): FeatureCollection<Geometry> | undefined => {
   const [data, setData] = useState<FeatureCollection<Geometry>>();
 
@@ -27,12 +27,14 @@ const useGeoData = (
       }
 
       try {
-        // const bottomLat = bounds.getSouth();
-        // const bottomLong = bounds.getWest();
-        // const topLat = bounds.getNorth();
-        // const topLong = bounds.getEast();
-        // TO-DO: Fix so it is not hardcoded
-        const url = `http://localhost:8081/api/v1.0/Dataset/1/data?BottomLat=9&BottomLong=10&TopLat=48&TopLong=49`;
+        const bottomLat = bounds.getSouthWest().lat;
+        const bottomLong = bounds.getSouthWest().lng;
+        const topLat = bounds.getNorthEast().lat;
+        const topLong = bounds.getNorthEast().lng;
+
+        const url = `http://localhost:8081/api/v1.0/Dataset/1/data?BottomLat=${bottomLat}&BottomLong=${bottomLong}&TopLat=${topLat}&TopLong=${topLong}`;
+        console.log(url);
+
         const response = await fetch(url);
         if (!response.ok) {
           throw new Error("Network response was not ok");
