@@ -114,12 +114,11 @@ namespace BIE.DataPipeline.Import
                 Geometry geometry = parser.Geometry;
                 geometry= Convert(geometry);
 
-                builder.Append($", geography::STGeomFromText('{geometry.AsText()}', 4326)");
-                builder.Append("");
+                string geo= ($"geography::STGeomFromText('{geometry.AsText()}', 4326)");
 
                 // Print the SQL insert statement
                 Console.WriteLine(builder.ToString());
-                nextLine = builder.ToString();
+                nextLine = geo;
                 return true;
             }catch(Exception ex)
             {

@@ -36,7 +36,6 @@ var count = 0;
 
 while (notEOF)
 {
-    line = line.Remove(0, 1);
     dbHelper.InsertData(line);
     notEOF = shapeImporter.ReadLine(out line);
     count++;

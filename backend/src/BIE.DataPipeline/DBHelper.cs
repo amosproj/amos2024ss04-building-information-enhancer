@@ -11,7 +11,7 @@ namespace BIE.DataPipeline
         private StringBuilder mStringBuilder;
 
         private int mCount;
-        private int maxCount = 1;
+        private int maxCount = 5;
 
         public DBHelper()
         {
@@ -73,7 +73,7 @@ namespace BIE.DataPipeline
             }
 
             mStringBuilder.Append($"({values})");
-
+            values = string.Empty;
             mCount++;
             if (mCount >= maxCount)
             {
