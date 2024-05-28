@@ -140,7 +140,7 @@ namespace BIE.Core.API
             var dbName = Environment.GetEnvironmentVariable("DB_NAME");
             var dbUser = Environment.GetEnvironmentVariable("DB_USERNAME");
             var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
-            bool dbTrusted = "true "; //Environment.GetEnvironmentVariable("TRUSTED").ToLower() == "true";
+            bool dbTrusted = Environment.GetEnvironmentVariable("TRUSTED").ToLower() == "true";
             DatabaseType dbType = (DatabaseType)Enum.Parse(typeof(DatabaseType),
                 Environment.GetEnvironmentVariable("DB_TYPE"));
 
