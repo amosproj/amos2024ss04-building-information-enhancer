@@ -19,7 +19,7 @@ const ErrorAlert: React.FC = () => {
         ...currentAlertCache,
         isAlertOpened: false,
       });
-    }, 3000);
+    }, 4000);
 
     return () => {
       clearTimeout(timeId);
