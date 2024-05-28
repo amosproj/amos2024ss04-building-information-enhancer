@@ -3,6 +3,7 @@
   flex-direction: column;
   height: 100svh;
   max-height: 100vh;
+  background-color: red !important;
 }
 
 .header {
