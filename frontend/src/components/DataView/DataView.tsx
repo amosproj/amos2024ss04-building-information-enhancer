@@ -30,7 +30,6 @@ function DataView() {
     setIfOpenedDialog(!ifOpenedDialog);
   };
 
-  
   return (
     <div className="dataview-container">
       <TabContext value="1">
@@ -63,13 +62,10 @@ function DataView() {
             ></Tab>
           </TabList>
         </div>
-
         <TabPanel value="1" className="tab dataview-tab">
           <div className="datapanels-container">
             <div className="data-panels-container">
-
               <DataPanel listTitle={getCurrentTabTitle()} />
-
             </div>
             <Button variant="outlined">Load data</Button>
           </div>
