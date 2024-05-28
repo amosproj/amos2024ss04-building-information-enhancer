@@ -2,6 +2,7 @@
 using MySql.Data.MySqlClient.X.XDevAPI.Common;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
+using NetTopologySuite.Features;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -38,7 +39,7 @@ namespace BIE.DataPipeline.Import
 
             //read header
             fileHeader = ReadFileHeader();
-            //ImporterHelper.PrintRow(fileHeader);
+            ImporterHelper.PrintRow(fileHeader);
             /*yamlHeader = ImporterHelper.ReadYamlHeader(dataSourceDescription);
 
             // get all the indexes and descriptions that interest us
@@ -76,7 +77,7 @@ namespace BIE.DataPipeline.Import
                     return false;
                 }
 
-                int fieldCount = header.NumFields;
+                /*int fieldCount = header.NumFields;
                 for (int i = 0; i < fieldCount; i++)
                 {
                     var value = parser.GetValue(i);
@@ -98,7 +99,7 @@ namespace BIE.DataPipeline.Import
                     }
                     if (i < fieldCount - 1)
                         builder.Append(", ");
-                }
+                }*/
 
                 // Append geometry as WKT (Well-Known Text)
                 Geometry geometry = parser.Geometry;
@@ -118,13 +119,6 @@ namespace BIE.DataPipeline.Import
 
         private string[] ReadFileHeader()
         {
-            //check if parser has reached end of the file
-            if (!parser.Read())
-            {
-                //Handel case of no data
-                throw new Exception("No header found");
-            }
-
             int fieldCount = header.NumFields;
             string[] res = new string[fieldCount];
 
