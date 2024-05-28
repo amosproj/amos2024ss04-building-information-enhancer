@@ -8,6 +8,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: amosproj/amos2024ss04-building-information-enhancer
+  STAGE: production
 
 jobs:
   build-and-publish-frontend:
@@ -18,14 +19,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{github.ref_name}}
+          ref: ${{ github.ref_name }}
 
       - name: Log in to the container registry
         uses: docker/login-action@v3
         with:
-          registry: ${{env.REGISTRY}}
-          username: ${{github.actor}}
-          password: ${{secrets.GITHUB_TOKEN}}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata for Docker
         id: meta
@@ -35,7 +36,9 @@ jobs:
           tags: |
             type=ref,event=tag
             type=sha
-            latest
+            type=raw,value=${{ env.STAGE }}
+          labels: |
+            stage=${{ env.STAGE }}
 
       - name: Build and Publish Docker Images
         uses: docker/build-push-action@v5
@@ -43,8 +46,10 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: ${{steps.meta.outputs.tags}}
-          labels: ${{steps.meta.outputs.labels}}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            STAGE: ${{ env.STAGE }}
 
   build-and-publish-backend-api-gateway:
     name: Build and publish - API Gateway
@@ -54,14 +59,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{github.ref_name}}
+          ref: ${{ github.ref_name }}
 
       - name: Log in to the container registry
         uses: docker/login-action@v3
         with:
-          registry: ${{env.REGISTRY}}
-          username: ${{github.actor}}
-          password: ${{secrets.GITHUB_TOKEN}}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata for Docker
         id: meta
@@ -71,7 +76,9 @@ jobs:
           tags: |
             type=ref,event=tag
             type=sha
-            latest
+            type=raw,value=${{ env.STAGE }}
+          labels: |
+            stage=${{ env.STAGE }}
 
       - name: Build and Publish Docker Images
         uses: docker/build-push-action@v5
@@ -79,8 +86,10 @@ jobs:
           context: ./backend/src/BIE.Core
           file: ./backend/src/BIE.Core/Dockerfile
           push: true
-          tags: ${{steps.meta.outputs.tags}}
-          labels: ${{steps.meta.outputs.labels}}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            STAGE: ${{ env.STAGE }}
 
   build-and-publish-backend-datapipeline:
     name: Build and publish - Data Pipeline
@@ -90,14 +99,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{github.ref_name}}
+          ref: ${{ github.ref_name }}
 
       - name: Log in to the container registry
         uses: docker/login-action@v3
         with:
-          registry: ${{env.REGISTRY}}
-          username: ${{github.actor}}
-          password: ${{secrets.GITHUB_TOKEN}}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata for Docker
         id: meta
@@ -107,7 +116,9 @@ jobs:
           tags: |
             type=ref,event=tag
             type=sha
-            latest
+            type=raw,value=${{ env.STAGE }}
+          labels: |
+            stage=${{ env.STAGE }}
 
       - name: Build and Publish Docker Images
         uses: docker/build-push-action@v5
@@ -115,8 +126,10 @@ jobs:
           context: ./backend/src/BIE.DataPipeline
           file: ./backend/src/BIE.DataPipeline/Dockerfile
           push: true
-          tags: ${{steps.meta.outputs.tags}}
-          labels: ${{steps.meta.outputs.labels}}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            STAGE: ${{ env.STAGE }}
 
   build-and-publish-backend-sql-database:
     name: Build and publish - SQL Database
@@ -126,14 +139,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{github.ref_name}}
+          ref: ${{ github.ref_name }}
 
       - name: Log in to the container registry
         uses: docker/login-action@v3
         with:
-          registry: ${{env.REGISTRY}}
-          username: ${{github.actor}}
-          password: ${{secrets.GITHUB_TOKEN}}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata for Docker
         id: meta
@@ -143,7 +156,9 @@ jobs:
           tags: |
             type=ref,event=tag
             type=sha
-            latest
+            type=raw,value=${{ env.STAGE }}
+          labels: |
+            stage=${{ env.STAGE }}
 
       - name: Build and Publish Docker Images
         uses: docker/build-push-action@v5
@@ -151,10 +166,12 @@ jobs:
           context: ./backend/database
           file: ./backend/database/Dockerfile
           push: true
-          tags: ${{steps.meta.outputs.tags}}
-          labels: ${{steps.meta.outputs.labels}}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            STAGE: ${{ env.STAGE }}
 
-  deploy-prod-env:
+  deploy-test-env:
     needs:
       [
         build-and-publish-frontend,
@@ -162,7 +179,7 @@ jobs:
         build-and-publish-backend-datapipeline,
         build-and-publish-backend-sql-database,
       ]
-    name: Deploy Image in the Production Environment
+    name: Deploy Docker Images in the Test Environment
     runs-on: ubuntu-latest
 
     steps:
