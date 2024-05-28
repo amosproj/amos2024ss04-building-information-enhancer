@@ -1,63 +1,54 @@
 import { FeatureCollection, Geometry } from "geojson";
-import data from "./FeatureCollection.json";
+import defaultCityLocationData from "./FeatureCollection.json";
+import defaultPolygonData from "./gemeinden_simplify20.json";
 import { LatLngBounds } from "leaflet";
-import { useContext, useEffect, useState } from "react";
-import { AlertContext } from "../../contexts/AlertContext";
-const geojsonData: FeatureCollection = data as FeatureCollection;
-import axios from "axios";
-
-// Define the API URL
-const apiUrl = `http://${import.meta.env.VITE_BACKEND_HOST}:${
-  import.meta.env.VITE_BACKEND_PORT
-}/api/v1.0/Dataset/1/data`;
+import { useEffect, useState } from "react";
+const geojsonCities: FeatureCollection =
+  defaultCityLocationData as FeatureCollection;
+const geojsonGemeindenPolygons: FeatureCollection =
+  defaultPolygonData as FeatureCollection;
 
 const useGeoData = (
+  id: string,
   bounds: LatLngBounds,
-  zoom: number
+  zoom: number,
+  onUpdate: (data: FeatureCollection<Geometry>) => void
 ): FeatureCollection<Geometry> | undefined => {
   const [data, setData] = useState<FeatureCollection<Geometry>>();
-  const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
 
   useEffect(() => {
-    // Function to send the request
-    const fetchData = async (): Promise<void> => {
+    /* eslint-disable */
+    const fetchData = async (_bounds: LatLngBounds) => {
+      /* eslint-enable */
+      if (id === "house_footprints") {
+        setData(geojsonGemeindenPolygons as FeatureCollection<Geometry>);
+        onUpdate(geojsonGemeindenPolygons);
+        return;
+      }
+
       try {
-        const bottomLat = bounds.getSouth();
-        const bottomLong = bounds.getWest();
-        const topLat = bounds.getNorth();
-        const topLong = bounds.getEast();
-        console.log(apiUrl);
-        // Define the query parameters
-        const params = {
-          BottomLat: bottomLat,
-          BottomLong: bottomLong,
-          TopLat: topLat,
-          TopLong: topLong,
-          ZoomLevel: zoom,
-        };
-        const response = await axios.get<FeatureCollection<Geometry>>(apiUrl, {
-          params,
-        });
-        setData(response.data as FeatureCollection<Geometry>);
-      } catch (error) {
-        // Display alert
-        setCurrentAlertCache({
-          ...currentAlertCache,
-          isAlertOpened: true,
-          text: "Fetching data failed, using local GeoJSON data.",
-        });
-        // Console log the error
-        if (axios.isAxiosError(error)) {
-          console.error("Axios error fetching data:", error.message);
-        } else {
-          console.error("Unknown error fetching data:", error);
+        // const bottomLat = bounds.getSouth();
+        // const bottomLong = bounds.getWest();
+        // const topLat = bounds.getNorth();
+        // const topLong = bounds.getEast();
+        // TO-DO: Fix so it is not hardcoded
+        const url = `http://localhost:8081/api/v1.0/Dataset/1/data?BottomLat=9&BottomLong=10&TopLat=48&TopLong=49`;
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
         }
-        setData(geojsonData as FeatureCollection<Geometry>);
+        const result = await response.json();
+        setData(result as FeatureCollection<Geometry>);
+        onUpdate(result);
+      } catch (error) {
+        console.error("Fetching data failed, using local GeoJSON data:", error);
+        setData(geojsonCities as FeatureCollection<Geometry>);
+        onUpdate(geojsonCities);
       }
     };
 
-    fetchData();
-  }, [bounds, zoom]);
+    fetchData(bounds);
+  }, [bounds, zoom, id, onUpdate]);
 
   return data;
 };

@@ -151,7 +151,7 @@ const MultiMap = () => {
                 <span className="tab-description-container">
                   {tab.dataset.description}
                 </span>
-                <MapView />
+                <MapView datasetId={tab.dataset.id} />
               </div>
             </TabPanel>
           );
