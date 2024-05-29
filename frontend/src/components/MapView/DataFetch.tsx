@@ -41,6 +41,8 @@ const useGeoData = (
   // Returns the API URL of the endpoint for a specific dataset
   const getApiUrlForDataset = (): string => {
     switch (id) {
+      case "empty_map":
+        return "";
       case "charging_stations":
         return getBaseApiUrl() + "/api/v1.0/Dataset/1/data";
       case "house_footprints":
@@ -59,6 +61,10 @@ const useGeoData = (
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const fetchData = async (_bounds: LatLngBounds): Promise<void> => {
+      // Skip if just an empty map was loaded
+      if (id === "empty_map") {
+        return;
+      }
       try {
         // const bottomLat = bounds.getSouth();
         // const bottomLong = bounds.getWest();
