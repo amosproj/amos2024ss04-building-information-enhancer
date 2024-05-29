@@ -1,80 +1,35 @@
-import { Fragment, useContext } from "react";
+import { Fragment, useContext, useState } from "react";
 import "./MultiMap.css";
 import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
-import { X, PushPin, PushPinSlash, PushPinSimple } from "@phosphor-icons/react";
+import { DotsThreeOutline, PushPinSimple } from "@phosphor-icons/react";
 import Tooltip from "@mui/material/Tooltip";
 import MapView from "../MapView/MapView";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
 import NewTabButton from "./NewTabButton";
-import { AlertContext } from "../../contexts/AlertContext";
+import TabOptions from "./TabOptions";
 
 const MultiMap = () => {
   // Access the tabs context
   const { currentTabsCache, setCurrentTabsCache } = useContext(TabsContext);
-  // Alert
-  const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
+
+  // Dropdown menu for the tab options
+  const [anchorElementTabOptions, setAnchorElementTabOptions] =
+    useState<null | HTMLElement>(null);
+  const handleMenuClick = (
+    event: React.MouseEvent<SVGSVGElement, MouseEvent>
+  ) => {
+    setAnchorElementTabOptions(event.currentTarget as unknown as HTMLElement);
+  };
+  const handleMenuClose = () => {
+    setAnchorElementTabOptions(null);
+  };
 
   // Handles the change of the current tab id
   const handleChange = (_event: React.SyntheticEvent, newTabID: string) => {
     setCurrentTabsCache({ ...currentTabsCache, currentTabID: newTabID });
-  };
-
-  // Closes a specific tab
-  const closeTab = (id: string) => {
-    // Check if the tab is pinned
-    if (
-      currentTabsCache.openedTabs.find((tab) => tab.id === id)?.ifPinned ===
-      true
-    ) {
-      setCurrentAlertCache({
-        ...currentAlertCache,
-        isAlertOpened: true,
-        text: "A pinned tab cannot be closed.",
-      });
-      return;
-    }
-    // Close the tab
-    const newOpenedTabs = currentTabsCache.openedTabs.filter(
-      (tab) => tab.id !== id
-    );
-    // Reorder the tabs IDs
-    let tempID = 0;
-    const updatedOpenedTabs = newOpenedTabs.map((tab) => {
-      tempID = tempID + 1;
-      return {
-        ...tab,
-        id: tempID.toString(),
-      };
-    });
-    // Check if the current tab ID does not have to change
-    let newCurrentTabID =
-      Number(currentTabsCache.currentTabID) > updatedOpenedTabs.length - 1
-        ? updatedOpenedTabs.length.toString()
-        : currentTabsCache.currentTabID;
-    // Check if it is the last tab
-    if (currentTabsCache.openedTabs.length === 1) {
-      newCurrentTabID = "1";
-    }
-    setCurrentTabsCache({
-      ...currentTabsCache,
-      openedTabs: updatedOpenedTabs,
-      currentTabID: newCurrentTabID,
-    });
-  };
-
-  // Toggle pinning of a specific tab
-  const toggleTabPinned = (tabId: string) => {
-    const updatedOpenedTabs = currentTabsCache.openedTabs.map((tab) =>
-      tab.id === tabId ? { ...tab, ifPinned: !tab.ifPinned } : tab
-    );
-
-    setCurrentTabsCache({
-      ...currentTabsCache,
-      openedTabs: updatedOpenedTabs,
-    });
   };
 
   return (
@@ -93,46 +48,39 @@ const MultiMap = () => {
                 <Tab
                   label={
                     <div className="tab-title-container">
-                      <span>{tab.dataset.displayName}</span>
+                      <div className="tab-title">
+                        <tab.dataset.datasetIcon size={20} />
+                        <span>{tab.dataset.displayName}</span>
+                      </div>
                       <div className="tab-icons-container">
-                        {tab.ifPinned ? (
+                        {tab.ifPinned && !anchorElementTabOptions ? (
                           <PushPinSimple
                             weight="fill"
                             className="pinned-tab-icon"
-                            onClick={() => {
-                              closeTab(tab.id);
-                            }}
                           />
                         ) : (
                           <Fragment />
                         )}
-
-                        <Tooltip title="Close Tab" arrow>
-                          <X
-                            className="close-tab-icon"
-                            onClick={() => {
-                              closeTab(tab.id);
-                            }}
+                        {anchorElementTabOptions ? (
+                          <DotsThreeOutline
+                            weight="fill"
+                            className="options-tab-icon-inverted"
+                          />
+                        ) : (
+                          <Fragment />
+                        )}
+                        <Tooltip title="Tab Options" arrow>
+                          <DotsThreeOutline
+                            weight="fill"
+                            className="options-tab-icon"
+                            onClick={handleMenuClick}
                           />
                         </Tooltip>
-                        <Tooltip
-                          title={!tab.ifPinned ? "Pin Tab" : "Unpin Tab"}
-                          arrow
-                          onClick={() => {
-                            toggleTabPinned(tab.id);
-                          }}
-                        >
-                          <div className="pin-tab-container">
-                            {!tab.ifPinned ? (
-                              <PushPin className="pin-tab-icon" />
-                            ) : (
-                              <PushPinSlash
-                                weight="fill"
-                                className="unpin-tab-icon"
-                              />
-                            )}
-                          </div>
-                        </Tooltip>
+                        <TabOptions
+                          anchorElementTabOptions={anchorElementTabOptions}
+                          handleClose={handleMenuClose}
+                          currentTab={tab}
+                        />
                       </div>
                     </div>
                   }

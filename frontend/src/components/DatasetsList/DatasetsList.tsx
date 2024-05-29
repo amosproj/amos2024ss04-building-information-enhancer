@@ -21,7 +21,13 @@ import { FeatureCollection } from "geojson";
 import L, { Icon as LIcon, DivIcon } from "leaflet";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
-import { MarkersTypes } from "./MarkersTypesEnum";
+
+// Enum for types of markers
+enum MarkersTypes {
+  Markers = "markers", // Map will display single coordinates with markers on top.
+  Areas = "areas", // Map will display polygon areas.
+  None = "none", // Map will not display anything.
+}
 
 // Dataset Type
 export type Dataset = {

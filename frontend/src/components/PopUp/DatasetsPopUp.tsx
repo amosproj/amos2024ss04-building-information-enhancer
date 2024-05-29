@@ -16,6 +16,7 @@ const DatasetsPopUp: React.FC<DatasetsPopUpProps> = ({
       title="Available Datasets"
       onClose={onToggleIfOpenedDialog}
       ifOpenedDialog={ifOpenedDialog}
+      titleIcon={undefined}
     >
       <div style={{ display: "flex", flexDirection: "column" }}>
         <span className="secondary-text" style={{ paddingBottom: "1rem" }}>

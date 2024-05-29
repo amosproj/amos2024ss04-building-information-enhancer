@@ -47,9 +47,9 @@ const SearchPopUp: React.FC<SearchPopUpProps> = ({
 
   const provider = new OpenStreetMapProvider({
     params: {
-      'accept-language': 'de', 
-      countrycodes: 'de', 
-      addressdetails: 1, 
+      "accept-language": "de",
+      countrycodes: "de",
+      addressdetails: 1,
     },
   });
 
@@ -209,6 +209,7 @@ const SearchPopUp: React.FC<SearchPopUpProps> = ({
         reset();
       }}
       ifOpenedDialog={ifOpenedDialog}
+      titleIcon={undefined}
     >
       {searchMode === "single" ? (
         <TextField
