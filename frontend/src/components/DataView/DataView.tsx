@@ -1,6 +1,5 @@
 import DataPanel from "./DataPanel";
 import "./DataView.css";
-
 import Button from "@mui/material/Button";
 import TabPanel from "@mui/lab/TabPanel/TabPanel";
 import TabContext from "@mui/lab/TabContext/TabContext";
@@ -22,7 +21,7 @@ function DataView() {
       (tab) => tab.id === currentTabID
     );
 
-    return currentTab ? currentTab.title : "No map loaded";
+    return currentTab ? currentTab.dataset.displayName : "No map loaded";
   };
 
   // Stores the state of if the search popup is open
@@ -63,13 +62,10 @@ function DataView() {
             ></Tab>
           </TabList>
         </div>
-
         <TabPanel value="1" className="tab dataview-tab">
           <div className="datapanels-container">
             <div className="data-panels-container">
-              <DataPanel listTitle={getCurrentTabTitle()} filterPanelId={1} />
-              <DataPanel listTitle="General Data" filterPanelId={2} />
-              <DataPanel listTitle="Extra Capabilities" filterPanelId={3} />
+              <DataPanel listTitle={getCurrentTabTitle()} />
             </div>
             <Button variant="outlined">Load data</Button>
           </div>

@@ -18,6 +18,8 @@ import PopUp from "./PopUp";
 
 import { OpenStreetMapProvider } from "leaflet-geosearch";
 import { LatLng } from "leaflet";
+import { MapContext } from "../../contexts/MapContext";
+import L from "leaflet";
 
 interface SearchPopUpProps {
   onToggleIfOpenedDialog: () => void;
@@ -41,6 +43,15 @@ const SearchPopUp: React.FC<SearchPopUpProps> = ({
   const [latitudeError, setLatitudeError] = useState(false);
   const [longitudeError, setLongitudeError] = useState(false);
   const [suggestions, setSuggestions] = useState<Array<GeoSearchResult>>([]);
+  const { currentMapCache } = useContext(MapContext);
+
+  const flyToLocation = () => {
+    const { mapInstance } = currentMapCache;
+    if (mapInstance) {
+      const targetPosition = new L.LatLng(52.4799, 13.3821); // Replace with your target position
+      mapInstance.flyTo(targetPosition, 13, { animate: true, duration: 10 });
+    } else console.log("no map instance");
+  };
 
   const handleSearchSuggestions = async (input: string) => {
     console.log(input);
@@ -169,6 +180,7 @@ const SearchPopUp: React.FC<SearchPopUpProps> = ({
     onToggleIfOpenedDialog();
     setTimeout(() => {
       alert(item.displayName);
+      flyToLocation();
     }, 400);
   };
 
