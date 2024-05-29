@@ -86,18 +86,25 @@ namespace BIE.DataPipeline.Import
             /// </summary>
             public bool discard_null_rows { get; set; }
 
-            private string mIf_table_exists = "skip";
+            private InsertBehaviour mIf_table_exists = InsertBehaviour.skip;
 
             /// <summary>
             /// How to deal with an existing table in the database. Options:
             /// "skip": skip this dataset, is the default
-            /// "none": do nothing special
+            /// "ignore": do nothing special
             /// "replace": DROP the existing table before inserting data.
             /// </summary>
-            public string if_table_exists
+            public InsertBehaviour if_table_exists
             {
                 get => mIf_table_exists;
                 set => mIf_table_exists = value;
+            }
+            
+            public enum InsertBehaviour
+            {
+                ignore,
+                skip,
+                replace
             }
         }
 

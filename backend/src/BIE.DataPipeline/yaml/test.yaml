@@ -8,7 +8,7 @@ options:
   skip_lines: 10
   # discard any rows that have null values
   discard_null_rows: false
-  # how to deal with existing table. Options: noop, replace, skip (default).
+  # how to deal with existing table. Options: ignore, replace, skip (default).
   if_table_exists: replace
 table_name: EV_charging_stations
 delimiter: ";"

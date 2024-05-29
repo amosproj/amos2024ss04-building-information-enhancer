@@ -3,6 +3,7 @@ using BIE.Data;
 using BIE.DataPipeline.Import;
 using System.Data.Common;
 using Microsoft.Data.SqlClient;
+using static BIE.DataPipeline.Import.DataSourceDescription.DataSourceOptions;
 
 namespace BIE.DataPipeline
 {
@@ -43,7 +44,7 @@ namespace BIE.DataPipeline
 
             var db = Database.Instance;
 
-            if (description.options.if_table_exists == "skip")
+            if (description.options.if_table_exists == InsertBehaviour.skip)
             {
                 var tableExists =
                     (int)db.ExecuteScalar(db.CreateCommand($"SELECT count(*) as Exist" +
@@ -57,9 +58,9 @@ namespace BIE.DataPipeline
                 }
             }
 
-            if (description.options.if_table_exists == "replace")
+            if (description.options.if_table_exists == InsertBehaviour.replace)
             {
-                Console.WriteLine($"Dropping existing table {description.table_name}");
+                Console.WriteLine($"Dropping table {description.table_name} if it exists.");
                 db.ExecuteScalar(db.CreateCommand($"DROP TABLE IF EXISTS {description.table_name}"));
             }
             
