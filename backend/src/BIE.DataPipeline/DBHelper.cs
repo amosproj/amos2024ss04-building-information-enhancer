@@ -2,6 +2,7 @@
 using BIE.Data;
 using BIE.DataPipeline.Import;
 using System.Data.Common;
+using Microsoft.Data.SqlClient;
 
 namespace BIE.DataPipeline
 {
@@ -35,21 +36,44 @@ namespace BIE.DataPipeline
         /// To create table in DB
         /// </summary>
         /// <param name="description"></param>
-        internal void CreateTable(DataSourceDescription description, bool forshape = false)
+        /// <param name="forshape"></param>
+        internal bool CreateTable(DataSourceDescription description, bool forshape = false)
         {
             Console.WriteLine("Creating Table...");
 
             var db = Database.Instance;
+
+            if (description.options.if_table_exists == "skip")
+            {
+                var tableExists =
+                    (int)db.ExecuteScalar(db.CreateCommand($"SELECT count(*) as Exist" +
+                                                           $" from INFORMATION_SCHEMA.TABLES" +
+                                                           $" where table_name = '{description.table_name}'"));
+
+                if (tableExists == 1)
+                {
+                    Console.WriteLine($"Table {description.table_name} already exists, stopping...");
+                    return false;
+                }
+            }
+
+            if (description.options.if_table_exists == "replace")
+            {
+                Console.WriteLine($"Dropping existing table {description.table_name}");
+                db.ExecuteScalar(db.CreateCommand($"DROP TABLE IF EXISTS {description.table_name}"));
+            }
+            
             string query;
             if (!forshape)
             {
                 query = "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '" +
-                              description.table_name + "')\r\nBEGIN CREATE TABLE " + description.table_name;
+                        description.table_name + "')\r\nBEGIN CREATE TABLE " + description.table_name;
                 query += " (";
                 foreach (var column in description.table_cols)
                 {
                     query += " " + column.name_in_table + " " + column.type + ", ";
                 }
+
                 query += "); END";
             }
             else
@@ -63,10 +87,13 @@ namespace BIE.DataPipeline
                 );
             END";
             }
+
             DbCommand cmd = db.CreateCommand(query);
             db.Execute(cmd);
 
             Console.WriteLine("Table created.");
+
+            return true;
         }
 
 

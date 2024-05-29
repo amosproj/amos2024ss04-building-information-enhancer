@@ -11,9 +11,11 @@ CsvImporter csvImporter = new CsvImporter(description);
 
 var dbHelper = new DBHelper();
 dbHelper.SetInfo(csvImporter.GetTableName(), csvImporter.GetHeaderString());
-dbHelper.CreateTable(description);
 
-
+if (!dbHelper.CreateTable(description))
+{
+    return 0;
+}
 
 //Console.WriteLine(csvImporter.GetHeaderString());
 string line = "";
@@ -52,3 +54,5 @@ if (false)
 }
 Console.WriteLine();
 Console.WriteLine("Parser End");
+
+return 0;

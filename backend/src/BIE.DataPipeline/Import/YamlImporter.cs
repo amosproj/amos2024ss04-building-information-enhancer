@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Text;
 using YamlDotNet.Serialization;
+
 // ReSharper disable InconsistentNaming
 
 namespace BIE.DataPipeline.Import
@@ -49,6 +50,7 @@ namespace BIE.DataPipeline.Import
         /// </summary>
         public string table_name { get; set; }
 
+
         /// <summary>
         /// the delimiter used in the csv datasource.
         /// </summary>
@@ -77,12 +79,26 @@ namespace BIE.DataPipeline.Import
             /// <summary>
             /// The number of initial lines to skip while reading the data source.
             /// </summary>
-            public int skip_lines {get; set;}
+            public int skip_lines { get; set; }
 
             /// <summary>
             /// Indicates whether to discard rows with null values.
             /// </summary>
-            public bool discard_null_rows {get; set;}
+            public bool discard_null_rows { get; set; }
+
+            private string mIf_table_exists = "skip";
+
+            /// <summary>
+            /// How to deal with an existing table in the database. Options:
+            /// "skip": skip this dataset, is the default
+            /// "none": do nothing special
+            /// "replace": DROP the existing table before inserting data.
+            /// </summary>
+            public string if_table_exists
+            {
+                get => mIf_table_exists;
+                set => mIf_table_exists = value;
+            }
         }
 
         public class DataSourceColumn
@@ -90,7 +106,7 @@ namespace BIE.DataPipeline.Import
             /// <summary>
             /// The name of the column in the datasource.
             /// </summary>
-            public string name {get; set;}
+            public string name { get; set; }
 
             /// <summary>
             /// The name of the column in the database table.
@@ -98,9 +114,11 @@ namespace BIE.DataPipeline.Import
             public string name_in_table { get; set; }
 
             private string mType = "VARCHAR(500)";
+
             /// <summary>
             /// The data type of the column.
-            public string type {
+            public string type
+            {
                 get => mType;
                 set => mType = value;
             }
