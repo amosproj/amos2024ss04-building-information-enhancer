@@ -17,7 +17,7 @@ Welcome to the official repository for the `CODE.ING` group, developing an open-
 
 ## 🚀 Setup & Deployment
 
-This project is integrated with a full CI/CD pipeline, thus deployed automatically on the web. However, it is possible to deploy a production-ready system on your local machine using Docker. For further information on the `CI/CD` pipeline visit our GitHub [wiki](https://github.com/Corgam/SS23_ADSP_TCF/wiki) documentation.
+This project is integrated with a full CI/CD pipeline, thus deployed automatically on the web. However, it is possible to deploy a production-ready system on your local machine using Docker. For further information on the `CI/CD` pipeline visit our GitHub [wiki](https://github.com/amosproj/amos2024ss04-building-information-enhancer/wiki/CI%E2%80%90CD-Pipeline) documentation.
 
 ## 📦 Deployment using Docker
 
