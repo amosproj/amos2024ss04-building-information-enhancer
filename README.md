@@ -13,7 +13,7 @@
 
 ## 📢 About the Project
 
-Welcome to the official repository for the `CODE.ING` group, developing an open-source `Building Information Enhancer` software for the `BUILD.ING` partner and the `AMOS 2024` project. Together, we create a Building information system for potential energy savings. To read about the architecture of our service visit our GitHub [wiki](https://github.com/Corgam/SS23_ADSP_TCF/wiki).
+Welcome to the official repository for the `CODE.ING` group, developing an open-source `Building Information Enhancer` software for the `BUILD.ING` partner and the `AMOS 2024` project. Together, we create a Building information system for potential energy savings. To read about the architecture of our service visit our GitHub [wiki](https://github.com/amosproj/amos2024ss04-building-information-enhancer/wiki).
 
 ## 🚀 Setup & Deployment
 
