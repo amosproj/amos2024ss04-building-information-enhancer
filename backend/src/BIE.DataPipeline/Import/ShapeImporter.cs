@@ -13,9 +13,11 @@ using NetTopologySuite.IO.ShapeFile.Extended;
 using Microsoft.SqlServer;
 using NetTopologySuite.Utilities;
 using System.Diagnostics.Metrics;
+using System.IO.Compression;
 using System.Security.Policy;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
+using NetTopologySuite.IO.Streams;
 using ProjNet.IO.CoordinateSystems;
 using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
@@ -26,7 +28,6 @@ namespace BIE.DataPipeline.Import
     internal class ShapeImporter : IImporter
     {
         private DataSourceDescription dataSourceDescription;
-        private Type[] columnTypes;
         private string[] fileHeader;
         private string[] yamlHeader;
         private string headerString = "";
@@ -34,17 +35,17 @@ namespace BIE.DataPipeline.Import
         private ShapefileDataReader parser;
         DbaseFileHeader header;
         StringBuilder builder;
+
         public ShapeImporter(DataSourceDescription dataSourceDescription)
         {
             //YAML Arguments:
             this.dataSourceDescription = dataSourceDescription;
-            columnTypes = ImporterHelper.ParseColumnTypes(dataSourceDescription);
             builder = new StringBuilder();
             //Setup Parser
             SetupParser();
 
             //Skip lines until header
-            SkipNlines(0);//(dataSourceDescription.options.skip_lines);
+            // SkipNlines(0); //(dataSourceDescription.options.skip_lines);
 
             //read header
             fileHeader = ReadFileHeader();
@@ -65,12 +66,59 @@ namespace BIE.DataPipeline.Import
                     }
                 }
             }*/
-            
         }
 
         public void SetupParser()
         {
-            parser = new ShapefileDataReader(@"D:\datasets\093_Oberpfalz_Hausumringe\hausumringe", NetTopologySuite.Geometries.GeometryFactory.Default);
+            // handle Zip file:
+
+            Console.WriteLine($"Grabbing Webfile {dataSourceDescription.source.location}");
+            var client = new HttpClient();
+            var zipStream = client.GetStreamAsync(dataSourceDescription.source.location).Result;
+
+            Console.WriteLine("opening Zip file");
+            var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Read);
+
+            var shpStream = new MemoryStream();
+            var dbfStream = new MemoryStream();
+            foreach (var zipArchiveEntry in zipArchive.Entries)
+            {
+                if (zipArchiveEntry.Name.EndsWith(".shp"))
+                {
+                    zipArchiveEntry.Open().CopyTo(shpStream);
+                    shpStream.Position = 0;
+                    continue;
+                }
+
+                if (zipArchiveEntry.Name.EndsWith(".dbf"))
+                {
+                    zipArchiveEntry.Open().CopyTo(dbfStream);
+                    dbfStream.Position = 0;
+                }
+            }
+
+            if (shpStream == null || dbfStream == null)
+            {
+                throw new FileNotFoundException("the required .shp and .bdf files could not be found.");
+            }
+
+            shpStream.Position = 0;
+            dbfStream.Position = 0;
+            Console.WriteLine("File loaded.");
+
+            parser =
+                Shapefile.CreateDataReader(
+                                new ShapefileStreamProviderRegistry(
+                                                new ByteStreamProvider(
+                                                                       StreamTypes.Shape, shpStream),
+                                                  new ByteStreamProvider(
+                                                                         StreamTypes.Data, dbfStream),
+                                                true,
+                                                true),
+                                           GeometryFactory.Default);
+
+            // parser = new ShapefileDataReader(@"D:\datasets\093_Oberpfalz_Hausumringe\hausumringe",
+            //                                  NetTopologySuite.Geometries.GeometryFactory.Default);
             header = parser.DbaseHeader;
         }
 
@@ -112,15 +160,16 @@ namespace BIE.DataPipeline.Import
 
                 // Append geometry as WKT (Well-Known Text)
                 Geometry geometry = parser.Geometry;
-                geometry= Convert(geometry);
+                geometry = Convert(geometry);
 
-                string geo= ($"geography::STGeomFromText('{geometry.AsText()}', 4326)");
+                string geo = ($"geography::STGeomFromText('{geometry.AsText()}', 4326)");
 
                 // Print the SQL insert statement
                 Console.WriteLine(builder.ToString());
                 nextLine = geo;
                 return true;
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 nextLine = "";
                 return false;
@@ -176,6 +225,7 @@ namespace BIE.DataPipeline.Import
 
             return headerString;
         }
+
         private static string RemoveLastComma(string input)
         {
             int lastCommaIndex = input.LastIndexOf(',');
@@ -188,15 +238,18 @@ namespace BIE.DataPipeline.Import
                 return input; // No comma found, return original string
             }
         }
+
         public static Geometry Convert(Geometry polygon)
         {
             // Define the source and target coordinate systems
-            IInfo utmZone32 = CoordinateSystemWktReader.Parse("PROJCS[\"WGS 84 / UTM zone 32N\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AUTHORITY[\"EPSG\",\"32632\"]]");
+            IInfo utmZone32 =
+                CoordinateSystemWktReader
+                    .Parse("PROJCS[\"WGS 84 / UTM zone 32N\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AUTHORITY[\"EPSG\",\"32632\"]]");
             GeographicCoordinateSystem wgs84 = GeographicCoordinateSystem.WGS84;
 
             // Create coordinate transformation
-            var transformation = new CoordinateTransformationFactory().CreateFromCoordinateSystems((CoordinateSystem)utmZone32, wgs84);
-
+            var transformation =
+                new CoordinateTransformationFactory().CreateFromCoordinateSystems((CoordinateSystem)utmZone32, wgs84);
 
 
             // Convert UTM coordinates to latitude and longitude
@@ -215,8 +268,8 @@ namespace BIE.DataPipeline.Import
                 //Console.WriteLine("Latitude: " + latitude);
                 //Console.WriteLine("Longitude: " + longitude);
             }
-            return polygon;
 
+            return polygon;
         }
     }
 }

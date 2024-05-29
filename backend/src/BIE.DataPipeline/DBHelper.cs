@@ -38,7 +38,7 @@ namespace BIE.DataPipeline
         /// </summary>
         /// <param name="description"></param>
         /// <param name="forshape"></param>
-        internal bool CreateTable(DataSourceDescription description, bool forshape = false)
+        internal bool CreateTable(DataSourceDescription description)
         {
             Console.WriteLine("Creating Table...");
 
@@ -63,23 +63,22 @@ namespace BIE.DataPipeline
                 Console.WriteLine($"Dropping table {description.table_name} if it exists.");
                 db.ExecuteScalar(db.CreateCommand($"DROP TABLE IF EXISTS {description.table_name}"));
             }
-            
-            string query;
-            if (!forshape)
-            {
-                query = "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '" +
-                        description.table_name + "')\r\nBEGIN CREATE TABLE " + description.table_name;
-                query += " (";
-                foreach (var column in description.table_cols)
-                {
-                    query += " " + column.name_in_table + " " + column.type + ", ";
-                }
 
-                query += "); END";
-            }
-            else
+            var query = GetCreationQuery(description);
+
+            var cmd = db.CreateCommand(query);
+            db.Execute(cmd);
+
+            Console.WriteLine("Table created.");
+
+            return true;
+        }
+
+        private string GetCreationQuery(DataSourceDescription description)
+        {
+            if (description.source.data_format == "SHAPE")
             {
-                query = @"
+                return @"
             IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'SpatialData')
             BEGIN
                 CREATE TABLE SpatialData (
@@ -89,12 +88,17 @@ namespace BIE.DataPipeline
             END";
             }
 
-            DbCommand cmd = db.CreateCommand(query);
-            db.Execute(cmd);
+            var query = "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '" +
+                        description.table_name + "')\r\nBEGIN CREATE TABLE " + description.table_name;
+            query += " (";
+            foreach (var column in description.table_cols)
+            {
+                query += " " + column.name_in_table + " " + column.type + ", ";
+            }
 
-            Console.WriteLine("Table created.");
+            query += "); END";
 
-            return true;
+            return query;
         }
 
 

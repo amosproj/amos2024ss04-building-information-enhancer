@@ -51,10 +51,16 @@ namespace BIE.DataPipeline.Import
         public string table_name { get; set; }
 
 
+        private char mDelimiter = ';';
+
         /// <summary>
         /// the delimiter used in the csv datasource.
         /// </summary>
-        public char delimiter { get; set; }
+        public char delimiter
+        {
+            get => mDelimiter;
+            set => mDelimiter = value;
+        }
 
         /// <summary>
         /// The relevant columns that should be imported from the datasource.
@@ -72,6 +78,11 @@ namespace BIE.DataPipeline.Import
             /// The actual location.
             /// </summary>
             public string location { get; set; }
+
+            /// <summary>
+            /// the format of the data
+            /// </summary>
+            public string data_format { get; set; }
         }
 
         public class DataSourceOptions
@@ -99,7 +110,7 @@ namespace BIE.DataPipeline.Import
                 get => mIf_table_exists;
                 set => mIf_table_exists = value;
             }
-            
+
             public enum InsertBehaviour
             {
                 ignore,
