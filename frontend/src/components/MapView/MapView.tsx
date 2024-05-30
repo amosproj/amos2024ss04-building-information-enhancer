@@ -10,19 +10,20 @@ import "leaflet.markercluster";
 
 import "./MapView.css";
 import { useMap, useMapEvents } from "react-leaflet/hooks";
-import L, { DivIcon, LatLng } from "leaflet";
+import L, { DivIcon } from "leaflet";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import MapOptions from "./MapOptions";
 import useGeoData from "./DataFetch";
-import { GeoJSON, WMSTileLayer } from "react-leaflet";
+import { WMSTileLayer } from "react-leaflet";
 import { MapContext } from "../../contexts/MapContext";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
-import { FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
+import { FeatureCollection } from "geojson";
 import { Dataset } from "../DatasetsList/DatasetsList";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import { MapPin } from "@phosphor-icons/react";
+import MapDatasetVisualizer from "./MapDatasetVisualizer";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -52,43 +53,6 @@ const divIconMarker: DivIcon = L.divIcon({
 interface MapViewProps {
   datasetId: string;
 }
-
-interface TestProps {
-  id: string;
-  onUpdate1: (data: FeatureCollection<Geometry>) => void;
-}
-
-const Test: React.FC<TestProps> = ({ id, onUpdate1 }) => {
-  const map = useMap();
-  const { currentMapCache } = useContext(MapContext);
-
-  const geoData = useGeoData(
-    id,
-    currentMapCache.mapBounds,
-    currentMapCache.zoom,
-    onUpdate1
-  );
-
-  useEffect(() => {
-    if (!geoData) return;
-
-    const geojsonLayer = L.geoJson(geoData, {
-      pointToLayer: function (_feature, latlng) {
-        return L.marker(latlng, { icon: divIconMarker });
-      },
-    });
-    const markerClusterGroup = L.markerClusterGroup();
-
-    markerClusterGroup.addLayer(geojsonLayer);
-    map.addLayer(markerClusterGroup);
-
-    return () => {
-      map.removeLayer(markerClusterGroup);
-    };
-  }, [map, geoData]);
-
-  return null;
-};
 
 const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
   const { currentTabsCache, setCurrentTabsCache } = useContext(TabsContext);
@@ -239,7 +203,13 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
             }}
           />
         )}*/}
-        <Test id={datasetId} onUpdate1={updateDatasetData} />
+
+        {pinnedFeatureCollections.map((dataset: Dataset, index: number) => (
+          <MapDatasetVisualizer dataset={dataset} key={index} />
+        ))}
+        {!isCurrentDataPinned && tabProps && (
+          <MapDatasetVisualizer dataset={tabProps.dataset} />
+        )}
 
         <MapEventsHandler />
 

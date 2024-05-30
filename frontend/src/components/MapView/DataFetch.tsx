@@ -1,10 +1,11 @@
 import { FeatureCollection, Geometry } from "geojson";
 import defaultCityLocationData from "./FeatureCollection.json";
-import defaultPolygonData from "./gemeinden_simplify20.json";
+import defaultPolygonData from "./bayernatlas.json";
 import { LatLngBounds } from "leaflet";
 import { useContext, useEffect, useState } from "react";
-import axios from "axios";
+import { TabsContext } from "../../contexts/TabsContext";
 import { AlertContext } from "../../contexts/AlertContext";
+import axios from "axios";
 const geojsonCities: FeatureCollection =
   defaultCityLocationData as FeatureCollection;
 const geojsonGemeindenPolygons: FeatureCollection =
@@ -33,7 +34,8 @@ const useGeoData = (
   id: string,
   bounds: LatLngBounds,
   zoom: number,
-  onUpdate?: (data: FeatureCollection<Geometry>) => void
+
+  onUpdate: (data: FeatureCollection<Geometry>, bounds: LatLngBounds) => void
 ): FeatureCollection<Geometry> | undefined => {
   const [data, setData] = useState<FeatureCollection<Geometry>>();
   const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
@@ -56,9 +58,24 @@ const useGeoData = (
     }
   };
 
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const fetchData = async (_bounds: LatLngBounds): Promise<void> => {
+  const { currentTabsCache } = useContext(TabsContext);
+
+  const tabProps = currentTabsCache.openedTabs.find(
+    (tab) => tab.dataset.id === id
+  );
+
+  /*useEffect(() => {
+    if (tabProps && tabProps.dataset.lastDataRequestBounds === bounds) {
+      console.log("SAME AS LAST TIME");
+      return;
+    }
+    const fetchData = async (bounds: LatLngBounds) => {
+      if (id === "house_footprints") {
+        setData(geojsonGemeindenPolygons as FeatureCollection<Geometry>);
+        if (onUpdate) onUpdate(geojsonGemeindenPolygons, bounds);
+        return;
+      }
+
       try {
         const bottomLat = bounds.getSouthWest().lat;
         const bottomLong = bounds.getSouthWest().lng;
@@ -74,7 +91,42 @@ const useGeoData = (
         }
         const result = await response.json();
         setData(result as FeatureCollection<Geometry>);
-        onUpdate(result);
+        if (onUpdate) onUpdate(result, bounds);
+      } catch (error) {
+        console.error("Fetching data failed, using local GeoJSON data:", error);
+        setData(geojsonCities as FeatureCollection<Geometry>);
+        if (onUpdate) onUpdate(geojsonCities, bounds);
+      }
+    };
+
+    fetchData(bounds);
+  }, [tabProps, bounds, zoom, id, onUpdate]);*/
+
+  useEffect(() => {
+    if (tabProps && tabProps.dataset.lastDataRequestBounds === bounds) {
+      console.log("SAME AS LAST TIME");
+      return;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const fetchData = async (_bounds: LatLngBounds): Promise<void> => {
+      try {
+        console.log(getBaseApiUrl());
+        // Define the query parameters
+        const params = {
+          BottomLat: bounds.getSouthWest().lat, // bottomLat,
+          BottomLong: bounds.getSouthWest().lng, //bottomLong,
+          TopLat: bounds.getNorthEast().lat, //topLat,
+          TopLong: bounds.getNorthEast().lng, //topLong,
+          ZoomLevel: zoom,
+        };
+        const response = await axios.get<FeatureCollection<Geometry>>(
+          getApiUrlForDataset(),
+          {
+            params,
+          }
+        );
+        setData(response.data);
+        onUpdate(response.data, bounds);
       } catch (error) {
         // Display alert
         setCurrentAlertCache({
@@ -93,11 +145,11 @@ const useGeoData = (
         switch (id) {
           case "charging_stations":
             setData(geojsonCities as FeatureCollection<Geometry>);
-            onUpdate(geojsonCities);
+            onUpdate(geojsonCities, bounds);
             return;
           case "house_footprints":
             setData(geojsonGemeindenPolygons as FeatureCollection<Geometry>);
-            onUpdate(geojsonGemeindenPolygons);
+            onUpdate(geojsonGemeindenPolygons, bounds);
             return;
           default:
             return;

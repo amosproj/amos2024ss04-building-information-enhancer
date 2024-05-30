@@ -13,7 +13,7 @@ import { TabProps, TabsContext } from "../../contexts/TabsContext";
 import "./DatasetsList.css";
 import { AlertContext } from "../../contexts/AlertContext";
 import { FeatureCollection } from "geojson";
-import L, { Icon as LIcon, DivIcon } from "leaflet";
+import L, { Icon as LIcon, DivIcon, LatLngBounds } from "leaflet";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 
@@ -26,6 +26,7 @@ export type Dataset = {
   datasetIcon: Icon;
   markerIcon: LIcon | DivIcon | undefined;
   data: FeatureCollection;
+  lastDataRequestBounds: LatLngBounds;
 };
 
 // Define an empty FeatureCollection
@@ -60,6 +61,7 @@ const datasetsData: Dataset[] = [
     datasetIcon: ChargingStation,
     markerIcon: divIconChargingStation,
     data: emptyFeatureCollection,
+    lastDataRequestBounds: L.latLngBounds(L.latLng(0, 0), L.latLng(0, 0)),
   },
   {
     id: "house_footprints",
@@ -69,6 +71,7 @@ const datasetsData: Dataset[] = [
     datasetIcon: Blueprint,
     markerIcon: undefined,
     data: emptyFeatureCollection,
+    lastDataRequestBounds: L.latLngBounds(L.latLng(0, 0), L.latLng(0, 0)),
   },
 ];
 
