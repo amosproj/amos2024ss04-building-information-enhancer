@@ -13,7 +13,6 @@ const geojsonGemeindenPolygons: FeatureCollection =
 
 // Define the base of the API URL
 const getBaseApiUrl = () => {
-  console.log("Checking base url: " + import.meta.env.VITE_STAGE);
   switch (import.meta.env.VITE_STAGE) {
     case "production":
       return `http://${import.meta.env.VITE_API_HOST_PRODUCTION}:${
@@ -24,10 +23,10 @@ const getBaseApiUrl = () => {
         import.meta.env.VITE_API_PORT_TEST
       }`;
     default:
-      return `http://${import.meta.env.VITE_API_HOST_DEV}:${
-        import.meta.env.VITE_API_PORT_DEV
-      }`;
   }
+  return `http://${import.meta.env.VITE_API_HOST_DEV}:${
+    import.meta.env.VITE_API_PORT_DEV
+  }`;
 };
 
 const useGeoData = (
@@ -119,6 +118,7 @@ const useGeoData = (
           TopLong: bounds.getNorthEast().lng, //topLong,
           ZoomLevel: zoom,
         };
+        console.log(getApiUrlForDataset());
         const response = await axios.get<FeatureCollection<Geometry>>(
           getApiUrlForDataset(),
           {
