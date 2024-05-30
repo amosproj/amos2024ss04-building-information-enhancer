@@ -2,21 +2,18 @@
   This component displays a mui DataGrid with a Filterbar.
   Depending on the value of the "button" column, a map icon with the hover "open as map" is shown
   
-  • mui DataGrid https://mui.com/x/api/data-grid/data-grid/
-    Installation: https://mui.com/x/react-data-grid/getting-started/
-    Quick filter outside of the grid https://mui.com/x/react-data-grid/filtering-recipes/#quick-filter-outside-of-the-grid
+  Quick filter outside of the grid https://mui.com/x/react-data-grid/filtering-recipes/#quick-filter-outside-of-the-grid
 
-  ! If you use this component you have to pass a unique ID to it. This is needed so the filterbar is assigned to the correct Data Grid
 */
-
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
-import FilterBar from "./FilterBar";
-import { MapTrifold } from "@phosphor-icons/react";
+import { Funnel, MapTrifold } from "@phosphor-icons/react";
 import "./DataPanel.css";
-import { Tooltip } from "@mui/material";
+import { Tooltip, TextField } from "@mui/material";
+import { GridToolbar, GridToolbarProps } from "@mui/x-data-grid";
+import { useState, Fragment } from "react";
 
 // Returns a button if the "button" value is set to 1
 const renderDetailsButton = (params: GridRenderCellParams) => {
@@ -45,7 +42,13 @@ const columns: GridColDef[] = [
     renderCell: renderDetailsButton,
   },
   { field: "key", headerName: "key", width: 150 },
-  { field: "value", headerName: "value", type: "number", width: 150, getApplyQuickFilterFn: undefined },
+  {
+    field: "value",
+    headerName: "value",
+    type: "number",
+    width: 150,
+    getApplyQuickFilterFn: undefined,
+  },
 ];
 
 // Data
@@ -76,64 +79,177 @@ const rows = [
   { id: 24, key: "distance to X", value: "400" },
 ];
 
-// Pass a unique filterPanelId so the FilterBar component is located next to the correct Data Grid
-// All DataGrid options explained https://mui.com/x/api/data-grid/data-grid/
-function DataPanel({
-  filterPanelId,
-  listTitle,
-}: {
-  filterPanelId: number;
-  listTitle: string;
-}) {
-  const filterPanelIdString = `filter-panel-${filterPanelId}`;
-  return (
-    <div className="data-panel-container">
-      <div className="data-panel-title">{listTitle}</div>
-      <Grid container spacing={2} className="data-panel-grid">
-        <Grid item>
-          <Box id={filterPanelIdString} />
-        </Grid>
-        <Grid item style={{ width: "100%" }}>
-          <DataGrid
-            disableColumnMenu
-            columnHeaderHeight={0}
-            rows={rows}
-            columns={columns}
-            slots={{
-              toolbar: (slotProps) => (
-                <FilterBar {...slotProps} filterPanelId={filterPanelId} />
-              ), // Pass props here
-            }}
-            slotProps={{
-              toolbar: {
-                printOptions: { disableToolbarButton: true },
-                csvOptions: { disableToolbarButton: true },
-              },
-            }}
-            disableDensitySelector
-            disableColumnFilter
-            disableColumnSelector
-            disableColumnSorting
-            initialState={{
-              pagination: {
-                paginationModel: { page: 0, pageSize: 5 },
-              },
-              filter: {
-                filterModel: {
-                  items: [],
-                  quickFilterExcludeHiddenColumns: true,
-                },
-              },
-            }}
-            pageSizeOptions={[5, 10]}
-            //autoPageSize
-            density="compact"
-            disableRowSelectionOnClick
-          />
-        </Grid>
-      </Grid>
-    </div>
-  );
+function MyCustomToolbar(props: GridToolbarProps) {
+  return <GridToolbar {...props} />;
 }
 
-export default DataPanel;
+// All DataGrid options explained https://mui.com/x/api/data-grid/data-grid/
+export default function DataPanel({ listTitle }: { listTitle: string }) {
+  const [filterValue, setFilterValue] = useState("");
+
+  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFilterValue(event.target.value);
+  };
+
+  return (
+    <Fragment>
+      <Grid item>
+        <Box id="filter-panel">
+          <TextField
+            label={
+              <div className="search-box-label">
+                <Funnel size={20} /> Search
+              </div>
+            }
+            variant="outlined"
+            size="small"
+            value={filterValue}
+            onChange={handleFilterChange}
+            fullWidth
+          />
+        </Box>
+      </Grid>
+      <div className="data-panel-container">
+        <div className="data-panel-title">{listTitle}</div>
+        <Grid container spacing={2} className="data-panel-grid">
+          <Grid item style={{ width: "100%" }}>
+            <DataGrid
+              disableColumnMenu
+              columnHeaderHeight={0}
+              rows={rows}
+              columns={columns}
+              slots={{
+                toolbar: MyCustomToolbar,
+              }}
+              slotProps={{
+                toolbar: {
+                  printOptions: { disableToolbarButton: true },
+                  csvOptions: { disableToolbarButton: true },
+                },
+              }}
+              disableDensitySelector
+              disableColumnFilter
+              disableColumnSelector
+              disableColumnSorting
+              initialState={{
+                pagination: {
+                  paginationModel: { page: 0, pageSize: 5 },
+                },
+                filter: {
+                  filterModel: {
+                    items: [],
+                    quickFilterValues: [filterValue],
+                    quickFilterExcludeHiddenColumns: true,
+                  },
+                },
+              }}
+              filterModel={{
+                items: [
+                  { field: "key", operator: "contains", value: filterValue },
+                ],
+              }}
+              pageSizeOptions={[5, 10]}
+              density="compact"
+              disableRowSelectionOnClick
+              autoHeight
+            />
+          </Grid>
+        </Grid>
+      </div>
+      <div className="data-panel-container">
+        <div className="data-panel-title">General Data</div>
+        <Grid container spacing={2} className="data-panel-grid">
+          <Grid item style={{ width: "100%" }}>
+            <DataGrid
+              disableColumnMenu
+              columnHeaderHeight={0}
+              rows={rows}
+              columns={columns}
+              slots={{
+                toolbar: MyCustomToolbar,
+              }}
+              slotProps={{
+                toolbar: {
+                  printOptions: { disableToolbarButton: true },
+                  csvOptions: { disableToolbarButton: true },
+                },
+              }}
+              disableDensitySelector
+              disableColumnFilter
+              disableColumnSelector
+              disableColumnSorting
+              initialState={{
+                pagination: {
+                  paginationModel: { page: 0, pageSize: 5 },
+                },
+                filter: {
+                  filterModel: {
+                    items: [],
+                    quickFilterValues: [filterValue],
+                    quickFilterExcludeHiddenColumns: true,
+                  },
+                },
+              }}
+              filterModel={{
+                items: [
+                  { field: "key", operator: "contains", value: filterValue },
+                ],
+              }}
+              pageSizeOptions={[5, 10]}
+              density="compact"
+              disableRowSelectionOnClick
+              autoHeight
+            />
+          </Grid>
+        </Grid>
+      </div>
+      <div className="data-panel-container">
+        <div className="data-panel-title">Extra Capabilities</div>
+        <Grid container spacing={2} className="data-panel-grid">
+          <Grid item style={{ width: "100%" }}>
+            <DataGrid
+              disableColumnMenu
+              columnHeaderHeight={0}
+              rows={rows}
+              columns={columns}
+              slots={{
+                toolbar: MyCustomToolbar,
+              }}
+              slotProps={{
+                toolbar: {
+                  printOptions: { disableToolbarButton: true },
+                  csvOptions: { disableToolbarButton: true },
+                },
+              }}
+              disableDensitySelector
+              disableColumnFilter
+              disableColumnSelector
+              disableColumnSorting
+              initialState={{
+                pagination: {
+                  paginationModel: { page: 0, pageSize: 5 },
+                },
+                filter: {
+                  filterModel: {
+                    items: [],
+                    quickFilterValues: [filterValue],
+                    quickFilterExcludeHiddenColumns: true,
+                  },
+                },
+              }}
+              filterModel={{
+                items: [
+                  { field: "key", operator: "contains", value: filterValue },
+                ],
+              }}
+              pageSizeOptions={[5, 10]}
+              density="compact"
+              disableRowSelectionOnClick
+              autoHeight
+            />
+          </Grid>
+        </Grid>
+      </div>
+    </Fragment>
+  );
+}

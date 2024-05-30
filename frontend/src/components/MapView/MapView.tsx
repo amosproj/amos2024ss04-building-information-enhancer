@@ -92,7 +92,7 @@ const Test: React.FC<TestProps> = ({ id, onUpdate1 }) => {
 
 const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
   const { currentTabsCache, setCurrentTabsCache } = useContext(TabsContext);
-
+  const [map, setMap] = useState<L.Map | null>(null);
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
   const [showSatellite, setShowSatellite] = useState<boolean>(false);
   const toggleShowSatellite = () => {
@@ -130,6 +130,12 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
     currentMapCache.zoom,
     updateDatasetData
   );
+
+  useEffect(() => {
+    if (map) {
+      setCurrentMapCache((prev) => ({ ...prev, mapInstance: map }));
+    }
+  }, [map, setCurrentMapCache]);
 
   const MapEventsHandler = () => {
     const map = useMap();
@@ -208,6 +214,7 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
         center={currentMapCache.mapCenter}
         zoom={currentMapCache.zoom}
         className="map"
+        ref={setMap}
       >
         {/*{pinnedFeatureCollections.map((dataset: Dataset, index: number) => (
           <GeoJSON

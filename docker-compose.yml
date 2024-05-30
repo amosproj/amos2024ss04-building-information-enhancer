@@ -5,12 +5,9 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: frontend
-    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-frontend
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-frontend:${DOCKER_COMPOSE_IMAGES_TAG}
     environment:
-      - HOST=${FRONTEND_HOST}
-      - PORT=${FRONTEND_PORT}
-      - BACKEND_HOST=${BACKEND_HOST}
-      - BACKEND_PORT=${BACKEND_PORT}
+      - NODE_ENV=${ENVIRONMENT_STAGE}
     networks:
       - bie-network
     ports:
@@ -22,9 +19,9 @@ services:
       context: ./backend/src/BIE.Core
       dockerfile: Dockerfile
     container_name: api-gateway
-    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-api-gateway
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-api-gateway:${DOCKER_COMPOSE_IMAGES_TAG}
     environment:
-      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT_STAGE} # Needs to be changed to `Production` for production env.
+      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT_STAGE}
       - DB_NAME=BIEDB
       - DB_PASSWORD=MyPass@1234
       - DB_SERVER=sql-db
@@ -32,7 +29,7 @@ services:
       - DB_TYPE=SQL
       - TRUSTED=False
     ports:
-      - ${BACKEND_PORT}:80
+      - ${VITE_BACKEND_PORT}:80
     networks:
       - bie-network
     depends_on:
@@ -43,7 +40,7 @@ services:
     build:
       context: ./backend/src/BIE.DataPipeline
       dockerfile: Dockerfile
-    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-datapipeline
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-datapipeline:${DOCKER_COMPOSE_IMAGES_TAG}
     environment:
       - DB_NAME=BIEDB
       - DB_PASSWORD=MyPass@1234
@@ -63,7 +60,7 @@ services:
       context: ./backend/database
       dockerfile: Dockerfile
     container_name: sql-db
-    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-sql-database
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-sql-database:${DOCKER_COMPOSE_IMAGES_TAG}
     networks:
       - bie-network
     volumes:

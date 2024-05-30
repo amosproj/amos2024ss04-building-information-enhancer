@@ -4,6 +4,10 @@ FROM node:20-slim as builder
 # Create app work directory
 WORKDIR /usr/src/app
 
+# Set environment variables 
+ARG STAGE
+ENV VITE_STAGE=${STAGE}
+
 ### Install dependencies ###
 
 # Copy package.json and package-lock.json to the working directory
@@ -18,16 +22,12 @@ ADD . .
 
 RUN npm run build
 
-### Deploy the server ### 
+### Deploy the server ###
 
 # Use Apache HTTP server
 FROM httpd:2.4
 
 COPY --from=builder /usr/src/app/dist /usr/local/apache2/htdocs/
-
-## Environment variables
-ENV NODE_ENV=production
-ENV PORT=80
 
 # Expose the port
 EXPOSE "${PORT}"
