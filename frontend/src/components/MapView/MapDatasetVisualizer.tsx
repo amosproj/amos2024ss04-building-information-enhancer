@@ -7,6 +7,8 @@ import { TabsContext } from "../../contexts/TabsContext";
 import useGeoData from "./DataFetch";
 import L from "leaflet";
 import { LatLngBounds } from "leaflet";
+import proj4 from "proj4";
+import "proj4leaflet";
 
 interface MapDatasetVisualizerProps {
   dataset: Dataset;
@@ -17,7 +19,7 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
 }) => {
   const map = useMap();
   const { currentMapCache } = useContext(MapContext);
-  const { setCurrentTabsCache } = useContext(TabsContext);
+  const { currentTabsCache, setCurrentTabsCache } = useContext(TabsContext);
 
   const updateDatasetData = useCallback(
     (newData: FeatureCollection, bounds: LatLngBounds) => {
@@ -55,21 +57,44 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
     if (!geoData) return;
 
     // todo: if type is marker do this, dont do this with areas
-    const geojsonLayer = L.geoJson(geoData, {
-      pointToLayer: function (_feature, latlng) {
-        return L.marker(latlng, { icon: dataset.markerIcon });
-      },
-      style: { fillOpacity: 0.1 },
-    });
-    const markerClusterGroup = L.markerClusterGroup();
+    if (dataset.id === "house_footprints") {
+      console.log("hi from data visualizer");
 
-    markerClusterGroup.addLayer(geojsonLayer);
-    map.addLayer(markerClusterGroup);
+      const myCRS = new L.Proj.CRS(
+        "EPSG:25832",
+        "+proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+      );
 
-    return () => {
-      map.removeLayer(markerClusterGroup);
-    };
-  }, [dataset.markerIcon, map, geoData]);
+      function coordsToLatLng1(coords: number[]) {
+        var latLng = myCRS.unproject(L.point(coords[0], coords[1]));
+        console.log(latLng);
+        return latLng;
+      }
+      const geojsonLayer = L.geoJson(geoData, {
+        coordsToLatLng: coordsToLatLng1,
+      });
+
+      geojsonLayer.addTo(map);
+      map.fitBounds(geojsonLayer.getBounds());
+      return;
+    } else {
+      const geojsonLayer = L.geoJson(geoData, {
+        pointToLayer: function (_feature, latlng) {
+          return L.marker(latlng, { icon: dataset.markerIcon });
+        },
+
+        style: { fillOpacity: 0.1 },
+      });
+      const markerClusterGroup = L.markerClusterGroup();
+
+      markerClusterGroup.addLayer(geojsonLayer);
+      map.addLayer(markerClusterGroup);
+
+      return () => {
+        map.removeLayer(markerClusterGroup);
+      };
+    }
+  }, [dataset.markerIcon, currentMapCache.zoom, map, geoData]);
 
   return null;
 };

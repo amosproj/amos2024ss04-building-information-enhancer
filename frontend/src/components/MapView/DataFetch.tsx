@@ -1,11 +1,12 @@
 import { FeatureCollection, Geometry } from "geojson";
 import defaultCityLocationData from "./FeatureCollection.json";
-import defaultPolygonData from "./bayernatlas.json";
+import defaultPolygonData from "./output.json";
 import { LatLngBounds } from "leaflet";
 import { useContext, useEffect, useState } from "react";
-import { TabsContext } from "../../contexts/TabsContext";
+import { TabProps, TabsContext } from "../../contexts/TabsContext";
 import { AlertContext } from "../../contexts/AlertContext";
 import axios from "axios";
+import { MapContext } from "../../contexts/MapContext";
 const geojsonCities: FeatureCollection =
   defaultCityLocationData as FeatureCollection;
 const geojsonGemeindenPolygons: FeatureCollection =
@@ -39,6 +40,12 @@ const useGeoData = (
   const [data, setData] = useState<FeatureCollection<Geometry>>();
   const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
 
+  const { currentTabsCache } = useContext(TabsContext);
+
+  const tabProps = currentTabsCache.openedTabs.find(
+    (tab) => tab.dataset.id === id
+  );
+
   // Returns the API URL of the endpoint for a specific dataset
   const getApiUrlForDataset = (): string => {
     switch (id) {
@@ -56,12 +63,6 @@ const useGeoData = (
         return "";
     }
   };
-
-  const { currentTabsCache } = useContext(TabsContext);
-
-  const tabProps = currentTabsCache.openedTabs.find(
-    (tab) => tab.dataset.id === id
-  );
 
   /*useEffect(() => {
     if (tabProps && tabProps.dataset.lastDataRequestBounds === bounds) {
@@ -106,10 +107,21 @@ const useGeoData = (
       console.log("SAME AS LAST TIME");
       return;
     }
+    if (tabProps && tabProps.dataset.type === "markers" && zoom <= 10) {
+      console.log("too far away");
+      return;
+    }
+    if (id === "house_footprints") {
+      if (tabProps?.dataset.data.features.length == 0) {
+        setData(geojsonGemeindenPolygons as FeatureCollection<Geometry>);
+        onUpdate(geojsonGemeindenPolygons, bounds);
+      }
+
+      return;
+    }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const fetchData = async (_bounds: LatLngBounds): Promise<void> => {
+    const fetchData = async (bounds: LatLngBounds): Promise<void> => {
       try {
-        console.log(getBaseApiUrl());
         // Define the query parameters
         const params = {
           BottomLat: bounds.getSouthWest().lat, // bottomLat,
@@ -118,7 +130,9 @@ const useGeoData = (
           TopLong: bounds.getNorthEast().lng, //topLong,
           ZoomLevel: zoom,
         };
-        console.log(getApiUrlForDataset());
+        //console.log(getApiUrlForDataset());
+        const url = `http://localhost:8081/api/v1.0/Dataset/1/data?BottomLat=${params.BottomLat}&BottomLong=${params.BottomLong}&TopLat=${params.TopLat}&TopLong=${params.TopLong}`;
+        console.log(url);
         const response = await axios.get<FeatureCollection<Geometry>>(
           getApiUrlForDataset(),
           {
@@ -158,7 +172,6 @@ const useGeoData = (
     };
 
     fetchData(bounds);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bounds, zoom, id]);
 
   return data;
