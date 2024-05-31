@@ -9,7 +9,7 @@ import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import MapOptions from "./MapOptions";
 import useGeoData from "./DataFetch";
-import { GeoJSON, WMSTileLayer } from "react-leaflet";
+import { GeoJSON, WMSTileLayer, ZoomControl } from "react-leaflet";
 import { MapContext } from "../../contexts/MapContext";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
 import { FeatureCollection } from "geojson";
@@ -97,7 +97,9 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
         zoom={currentMapCache.zoom}
         className="map"
         ref={setMap}
+        zoomControl={false}
       >
+        <ZoomControl position="topright" />
         {pinnedFeatureCollections.map((dataset: Dataset, index: number) => (
           <GeoJSON
             style={{ fillOpacity: 0.1 }}

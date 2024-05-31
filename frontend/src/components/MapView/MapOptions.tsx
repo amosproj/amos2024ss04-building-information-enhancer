@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowsClockwise, MagnifyingGlass } from "@phosphor-icons/react";
+import { Stack, MagnifyingGlass } from "@phosphor-icons/react";
 import "./MapOptions.css";
 import { Tooltip } from "@mui/material";
 import SearchPopUp from "../PopUp/SearchPopUp";
@@ -18,18 +18,17 @@ const MapOptions: React.FC<MapOptionsProps> = ({ toggleShowSatellite }) => {
   return (
     <div className="map-options-container">
       <Tooltip arrow title="Search for an address">
-        <MagnifyingGlass
-          weight="duotone"
-          className="search-map-icon"
-          onClick={toggleIfOpenedDialog}
-        />
+        <div className="search-map-icon-container leaflet-bar leaflet-control leaflet-control-custom">
+          <MagnifyingGlass
+            className="search-map-icon"
+            onClick={toggleIfOpenedDialog}
+          />
+        </div>
       </Tooltip>
-      <Tooltip arrow title="Switch satellite / openstreetmap">
-        <ArrowsClockwise
-          weight="duotone"
-          className="switch-map-icon"
-          onClick={toggleShowSatellite}
-        />
+      <Tooltip arrow title="Switch layer">
+        <div className="layers-map-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom">
+          <Stack className="layers-map-icon" onClick={toggleShowSatellite} />
+        </div>
       </Tooltip>
       <SearchPopUp
         onToggleIfOpenedDialog={toggleIfOpenedDialog}
