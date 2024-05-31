@@ -89,11 +89,11 @@ const useGeoData = (
         onUpdate(response.data);
       } catch (error) {
         // Display alert
-        setCurrentAlertCache({
-          ...currentAlertCache,
-          isAlertOpened: true,
-          text: "Fetching data failed, using local GeoJSON data.",
-        });
+        // setCurrentAlertCache({
+        //   ...currentAlertCache,
+        //   isAlertOpened: true,
+        //   text: "Fetching data failed, using local GeoJSON data.",
+        // });
         console.error("Fetching data failed, using local GeoJSON data.", error);
         // Console log the error
         if (axios.isAxiosError(error)) {
