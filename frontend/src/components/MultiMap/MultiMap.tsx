@@ -94,9 +94,6 @@ const MultiMap = () => {
           return (
             <TabPanel value={tab.id.toString()} className="tab" key={tab.id}>
               <div className="tab-context-container">
-                <span className="tab-description-container">
-                  {tab.dataset.description}
-                </span>
                 <MapView datasetId={tab.dataset.id} />
               </div>
             </TabPanel>

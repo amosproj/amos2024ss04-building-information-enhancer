@@ -24,11 +24,6 @@
   flex-direction: column;
 }
 
-.tab-description-container {
-  padding-bottom: 1rem;
-  text-wrap: nowrap;
-}
-
 .tab-title-container {
   display: flex;
   align-items: center;

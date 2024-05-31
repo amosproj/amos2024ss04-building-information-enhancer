@@ -18,7 +18,13 @@ const DatasetsPopUp: React.FC<DatasetsPopUpProps> = ({
       ifOpenedDialog={ifOpenedDialog}
       titleIcon={undefined}
     >
-      <div style={{ display: "flex", flexDirection: "column" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          textAlign: "center",
+        }}
+      >
         <span className="secondary-text" style={{ paddingBottom: "1rem" }}>
           Select one of the datasets below to create a new map tab
         </span>
