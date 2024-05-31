@@ -10,7 +10,7 @@ import TabInfoPopUp from "../PopUp/TabInfoPopup";
 interface TabOptionsProps {
   anchorElementTabOptions: null | HTMLElement;
   handleClose: () => void;
-  currentTab: TabProps;
+  currentTab: TabProps | undefined;
 }
 
 const TabOptions: React.FC<TabOptionsProps> = ({
@@ -95,54 +95,60 @@ const TabOptions: React.FC<TabOptionsProps> = ({
 
   return (
     <Fragment>
-      <Menu
-        id="basic-menu"
-        anchorEl={anchorElementTabOptions}
-        open={Boolean(anchorElementTabOptions)}
-        onClose={handleClose}
-        MenuListProps={{
-          "aria-labelledby": "basic-button",
-        }}
-      >
-        <MenuItem
-          className="tab-options-item-container"
-          onClick={toggleIfOpenedDialog}
-        >
-          <Info size={18} />
-          Info
-        </MenuItem>
-        <MenuItem
-          className="tab-options-item-container"
-          onClick={() => {
-            toggleTabPinned(currentTabsCache.currentTabID);
-          }}
-        >
-          {currentTab.ifPinned ? (
-            <Fragment>
-              <PushPinSlash size={18} weight="fill" />
-              Unpin Tab
-            </Fragment>
-          ) : (
-            <Fragment>
-              <PushPin size={18} /> Pin Tab
-            </Fragment>
-          )}
-        </MenuItem>
-        <MenuItem
-          className="tab-options-item-container"
-          onClick={() => {
-            closeTab(currentTabsCache.currentTabID);
-          }}
-        >
-          <X size={18} />
-          Close Tab
-        </MenuItem>
-      </Menu>
-      <TabInfoPopUp
-        onToggleIfOpenedDialog={toggleIfOpenedDialog}
-        ifOpenedDialog={ifOpenedDialog}
-        currentTab={currentTab}
-      />
+      {currentTab ? (
+        <Fragment>
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorElementTabOptions}
+            open={Boolean(anchorElementTabOptions)}
+            onClose={handleClose}
+            MenuListProps={{
+              "aria-labelledby": "basic-button",
+            }}
+          >
+            <MenuItem
+              className="tab-options-item-container"
+              onClick={toggleIfOpenedDialog}
+            >
+              <Info size={18} />
+              Info
+            </MenuItem>
+            <MenuItem
+              className="tab-options-item-container"
+              onClick={() => {
+                toggleTabPinned(currentTabsCache.currentTabID);
+              }}
+            >
+              {currentTab.ifPinned ? (
+                <Fragment>
+                  <PushPinSlash size={18} weight="fill" />
+                  Unpin Tab
+                </Fragment>
+              ) : (
+                <Fragment>
+                  <PushPin size={18} /> Pin Tab
+                </Fragment>
+              )}
+            </MenuItem>
+            <MenuItem
+              className="tab-options-item-container"
+              onClick={() => {
+                closeTab(currentTabsCache.currentTabID);
+              }}
+            >
+              <X size={18} />
+              Close Tab
+            </MenuItem>
+          </Menu>
+          <TabInfoPopUp
+            onToggleIfOpenedDialog={toggleIfOpenedDialog}
+            ifOpenedDialog={ifOpenedDialog}
+            currentTab={currentTab}
+          />
+        </Fragment>
+      ) : (
+        <Fragment />
+      )}
     </Fragment>
   );
 };

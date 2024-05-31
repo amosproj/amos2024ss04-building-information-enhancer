@@ -61,7 +61,8 @@ const MultiMap = () => {
                         ) : (
                           <Fragment />
                         )}
-                        {anchorElementTabOptions ? (
+                        {anchorElementTabOptions &&
+                        tab.id === currentTabsCache.currentTabID ? (
                           <DotsThreeOutline
                             weight="fill"
                             className="options-tab-icon-inverted"
@@ -76,11 +77,6 @@ const MultiMap = () => {
                             onClick={handleMenuClick}
                           />
                         </Tooltip>
-                        <TabOptions
-                          anchorElementTabOptions={anchorElementTabOptions}
-                          handleClose={handleMenuClose}
-                          currentTab={tab}
-                        />
                       </div>
                     </div>
                   }
@@ -105,6 +101,13 @@ const MultiMap = () => {
           );
         })}
       </TabContext>
+      <TabOptions
+        anchorElementTabOptions={anchorElementTabOptions}
+        handleClose={handleMenuClose}
+        currentTab={currentTabsCache.openedTabs.find(
+          (tab) => tab.id === currentTabsCache.currentTabID
+        )}
+      />
     </div>
   );
 };
