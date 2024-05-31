@@ -17,7 +17,7 @@ const MapOptions: React.FC<MapOptionsProps> = ({ toggleShowSatellite }) => {
 
   return (
     <div className="map-options-container">
-      <Tooltip arrow title="Search for an address">
+      <Tooltip arrow title="Search for an address" placement="right">
         <div className="search-map-icon-container leaflet-bar leaflet-control leaflet-control-custom">
           <MagnifyingGlass
             className="search-map-icon"
@@ -25,7 +25,7 @@ const MapOptions: React.FC<MapOptionsProps> = ({ toggleShowSatellite }) => {
           />
         </div>
       </Tooltip>
-      <Tooltip arrow title="Switch layer">
+      <Tooltip arrow title="Switch layers" placement="right">
         <div className="layers-map-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom">
           <Stack className="layers-map-icon" onClick={toggleShowSatellite} />
         </div>
