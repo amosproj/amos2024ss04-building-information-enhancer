@@ -82,6 +82,8 @@ const MultiMap = () => {
                   }
                   value={tab.id.toString()}
                   key={tab.id}
+                  disableRipple
+                  disableFocusRipple
                 ></Tab>
               );
             })}
