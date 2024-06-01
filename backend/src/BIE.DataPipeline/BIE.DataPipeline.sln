@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIE.DataPipeline", "BIE.Dat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BIE.Data", "BIE.Data\BIE.Data.csproj", "{46943C58-4802-44BB-A9DE-68FB3EB06D58}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BIE.Tests", "..\BIE.Tests\BIE.Tests.csproj", "{1CBB88CE-5377-48FD-993F-A5B299DFC514}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{46943C58-4802-44BB-A9DE-68FB3EB06D58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46943C58-4802-44BB-A9DE-68FB3EB06D58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46943C58-4802-44BB-A9DE-68FB3EB06D58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CBB88CE-5377-48FD-993F-A5B299DFC514}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CBB88CE-5377-48FD-993F-A5B299DFC514}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CBB88CE-5377-48FD-993F-A5B299DFC514}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CBB88CE-5377-48FD-993F-A5B299DFC514}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
