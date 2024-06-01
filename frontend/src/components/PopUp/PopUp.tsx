@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import {
   Dialog,
   DialogActions,
@@ -6,12 +6,16 @@ import {
   DialogContent,
   Button,
 } from "@mui/material";
+import { Icon } from "@phosphor-icons/react";
+
+import "./PopUp.css";
 
 interface PopUpProps {
   ifOpenedDialog: boolean;
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  titleIcon: Icon | undefined;
 }
 
 // This is the partent component for all PopUps.
@@ -24,6 +28,7 @@ const PopUp: React.FC<PopUpProps> = ({
   onClose,
   title,
   children,
+  titleIcon,
 }) => {
   return (
     <Dialog
@@ -38,7 +43,10 @@ const PopUp: React.FC<PopUpProps> = ({
       open={ifOpenedDialog}
       onClose={onClose}
     >
-      <DialogTitle style={{ paddingBottom: 8 }}>{title}</DialogTitle>
+      <DialogTitle className="popup-name" style={{ paddingBottom: 8 }}>
+        {titleIcon ? React.createElement(titleIcon) : <Fragment />}
+        {title}
+      </DialogTitle>
       <DialogContent>{children}</DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="primary">

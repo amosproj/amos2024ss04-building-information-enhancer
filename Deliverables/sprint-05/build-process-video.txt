@@ -1,0 +1,6 @@
+GitHub accepts files <=100MB, therefore we needed to compress the video with a free online software,
+thus adding a watermark and making the quality worse. 
+
+To find the full quality, not watermarked video visite the YouTube link below:
+https://youtu.be/bzP1DiHh75c
+

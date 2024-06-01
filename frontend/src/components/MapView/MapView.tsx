@@ -1,7 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { MapContainer } from "react-leaflet/MapContainer";
-import { Marker } from "react-leaflet/Marker";
-import { Popup } from "react-leaflet/Popup";
+
 import { TileLayer } from "react-leaflet/TileLayer";
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
@@ -9,20 +8,16 @@ import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet.markercluster";
 
 import "./MapView.css";
-import { useMap, useMapEvents } from "react-leaflet/hooks";
-import L, { DivIcon } from "leaflet";
+import L from "leaflet";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import MapOptions from "./MapOptions";
 import useGeoData from "./DataFetch";
-import { WMSTileLayer } from "react-leaflet";
+import { WMSTileLayer, ZoomControl } from "react-leaflet";
 import { MapContext } from "../../contexts/MapContext";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
 import { FeatureCollection } from "geojson";
 import { Dataset } from "../DatasetsList/DatasetsList";
-import { createRoot } from "react-dom/client";
-import { flushSync } from "react-dom";
-import { MapPin } from "@phosphor-icons/react";
 import MapDatasetVisualizer from "./MapDatasetVisualizer";
 
 const DefaultIcon = L.icon({
@@ -32,23 +27,6 @@ const DefaultIcon = L.icon({
 });
 
 L.Marker.prototype.options.icon = DefaultIcon;
-
-// Utility function to render a React component to HTML string
-const renderToHtml = (Component: React.FC) => {
-  const div = document.createElement("div");
-  const root = createRoot(div);
-  flushSync(() => {
-    root.render(<Component />);
-  });
-  return div.innerHTML;
-};
-
-const divIconMarker: DivIcon = L.divIcon({
-  html: renderToHtml(() => <MapPin size={36} color="#ff0000" weight="fill" />),
-  className: "", // Optional: add a custom class name
-  iconSize: [36, 36],
-  iconAnchor: [18, 36], // Adjust the anchor point as needed
-});
 
 interface MapViewProps {
   datasetId: string;
@@ -101,62 +79,6 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
     }
   }, [map, setCurrentMapCache]);
 
-  const MapEventsHandler = () => {
-    const map = useMap();
-    useMapEvents({
-      click: (event) => {
-        console.log(event);
-        setCurrentMapCache({
-          ...currentMapCache,
-          selectedCoordinates: event.latlng,
-        });
-      },
-      moveend: (event) => {
-        setCurrentMapCache({
-          ...currentMapCache,
-          mapCenter: event.target.getCenter(),
-          mapBounds: event.target.getBounds(),
-          zoom: event.target.getZoom(),
-        });
-      },
-    });
-    return (
-      <Marker
-        position={currentMapCache.selectedCoordinates}
-        icon={divIconMarker}
-      >
-        <Popup>
-          <span
-            // Get the current location of the user
-            onClick={() => {
-              map
-                .locate({ setView: true })
-                .on("locationfound", function (event) {
-                  setPosition(event.latlng);
-                  map.flyTo(event.latlng, map.getZoom(), {
-                    animate: true,
-                    duration: 50,
-                  });
-                })
-                // If access to the location was denied
-                .on("locationerror", function (event) {
-                  console.log(event);
-                  alert("Location access denied.");
-                });
-            }}
-          >
-            {currentMapCache.selectedCoordinates.lat.toFixed(4)},{" "}
-            {currentMapCache.selectedCoordinates.lng.toFixed(4)}
-          </span>
-        </Popup>
-      </Marker>
-    );
-  };
-
-  function setPosition(latlng: L.LatLng) {
-    setCurrentMapCache({ ...currentMapCache, selectedCoordinates: latlng });
-  }
-
   // Get the feature collections from pinned tabs
   const pinnedFeatureCollections = currentTabsCache.openedTabs
     .filter((tab: TabProps) => tab.ifPinned)
@@ -179,8 +101,10 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
         zoom={currentMapCache.zoom}
         className="map"
         ref={setMap}
+        zoomControl={false}
       >
-        {/*{pinnedFeatureCollections.map((dataset: Dataset, index: number) => (
+        <ZoomControl position="topright" />
+        {pinnedFeatureCollections.map((dataset: Dataset, index: number) => (
           <GeoJSON
             style={{ fillOpacity: 0.1 }}
             key={index}

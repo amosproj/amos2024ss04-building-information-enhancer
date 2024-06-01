@@ -24,13 +24,14 @@
   flex-direction: column;
 }
 
-.tab-description-container {
-  padding-bottom: 1rem;
-  text-wrap: nowrap;
-}
-
 .tab-title-container {
   display: flex;
+  align-items: center;
+}
+
+.tab-title {
+  display: flex;
+  gap: 0.5rem;
   align-items: center;
 }
 
@@ -54,31 +55,21 @@
   right: 0.1rem;
 }
 
-.tab-icons-container .close-tab-icon {
+.tab-icons-container .options-tab-icon {
   height: 0.8rem;
   display: flex;
   position: absolute;
   top: 0.2rem;
-  right: 0.1rem;
+  right: 0.2rem;
   visibility: hidden;
 }
 
-.tab-icons-container .pin-tab-icon {
+.tab-icons-container .options-tab-icon-inverted {
   height: 0.8rem;
   display: flex;
   position: absolute;
   top: 0.2rem;
-  right: 1rem;
-  visibility: hidden;
-}
-
-.tab-icons-container .unpin-tab-icon {
-  height: 0.8rem;
-  display: flex;
-  position: absolute;
-  top: 0.2rem;
-  right: 1rem;
-  visibility: hidden;
+  right: 0.2rem;
 }
 
 .add-tab-button {

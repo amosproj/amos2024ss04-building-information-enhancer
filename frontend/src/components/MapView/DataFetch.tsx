@@ -49,6 +49,8 @@ const useGeoData = (
   // Returns the API URL of the endpoint for a specific dataset
   const getApiUrlForDataset = (): string => {
     switch (id) {
+      case "empty_map":
+        return "";
       case "charging_stations":
         return getBaseApiUrl() + "/api/v1.0/Dataset/1/data";
       case "house_footprints":
@@ -63,44 +65,6 @@ const useGeoData = (
         return "";
     }
   };
-
-  /*useEffect(() => {
-    if (tabProps && tabProps.dataset.lastDataRequestBounds === bounds) {
-      console.log("SAME AS LAST TIME");
-      return;
-    }
-    const fetchData = async (bounds: LatLngBounds) => {
-      if (id === "house_footprints") {
-        setData(geojsonGemeindenPolygons as FeatureCollection<Geometry>);
-        if (onUpdate) onUpdate(geojsonGemeindenPolygons, bounds);
-        return;
-      }
-
-      try {
-        const bottomLat = bounds.getSouthWest().lat;
-        const bottomLong = bounds.getSouthWest().lng;
-        const topLat = bounds.getNorthEast().lat;
-        const topLong = bounds.getNorthEast().lng;
-
-        const url = `http://localhost:8081/api/v1.0/Dataset/1/data?BottomLat=${bottomLat}&BottomLong=${bottomLong}&TopLat=${topLat}&TopLong=${topLong}`;
-        console.log(url);
-
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const result = await response.json();
-        setData(result as FeatureCollection<Geometry>);
-        if (onUpdate) onUpdate(result, bounds);
-      } catch (error) {
-        console.error("Fetching data failed, using local GeoJSON data:", error);
-        setData(geojsonCities as FeatureCollection<Geometry>);
-        if (onUpdate) onUpdate(geojsonCities, bounds);
-      }
-    };
-
-    fetchData(bounds);
-  }, [tabProps, bounds, zoom, id, onUpdate]);*/
 
   useEffect(() => {
     if (tabProps && tabProps.dataset.lastDataRequestBounds === bounds) {
@@ -145,11 +109,11 @@ const useGeoData = (
         onUpdate(response.data, bounds);
       } catch (error) {
         // Display alert
-        setCurrentAlertCache({
-          ...currentAlertCache,
-          isAlertOpened: true,
-          text: "Fetching data failed, using local GeoJSON data.",
-        });
+        // setCurrentAlertCache({
+        //   ...currentAlertCache,
+        //   isAlertOpened: true,
+        //   text: "Fetching data failed, using local GeoJSON data.",
+        // });
         console.error("Fetching data failed, using local GeoJSON data.", error);
         // Console log the error
         if (axios.isAxiosError(error)) {

@@ -45,6 +45,24 @@ const SearchPopUp: React.FC<SearchPopUpProps> = ({
   const [suggestions, setSuggestions] = useState<Array<GeoSearchResult>>([]);
   const { currentMapCache } = useContext(MapContext);
 
+  const provider = new OpenStreetMapProvider({
+    params: {
+      "accept-language": "de",
+      countrycodes: "de",
+      addressdetails: 1,
+    },
+  });
+
+  const reset = () => {
+    setSearchText("");
+    setLongitude("");
+    setLatitude("");
+    setSearchMode("single");
+    setSuggestions([]);
+    setLatitudeError(false);
+    setLongitudeError(false);
+  };
+
   const flyToLocation = () => {
     const { mapInstance } = currentMapCache;
     if (mapInstance) {
@@ -59,7 +77,6 @@ const SearchPopUp: React.FC<SearchPopUpProps> = ({
       setSuggestions([]);
       return;
     }
-    const provider = new OpenStreetMapProvider();
     const results = await provider.search({ query: input });
     const transformedResults: GeoSearchResult[] = results.map((result) => ({
       x: result.x,
@@ -70,8 +87,8 @@ const SearchPopUp: React.FC<SearchPopUpProps> = ({
   };
 
   const handleModeSwitch = () => {
+    reset();
     if (searchMode === "single") {
-      setSuggestions([]);
       setSearchMode("coordinates");
     } else {
       setSearchMode("single");
@@ -91,7 +108,7 @@ const SearchPopUp: React.FC<SearchPopUpProps> = ({
         return item.displayName;
       }
 
-      const [latitudeTerm, longitudeTerm] = searchText.split(" ");
+      const [latitudeTerm, longitudeTerm] = [latitude, longitude];
       const regex = new RegExp(
         `^-?${latitudeTerm}[\\S\\d°'\\\\".]*\\s-?${longitudeTerm}[\\S\\d°'\\\\".]*$`
       );
@@ -187,8 +204,12 @@ const SearchPopUp: React.FC<SearchPopUpProps> = ({
   return (
     <PopUp
       title="Locations"
-      onClose={onToggleIfOpenedDialog}
+      onClose={() => {
+        onToggleIfOpenedDialog();
+        reset();
+      }}
       ifOpenedDialog={ifOpenedDialog}
+      titleIcon={undefined}
     >
       {searchMode === "single" ? (
         <TextField
