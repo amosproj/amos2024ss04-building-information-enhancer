@@ -2,6 +2,8 @@
 using BIE.Data;
 using BIE.DataPipeline.Import;
 using System.Data.Common;
+using Microsoft.Data.SqlClient;
+using static BIE.DataPipeline.Import.DataSourceDescription.DataSourceOptions;
 
 namespace BIE.DataPipeline
 {
@@ -18,7 +20,7 @@ namespace BIE.DataPipeline
             ConfigureEnviornmentVaraiables();
             mStringBuilder = new StringBuilder();
         }
-        
+
         /// <summary>
         /// Set the main INSERT INTO QueryString.
         /// </summary>
@@ -27,7 +29,7 @@ namespace BIE.DataPipeline
         public void SetInfo(string tableName, string columnNames)
         {
             mInputQueryString = "INSERT INTO " + tableName + " ( " + columnNames + " ) " + " VALUES ";
-
+            mStringBuilder.Clear();
             mStringBuilder.Append(mInputQueryString);
         }
 
@@ -35,13 +37,59 @@ namespace BIE.DataPipeline
         /// To create table in DB
         /// </summary>
         /// <param name="description"></param>
-        internal void CreateTable(DataSourceDescription description)
+        /// <param name="forshape"></param>
+        internal bool CreateTable(DataSourceDescription description)
         {
             Console.WriteLine("Creating Table...");
 
             var db = Database.Instance;
-            string query = "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '" +
-                           description.table_name + "')\r\nBEGIN CREATE TABLE " + description.table_name;
+
+            if (description.options.if_table_exists == InsertBehaviour.skip)
+            {
+                var tableExists =
+                    (int)db.ExecuteScalar(db.CreateCommand($"SELECT count(*) as Exist" +
+                                                           $" from INFORMATION_SCHEMA.TABLES" +
+                                                           $" where table_name = '{description.table_name}'"));
+
+                if (tableExists == 1)
+                {
+                    Console.WriteLine($"Table {description.table_name} already exists, stopping...");
+                    return false;
+                }
+            }
+
+            if (description.options.if_table_exists == InsertBehaviour.replace)
+            {
+                Console.WriteLine($"Dropping table {description.table_name} if it exists.");
+                db.ExecuteScalar(db.CreateCommand($"DROP TABLE IF EXISTS {description.table_name}"));
+            }
+
+            var query = GetCreationQuery(description);
+
+            var cmd = db.CreateCommand(query);
+            db.Execute(cmd);
+
+            Console.WriteLine("Table created.");
+
+            return true;
+        }
+
+        private string GetCreationQuery(DataSourceDescription description)
+        {
+            if (description.source.data_format == "SHAPE")
+            {
+                return @"
+            IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'SpatialData')
+            BEGIN
+                CREATE TABLE SpatialData (
+                    Id INT PRIMARY KEY IDENTITY(1,1),
+                    Location GEOGRAPHY
+                );
+            END";
+            }
+
+            var query = "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '" +
+                        description.table_name + "')\r\nBEGIN CREATE TABLE " + description.table_name;
             query += " (";
             foreach (var column in description.table_cols)
             {
@@ -49,10 +97,8 @@ namespace BIE.DataPipeline
             }
 
             query += "); END";
-            DbCommand cmd = db.CreateCommand(query);
-            db.Execute(cmd);
 
-            Console.WriteLine("Table created.");
+            return query;
         }
 
 

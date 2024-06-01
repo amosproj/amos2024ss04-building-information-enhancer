@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Text;
 using YamlDotNet.Serialization;
+
 // ReSharper disable InconsistentNaming
 
 namespace BIE.DataPipeline.Import
@@ -49,10 +50,17 @@ namespace BIE.DataPipeline.Import
         /// </summary>
         public string table_name { get; set; }
 
+
+        private char mDelimiter = ';';
+
         /// <summary>
         /// the delimiter used in the csv datasource.
         /// </summary>
-        public char delimiter { get; set; }
+        public char delimiter
+        {
+            get => mDelimiter;
+            set => mDelimiter = value;
+        }
 
         /// <summary>
         /// The relevant columns that should be imported from the datasource.
@@ -70,6 +78,11 @@ namespace BIE.DataPipeline.Import
             /// The actual location.
             /// </summary>
             public string location { get; set; }
+
+            /// <summary>
+            /// the format of the data
+            /// </summary>
+            public string data_format { get; set; }
         }
 
         public class DataSourceOptions
@@ -77,12 +90,33 @@ namespace BIE.DataPipeline.Import
             /// <summary>
             /// The number of initial lines to skip while reading the data source.
             /// </summary>
-            public int skip_lines {get; set;}
+            public int skip_lines { get; set; }
 
             /// <summary>
             /// Indicates whether to discard rows with null values.
             /// </summary>
-            public bool discard_null_rows {get; set;}
+            public bool discard_null_rows { get; set; }
+
+            private InsertBehaviour mIf_table_exists = InsertBehaviour.skip;
+
+            /// <summary>
+            /// How to deal with an existing table in the database. Options:
+            /// "skip": skip this dataset, is the default
+            /// "ignore": do nothing special
+            /// "replace": DROP the existing table before inserting data.
+            /// </summary>
+            public InsertBehaviour if_table_exists
+            {
+                get => mIf_table_exists;
+                set => mIf_table_exists = value;
+            }
+
+            public enum InsertBehaviour
+            {
+                ignore,
+                skip,
+                replace
+            }
         }
 
         public class DataSourceColumn
@@ -90,7 +124,7 @@ namespace BIE.DataPipeline.Import
             /// <summary>
             /// The name of the column in the datasource.
             /// </summary>
-            public string name {get; set;}
+            public string name { get; set; }
 
             /// <summary>
             /// The name of the column in the database table.
@@ -98,9 +132,11 @@ namespace BIE.DataPipeline.Import
             public string name_in_table { get; set; }
 
             private string mType = "VARCHAR(500)";
+
             /// <summary>
             /// The data type of the column.
-            public string type {
+            public string type
+            {
                 get => mType;
                 set => mType = value;
             }
