@@ -23,7 +23,7 @@ jobs:
   tests:
     needs: linting
     name: Run Tests
-   runs-on: windows-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2.1.0
