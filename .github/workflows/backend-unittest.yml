@@ -12,4 +12,4 @@ jobs:
       
       - name: Run unit tests 
         run: dotnet test
-        working-directory: ../../backend/src/BIE.DataPipeline
+        working-directory: backend\src\BIE.DataPipeline
