@@ -7,6 +7,9 @@ jobs:
     name: Unit Testing
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2.1.0
-      - working-directory: ../../backend/src/BIE.DataPipeline
-      - run: dotnet test
+      - name: Checkout repository
+        uses: actions/checkout@v2.1.0
+      
+      - name: Run unit tests 
+        run: dotnet test
+        working-directory: ../../backend/src/BIE.DataPipeline
