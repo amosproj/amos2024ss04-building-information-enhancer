@@ -8,8 +8,13 @@ using YamlDotNet.Core;
 
 namespace BIE.DataPipeline.Import
 {
-    internal static class ImporterHelper
+    public static class ImporterHelper
     {
+        /// <summary>
+        /// Creates an array of c# types matching to the SQL types given by the DataSourceDescription.
+        /// </summary>
+        /// <param name="dataSourceDescription">The dataSourceDescription.</param>
+        /// <returns>The array of C# types.</returns>
         public static Type[] ParseColumnTypes(DataSourceDescription dataSourceDescription)
         {
             Type[] res = new Type[dataSourceDescription.table_cols.Count];

@@ -39,4 +39,9 @@
     </Content>
   </ItemGroup>
 
+
+  <ItemGroup>
+    <None Remove="yaml\unitTest.yaml" />
+  </ItemGroup>
+
 </Project>
