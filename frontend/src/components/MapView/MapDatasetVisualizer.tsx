@@ -67,16 +67,38 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
 
       function coordsToLatLng1(coords: number[]) {
         var latLng = myCRS.unproject(L.point(coords[0], coords[1]));
-        console.log(latLng);
         return latLng;
       }
-      const geojsonLayer = L.geoJson(geoData, {
-        coordsToLatLng: coordsToLatLng1,
-      });
 
-      geojsonLayer.addTo(map);
-      map.fitBounds(geojsonLayer.getBounds());
-      return;
+      if (currentMapCache.zoom < 13) {
+        const markerClusterGroup = L.markerClusterGroup();
+        const g = L.geoJson(geoData, {
+          coordsToLatLng: coordsToLatLng1,
+          onEachFeature: function (feature, layer) {
+            if (feature.geometry.type === "Polygon") {
+              const center = layer.getBounds().getCenter();
+              const marker = L.marker(center);
+              marker.addTo(markerClusterGroup);
+              console.log(center);
+            }
+          },
+        });
+
+        //map.fitBounds(g.getBounds());
+        map.addLayer(markerClusterGroup);
+        return () => {
+          map.removeLayer(markerClusterGroup);
+        };
+      } else {
+        const geojsonLayer = L.geoJson(geoData, {
+          coordsToLatLng: coordsToLatLng1,
+        });
+        geojsonLayer.addTo(map);
+
+        return () => {
+          map.removeLayer(geojsonLayer);
+        };
+      }
     } else {
       const geojsonLayer = L.geoJson(geoData, {
         pointToLayer: function (_feature, latlng) {

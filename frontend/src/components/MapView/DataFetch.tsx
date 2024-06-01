@@ -1,6 +1,6 @@
 import { FeatureCollection, Geometry } from "geojson";
 import defaultCityLocationData from "./FeatureCollection.json";
-import defaultPolygonData from "./output.json";
+import defaultPolygonData from "./output1000.json";
 import { LatLngBounds } from "leaflet";
 import { useContext, useEffect, useState } from "react";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
@@ -115,6 +115,8 @@ const useGeoData = (
       if (tabProps?.dataset.data.features.length == 0) {
         setData(geojsonGemeindenPolygons as FeatureCollection<Geometry>);
         onUpdate(geojsonGemeindenPolygons, bounds);
+      } else {
+        console.log("already loaded house_footprints");
       }
 
       return;
