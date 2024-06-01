@@ -4,7 +4,7 @@ using YamlDotNet.Serialization;
 
 namespace BIE.DataPipeline.Import
 {
-    internal static class YamlImporter
+    public static class YamlImporter
     {
         public static DataSourceDescription GetSourceDescription(string path)
         {
@@ -31,7 +31,7 @@ namespace BIE.DataPipeline.Import
         }
     }
 
-    internal struct DataSourceDescription
+    public struct DataSourceDescription
     {
         /// <summary>
         /// The location of the data source.
@@ -58,7 +58,7 @@ namespace BIE.DataPipeline.Import
         /// </summary>
         public List<DataSourceColumn> table_cols;
 
-        internal struct DataSourceLocation
+        public struct DataSourceLocation
         {
             /// <summary>
             /// The type of location. options: filepath | URL
@@ -71,7 +71,7 @@ namespace BIE.DataPipeline.Import
             public string location;
         }
 
-        internal struct DataSourceOptions
+        public struct DataSourceOptions
         {
             /// <summary>
             /// The number of initial lines to skip while reading the data source.
@@ -84,7 +84,7 @@ namespace BIE.DataPipeline.Import
             public bool discard_null_rows;
         }
 
-        internal struct DataSourceColumn
+        public struct DataSourceColumn
         {
             /// <summary>
             /// The name of the column in the datasource.
