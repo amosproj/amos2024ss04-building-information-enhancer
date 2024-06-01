@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Text;
 using YamlDotNet.Serialization;
+// ReSharper disable InconsistentNaming
 
 namespace BIE.DataPipeline.Import
 {
@@ -31,81 +32,84 @@ namespace BIE.DataPipeline.Import
         }
     }
 
-    public struct DataSourceDescription
+    public class DataSourceDescription
     {
         /// <summary>
         /// The location of the data source.
         /// </summary>
-        public DataSourceLocation source;
+        public DataSourceLocation source { get; set; }
 
         /// <summary>
         /// Options related to the data source.
         /// </summary>
-        public DataSourceOptions options;
+        public DataSourceOptions options { get; set; }
 
         /// <summary>
         /// The name of the database table associated with the data source.
         /// </summary>
-        public string table_name;
+        public string table_name { get; set; }
 
         /// <summary>
         /// the delimiter used in the csv datasource.
         /// </summary>
-        public char delimiter;
+        public char delimiter { get; set; }
 
         /// <summary>
         /// The relevant columns that should be imported from the datasource.
         /// </summary>
-        public List<DataSourceColumn> table_cols;
+        public List<DataSourceColumn> table_cols { get; set; }
 
-        public struct DataSourceLocation
+        public class DataSourceLocation
         {
             /// <summary>
             /// The type of location. options: filepath | URL
             /// </summary>
-            public string type;
+            public string type { get; set; }
 
             /// <summary>
             /// The actual location.
             /// </summary>
-            public string location;
+            public string location { get; set; }
         }
 
-        public struct DataSourceOptions
+        public class DataSourceOptions
         {
             /// <summary>
             /// The number of initial lines to skip while reading the data source.
             /// </summary>
-            public int skip_lines;
+            public int skip_lines {get; set;}
 
             /// <summary>
             /// Indicates whether to discard rows with null values.
             /// </summary>
-            public bool discard_null_rows;
+            public bool discard_null_rows {get; set;}
         }
 
-        public struct DataSourceColumn
+        public class DataSourceColumn
         {
             /// <summary>
             /// The name of the column in the datasource.
             /// </summary>
-            public string name;
+            public string name {get; set;}
 
             /// <summary>
             /// The name of the column in the database table.
             /// </summary>
-            public string name_in_table;
+            public string name_in_table { get; set; }
 
+            private string mType = "VARCHAR(500)";
             /// <summary>
             /// The data type of the column.
-            /// </summary>
-            public string type;
+            public string type {
+                get => mType;
+                set => mType = value;
+            }
 
             /// <summary>
             /// True if the column is not nullable in the database.
             /// </summary>
-            public bool is_not_nullable;
+            [DefaultValue(false)]
+            public bool is_not_nullable { get; set; }
         }
     }
-
 }

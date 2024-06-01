@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using BIE.Data;
-using System.Configuration;
-using System.Data;
-using System.Xml.Linq;
 using BIE.DataPipeline.Import;
 using System.Data.Common;
 
@@ -14,22 +7,38 @@ namespace BIE.DataPipeline
 {
     internal class DBHelper
     {
-        /// <summary>
-        /// To create connection with DB
-        /// </summary>
-        internal static void CreateDBConnection()
+        private string mInputQueryString;
+        private StringBuilder mStringBuilder;
+
+        private int mCount;
+        private int maxCount = 900;
+
+        public DBHelper()
         {
             ConfigureEnviornmentVaraiables();
+            mStringBuilder = new StringBuilder();
+        }
+        
+        /// <summary>
+        /// Set the main INSERT INTO QueryString.
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="columnNames"></param>
+        public void SetInfo(string tableName, string columnNames)
+        {
+            mInputQueryString = "INSERT INTO " + tableName + " ( " + columnNames + " ) " + " VALUES ";
+
+            mStringBuilder.Append(mInputQueryString);
         }
 
         /// <summary>
         /// To create table in DB
         /// </summary>
         /// <param name="description"></param>
-        internal static void CreateTable(DataSourceDescription description)
+        internal void CreateTable(DataSourceDescription description)
         {
             Console.WriteLine("Creating Table...");
-            
+
             var db = Database.Instance;
             string query = "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '" +
                            description.table_name + "')\r\nBEGIN CREATE TABLE " + description.table_name;
@@ -42,25 +51,47 @@ namespace BIE.DataPipeline
             query += "); END";
             DbCommand cmd = db.CreateCommand(query);
             db.Execute(cmd);
-            
+
             Console.WriteLine("Table created.");
         }
 
+
         /// <summary>
-        /// To insert data into DB
+        /// Insert Data into the Table. Inserts will be bundled.
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="columnNames"></param>
         /// <param name="values"></param>
-        internal static void InsertData(string tableName, string columnNames, string values)
+        internal void InsertData(string values)
         {
-            var db = Database.Instance;
-            string query = "INSERT INTO " + tableName + " ( " + columnNames + " ) " + " VALUES " + " ( " + values +
-                           " );";
-            // Console.WriteLine(query);
+            // var query = mInputQueryString + $"({values});";
+
+            if (mCount > 0)
+            {
+                mStringBuilder.Append(',');
+            }
+
+            mStringBuilder.Append($"({values})");
+
+            mCount++;
+            if (mCount >= maxCount)
+            {
+                ExecuteInsert();
+            }
+        }
+
+        /// <summary>
+        /// Execute the Actual Insert Statement.
+        /// </summary>
+        private void ExecuteInsert()
+        {
+            mStringBuilder.Append(';');
+            var query = mStringBuilder.ToString();
+
             try
             {
-                DbCommand cmd = db.CreateCommand(query);
+                var db = Database.Instance;
+                var cmd = db.CreateCommand(query);
                 db.Execute(cmd);
             }
             catch (Exception e)
@@ -68,12 +99,16 @@ namespace BIE.DataPipeline
                 Console.WriteLine("Failed at:\n" + query);
                 throw;
             }
+
+            mCount = 0;
+            mStringBuilder.Clear();
+            mStringBuilder.Append(mInputQueryString);
         }
 
         /// <summary>
         /// To set enviornment variables
         /// </summary>
-        private static void ConfigureEnviornmentVaraiables()
+        private void ConfigureEnviornmentVaraiables()
         {
             var dbServer = Environment.GetEnvironmentVariable("DB_SERVER");
             var dbName = Environment.GetEnvironmentVariable("DB_NAME");
