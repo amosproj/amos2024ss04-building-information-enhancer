@@ -3,10 +3,9 @@ import defaultCityLocationData from "./FeatureCollection.json";
 import defaultPolygonData from "./output1000.json";
 import { LatLngBounds } from "leaflet";
 import { useContext, useEffect, useState } from "react";
-import { TabProps, TabsContext } from "../../contexts/TabsContext";
+import { TabsContext } from "../../contexts/TabsContext";
 import { AlertContext } from "../../contexts/AlertContext";
 import axios from "axios";
-import { MapContext } from "../../contexts/MapContext";
 const geojsonCities: FeatureCollection =
   defaultCityLocationData as FeatureCollection;
 const geojsonGemeindenPolygons: FeatureCollection =
@@ -85,7 +84,6 @@ const useGeoData = (
 
       return;
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const fetchData = async (bounds: LatLngBounds): Promise<void> => {
       try {
         // Define the query parameters

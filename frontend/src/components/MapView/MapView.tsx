@@ -19,6 +19,7 @@ import { TabProps, TabsContext } from "../../contexts/TabsContext";
 import { FeatureCollection } from "geojson";
 import { Dataset } from "../DatasetsList/DatasetsList";
 import MapDatasetVisualizer from "./MapDatasetVisualizer";
+import MapEventsHandler from "./MapEventsHandler";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -104,29 +105,6 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
         zoomControl={false}
       >
         <ZoomControl position="topright" />
-        {pinnedFeatureCollections.map((dataset: Dataset, index: number) => (
-          <GeoJSON
-            style={{ fillOpacity: 0.1 }}
-            key={index}
-            data={dataset.data}
-            pointToLayer={(_geoJsonPoint, latlng: LatLng) => {
-              if (dataset.markerIcon)
-                return L.marker(latlng, { icon: dataset.markerIcon });
-              else return L.marker(latlng);
-            }}
-          />
-        ))}
-        {!isCurrentDataPinned && geoData && (
-          <GeoJSON
-            style={{ fillOpacity: 0.1 }}
-            data={geoData}
-            pointToLayer={(_geoJsonPoint, latlng: LatLng) => {
-              if (tabProps && tabProps.dataset.markerIcon)
-                return L.marker(latlng, { icon: tabProps.dataset.markerIcon });
-              else return L.marker(latlng);
-            }}
-          />
-        )}*/}
 
         {pinnedFeatureCollections.map((dataset: Dataset, index: number) => (
           <MapDatasetVisualizer dataset={dataset} key={index} />

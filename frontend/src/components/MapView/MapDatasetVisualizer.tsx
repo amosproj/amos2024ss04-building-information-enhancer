@@ -7,7 +7,6 @@ import { TabsContext } from "../../contexts/TabsContext";
 import useGeoData from "./DataFetch";
 import L from "leaflet";
 import { LatLngBounds } from "leaflet";
-import proj4 from "proj4";
 import "proj4leaflet";
 
 interface MapDatasetVisualizerProps {
@@ -19,7 +18,7 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
 }) => {
   const map = useMap();
   const { currentMapCache } = useContext(MapContext);
-  const { currentTabsCache, setCurrentTabsCache } = useContext(TabsContext);
+  const { setCurrentTabsCache } = useContext(TabsContext);
 
   const updateDatasetData = useCallback(
     (newData: FeatureCollection, bounds: LatLngBounds) => {
@@ -52,31 +51,31 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
     currentMapCache.zoom,
     updateDatasetData
   );
+  const myCRS = new L.Proj.CRS(
+    "EPSG:25832",
+    "+proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+  );
+  const coordsToLatLng = (coords: number[]) => {
+    const latLng = myCRS.unproject(L.point(coords[0], coords[1]));
+    return latLng;
+  };
 
   useEffect(() => {
     if (!geoData) return;
 
-    // todo: if type is marker do this, dont do this with areas
     if (dataset.id === "house_footprints") {
       console.log("hi from data visualizer");
 
-      const myCRS = new L.Proj.CRS(
-        "EPSG:25832",
-        "+proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
-      );
-
-      function coordsToLatLng1(coords: number[]) {
-        var latLng = myCRS.unproject(L.point(coords[0], coords[1]));
-        return latLng;
-      }
-
       if (currentMapCache.zoom < 13) {
         const markerClusterGroup = L.markerClusterGroup();
-        const g = L.geoJson(geoData, {
-          coordsToLatLng: coordsToLatLng1,
-          onEachFeature: function (feature, layer) {
+        L.geoJson(geoData, {
+          coordsToLatLng: coordsToLatLng,
+          onEachFeature: function (feature, featureLayer) {
             if (feature.geometry.type === "Polygon") {
-              const center = layer.getBounds().getCenter();
+              const bounds = (
+                featureLayer as unknown as { getBounds: () => L.LatLngBounds }
+              ).getBounds();
+              const center = bounds.getCenter();
               const marker = L.marker(center);
               marker.addTo(markerClusterGroup);
               console.log(center);
@@ -116,7 +115,7 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
         map.removeLayer(markerClusterGroup);
       };
     }
-  }, [dataset.markerIcon, currentMapCache.zoom, map, geoData]);
+  }, [dataset, currentMapCache.zoom, map, geoData]);
 
   return null;
 };
