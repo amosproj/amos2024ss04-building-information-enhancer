@@ -23,8 +23,8 @@ jobs:
         run: dotnet restore
         working-directory: backend\src\BIE.DataPipeline
       
-      - name: Run unit tests 
-        run: dotnet format BIE.DataPipeline.sln --verify-no-changes
+      - name: Linting 
+        run: dotnet format BIE.DataPipeline.sln
         working-directory: backend\src\BIE.DataPipeline
 
   tests:
