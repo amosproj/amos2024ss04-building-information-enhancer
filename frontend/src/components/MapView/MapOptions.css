@@ -1,22 +1,53 @@
-.search-map-icon {
-  width: 2rem;
-  height: 2rem;
+.search-map-icon-container {
+  width: 2.1rem;
+  height: 2.1rem;
   position: absolute;
-  bottom: 1.5rem;
-  right: 1rem;
+  top: 7.5rem;
+  right: 0.6rem;
   cursor: pointer;
   z-index: 2;
   display: flex;
   flex-direction: column;
+  background-color: white;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid rgba(0, 0, 0, 0.27);
+  box-shadow: none;
 }
-.switch-map-icon {
-  width: 2rem;
-  height: 2rem;
+
+.search-map-icon-container:hover {
+  background-color: #f4f4f4;
+  color: #535bf2;
+}
+
+.search-map-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.layers-map-icon-container {
+  width: 2.1rem;
+  height: 2.1rem;
   position: absolute;
-  bottom: 4rem;
-  right: 1rem;
+  top: 5rem;
+  right: 0.6rem;
   cursor: pointer;
   z-index: 2;
   display: flex;
   flex-direction: column;
+  background-color: white;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid rgba(0, 0, 0, 0.27);
+  box-shadow: none;
+}
+
+.layers-map-icon-container:hover {
+  background-color: #f4f4f4;
+  color: #535bf2;
+}
+
+.layers-map-icon {
+  width: 1.5rem;
+  height: 1.5rem;
 }

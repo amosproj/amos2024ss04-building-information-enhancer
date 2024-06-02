@@ -6,7 +6,12 @@ import {
   ListItemButton,
   ListItemText,
 } from "@mui/material";
-import { ChargingStation, Icon, Blueprint } from "@phosphor-icons/react";
+import {
+  ChargingStation,
+  Icon,
+  Blueprint,
+  MapTrifold,
+} from "@phosphor-icons/react";
 import { useContext } from "react";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
 
@@ -17,12 +22,19 @@ import L, { Icon as LIcon, DivIcon } from "leaflet";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 
+// Enum for types of markers
+enum MarkersTypes {
+  Markers = "markers", // Map will display single coordinates with markers on top.
+  Areas = "areas", // Map will display polygon areas.
+  None = "none", // Map will not display anything.
+}
+
 // Dataset Type
 export type Dataset = {
   id: string;
   displayName: string;
   description: string;
-  type: string;
+  type: MarkersTypes;
   datasetIcon: Icon;
   markerIcon: LIcon | DivIcon | undefined;
   data: FeatureCollection;
@@ -53,10 +65,19 @@ const divIconChargingStation: DivIcon = L.divIcon({
 
 const datasetsData: Dataset[] = [
   {
+    id: "empty_map",
+    displayName: "Empty Map",
+    description: "An empty, default map of Germany, with no data loaded.",
+    type: MarkersTypes.None,
+    datasetIcon: MapTrifold,
+    markerIcon: undefined,
+    data: emptyFeatureCollection,
+  },
+  {
     id: "charging_stations",
     displayName: "Charging stations",
     description: "Locations of all charging stations in Germany.",
-    type: "markers",
+    type: MarkersTypes.Markers,
     datasetIcon: ChargingStation,
     markerIcon: divIconChargingStation,
     data: emptyFeatureCollection,
@@ -65,7 +86,7 @@ const datasetsData: Dataset[] = [
     id: "house_footprints",
     displayName: "House Footprints",
     description: "Footprints for the hauses.",
-    type: "areas",
+    type: MarkersTypes.Areas,
     datasetIcon: Blueprint,
     markerIcon: undefined,
     data: emptyFeatureCollection,

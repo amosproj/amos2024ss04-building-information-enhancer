@@ -12,7 +12,6 @@ const geojsonGemeindenPolygons: FeatureCollection =
 
 // Define the base of the API URL
 const getBaseApiUrl = () => {
-  console.log("Checking base url: " + import.meta.env.VITE_STAGE);
   switch (import.meta.env.VITE_STAGE) {
     case "production":
       return `http://${import.meta.env.VITE_API_HOST_PRODUCTION}:${
@@ -23,10 +22,10 @@ const getBaseApiUrl = () => {
         import.meta.env.VITE_API_PORT_TEST
       }`;
     default:
-      return `http://${import.meta.env.VITE_API_HOST_DEV}:${
-        import.meta.env.VITE_API_PORT_DEV
-      }`;
   }
+  return `http://${import.meta.env.VITE_API_HOST_DEV}:${
+    import.meta.env.VITE_API_PORT_DEV
+  }`;
 };
 
 const useGeoData = (
@@ -41,6 +40,8 @@ const useGeoData = (
   // Returns the API URL of the endpoint for a specific dataset
   const getApiUrlForDataset = (): string => {
     switch (id) {
+      case "empty_map":
+        return "";
       case "charging_stations":
         return getBaseApiUrl() + "/api/v1.0/Dataset/1/data";
       case "house_footprints":
@@ -59,6 +60,10 @@ const useGeoData = (
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const fetchData = async (_bounds: LatLngBounds): Promise<void> => {
+      // Skip if just an empty map was loaded
+      if (id === "empty_map") {
+        return;
+      }
       try {
         // const bottomLat = bounds.getSouth();
         // const bottomLong = bounds.getWest();
@@ -73,6 +78,7 @@ const useGeoData = (
           TopLong: 49, //topLong,
           ZoomLevel: zoom,
         };
+        console.log(getApiUrlForDataset());
         const response = await axios.get<FeatureCollection<Geometry>>(
           getApiUrlForDataset(),
           {
@@ -83,11 +89,11 @@ const useGeoData = (
         onUpdate(response.data);
       } catch (error) {
         // Display alert
-        setCurrentAlertCache({
-          ...currentAlertCache,
-          isAlertOpened: true,
-          text: "Fetching data failed, using local GeoJSON data.",
-        });
+        // setCurrentAlertCache({
+        //   ...currentAlertCache,
+        //   isAlertOpened: true,
+        //   text: "Fetching data failed, using local GeoJSON data.",
+        // });
         console.error("Fetching data failed, using local GeoJSON data.", error);
         // Console log the error
         if (axios.isAxiosError(error)) {
