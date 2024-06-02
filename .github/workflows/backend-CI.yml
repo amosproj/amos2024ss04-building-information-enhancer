@@ -32,6 +32,12 @@ jobs:
     name: Run Tests
     runs-on: windows-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2.1.0
+        
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: backend\src\BIE.DataPipeline
       
       - name: Run unit tests 
         run: dotnet test
