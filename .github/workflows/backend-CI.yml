@@ -15,32 +15,6 @@ jobs:
   linting:
     name: Check linting
     runs-on: windows-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: '3.1.x'
-
-      - name: Restore dependencies
-        run: dotnet restore backend/src/BIE.DataPipeline/BIE.DataPipeline.sln
-
-      - name: Run NuGet restore
-        run: dotnet restore backend/src/BIE.DataPipeline/BIE.DataPipeline.sln
-
-      - name: Run .NET Code Analysis
-        uses: dotnet/code-analysis@v1
-        id: code-analysis
-        with:
-          build-breaking: false
-
-  tests:
-    needs: linting
-    name: Run Tests
-    runs-on: windows-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2.1.0
@@ -48,6 +22,16 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
         working-directory: backend\src\BIE.DataPipeline
+      
+      - name: Run unit tests 
+        run: dotnet format --verify-no-changes
+        working-directory: backend\src\BIE.DataPipeline
+
+  tests:
+    needs: linting
+    name: Run Tests
+    runs-on: windows-latest
+    steps:
       
       - name: Run unit tests 
         run: dotnet test
