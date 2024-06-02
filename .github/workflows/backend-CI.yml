@@ -24,7 +24,7 @@ jobs:
         working-directory: backend\src\BIE.DataPipeline
       
       - name: Run unit tests 
-        run: dotnet format --verify-no-changes
+        run: dotnet format BIE.DataPipeline.sln --verify-no-changes
         working-directory: backend\src\BIE.DataPipeline
 
   tests:
