@@ -1,6 +1,6 @@
 //import { useState } from "react";
-import { Stack } from "@phosphor-icons/react";
-import { useState } from "react";
+//import { Stack } from "@phosphor-icons/react";
+//import { useState } from "react";
 import { ArrowsClockwise } from "@phosphor-icons/react";
 import "./MapOptions.css";
 import { Tooltip } from "@mui/material";
