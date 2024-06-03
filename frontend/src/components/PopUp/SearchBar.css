@@ -1,0 +1,8 @@
+.search-field {
+    width: 150px; /* Initial width */
+    transition: width 0.5s; /* Apply transition only to width property */
+  }
+  
+.search-field:focus {
+    width: 100%; /* Expanded width on focus */
+}

@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Stack, MagnifyingGlass } from "@phosphor-icons/react";
 import "./MapOptions.css";
 import { Tooltip } from "@mui/material";
-import SearchPopUp from "../PopUp/SearchPopUp";
+//import SearchPopUp from "../PopUp/SearchPopUp";
+import SearchBar from "../PopUp/SearchBar";
 
 interface MapOptionsProps {
   toggleShowSatellite: () => void;
@@ -17,23 +18,26 @@ const MapOptions: React.FC<MapOptionsProps> = ({ toggleShowSatellite }) => {
 
   return (
     <div className="map-options-container">
-      <Tooltip arrow title="Search for an address" placement="right">
+      <div className="search-bar">
+      <SearchBar/>
+      </div>
+      {/* <Tooltip arrow title="Search for an address" placement="right">
         <div className="search-map-icon-container leaflet-bar leaflet-control leaflet-control-custom">
           <MagnifyingGlass
             className="search-map-icon"
             onClick={toggleIfOpenedDialog}
           />
         </div>
-      </Tooltip>
+      </Tooltip> */}
       <Tooltip arrow title="Switch layers" placement="right">
         <div className="layers-map-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom">
           <Stack className="layers-map-icon" onClick={toggleShowSatellite} />
         </div>
       </Tooltip>
-      <SearchPopUp
+      {/* <SearchPopUp
         onToggleIfOpenedDialog={toggleIfOpenedDialog}
         ifOpenedDialog={ifOpenedDialog}
-      />
+      /> */}
     </div>
   );
 };
