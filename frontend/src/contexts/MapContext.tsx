@@ -7,6 +7,7 @@ import React, { createContext, useState, ReactNode } from "react";
 export type MapCacheProps = {
   mapInstance: L.Map | null;
   selectedCoordinates: LatLng | null;
+  loadedCoordinates: LatLng | null;
   mapCenter: LatLng;
   mapBounds: LatLngBounds;
   zoom: number;
@@ -28,7 +29,8 @@ type MapContextProviderProps = {
 // Default Map Cache
 const defaultMapCache: MapCacheProps = {
   mapInstance: null,
-  selectedCoordinates: null,
+  selectedCoordinates: null, // The coordinates selected by the use on the map
+  loadedCoordinates: null, // The last coordinates loaded in the dataview panel
   mapCenter: L.latLng([49.5732, 11.0288]),
   mapBounds: L.latLngBounds([49.5732, 11.0288], [49.5732, 11.0288]),
   zoom: 13,

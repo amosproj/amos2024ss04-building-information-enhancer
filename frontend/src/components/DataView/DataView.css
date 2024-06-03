@@ -8,6 +8,23 @@
   position: relative;
 }
 
+.dataview-empty {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.dataview-empty h2 {
+  margin-top: 0;
+}
+
+.dataview-empty-button {
+  width: 50%;
+  margin-top: 4rem;
+}
+
 .dataview-header-container {
   display: flex;
   width: 100%;

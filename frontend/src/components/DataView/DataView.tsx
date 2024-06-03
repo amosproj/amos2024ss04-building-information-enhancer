@@ -1,11 +1,11 @@
 import DataPanel from "./DataPanel";
 import "./DataView.css";
-import Button from "@mui/material/Button";
 import { Fragment, useContext, useEffect, useState } from "react";
 import { TabsContext } from "../../contexts/TabsContext";
 import { Box, TextField } from "@mui/material";
-import { ArrowsClockwise, Funnel, MapPin } from "@phosphor-icons/react";
+import { Funnel, MapPin, Warning } from "@phosphor-icons/react";
 import { MapContext } from "../../contexts/MapContext";
+import LoadDataButton from "./LoadDataButton";
 
 function DataView() {
   // Access the tabs context
@@ -13,11 +13,8 @@ function DataView() {
   // Filter data
   const [filterValue, setFilterValue] = useState("");
   // Map selection - Reload data
-  const { currentMapCache } = useContext(MapContext);
+  const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
   const [ifNeedsReloading, setIfNeedsReloading] = useState(false);
-  const [lastSelectedCoords, setLastSelectedCoords] = useState(
-    currentMapCache.selectedCoordinates
-  );
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilterValue(event.target.value);
@@ -38,58 +35,73 @@ function DataView() {
     if (
       !ifNeedsReloading &&
       currentMapCache.selectedCoordinates !== null &&
-      lastSelectedCoords !== currentMapCache.selectedCoordinates
+      currentMapCache.loadedCoordinates !== currentMapCache.selectedCoordinates
     ) {
       setIfNeedsReloading(true);
     }
-    setLastSelectedCoords(currentMapCache.selectedCoordinates);
-  }, [currentMapCache, ifNeedsReloading, lastSelectedCoords]);
+  }, [currentMapCache, ifNeedsReloading]);
 
   const reloadData = () => {
     setIfNeedsReloading(false);
+    setCurrentMapCache({
+      ...currentMapCache,
+      loadedCoordinates: currentMapCache.selectedCoordinates,
+    });
   };
 
   return (
     <div className="dataview-container">
-      <div className="dataview-header-container">
-        <b className="dataview-header-title">
-          <MapPin size={20} /> Nuremberg
-        </b>
-        <Box id="filter-panel">
-          <TextField
-            label={
-              <div className="search-box-label">
-                <Funnel size={20} /> Filter data
-              </div>
-            }
-            variant="outlined"
-            size="small"
-            value={filterValue}
-            onChange={handleFilterChange}
+      {currentMapCache.loadedCoordinates ? (
+        <Fragment>
+          <div className="dataview-header-container">
+            <b className="dataview-header-title">
+              <MapPin size={20} /> Nuremberg
+            </b>
+            <Box id="filter-panel">
+              <TextField
+                label={
+                  <div className="search-box-label">
+                    <Funnel size={20} /> Filter data
+                  </div>
+                }
+                variant="outlined"
+                size="small"
+                value={filterValue}
+                onChange={handleFilterChange}
+              />
+            </Box>
+          </div>
+          <DataPanel
+            listTitle={getCurrentTabTitle()}
+            filterValue={filterValue}
           />
-        </Box>
-      </div>
-      <DataPanel listTitle={getCurrentTabTitle()} filterValue={filterValue} />
-      {ifNeedsReloading ? (
-        <div className="load-data-container">
-          <div className="load-data-button" onClick={reloadData}>
-            <Button
-              variant="contained"
-              color={ifNeedsReloading ? "warning" : "info"}
-            >
-              {ifNeedsReloading ? (
-                <div className="load-data-reload">
-                  <ArrowsClockwise />
-                  Reload Data
-                </div>
-              ) : (
-                "Load data"
-              )}
-            </Button>
+          {ifNeedsReloading ? (
+            <div className="load-data-container">
+              <div className="load-data-button" onClick={reloadData}>
+                <LoadDataButton
+                  disabled={false}
+                  ifNeedsReloading={ifNeedsReloading}
+                />
+              </div>
+            </div>
+          ) : (
+            <Fragment />
+          )}
+        </Fragment>
+      ) : (
+        <div className="dataview-empty">
+          <Warning size={100} />
+          <h2>No coordinates selected</h2>
+          <span>Click on the map, to select a new location</span>
+          <div className="dataview-empty-button">
+            <div onClick={reloadData}>
+              <LoadDataButton
+                disabled={currentMapCache.selectedCoordinates ? false : true}
+                ifNeedsReloading={ifNeedsReloading}
+              />
+            </div>
           </div>
         </div>
-      ) : (
-        <Fragment />
       )}
     </div>
   );
