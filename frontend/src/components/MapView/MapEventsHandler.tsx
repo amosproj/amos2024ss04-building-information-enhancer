@@ -43,6 +43,7 @@ const MapEventsHandler = () => {
       });
     },
     moveend: (event) => {
+      console.log("updates");
       setCurrentMapCache({
         ...currentMapCache,
         mapCenter: event.target.getCenter(),
