@@ -88,12 +88,6 @@ const generateData = () => {
         key: "Biodiversity Index",
         value: `${randomNumber(0, 1, 1)} (Shannon Diversity)`,
       },
-      {
-        id: 2,
-        key: "Income Inequality",
-        value: `${randomNumber(0, 1, 2)}`,
-        button: 1,
-      },
     ],
   };
 };
