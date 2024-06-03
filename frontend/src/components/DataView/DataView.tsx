@@ -1,18 +1,20 @@
 import DataPanel from "./DataPanel";
 import "./DataView.css";
 import Button from "@mui/material/Button";
-import TabPanel from "@mui/lab/TabPanel/TabPanel";
-import TabContext from "@mui/lab/TabContext/TabContext";
-import Tab from "@mui/material/Tab/Tab";
-import TabList from "@mui/lab/TabList/TabList";
-import { CaretDown } from "@phosphor-icons/react";
 import { useContext, useState } from "react";
 import { TabsContext } from "../../contexts/TabsContext";
-import SearchPopUp from "../PopUp/SearchPopUp";
+import { Box, TextField } from "@mui/material";
+import { Funnel, MapPin } from "@phosphor-icons/react";
 
 function DataView() {
   // Access the tabs context
   const { currentTabsCache } = useContext(TabsContext);
+  // Filter data
+  const [filterValue, setFilterValue] = useState("");
+
+  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFilterValue(event.target.value);
+  };
 
   // Function to always return the title of the currently opened tab
   const getCurrentTabTitle = (): string => {
@@ -24,53 +26,29 @@ function DataView() {
     return currentTab ? currentTab.dataset.displayName : "No map loaded";
   };
 
-  // Stores the state of if the search popup is open
-  const [ifOpenedDialog, setIfOpenedDialog] = useState(false);
-  const toggleIfOpenedDialog = () => {
-    setIfOpenedDialog(!ifOpenedDialog);
-  };
-
   return (
     <div className="dataview-container">
-      <TabContext value="1">
-        <div className="tab-list-container">
-          <TabList
-            variant="scrollable"
-            scrollButtons="auto"
-            onChange={() => {}}
-            aria-label="lab API multimap tabs"
-            selectionFollowsFocus
-          >
-            <Tab
-              label={
-                <div className="dataview-title-container">
-                  <span>Nuremberg</span>
-                  <div className="favourite-icon-container">
-                    <CaretDown
-                      weight="bold"
-                      className="location-icon"
-                      onClick={toggleIfOpenedDialog}
-                    />
-                    <SearchPopUp
-                      onToggleIfOpenedDialog={toggleIfOpenedDialog}
-                      ifOpenedDialog={ifOpenedDialog}
-                    ></SearchPopUp>
-                  </div>
-                </div>
-              }
-              value="1"
-            ></Tab>
-          </TabList>
+      <div className="dataview-header-container">
+        <div className="dataview-header-title">
+          <MapPin size={20} /> Nuremberg
         </div>
-        <TabPanel value="1" className="tab dataview-tab">
-          <div className="datapanels-container">
-            <div className="data-panels-container">
-              <DataPanel listTitle={getCurrentTabTitle()} />
-            </div>
-            <Button variant="outlined">Load data</Button>
-          </div>
-        </TabPanel>
-      </TabContext>
+        <Box id="filter-panel">
+          <TextField
+            label={
+              <div className="search-box-label">
+                <Funnel size={20} /> Filter data
+              </div>
+            }
+            variant="outlined"
+            size="small"
+            value={filterValue}
+            onChange={handleFilterChange}
+            fullWidth
+          />
+        </Box>
+      </div>
+      <DataPanel listTitle={getCurrentTabTitle()} filterValue={filterValue} />
+      <Button variant="outlined">Load data</Button>
     </div>
   );
 }
