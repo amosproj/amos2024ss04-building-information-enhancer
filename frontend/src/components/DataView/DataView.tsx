@@ -1,20 +1,108 @@
 import DataPanel from "./DataPanel";
 import "./DataView.css";
-import Button from "@mui/material/Button";
-import TabPanel from "@mui/lab/TabPanel/TabPanel";
-import TabContext from "@mui/lab/TabContext/TabContext";
-import Tab from "@mui/material/Tab/Tab";
-import TabList from "@mui/lab/TabList/TabList";
-import { CaretDown } from "@phosphor-icons/react";
-import { useContext, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { TabsContext } from "../../contexts/TabsContext";
-import SearchPopUp from "../PopUp/SearchPopUp";
+import { Box, TextField } from "@mui/material";
+import { Funnel, MapPin, MapPinLine } from "@phosphor-icons/react";
+import { MapContext } from "../../contexts/MapContext";
+import LoadDataButton from "./LoadDataButton";
+
+const randomNumber = (
+  min: number,
+  max: number,
+  precision: number = 0
+): number => {
+  const factor = Math.pow(10, precision);
+  const randomValue = Math.random() * (max - min) + min;
+  return Math.round(randomValue * factor) / factor;
+};
+
+const randomGrade = (): string => {
+  const grades = ["A", "B", "C", "D", "E", "F"];
+  const randomIndex = Math.floor(Math.random() * grades.length);
+  return grades[randomIndex];
+};
+
+const generateData = () => {
+  return {
+    mapRows: [
+      {
+        id: 1,
+        key: "Pollution Level",
+        value: `${randomNumber(950, 1050)} (Moore Scale)`,
+        button: 0,
+      },
+      {
+        id: 2,
+        key: "Resource Efficiency",
+        value: `${randomNumber(30, 100)}%`,
+        button: 1,
+      },
+      {
+        id: 3,
+        key: "Socio-economic Evaluation",
+        value: `Grade ${randomGrade()}`,
+      },
+      {
+        id: 4,
+        key: "Carbon Footprint",
+        value: `${randomNumber(5, 10, 2)} CO2 m^2 (per capita)`,
+      },
+      {
+        id: 5,
+        key: "Ecosystem Integrity",
+        value: `Grade ${randomGrade()}`,
+        button: 1,
+      },
+    ],
+    genericRows: [
+      {
+        id: 1,
+        key: "Native vegetation",
+        value: `${randomNumber(30, 100)}%`,
+        button: 0,
+      },
+      {
+        id: 2,
+        key: "Municipal Waste Recycled",
+        value: `${randomNumber(30, 100)}%`,
+        button: 1,
+      },
+      { id: 3, key: "Poverty Rate", value: `${randomNumber(30, 100)}%` },
+      {
+        id: 4,
+        key: "Energy Consumption",
+        value: `${randomNumber(100, 300)} kWh per capita`,
+        button: 1,
+      },
+      {
+        id: 5,
+        key: "Green Space Coverage",
+        value: `${randomNumber(30, 100)}%`,
+        button: 1,
+      },
+    ],
+    extraRows: [
+      {
+        id: 1,
+        key: "Biodiversity Index",
+        value: `${randomNumber(0, 1, 1)} (Shannon Diversity)`,
+      },
+    ],
+  };
+};
 
 function DataView() {
-  // Access the tabs context
   const { currentTabsCache } = useContext(TabsContext);
+  const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
+  const [filterValue, setFilterValue] = useState("");
+  const [ifNeedsReloading, setIfNeedsReloading] = useState(false);
+  const [data, setData] = useState(generateData());
 
-  // Function to always return the title of the currently opened tab
+  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFilterValue(event.target.value);
+  };
+
   const getCurrentTabTitle = (): string => {
     const currentTabID = currentTabsCache.currentTabID.toString();
     const currentTab = currentTabsCache.openedTabs.find(
@@ -24,53 +112,83 @@ function DataView() {
     return currentTab ? currentTab.dataset.displayName : "No map loaded";
   };
 
-  // Stores the state of if the search popup is open
-  const [ifOpenedDialog, setIfOpenedDialog] = useState(false);
-  const toggleIfOpenedDialog = () => {
-    setIfOpenedDialog(!ifOpenedDialog);
+  useEffect(() => {
+    if (
+      !ifNeedsReloading &&
+      currentMapCache.selectedCoordinates !== null &&
+      currentMapCache.loadedCoordinates !== currentMapCache.selectedCoordinates
+    ) {
+      setIfNeedsReloading(true);
+    }
+  }, [currentMapCache, ifNeedsReloading]);
+
+  const reloadData = () => {
+    setIfNeedsReloading(false);
+    setCurrentMapCache({
+      ...currentMapCache,
+      loadedCoordinates: currentMapCache.selectedCoordinates,
+    });
+    setData(generateData());
   };
 
   return (
     <div className="dataview-container">
-      <TabContext value="1">
-        <div className="tab-list-container">
-          <TabList
-            variant="scrollable"
-            scrollButtons="auto"
-            onChange={() => {}}
-            aria-label="lab API multimap tabs"
-            selectionFollowsFocus
-          >
-            <Tab
-              label={
-                <div className="dataview-title-container">
-                  <span>Nuremberg</span>
-                  <div className="favourite-icon-container">
-                    <CaretDown
-                      weight="bold"
-                      className="location-icon"
-                      onClick={toggleIfOpenedDialog}
-                    />
-                    <SearchPopUp
-                      onToggleIfOpenedDialog={toggleIfOpenedDialog}
-                      ifOpenedDialog={ifOpenedDialog}
-                    ></SearchPopUp>
+      {currentMapCache.loadedCoordinates ? (
+        <Fragment>
+          <div className="dataview-header-container">
+            <b className="dataview-header-title">
+              <MapPin size={20} /> Nuremberg
+            </b>
+            <Box id="filter-panel" style={{ maxWidth: "18rem", width: "100%" }}>
+              <TextField
+                style={{ width: "100%" }}
+                label={
+                  <div className="search-box-label">
+                    <Funnel size={20} /> Filter data
                   </div>
-                </div>
-              }
-              value="1"
-            ></Tab>
-          </TabList>
-        </div>
-        <TabPanel value="1" className="tab dataview-tab">
-          <div className="datapanels-container">
-            <div className="data-panels-container">
-              <DataPanel listTitle={getCurrentTabTitle()} />
-            </div>
-            <Button variant="outlined">Load data</Button>
+                }
+                variant="outlined"
+                size="small"
+                value={filterValue}
+                onChange={handleFilterChange}
+              />
+            </Box>
           </div>
-        </TabPanel>
-      </TabContext>
+          <DataPanel
+            listTitle={getCurrentTabTitle()}
+            filterValue={filterValue}
+            mapRows={data.mapRows}
+            genericRows={data.genericRows}
+            extraRows={data.extraRows}
+          />
+          {ifNeedsReloading ? (
+            <div className="load-data-container">
+              <div className="load-data-button" onClick={reloadData}>
+                <LoadDataButton
+                  disabled={false}
+                  ifNeedsReloading={ifNeedsReloading}
+                />
+              </div>
+            </div>
+          ) : (
+            <Fragment />
+          )}
+        </Fragment>
+      ) : (
+        <div className="dataview-empty">
+          <MapPinLine size={100} />
+          <h2>No coordinates selected</h2>
+          <span>Click on the map, to select a new location</span>
+          <div className="dataview-empty-button">
+            <div onClick={reloadData}>
+              <LoadDataButton
+                disabled={currentMapCache.selectedCoordinates ? false : true}
+                ifNeedsReloading={ifNeedsReloading}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
