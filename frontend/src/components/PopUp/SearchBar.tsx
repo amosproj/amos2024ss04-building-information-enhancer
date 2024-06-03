@@ -44,7 +44,7 @@ const SearchBar: React.FC = () => {
         }));
         callback(transformedResults);
       }, 400),
-    []
+    [provider]
   );
 
   useEffect(() => {
