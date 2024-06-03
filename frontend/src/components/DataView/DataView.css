@@ -25,6 +25,14 @@
   margin-top: 4rem;
 }
 
+.dataview-empty-button .MuiButtonBase-root {
+  width: 100%;
+}
+
+.dataview-empty-button .MuiButtonBase-root:focus {
+  outline: none;
+}
+
 .dataview-header-container {
   display: flex;
   width: 100%;
@@ -59,11 +67,11 @@
   width: 50%;
 }
 
-.MuiButtonBase-root {
+.load-data-container .MuiButtonBase-root {
   width: 100%;
 }
 
-.MuiButtonBase-root:focus {
+.load-data-container .MuiButtonBase-root:focus {
   outline: none;
 }
 
