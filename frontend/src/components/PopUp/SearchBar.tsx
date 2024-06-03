@@ -39,7 +39,7 @@ const SearchBar: React.FC = () => {
         }
         const results = await provider.search({ query });
         const transformedResults: MapSelection[] = results.map((result) => ({
-          coordinates: new LatLng(result.x, result.y),
+          coordinates: new LatLng(result.y, result.x),
           displayName: result.label,
         }));
         callback(transformedResults);
@@ -84,7 +84,6 @@ const SearchBar: React.FC = () => {
 
   const onItemSelected = (item: MapSelection) => {
     setTimeout(() => {
-      alert(item.displayName);
       flyToLocation(new LatLng(item.coordinates.lat, item.coordinates.lng));
     }, 400);
   };
@@ -92,7 +91,7 @@ const SearchBar: React.FC = () => {
   const flyToLocation = (targetPosition: LatLng) => {
     const { mapInstance } = currentMapCache;
     if (mapInstance) {
-      mapInstance.flyTo(targetPosition, 13, { animate: true, duration: 10 });
+      mapInstance.flyTo(targetPosition, 13, { animate: true, duration: 5 });
     } else console.log("no map instance");
   };
 
