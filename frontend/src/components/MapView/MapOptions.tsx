@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Stack, MagnifyingGlass } from "@phosphor-icons/react";
+//import { useState } from "react";
+import { Stack } from "@phosphor-icons/react";
 import "./MapOptions.css";
 import { Tooltip } from "@mui/material";
 //import SearchPopUp from "../PopUp/SearchPopUp";
@@ -11,10 +11,10 @@ interface MapOptionsProps {
 
 const MapOptions: React.FC<MapOptionsProps> = ({ toggleShowSatellite }) => {
   // Stores the state of if the search popup is open
-  const [ifOpenedDialog, setIfOpenedDialog] = useState(false);
-  const toggleIfOpenedDialog = () => {
-    setIfOpenedDialog(!ifOpenedDialog);
-  };
+  //const [ifOpenedDialog, setIfOpenedDialog] = useState(false);
+  // const toggleIfOpenedDialog = () => {
+  //   setIfOpenedDialog(!ifOpenedDialog);
+  // };
 
   return (
     <div className="map-options-container">

@@ -109,7 +109,7 @@ const SearchBar: React.FC = () => {
       filterSelectedOptions
       value={null}
       noOptionsText="No locations"
-      onChange={(event, newValue) => {
+      onChange={(_event, newValue) => {
         if (newValue) {
           const selectedLocation = {
             coordinates: newValue.coordinates,
@@ -118,7 +118,7 @@ const SearchBar: React.FC = () => {
           onItemSelected(selectedLocation);
         }
       }}
-      onInputChange={(event, newInputValue) => {
+      onInputChange={(_event, newInputValue) => {
         setInputValue(newInputValue);
       }}
       renderInput={(params) => (
