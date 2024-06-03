@@ -15,9 +15,5 @@
     "deploy:build": "docker compose up --build -d",
     "deploy:frontend:dev": "cd frontend/ && npm run dev",
     "deploy:backend:api": "cd backend/src/BIE.Core/BIE.Core.API/bin/build && BIE.Core.API"
-  },
-  "dependencies": {
-    "@types/leaflet.markercluster": "^1.5.4",
-    "leaflet.markercluster": "^1.5.3"
   }
 }
