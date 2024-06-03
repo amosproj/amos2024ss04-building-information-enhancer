@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { Fragment, useContext } from "react";
 import { Marker } from "react-leaflet/Marker";
 import { Popup } from "react-leaflet/Popup";
 import { useMap, useMapEvents } from "react-leaflet/hooks";
@@ -52,7 +52,7 @@ const MapEventsHandler = () => {
     },
   });
 
-  return (
+  return currentMapCache.selectedCoordinates !== null ? (
     <Marker position={currentMapCache.selectedCoordinates} icon={divIconMarker}>
       <Popup>
         <span
@@ -79,6 +79,8 @@ const MapEventsHandler = () => {
         </span>
       </Popup>
     </Marker>
+  ) : (
+    <Fragment />
   );
 };
 
