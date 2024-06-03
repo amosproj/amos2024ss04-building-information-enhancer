@@ -33,7 +33,7 @@ const columns: GridColDef[] = [
     width: 60,
     renderCell: renderDetailsButton,
   },
-  { field: "key", headerName: "key", width: 150 },
+  { field: "key", headerName: "key", width: 250 },
   {
     field: "value",
     headerName: "value",
@@ -43,29 +43,6 @@ const columns: GridColDef[] = [
   },
 ];
 
-// Data
-const mapRows = [
-  { id: 1, key: "Pollution Level", value: "1002 (Moore Scale)", button: 0 },
-  { id: 2, key: "Resource Efficiency", value: "57%", button: 1 },
-  { id: 3, key: "Socio-economic Evaluation", value: "Grade B" },
-  { id: 4, key: "Carbon Footprint", value: "7.72 CO2 m^2 (per capita)" },
-  { id: 5, key: "Ecosystem Integrity", value: "Grade C", button: 1 },
-];
-
-const genericRows = [
-  { id: 1, key: "Native vegetation", value: "75%", button: 0 },
-  { id: 2, key: "Municipal Waste Recycled", value: "85%", button: 1 },
-  { id: 3, key: "Poverty Rate", value: "12%" },
-  { id: 4, key: "Energy Consumption", value: "250 kWh per capita", button: 1 },
-  { id: 5, key: "Green Space Coverage", value: "30%", button: 1 },
-];
-
-// Data
-const extraRows = [
-  { id: 1, key: "Biodiversity Index", value: "0.8 (Shannon Diversity)" },
-  { id: 2, key: "Income Inequality", value: "0.45", button: 1 },
-];
-
 function MyCustomToolbar(props: GridToolbarProps) {
   return <GridToolbar {...props} />;
 }
@@ -73,13 +50,22 @@ function MyCustomToolbar(props: GridToolbarProps) {
 interface DataPanelProps {
   listTitle: string;
   filterValue: string;
+  mapRows: object[];
+  genericRows: object[];
+  extraRows: object[];
 }
 
 /*
   This component displays a mui DataGrid.
   Depending on the value of the "button" column, a map icon with the hover "open as map" is shown
 */
-const DataPanel: React.FC<DataPanelProps> = ({ listTitle, filterValue }) => {
+const DataPanel: React.FC<DataPanelProps> = ({
+  listTitle,
+  filterValue,
+  mapRows,
+  genericRows,
+  extraRows,
+}) => {
   // Keep track of if tabs are hidden
   const [ifMapDataTabHidden, toggleMapDataHidden] = useState<boolean>(false);
   const [ifGeneralDataTabHidden, toggleGeneralDataHidden] =
@@ -147,6 +133,7 @@ const DataPanel: React.FC<DataPanelProps> = ({ listTitle, filterValue }) => {
             }}
             density="compact"
             disableRowSelectionOnClick
+            autoHeight
           />
         </Grid>
       </div>
@@ -208,6 +195,7 @@ const DataPanel: React.FC<DataPanelProps> = ({ listTitle, filterValue }) => {
             }}
             density="compact"
             disableRowSelectionOnClick
+            autoHeight
           />
         </Grid>
       </div>
@@ -269,6 +257,7 @@ const DataPanel: React.FC<DataPanelProps> = ({ listTitle, filterValue }) => {
             }}
             density="compact"
             disableRowSelectionOnClick
+            autoHeight
           />
         </Grid>
       </div>
