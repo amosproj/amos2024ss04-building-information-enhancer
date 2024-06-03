@@ -57,8 +57,9 @@ function DataView() {
             <b className="dataview-header-title">
               <MapPin size={20} /> Nuremberg
             </b>
-            <Box id="filter-panel">
+            <Box id="filter-panel" style={{ maxWidth: "18rem", width: "100%" }}>
               <TextField
+                style={{ width: "100%" }}
                 label={
                   <div className="search-box-label">
                     <Funnel size={20} /> Filter data

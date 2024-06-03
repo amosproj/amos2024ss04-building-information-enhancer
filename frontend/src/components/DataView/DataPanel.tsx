@@ -38,25 +38,32 @@ const columns: GridColDef[] = [
     field: "value",
     headerName: "value",
     type: "number",
-    width: 150,
+    width: 250,
     getApplyQuickFilterFn: undefined,
   },
 ];
 
 // Data
-const rows = [
-  { id: 1, key: "sun hours", value: "20.5", button: 0 },
-  { id: 2, key: "height", value: "100", button: 1 },
-  { id: 3, key: "distance to X", value: "200" },
-  { id: 4, key: "sun hours", value: "21.5" },
-  { id: 5, key: "height", value: "300", button: 1 },
-  { id: 6, key: "distance to X", value: "400" },
-  { id: 7, key: "sun hours", value: "20.5", button: 0 },
-  { id: 8, key: "height", value: "100", button: 1 },
-  { id: 9, key: "distance to X", value: "200", button: 1 },
-  { id: 10, key: "sun hours", value: "21.5" },
-  { id: 11, key: "height", value: "300" },
-  { id: 12, key: "distance to X", value: "400" },
+const mapRows = [
+  { id: 1, key: "Pollution Level", value: "1002 (Moore Scale)", button: 0 },
+  { id: 2, key: "Resource Efficiency", value: "57%", button: 1 },
+  { id: 3, key: "Socio-economic Evaluation", value: "Grade B" },
+  { id: 4, key: "Carbon Footprint", value: "7.72 CO2 m^2 (per capita)" },
+  { id: 5, key: "Ecosystem Integrity", value: "Grade C", button: 1 },
+];
+
+const genericRows = [
+  { id: 1, key: "Native vegetation", value: "75%", button: 0 },
+  { id: 2, key: "Municipal Waste Recycled", value: "85%", button: 1 },
+  { id: 3, key: "Poverty Rate", value: "12%" },
+  { id: 4, key: "Energy Consumption", value: "250 kWh per capita", button: 1 },
+  { id: 5, key: "Green Space Coverage", value: "30%", button: 1 },
+];
+
+// Data
+const extraRows = [
+  { id: 1, key: "Biodiversity Index", value: "0.8 (Shannon Diversity)" },
+  { id: 2, key: "Income Inequality", value: "0.45", button: 1 },
 ];
 
 function MyCustomToolbar(props: GridToolbarProps) {
@@ -109,7 +116,7 @@ const DataPanel: React.FC<DataPanelProps> = ({ listTitle, filterValue }) => {
             hideFooter={true}
             disableColumnMenu
             columnHeaderHeight={0}
-            rows={rows}
+            rows={mapRows}
             columns={columns}
             slots={{
               toolbar: MyCustomToolbar,
@@ -170,7 +177,7 @@ const DataPanel: React.FC<DataPanelProps> = ({ listTitle, filterValue }) => {
             hideFooter={true}
             disableColumnMenu
             columnHeaderHeight={0}
-            rows={rows}
+            rows={genericRows}
             columns={columns}
             slots={{
               toolbar: MyCustomToolbar,
@@ -231,7 +238,7 @@ const DataPanel: React.FC<DataPanelProps> = ({ listTitle, filterValue }) => {
             hideFooter={true}
             disableColumnMenu
             columnHeaderHeight={0}
-            rows={rows}
+            rows={extraRows}
             columns={columns}
             slots={{
               toolbar: MyCustomToolbar,

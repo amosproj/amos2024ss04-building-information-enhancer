@@ -31,12 +31,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 0 1rem 0;
+  gap: 1rem;
 }
 
 .dataview-header-title {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  overflow-x: auto;
 }
 
 .dataview-title-container {
@@ -49,7 +51,7 @@
   display: flex;
   justify-content: center;
   position: absolute;
-  bottom: 2rem;
+  bottom: 1rem;
   left: 0;
 }
 
