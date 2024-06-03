@@ -2,6 +2,8 @@
 using System.Text;
 using YamlDotNet.Serialization;
 
+// ReSharper disable InconsistentNaming
+
 namespace BIE.DataPipeline.Import
 {
     internal static class YamlImporter
@@ -31,81 +33,119 @@ namespace BIE.DataPipeline.Import
         }
     }
 
-    internal struct DataSourceDescription
+    public class DataSourceDescription
     {
         /// <summary>
         /// The location of the data source.
         /// </summary>
-        public DataSourceLocation source;
+        public DataSourceLocation source { get; set; }
 
         /// <summary>
         /// Options related to the data source.
         /// </summary>
-        public DataSourceOptions options;
+        public DataSourceOptions options { get; set; }
 
         /// <summary>
         /// The name of the database table associated with the data source.
         /// </summary>
-        public string table_name;
+        public string table_name { get; set; }
+
+
+        private char mDelimiter = ';';
 
         /// <summary>
         /// the delimiter used in the csv datasource.
         /// </summary>
-        public char delimiter;
+        public char delimiter
+        {
+            get => mDelimiter;
+            set => mDelimiter = value;
+        }
 
         /// <summary>
         /// The relevant columns that should be imported from the datasource.
         /// </summary>
-        public List<DataSourceColumn> table_cols;
+        public List<DataSourceColumn> table_cols { get; set; }
 
-        internal struct DataSourceLocation
+        public class DataSourceLocation
         {
             /// <summary>
             /// The type of location. options: filepath | URL
             /// </summary>
-            public string type;
+            public string type { get; set; }
 
             /// <summary>
             /// The actual location.
             /// </summary>
-            public string location;
+            public string location { get; set; }
+
+            /// <summary>
+            /// the format of the data
+            /// </summary>
+            public string data_format { get; set; }
         }
 
-        internal struct DataSourceOptions
+        public class DataSourceOptions
         {
             /// <summary>
             /// The number of initial lines to skip while reading the data source.
             /// </summary>
-            public int skip_lines;
+            public int skip_lines { get; set; }
 
             /// <summary>
             /// Indicates whether to discard rows with null values.
             /// </summary>
-            public bool discard_null_rows;
+            public bool discard_null_rows { get; set; }
+
+            private InsertBehaviour mIf_table_exists = InsertBehaviour.skip;
+
+            /// <summary>
+            /// How to deal with an existing table in the database. Options:
+            /// "skip": skip this dataset, is the default
+            /// "ignore": do nothing special
+            /// "replace": DROP the existing table before inserting data.
+            /// </summary>
+            public InsertBehaviour if_table_exists
+            {
+                get => mIf_table_exists;
+                set => mIf_table_exists = value;
+            }
+
+            public enum InsertBehaviour
+            {
+                ignore,
+                skip,
+                replace
+            }
         }
 
-        internal struct DataSourceColumn
+        public class DataSourceColumn
         {
             /// <summary>
             /// The name of the column in the datasource.
             /// </summary>
-            public string name;
+            public string name { get; set; }
 
             /// <summary>
             /// The name of the column in the database table.
             /// </summary>
-            public string name_in_table;
+            public string name_in_table { get; set; }
+
+            private string mType = "VARCHAR(500)";
 
             /// <summary>
             /// The data type of the column.
-            /// </summary>
-            public string type;
+            public string type
+            {
+                get => mType;
+                set => mType = value;
+            }
 
             /// <summary>
             /// True if the column is not nullable in the database.
             /// </summary>
-            public bool is_not_nullable;
+            [DefaultValue(false)]
+            public bool is_not_nullable { get; set; }
         }
     }
-
 }

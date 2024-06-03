@@ -1,38 +1,95 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using BIE.Data;
-using System.Configuration;
-using System.Data;
-using System.Xml.Linq;
 using BIE.DataPipeline.Import;
 using System.Data.Common;
+using Microsoft.Data.SqlClient;
+using static BIE.DataPipeline.Import.DataSourceDescription.DataSourceOptions;
 
 namespace BIE.DataPipeline
 {
     internal class DBHelper
     {
-        /// <summary>
-        /// To create connection with DB
-        /// </summary>
-        internal static void CreateDBConnection()
+        private string mInputQueryString;
+        private StringBuilder mStringBuilder;
+
+        private int mCount;
+        private int maxCount = 900;
+
+        public DBHelper()
         {
             ConfigureEnviornmentVaraiables();
+            mStringBuilder = new StringBuilder();
+        }
+
+        /// <summary>
+        /// Set the main INSERT INTO QueryString.
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="columnNames"></param>
+        public void SetInfo(string tableName, string columnNames)
+        {
+            mInputQueryString = "INSERT INTO " + tableName + " ( " + columnNames + " ) " + " VALUES ";
+            mStringBuilder.Clear();
+            mStringBuilder.Append(mInputQueryString);
         }
 
         /// <summary>
         /// To create table in DB
         /// </summary>
         /// <param name="description"></param>
-        internal static void CreateTable(DataSourceDescription description)
+        /// <param name="forshape"></param>
+        internal bool CreateTable(DataSourceDescription description)
         {
             Console.WriteLine("Creating Table...");
-            
+
             var db = Database.Instance;
-            string query = "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '" +
-                           description.table_name + "')\r\nBEGIN CREATE TABLE " + description.table_name;
+
+            if (description.options.if_table_exists == InsertBehaviour.skip)
+            {
+                var tableExists =
+                    (int)db.ExecuteScalar(db.CreateCommand($"SELECT count(*) as Exist" +
+                                                           $" from INFORMATION_SCHEMA.TABLES" +
+                                                           $" where table_name = '{description.table_name}'"));
+
+                if (tableExists == 1)
+                {
+                    Console.WriteLine($"Table {description.table_name} already exists, stopping...");
+                    return false;
+                }
+            }
+
+            if (description.options.if_table_exists == InsertBehaviour.replace)
+            {
+                Console.WriteLine($"Dropping table {description.table_name} if it exists.");
+                db.ExecuteScalar(db.CreateCommand($"DROP TABLE IF EXISTS {description.table_name}"));
+            }
+
+            var query = GetCreationQuery(description);
+
+            var cmd = db.CreateCommand(query);
+            db.Execute(cmd);
+
+            Console.WriteLine("Table created.");
+
+            return true;
+        }
+
+        private string GetCreationQuery(DataSourceDescription description)
+        {
+            if (description.source.data_format == "SHAPE")
+            {
+                return @"
+            IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'SpatialData')
+            BEGIN
+                CREATE TABLE SpatialData (
+                    Id INT PRIMARY KEY IDENTITY(1,1),
+                    Location GEOGRAPHY
+                );
+            END";
+            }
+
+            var query = "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '" +
+                        description.table_name + "')\r\nBEGIN CREATE TABLE " + description.table_name;
             query += " (";
             foreach (var column in description.table_cols)
             {
@@ -40,27 +97,47 @@ namespace BIE.DataPipeline
             }
 
             query += "); END";
-            DbCommand cmd = db.CreateCommand(query);
-            db.Execute(cmd);
-            
-            Console.WriteLine("Table created.");
+
+            return query;
         }
 
+
         /// <summary>
-        /// To insert data into DB
+        /// Insert Data into the Table. Inserts will be bundled.
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="columnNames"></param>
         /// <param name="values"></param>
-        internal static void InsertData(string tableName, string columnNames, string values)
+        internal void InsertData(string values)
         {
-            var db = Database.Instance;
-            string query = "INSERT INTO " + tableName + " ( " + columnNames + " ) " + " VALUES " + " ( " + values +
-                           " );";
-            // Console.WriteLine(query);
+            // var query = mInputQueryString + $"({values});";
+
+            if (mCount > 0)
+            {
+                mStringBuilder.Append(',');
+            }
+
+            mStringBuilder.Append($"({values})");
+
+            mCount++;
+            if (mCount >= maxCount)
+            {
+                ExecuteInsert();
+            }
+        }
+
+        /// <summary>
+        /// Execute the Actual Insert Statement.
+        /// </summary>
+        private void ExecuteInsert()
+        {
+            mStringBuilder.Append(';');
+            var query = mStringBuilder.ToString();
+
             try
             {
-                DbCommand cmd = db.CreateCommand(query);
+                var db = Database.Instance;
+                var cmd = db.CreateCommand(query);
                 db.Execute(cmd);
             }
             catch (Exception e)
@@ -68,12 +145,16 @@ namespace BIE.DataPipeline
                 Console.WriteLine("Failed at:\n" + query);
                 throw;
             }
+
+            mCount = 0;
+            mStringBuilder.Clear();
+            mStringBuilder.Append(mInputQueryString);
         }
 
         /// <summary>
         /// To set enviornment variables
         /// </summary>
-        private static void ConfigureEnviornmentVaraiables()
+        private void ConfigureEnviornmentVaraiables()
         {
             var dbServer = Environment.GetEnvironmentVariable("DB_SERVER");
             var dbName = Environment.GetEnvironmentVariable("DB_NAME");
