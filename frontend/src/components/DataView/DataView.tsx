@@ -137,7 +137,9 @@ function DataView() {
         <Fragment>
           <div className="dataview-header-container">
             <b className="dataview-header-title">
-              <MapPin size={20} /> Nuremberg
+              <MapPin size={20} />
+              {currentMapCache.loadedCoordinates.lat.toFixed(6)},{" "}
+              {currentMapCache.loadedCoordinates.lng.toFixed(6)}
             </b>
             <Box id="filter-panel" style={{ maxWidth: "18rem", width: "100%" }}>
               <TextField
