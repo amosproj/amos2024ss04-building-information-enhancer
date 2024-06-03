@@ -22,17 +22,17 @@ const SearchBar: React.FC = () => {
   const { currentMapCache } = useContext(MapContext);
   const { currentSearchCache, setCurrentSearchCache } = useContext(SearchContext);
 
-  const provider = new OpenStreetMapProvider({
-    params: {
-      "accept-language": "de",
-      countrycodes: "de",
-      addressdetails: 1,
-    },
-  });
 
   const fetch = useMemo(
     () =>
       debounce(async (query: string, callback: (results: MapSelection[]) => void) => {
+        const provider = new OpenStreetMapProvider({
+          params: {
+            "accept-language": "de",
+            countrycodes: "de",
+            addressdetails: 1,
+          },
+        });
         if (query === "") {
           callback([]);
           return;
@@ -44,7 +44,7 @@ const SearchBar: React.FC = () => {
         }));
         callback(transformedResults);
       }, 400),
-    [provider]
+    []
   );
 
   useEffect(() => {
