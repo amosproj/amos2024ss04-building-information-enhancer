@@ -1,5 +1,7 @@
 //import { useState } from "react";
 import { Stack } from "@phosphor-icons/react";
+import { useState } from "react";
+import { ArrowsClockwise } from "@phosphor-icons/react";
 import "./MapOptions.css";
 import { Tooltip } from "@mui/material";
 //import SearchPopUp from "../PopUp/SearchPopUp";
@@ -31,7 +33,10 @@ const MapOptions: React.FC<MapOptionsProps> = ({ toggleShowSatellite }) => {
       </Tooltip> */}
       <Tooltip arrow title="Switch layers" placement="right">
         <div className="layers-map-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom">
-          <Stack className="layers-map-icon" onClick={toggleShowSatellite} />
+          <ArrowsClockwise
+            /** ArrowsClockwise requested from po. stack only if we have more than 2 backgrounds */ className="layers-map-icon"
+            onClick={toggleShowSatellite}
+          />
         </div>
       </Tooltip>
       {/* <SearchPopUp
