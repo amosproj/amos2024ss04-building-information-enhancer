@@ -8,6 +8,7 @@ import useGeoData from "./DataFetch";
 import L from "leaflet";
 import { LatLngBounds } from "leaflet";
 import "proj4leaflet";
+import "proj4";
 
 interface MapDatasetVisualizerProps {
   dataset: Dataset;
@@ -55,7 +56,7 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
     "EPSG:25832",
     "+proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
   );
-  const coordsToLatLng = (coords: number[]) => {
+  const coordsToLatLngWithCRS = (coords: number[]) => {
     const latLng = myCRS.unproject(L.point(coords[0], coords[1]));
     return latLng;
   };
@@ -69,7 +70,7 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
       if (currentMapCache.zoom < 13) {
         const markerClusterGroup = L.markerClusterGroup();
         L.geoJson(geoData, {
-          coordsToLatLng: coordsToLatLng,
+          coordsToLatLng: coordsToLatLngWithCRS,
           onEachFeature: function (feature, featureLayer) {
             if (feature.geometry.type === "Polygon") {
               const bounds = (
@@ -78,7 +79,6 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
               const center = bounds.getCenter();
               const marker = L.marker(center);
               marker.addTo(markerClusterGroup);
-              console.log(center);
             }
           },
         });
@@ -90,7 +90,7 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
         };
       } else {
         const geojsonLayer = L.geoJson(geoData, {
-          coordsToLatLng: coordsToLatLng1,
+          coordsToLatLng: coordsToLatLngWithCRS,
         });
         geojsonLayer.addTo(map);
 
@@ -115,6 +115,7 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
         map.removeLayer(markerClusterGroup);
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataset, currentMapCache.zoom, map, geoData]);
 
   return null;

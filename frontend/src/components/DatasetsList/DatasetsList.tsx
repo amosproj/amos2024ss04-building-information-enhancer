@@ -21,13 +21,7 @@ import { FeatureCollection } from "geojson";
 import L, { Icon as LIcon, DivIcon, LatLngBounds } from "leaflet";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
-
-// Enum for types of markers
-enum MarkersTypes {
-  Markers = "markers", // Map will display single coordinates with markers on top.
-  Areas = "areas", // Map will display polygon areas.
-  None = "none", // Map will not display anything.
-}
+import { MarkersTypes } from "./MarkersTypes";
 
 // Dataset Type
 export type Dataset = {
@@ -73,6 +67,7 @@ const datasetsData: Dataset[] = [
     datasetIcon: MapTrifold,
     markerIcon: undefined,
     data: emptyFeatureCollection,
+    lastDataRequestBounds: L.latLngBounds(L.latLng(0, 0), L.latLng(0, 0)),
   },
   {
     id: "charging_stations",

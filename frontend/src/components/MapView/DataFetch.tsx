@@ -66,11 +66,13 @@ const useGeoData = (
   };
 
   useEffect(() => {
+    if (id === "empty_map") return;
     if (tabProps && tabProps.dataset.lastDataRequestBounds === bounds) {
       console.log("SAME AS LAST TIME");
       return;
     }
     if (tabProps && tabProps.dataset.type === "markers" && zoom <= 10) {
+      setData(undefined);
       console.log("too far away");
       return;
     }
@@ -79,7 +81,8 @@ const useGeoData = (
         setData(geojsonGemeindenPolygons as FeatureCollection<Geometry>);
         onUpdate(geojsonGemeindenPolygons, bounds);
       } else {
-        console.log("already loaded house_footprints");
+        setData(geojsonGemeindenPolygons as FeatureCollection<Geometry>);
+        //console.log("already loaded house_footprints");
       }
 
       return;
@@ -136,6 +139,7 @@ const useGeoData = (
     };
 
     fetchData(bounds);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bounds, zoom, id]);
 
   return data;
