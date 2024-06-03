@@ -29,9 +29,9 @@ function DataView() {
   return (
     <div className="dataview-container">
       <div className="dataview-header-container">
-        <div className="dataview-header-title">
+        <b className="dataview-header-title">
           <MapPin size={20} /> Nuremberg
-        </div>
+        </b>
         <Box id="filter-panel">
           <TextField
             label={
@@ -43,7 +43,6 @@ function DataView() {
             size="small"
             value={filterValue}
             onChange={handleFilterChange}
-            fullWidth
           />
         </Box>
       </div>
