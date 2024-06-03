@@ -3,7 +3,7 @@ import "./DataView.css";
 import { Fragment, useContext, useEffect, useState } from "react";
 import { TabsContext } from "../../contexts/TabsContext";
 import { Box, TextField } from "@mui/material";
-import { Funnel, MapPin, Warning } from "@phosphor-icons/react";
+import { Funnel, MapPin, MapPinLine } from "@phosphor-icons/react";
 import { MapContext } from "../../contexts/MapContext";
 import LoadDataButton from "./LoadDataButton";
 
@@ -176,7 +176,7 @@ function DataView() {
         </Fragment>
       ) : (
         <div className="dataview-empty">
-          <Warning size={100} />
+          <MapPinLine size={100} />
           <h2>No coordinates selected</h2>
           <span>Click on the map, to select a new location</span>
           <div className="dataview-empty-button">
