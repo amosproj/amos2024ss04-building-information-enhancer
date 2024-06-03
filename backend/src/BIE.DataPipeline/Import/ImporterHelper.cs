@@ -72,6 +72,11 @@ namespace BIE.DataPipeline.Import
             }
         }
 
+        /// <summary>
+        /// Creats an array with all column headers of the source file, mentioned in the yaml file.
+        /// </summary>
+        /// <param name="dataSourceDescription">The description of the source file.</param>
+        /// <returns>The array with the header names.</returns>
         public static string[] ReadYamlHeader(DataSourceDescription dataSourceDescription)
         {
             string[] res = new string[dataSourceDescription.table_cols.Count];
@@ -83,8 +88,19 @@ namespace BIE.DataPipeline.Import
             return res;
         }
 
+        /// <summary>
+        /// Prints an array of string values.
+        /// The values are printed with indices if the header is null. Otherwise with the corresponding header.
+        /// </summary>
+        /// <param name="row">The array of strings.</param>
+        /// <param name="header">The corresponding header names.</param>
         public static void PrintRow(string[] row, string[] header = null)
         {
+            if(header != null && header.Length < row.Length)
+            {
+                throw new System.Exception("The length of header is to short");
+            }
+
             for (int i = 0; i < row.Length; i++)
             {
                 if (header != null)

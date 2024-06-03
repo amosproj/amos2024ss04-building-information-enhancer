@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BIE.Tests
 {
@@ -57,6 +58,24 @@ namespace BIE.Tests
             input = "BOOLEAN";
             expected = "BOOLEAN";
             result = ImporterHelper.RemoveLastBrackets(input);
+            Assert.That(result, Is.EquivalentTo(expected));
+        }
+
+        [Test]
+        public void TestReadYamlHeader()
+        {
+            string[] expected = {
+            "testDefault",
+            "testVarChar",
+            "testBool",
+            "testBoolean",
+            "testInt",
+            "testInteger",
+            "testFloat",
+            "testDouble",
+            "testDecimal"
+            };
+            string[] result = ImporterHelper.ReadYamlHeader(description);
             Assert.That(result, Is.EquivalentTo(expected));
         }
     }
