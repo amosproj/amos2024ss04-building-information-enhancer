@@ -54,6 +54,11 @@ namespace BIE.DataPipeline.Import
             }
         }
 
+        /// <summary>
+        /// Removes everything at the end of a string starting on the last (
+        /// </summary>
+        /// <param name="s">The input string.</param>
+        /// <returns>The string with the missing brackets.</returns>
         public static string RemoveLastBrackets(string s)
         {
             int lastOpeningParenthesisIndex = s.LastIndexOf('(');

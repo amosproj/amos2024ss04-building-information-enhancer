@@ -34,5 +34,30 @@ namespace BIE.Tests
             Type[] result = ImporterHelper.ParseColumnTypes(description);
             Assert.That(result, Is.EquivalentTo(expected));
         }
+
+        [Test]
+        public void TestRemoveLastBrackets()
+        {
+            string input = "string with brackets (something)";
+            string expected = "string with brackets ";
+            string result = ImporterHelper.RemoveLastBrackets(input);
+            Assert.That(result, Is.EquivalentTo(expected));
+
+            input = "string without brackets";
+            expected = "string without brackets";
+            result = ImporterHelper.RemoveLastBrackets(input);
+            Assert.That(result, Is.EquivalentTo(expected));
+
+
+            input = "DOUBLE(1,2)";
+            expected = "DOUBLE";
+            result = ImporterHelper.RemoveLastBrackets(input);
+            Assert.That(result, Is.EquivalentTo(expected));
+
+            input = "BOOLEAN";
+            expected = "BOOLEAN";
+            result = ImporterHelper.RemoveLastBrackets(input);
+            Assert.That(result, Is.EquivalentTo(expected));
+        }
     }
 }
