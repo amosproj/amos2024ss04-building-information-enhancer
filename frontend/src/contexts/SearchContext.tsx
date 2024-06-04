@@ -1,4 +1,5 @@
 import L, { LatLng } from "leaflet";
+//import { RawResult } from "leaflet-geosearch/dist/providers/openStreetMapProvider.js";
 import React, { createContext, useState, ReactNode } from "react";
 
 //// TYPES ////
@@ -7,6 +8,7 @@ import React, { createContext, useState, ReactNode } from "react";
 export type MapSelection = {
   coordinates: LatLng;
   displayName: string;
+  //raw? : RawResult;
 };
 
 // Search Cache Type

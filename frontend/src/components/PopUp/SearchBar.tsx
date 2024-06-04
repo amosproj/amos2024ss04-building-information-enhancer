@@ -21,6 +21,9 @@ const SearchBar: React.FC = () => {
   const [options, setOptions] = useState<Array<MapSelection>>([]);
   const { currentMapCache } = useContext(MapContext);
   const { currentSearchCache, setCurrentSearchCache } = useContext(SearchContext);
+  const [loading, setLoading] = useState(false);
+  
+
 
 
   const fetch = useMemo(
@@ -31,6 +34,8 @@ const SearchBar: React.FC = () => {
             "accept-language": "de",
             countrycodes: "de",
             addressdetails: 1,
+            //polygon_geojson: 1,
+            //polygon_threshold: 3,
           },
         });
         if (query === "") {
@@ -38,6 +43,7 @@ const SearchBar: React.FC = () => {
           return;
         }
         const results = await provider.search({ query });
+        //console.log(results);
         const transformedResults: MapSelection[] = results.map((result) => ({
           coordinates: new LatLng(result.y, result.x),
           displayName: result.label,
@@ -50,8 +56,10 @@ const SearchBar: React.FC = () => {
   useEffect(() => {
     let active = true;
     if (!active) return undefined;
+    setLoading(true);
     fetch(inputValue, (results) => {
       setOptions(results);
+      setLoading(false);
     });
     return () => {
       active = false;
@@ -86,6 +94,7 @@ const SearchBar: React.FC = () => {
     setTimeout(() => {
       flyToLocation(new LatLng(item.coordinates.lat, item.coordinates.lng));
     }, 400);
+    //console.log(item.raw);
   };
 
   const flyToLocation = (targetPosition: LatLng) => {
@@ -95,20 +104,35 @@ const SearchBar: React.FC = () => {
     } else console.log("no map instance");
   };
 
+  const getUniqueOptions = (options: MapSelection[]) => {
+    const uniqueOptions = new Map<string, MapSelection>();
+    options.forEach((option) => {
+      uniqueOptions.set(option.displayName, option);
+    });
+    return Array.from(uniqueOptions.values());
+  };
+
   return (
     <>
     <Autocomplete
       id="search-popup"
+      noOptionsText="No locations"
       sx={{ width: 400 }}
-      getOptionLabel={(option) => option.displayName}
+      getOptionLabel={(option) => (typeof option === "string" ? option : option.displayName)}
+      freeSolo={inputValue?.length ? false : true}
+      loading={loading}
+      forcePopupIcon={false}
       filterOptions={(x) => x}
-      options={[...currentSearchCache.favourites, ...options]}
+      options={getUniqueOptions([...currentSearchCache.favourites, ...options])}
       autoComplete
       includeInputInList
       filterSelectedOptions
       value={null}
-      noOptionsText="No locations"
+      disableClearable={false}
       onChange={(_event, newValue) => {
+        if (typeof newValue === "string"){
+            return;
+        }
         if (newValue) {
           const selectedLocation = {
             coordinates: newValue.coordinates,
@@ -117,6 +141,7 @@ const SearchBar: React.FC = () => {
           onItemSelected(selectedLocation);
         }
       }}
+
       onInputChange={(_event, newInputValue) => {
         setInputValue(newInputValue);
       }}
@@ -177,7 +202,8 @@ const SearchBar: React.FC = () => {
                 <IconButton
                   edge="end"
                   aria-label={isFavorite ? "unfavorite" : "favorite"}
-                  onClick={() =>
+                  onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+                    event.stopPropagation();
                     isFavorite
                       ? removeFromFavourites({
                           coordinates: option.coordinates,
@@ -188,6 +214,7 @@ const SearchBar: React.FC = () => {
                           displayName: option.displayName,
                         })
                   }
+                }
                 >
                   <StarIcon style={{ fill: isFavorite ? "yellow" : "transparent", stroke: "black" }} />
                 </IconButton>
