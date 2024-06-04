@@ -74,18 +74,9 @@ const defaultSearchCache: SearchCacheProps = {
     {
       coordinates: L.latLng([51.500729, -0.124625]),
       displayName: "51°30'02.6\"N 0°07'28.7\"W",
-    }
-  ],
-  favourites: [
-    {
-      coordinates: L.latLng([49.5732, 12.0288]),
-      displayName: "Nuremberg",
-    },
-    {
-      coordinates: L.latLng([49.5732, 13.0288]),
-      displayName: "Munich",
     },
   ],
+  favourites: [],
 };
 
 // Actual value of the context
