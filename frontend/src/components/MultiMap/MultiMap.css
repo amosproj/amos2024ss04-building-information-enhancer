@@ -1,0 +1,154 @@
+.multimap-container {
+  height: 100%;
+  width: 50%;
+  max-width: 50%;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-list-container {
+  display: flex;
+  justify-content: space-between;
+  transform: translateY(1px);
+}
+
+.tab {
+  border: 1px solid gray;
+  height: 100%;
+  overflow: hidden;
+}
+
+.tab-context-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-description-container {
+  padding-bottom: 1rem;
+  text-wrap: nowrap;
+}
+
+.tab-title-container {
+  display: flex;
+  align-items: center;
+}
+
+.tabs-icons-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  align-items: center;
+  vertical-align: middle;
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  height: 0.8rem;
+}
+
+.tab-icons-container .pinned-tab-icon {
+  height: 0.8rem;
+  display: flex;
+  position: absolute;
+  top: 0.2rem;
+  right: 0.1rem;
+}
+
+.tab-icons-container .close-tab-icon {
+  height: 0.8rem;
+  display: flex;
+  position: absolute;
+  top: 0.2rem;
+  right: 0.1rem;
+  visibility: hidden;
+}
+
+.tab-icons-container .pin-tab-icon {
+  height: 0.8rem;
+  display: flex;
+  position: absolute;
+  top: 0.2rem;
+  right: 1rem;
+  visibility: hidden;
+}
+
+.tab-icons-container .unpin-tab-icon {
+  height: 0.8rem;
+  display: flex;
+  position: absolute;
+  top: 0.2rem;
+  right: 1rem;
+  visibility: hidden;
+}
+
+.add-tab-button {
+  background-color: white;
+  border-color: gray;
+  color: gray;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.4rem;
+  min-width: 2rem;
+  min-height: 2rem;
+  width: 2rem;
+  height: 2rem;
+}
+
+.add-tab-button:hover {
+  background-color: rgb(245, 245, 245);
+  border-color: black;
+  color: black;
+}
+
+.add-tab-button:focus {
+  color: black;
+  border-color: black;
+}
+
+.MuiTabs-scrollButtons.Mui-disabled {
+  opacity: 0.3 !important;
+}
+
+.MuiTab-root {
+  border: 1px solid gray !important;
+  background-color: rgb(238, 238, 238) !important;
+  text-transform: none !important;
+  padding: 1.1rem 1rem 0.8rem 1rem !important;
+}
+
+.MuiTab-root + .MuiTab-root {
+  border-left: none !important;
+}
+
+.MuiTab-root:hover {
+  background-color: rgb(228, 228, 228) !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.MuiTab-root:hover .tab-icons-container svg {
+  visibility: visible !important;
+}
+
+.MuiTab-root:hover .tab-icons-container .pinned-tab-icon {
+  visibility: hidden !important;
+}
+
+.Mui-selected {
+  color: black !important;
+  border-bottom: none !important;
+  background-color: rgb(255, 255, 255) !important;
+}
+
+.Mui-selected:hover {
+  background-color: white !important;
+}
+
+.Mui-selected:focus {
+  outline: none !important;
+}
+
+.MuiTabs-indicator {
+  visibility: hidden;
+}

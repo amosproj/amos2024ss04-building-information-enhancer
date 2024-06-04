@@ -8,8 +8,13 @@ using YamlDotNet.Core;
 
 namespace BIE.DataPipeline.Import
 {
-    internal static class ImporterHelper
+    public static class ImporterHelper
     {
+        /// <summary>
+        /// Creates an array of c# types matching to the SQL types given by the DataSourceDescription.
+        /// </summary>
+        /// <param name="dataSourceDescription">The dataSourceDescription.</param>
+        /// <returns>The array of C# types.</returns>
         public static Type[] ParseColumnTypes(DataSourceDescription dataSourceDescription)
         {
             Type[] res = new Type[dataSourceDescription.table_cols.Count];
@@ -49,6 +54,11 @@ namespace BIE.DataPipeline.Import
             }
         }
 
+        /// <summary>
+        /// Removes everything at the end of a string starting on the last (
+        /// </summary>
+        /// <param name="s">The input string.</param>
+        /// <returns>The string with the missing brackets.</returns>
         public static string RemoveLastBrackets(string s)
         {
             int lastOpeningParenthesisIndex = s.LastIndexOf('(');
@@ -62,6 +72,11 @@ namespace BIE.DataPipeline.Import
             }
         }
 
+        /// <summary>
+        /// Creats an array with all column headers of the source file, mentioned in the yaml file.
+        /// </summary>
+        /// <param name="dataSourceDescription">The description of the source file.</param>
+        /// <returns>The array with the header names.</returns>
         public static string[] ReadYamlHeader(DataSourceDescription dataSourceDescription)
         {
             string[] res = new string[dataSourceDescription.table_cols.Count];
@@ -73,8 +88,19 @@ namespace BIE.DataPipeline.Import
             return res;
         }
 
+        /// <summary>
+        /// Prints an array of string values.
+        /// The values are printed with indices if the header is null. Otherwise with the corresponding header.
+        /// </summary>
+        /// <param name="row">The array of strings.</param>
+        /// <param name="header">The corresponding header names.</param>
         public static void PrintRow(string[] row, string[] header = null)
         {
+            if(header != null && header.Length < row.Length)
+            {
+                throw new System.Exception("The length of header is to short");
+            }
+
             for (int i = 0; i < row.Length; i++)
             {
                 if (header != null)

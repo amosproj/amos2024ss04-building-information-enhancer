@@ -1,0 +1,29 @@
+.data-panel-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.data-panel-title {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem;
+  border: 1px solid gray;
+}
+
+.data-panel-grid {
+  border: 1px solid gray;
+  max-width: 100%;
+  margin: 0 !important;
+}
+
+.MuiGrid-item {
+  padding: 1rem !important;
+}
+
+.search-box-label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.3rem;
+}

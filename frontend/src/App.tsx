@@ -4,58 +4,30 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import "./App.css";
 
-import MultiMap from "./components/multimap/multimap";
-import Button from "@mui/material/Button";
-import DataBox from "./components/DataView/DataBox";
-import Dataview from "./components/DataViewOld/dataview";
-import TestAreaLn from "./TestAreaLn";
-
-import { useState } from "react";
+import DataView from "./components/DataView/DataView";
+import MultiMap from "./components/MultiMap/MultiMap";
+import { Fragment, useContext } from "react";
+import { TabsContext } from "./contexts/TabsContext";
+import MainMenu from "./components/MainMenu/MainMenu";
+import ErrorAlert from "./components/Alerts/ErrorAlert";
 
 function App() {
-  const [currentComp, setCurrentComp] = useState(1);
+  const { currentTabsCache } = useContext(TabsContext);
 
   return (
-    <div>
-      <div className="toggle-work">
-        <div
-          onClick={() => {
-            setCurrentComp(1);
-          }}
-        >
-          [1]
-        </div>
-        <div
-          onClick={() => {
-            setCurrentComp(2);
-          }}
-        >
-          [2]
-        </div>
-        <div
-          onClick={() => {
-            setCurrentComp(3);
-          }}
-        >
-          [3]
-        </div>
-      </div>
-      {currentComp === 1 && (
-        <div className="app-container">
-          <div className="header">
-            <div className="title">Building Information Enhancer</div>
-          </div>
+    <div className="app-container">
+      {currentTabsCache.openedTabs.length === 0 ? (
+        <MainMenu />
+      ) : (
+        <Fragment>
+          <div className="header">Building Information Enhancer</div>
           <div className="content-container">
-            <MultiMap></MultiMap>
-            <div className="dataview-container">
-              <Dataview />
-              <Button variant="outlined">Load data</Button>
-            </div>
+            <MultiMap />
+            <DataView />
           </div>
-        </div>
+        </Fragment>
       )}
-      {currentComp === 2 && <DataBox />}
-      {currentComp === 3 && <TestAreaLn />}
+      <ErrorAlert />
     </div>
   );
 }

@@ -8,24 +8,25 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: amosproj/amos2024ss04-building-information-enhancer
+  STAGE: production
 
 jobs:
-  build-and-push-frontend:
-    name: Build and publish the Frontend image
+  build-and-publish-frontend:
+    name: Build and publish - Frontend
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{github.ref_name}}
+          ref: ${{ github.ref_name }}
 
       - name: Log in to the container registry
         uses: docker/login-action@v3
         with:
-          registry: ${{env.REGISTRY}}
-          username: ${{github.actor}}
-          password: ${{secrets.GITHUB_TOKEN}}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata for Docker
         id: meta
@@ -35,7 +36,10 @@ jobs:
           tags: |
             type=ref,event=tag
             type=sha
+            type=raw,value=${{ env.STAGE }}
             latest
+          labels: |
+            stage=${{ env.STAGE }}
 
       - name: Build and Publish Docker Images
         uses: docker/build-push-action@v5
@@ -43,35 +47,40 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: ${{steps.meta.outputs.tags}}
-          labels: ${{steps.meta.outputs.labels}}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            STAGE=${{ env.STAGE }}
 
-  build-and-push-backend:
-    name: Build and publish the Backend image
+  build-and-publish-backend-api-gateway:
+    name: Build and publish - API Gateway
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{github.ref_name}}
+          ref: ${{ github.ref_name }}
 
       - name: Log in to the container registry
         uses: docker/login-action@v3
         with:
-          registry: ${{env.REGISTRY}}
-          username: ${{github.actor}}
-          password: ${{secrets.GITHUB_TOKEN}}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api-gateway
           tags: |
             type=ref,event=tag
             type=sha
+            type=raw,value=${{ env.STAGE }}
             latest
+          labels: |
+            stage=${{ env.STAGE }}
 
       - name: Build and Publish Docker Images
         uses: docker/build-push-action@v5
@@ -79,12 +88,102 @@ jobs:
           context: ./backend/src/BIE.Core
           file: ./backend/src/BIE.Core/Dockerfile
           push: true
-          tags: ${{steps.meta.outputs.tags}}
-          labels: ${{steps.meta.outputs.labels}}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            STAGE=${{ env.STAGE }}
+
+  build-and-publish-backend-datapipeline:
+    name: Build and publish - Data Pipeline
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Log in to the container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-datapipeline
+          tags: |
+            type=ref,event=tag
+            type=sha
+            type=raw,value=${{ env.STAGE }}
+            latest
+          labels: |
+            stage=${{ env.STAGE }}
+
+      - name: Build and Publish Docker Images
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/src/BIE.DataPipeline
+          file: ./backend/src/BIE.DataPipeline/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            STAGE=${{ env.STAGE }}
+
+  build-and-publish-backend-sql-database:
+    name: Build and publish - SQL Database
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Log in to the container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-sql-database
+          tags: |
+            type=ref,event=tag
+            type=sha
+            type=raw,value=${{ env.STAGE }}
+            latest
+          labels: |
+            stage=${{ env.STAGE }}
+
+      - name: Build and Publish Docker Images
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/database
+          file: ./backend/database/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            STAGE=${{ env.STAGE }}
 
   deploy-prod-env:
-    needs: [build-and-push-frontend, build-and-push-backend]
-    name: Deploy Image in the Production Environment
+    needs:
+      [
+        build-and-publish-frontend,
+        build-and-publish-backend-api-gateway,
+        build-and-publish-backend-datapipeline,
+        build-and-publish-backend-sql-database,
+      ]
+    name: Deploy - Production Environment
     runs-on: ubuntu-latest
 
     steps:
@@ -100,7 +199,7 @@ jobs:
       - name: Copy necessary files
         run: |
           scp ./docker-compose.yml ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}}:/var/lib/bie
-          scp ./.env ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}}:/var/lib/bie
+          scp ./.env.production ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}}:/var/lib/bie/.env
       - name: Connect and Pull
         run: ssh ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}} "cd /var/lib/bie && docker compose pull && docker compose up -d --remove-orphans && exit"
       - name: Cleanup

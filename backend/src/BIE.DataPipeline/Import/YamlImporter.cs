@@ -6,7 +6,7 @@ using YamlDotNet.Serialization;
 
 namespace BIE.DataPipeline.Import
 {
-    internal static class YamlImporter
+    public static class YamlImporter
     {
         public static DataSourceDescription GetSourceDescription(string path)
         {
