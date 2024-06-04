@@ -12,7 +12,7 @@ import { debounce } from "@mui/material/utils";
 import parse from "autosuggest-highlight/parse";
 import { MapSelection, SearchContext } from "../../contexts/SearchContext";
 import { OpenStreetMapProvider } from "leaflet-geosearch";
-import { LatLng } from "leaflet";
+import { LatLng} from "leaflet";
 import { MapContext } from "../../contexts/MapContext";
 
 
@@ -43,10 +43,12 @@ const SearchBar: React.FC = () => {
           return;
         }
         const results = await provider.search({ query });
-        //console.log(results);
+        console.log(results);
         const transformedResults: MapSelection[] = results.map((result) => ({
           coordinates: new LatLng(result.y, result.x),
           displayName: result.label,
+          bounds: result.bounds,
+          area: (result.raw.class === "boundary"),
         }));
         callback(transformedResults);
       }, 400),
@@ -92,15 +94,28 @@ const SearchBar: React.FC = () => {
 
   const onItemSelected = (item: MapSelection) => {
     setTimeout(() => {
-      flyToLocation(new LatLng(item.coordinates.lat, item.coordinates.lng));
+      flyToLocation(item);
     }, 400);
     //console.log(item.raw);
   };
 
-  const flyToLocation = (targetPosition: LatLng) => {
+  const flyToLocation = (item: MapSelection) => {
+
+    const targetPosition = new LatLng(item.coordinates.lat, item.coordinates.lng);
+
     const { mapInstance } = currentMapCache;
+    //const {selectedCoordinates} = currentMapCache;
+
     if (mapInstance) {
-      mapInstance.flyTo(targetPosition, 13, { animate: true, duration: 5 });
+        //TODO if polygon then flyToBounds
+        currentMapCache.selectedCoordinates = targetPosition; //Set Marker
+
+        if(item.area && item.bounds){
+            mapInstance.flyToBounds(item.bounds, { animate: true, duration: 5 });
+        }else{
+            mapInstance.flyTo(targetPosition, 13, { animate: true, duration: 5 });
+        }
+
     } else console.log("no map instance");
   };
 
@@ -137,6 +152,8 @@ const SearchBar: React.FC = () => {
           const selectedLocation = {
             coordinates: newValue.coordinates,
             displayName: newValue.displayName,
+            bounds: newValue.bounds,
+            area: newValue.area,
           };
           onItemSelected(selectedLocation);
         }
@@ -208,10 +225,14 @@ const SearchBar: React.FC = () => {
                       ? removeFromFavourites({
                           coordinates: option.coordinates,
                           displayName: option.displayName,
+                          bounds: option.bounds,
+                          area: option.area,
                         })
                       : addToFavourites({
                           coordinates: option.coordinates,
                           displayName: option.displayName,
+                          bounds: option.bounds,
+                          area: option.area,
                         })
                   }
                 }
