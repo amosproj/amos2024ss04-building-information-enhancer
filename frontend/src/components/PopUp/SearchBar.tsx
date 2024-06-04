@@ -31,6 +31,8 @@ const SearchBar: React.FC = () => {
             "accept-language": "de",
             countrycodes: "de",
             addressdetails: 1,
+            //polygon_geojson: 1,
+            //polygon_threshold: 3,
           },
         });
         if (query === "") {
@@ -38,6 +40,7 @@ const SearchBar: React.FC = () => {
           return;
         }
         const results = await provider.search({ query });
+        console.log(results);
         const transformedResults: MapSelection[] = results.map((result) => ({
           coordinates: new LatLng(result.y, result.x),
           displayName: result.label,
@@ -86,6 +89,7 @@ const SearchBar: React.FC = () => {
     setTimeout(() => {
       flyToLocation(new LatLng(item.coordinates.lat, item.coordinates.lng));
     }, 400);
+    console.log(item.raw);
   };
 
   const flyToLocation = (targetPosition: LatLng) => {
