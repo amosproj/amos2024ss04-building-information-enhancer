@@ -16,6 +16,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:BIE.Core.API.Controllers.DatasetController.GetHausumringedata(BIE.Core.API.Controllers.DatasetController.QueryParameters)">
+            <summary>
+            Get a record
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="T:BIE.Core.API.Controllers.InfrastructureController">
             <summary>
             Batch controller
