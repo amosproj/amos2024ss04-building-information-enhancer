@@ -1,40 +1,26 @@
-import { useState } from "react";
-import { ArrowsClockwise, MagnifyingGlass } from "@phosphor-icons/react";
+import { StackSimple } from "@phosphor-icons/react";
 import "./MapOptions.css";
 import { Tooltip } from "@mui/material";
-import SearchPopUp from "../PopUp/SearchPopUp";
+import SearchBar from "../PopUp/SearchBar";
 
 interface MapOptionsProps {
   toggleShowSatellite: () => void;
 }
 
 const MapOptions: React.FC<MapOptionsProps> = ({ toggleShowSatellite }) => {
-  // Stores the state of if the search popup is open
-  const [ifOpenedDialog, setIfOpenedDialog] = useState(false);
-  const toggleIfOpenedDialog = () => {
-    setIfOpenedDialog(!ifOpenedDialog);
-  };
-
   return (
     <div className="map-options-container">
-      <Tooltip arrow title="Search for an address">
-        <MagnifyingGlass
-          weight="duotone"
-          className="search-map-icon"
-          onClick={toggleIfOpenedDialog}
-        />
+      <div className="search-bar">
+        <SearchBar />
+      </div>
+      <Tooltip arrow title="Switch layers" placement="right">
+        <div className="layers-map-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom">
+          <StackSimple
+            className="layers-map-icon"
+            onClick={toggleShowSatellite}
+          />
+        </div>
       </Tooltip>
-      <Tooltip arrow title="Switch satellite / openstreetmap">
-        <ArrowsClockwise
-          weight="duotone"
-          className="switch-map-icon"
-          onClick={toggleShowSatellite}
-        />
-      </Tooltip>
-      <SearchPopUp
-        onToggleIfOpenedDialog={toggleIfOpenedDialog}
-        ifOpenedDialog={ifOpenedDialog}
-      />
     </div>
   );
 };

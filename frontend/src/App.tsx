@@ -20,7 +20,6 @@ function App() {
         <MainMenu />
       ) : (
         <Fragment>
-          <div className="header">Building Information Enhancer</div>
           <div className="content-container">
             <MultiMap />
             <DataView />
