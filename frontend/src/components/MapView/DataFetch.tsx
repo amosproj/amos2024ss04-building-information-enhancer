@@ -24,9 +24,7 @@ const getBaseApiUrl = () => {
       }`;
     default:
   }
-  return `http://${import.meta.env.VITE_API_HOST_DEV}:${
-    import.meta.env.VITE_API_PORT_DEV
-  }`;
+  return `http://test.amos.b-ci.de:8081`;
 };
 
 const useGeoData = (
