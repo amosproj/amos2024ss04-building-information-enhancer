@@ -1,11 +1,48 @@
 ﻿// See https://aka.ms/new-console-template for more information
-
 using BIE.DataPipeline;
 using BIE.DataPipeline.Import;
+using Mono.Options;
 
+var tableInsertBehaviour = InsertBehaviour.none;
+// setup command line options.
+var options = new OptionSet
+{
+    {
+        "b|behaviour", @"Behaviour when inserting into a database. Options:
+replace: drop existing table before inserting.
+skip: do not insert when table already exists.
+ignore: always try to insert regardles if table already exists or not.",
+        behaviour =>
+        {
+            switch (behaviour)
+            {
+                case "replace":
+                    tableInsertBehaviour = InsertBehaviour.replace;
+                    break;
+                case "skip":
+                    tableInsertBehaviour = InsertBehaviour.skip;
+                    break;
+                case "ignore":
+                    tableInsertBehaviour = InsertBehaviour.ignore;
+                    break;
+                default:
+                    Console.WriteLine($"{behaviour} is not a recognized behaviour.");
+                    Environment.Exit(42);
+                    break;
+            }
+        }
+    }
+};
+options.Parse(args);
 
 Console.WriteLine("Parser Started");
 DataSourceDescription description = YamlImporter.GetSourceDescription(args[0]);
+
+if (tableInsertBehaviour != InsertBehaviour.none)
+{
+    description.options.if_table_exists = tableInsertBehaviour;
+    Console.WriteLine($"Using {tableInsertBehaviour} Behaviour for insertion.");
+}
 
 var dbHelper = new DBHelper();
 IImporter importer;
@@ -34,7 +71,7 @@ if (!dbHelper.CreateTable(description))
 
 
 //Console.WriteLine(csvImporter.GetHeaderString());
-string line = "";
+var line = "";
 bool notEof = importer.ReadLine(out line);
 
 Console.WriteLine("Ready to write.");

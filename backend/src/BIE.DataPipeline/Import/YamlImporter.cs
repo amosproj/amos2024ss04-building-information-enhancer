@@ -110,13 +110,6 @@ namespace BIE.DataPipeline.Import
                 get => mIf_table_exists;
                 set => mIf_table_exists = value;
             }
-
-            public enum InsertBehaviour
-            {
-                ignore,
-                skip,
-                replace
-            }
         }
 
         public class DataSourceColumn
@@ -147,5 +140,13 @@ namespace BIE.DataPipeline.Import
             [DefaultValue(false)]
             public bool is_not_nullable { get; set; }
         }
+    }
+
+    public enum InsertBehaviour
+    {
+        ignore,
+        skip,
+        replace,
+        none
     }
 }
