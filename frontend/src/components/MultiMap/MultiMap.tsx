@@ -18,18 +18,31 @@ const MultiMap = () => {
   // Dropdown menu for the tab options
   const [anchorElementTabOptions, setAnchorElementTabOptions] =
     useState<null | HTMLElement>(null);
+
   const handleMenuClick = (
-    event: React.MouseEvent<SVGSVGElement, MouseEvent>
+    event: React.MouseEvent<SVGSVGElement, MouseEvent>,   tabId: string
   ) => {
+    event.stopPropagation();
     setAnchorElementTabOptions(event.currentTarget as unknown as HTMLElement);
-  };
-  const handleMenuClose = () => {
-    setAnchorElementTabOptions(null);
+    setSelectedTabId(tabId);
   };
 
+  const handleMenuClose = () => {
+    setAnchorElementTabOptions(null);
+    setSelectedTabId(null);
+  };
+
+  const [selectedTabId, setSelectedTabId] = useState<string | null>(null);
+
+
   // Handles the change of the current tab id
-  const handleChange = (_event: React.SyntheticEvent, newTabID: string) => {
-    setCurrentTabsCache({ ...currentTabsCache, currentTabID: newTabID });
+  const handleChange = (event: React.SyntheticEvent, newTabID: string) => {
+
+    if ((event.target as HTMLInputElement).type !== "button") {
+      console.log("inside if");
+      setCurrentTabsCache({ ...currentTabsCache, currentTabID: newTabID });
+    }
+
   };
 
   return (
@@ -44,6 +57,7 @@ const MultiMap = () => {
             selectionFollowsFocus
           >
             {currentTabsCache.openedTabs.map((tab) => {
+              const isMenuOpen = anchorElementTabOptions && tab.id === selectedTabId;
               return (
                 <Tab
                   label={
@@ -53,7 +67,7 @@ const MultiMap = () => {
                         <span>{tab.dataset.displayName}</span>
                       </div>
                       <div className="tab-icons-container">
-                        {tab.ifPinned && !anchorElementTabOptions ? (
+                        {tab.ifPinned && !isMenuOpen ? (
                           <PushPinSimple
                             weight="fill"
                             className="pinned-tab-icon"
@@ -61,8 +75,7 @@ const MultiMap = () => {
                         ) : (
                           <Fragment />
                         )}
-                        {anchorElementTabOptions &&
-                        tab.id === currentTabsCache.currentTabID ? (
+                        {isMenuOpen ? (
                           <DotsThreeOutline
                             weight="fill"
                             className="options-tab-icon-inverted"
@@ -73,8 +86,11 @@ const MultiMap = () => {
                         <Tooltip title="Tab Options" arrow>
                           <DotsThreeOutline
                             weight="fill"
-                            className="options-tab-icon"
-                            onClick={handleMenuClick}
+                            className={`options-tab-icon ${isMenuOpen ? 'options-tab-icon-inverted' : ''}`}
+                            onClick={(event) => {
+                                handleMenuClick(event, tab.id);
+                              }
+                            }
                           />
                         </Tooltip>
                       </div>
@@ -104,7 +120,7 @@ const MultiMap = () => {
         anchorElementTabOptions={anchorElementTabOptions}
         handleClose={handleMenuClose}
         currentTab={currentTabsCache.openedTabs.find(
-          (tab) => tab.id === currentTabsCache.currentTabID
+          (tab) => tab.id === selectedTabId
         )}
       />
     </div>

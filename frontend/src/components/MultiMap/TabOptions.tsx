@@ -116,7 +116,7 @@ const TabOptions: React.FC<TabOptionsProps> = ({
             <MenuItem
               className="tab-options-item-container"
               onClick={() => {
-                toggleTabPinned(currentTabsCache.currentTabID);
+                toggleTabPinned(currentTab.id);
               }}
             >
               {currentTab.ifPinned ? (
@@ -133,7 +133,7 @@ const TabOptions: React.FC<TabOptionsProps> = ({
             <MenuItem
               className="tab-options-item-container"
               onClick={() => {
-                closeTab(currentTabsCache.currentTabID);
+                closeTab(currentTab.id);
               }}
             >
               <X size={18} />
