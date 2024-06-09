@@ -119,7 +119,7 @@ namespace BIE.Core.API
                     "BIE.Core.API " + Global.API_VER));
             }
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
 
             app.UseRouting();
 
