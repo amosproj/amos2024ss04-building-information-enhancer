@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - sprint-**-release-candidate
+    branches:
+      - CI-CD
 
 env:
   REGISTRY: ghcr.io
@@ -11,8 +13,8 @@ env:
   STAGE: test
 
 jobs:
-  build-and-publish-frontend:
-    name: Build and publish - Frontend
+  build-and-publish:
+    name: Build and publish Docker images
     runs-on: ubuntu-latest
 
     steps:
@@ -20,6 +22,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Log in to the container registry
         uses: docker/login-action@v3
@@ -32,7 +37,11 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend
+          images: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api-gateway
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-datapipeline
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-sql-database
           tags: |
             type=ref,event=tag
             type=sha
@@ -40,145 +49,18 @@ jobs:
           labels: |
             stage=${{ env.STAGE }}
 
-      - name: Build and Publish Docker Images
-        uses: docker/build-push-action@v5
+      - name: Build and push images using bake
+        uses: docker/bake-action@v4
         with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
+          files: |
+            ./docker-bake.hcl
+            ${{ steps.meta.outputs.bake-file }}
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            STAGE=${{ env.STAGE }}
-
-  build-and-publish-backend-api-gateway:
-    name: Build and publish - API Gateway
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
-
-      - name: Log in to the container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api-gateway
-          tags: |
-            type=ref,event=tag
-            type=sha
-            type=raw,value=${{ env.STAGE }}
-          labels: |
-            stage=${{ env.STAGE }}
-
-      - name: Build and Publish Docker Images
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend/src/BIE.Core
-          file: ./backend/src/BIE.Core/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            STAGE=${{ env.STAGE }}
-
-  build-and-publish-backend-datapipeline:
-    name: Build and publish - Data Pipeline
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
-
-      - name: Log in to the container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-datapipeline
-          tags: |
-            type=ref,event=tag
-            type=sha
-            type=raw,value=${{ env.STAGE }}
-          labels: |
-            stage=${{ env.STAGE }}
-
-      - name: Build and Publish Docker Images
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend/src/BIE.DataPipeline
-          file: ./backend/src/BIE.DataPipeline/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            STAGE=${{ env.STAGE }}
-
-  build-and-publish-backend-sql-database:
-    name: Build and publish - SQL Database
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
-
-      - name: Log in to the container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-sql-database
-          tags: |
-            type=ref,event=tag
-            type=sha
-            type=raw,value=${{ env.STAGE }}
-          labels: |
-            stage=${{ env.STAGE }}
-
-      - name: Build and Publish Docker Images
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend/database
-          file: ./backend/database/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            STAGE=${{ env.STAGE }}
+        env:
+          STAGE: ${{ env.STAGE }}
 
   deploy-test-env:
-    needs:
-      [
-        build-and-publish-frontend,
-        build-and-publish-backend-api-gateway,
-        build-and-publish-backend-datapipeline,
-        build-and-publish-backend-sql-database,
-      ]
+    needs: build-and-publish
     name: Deploy - Test Environment
     runs-on: ubuntu-latest
 
@@ -187,16 +69,20 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
+
       - name: Install SSH key
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
           echo "${{ secrets.TEST_ENV_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.TEST_ENV_SSH_HOST }} > ~/.ssh/known_hosts
+
       - name: Copy necessary files
         run: |
           scp ./docker-compose.yml ${{ secrets.TEST_ENV_SSH_USER }}@${{ secrets.TEST_ENV_SSH_HOST }}:/var/lib/bie
           scp ./.env.test ${{ secrets.TEST_ENV_SSH_USER }}@${{ secrets.TEST_ENV_SSH_HOST }}:/var/lib/bie/.env
+
       - name: Connect and Pull
         run: ssh ${{ secrets.TEST_ENV_SSH_USER }}@${{ secrets.TEST_ENV_SSH_HOST }} "cd /var/lib/bie && docker compose pull && docker compose up -d --remove-orphans && exit"
+
       - name: Cleanup
         run: rm -rf ~/.ssh
