@@ -13,13 +13,27 @@ services:
     ports:
       - ${FRONTEND_PORT}:${FRONTEND_PORT}
 
-  # API Gateway for listening for FE requests
+  # API Gateway for listening for the FE requests
   api-gateway:
     build:
-      context: ./backend/src/BIE.Core
+      context: ./backend/api-gateway
       dockerfile: Dockerfile
     container_name: api-gateway
     image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-api-gateway:${DOCKER_COMPOSE_IMAGES_TAG}
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT_STAGE}
+    ports:
+      - ${BACKEND_API_GATEWAY_PORT}:8080
+    networks:
+      - bie-network
+
+  # API Composer for composing the FE requests
+  api-composer:
+    build:
+      context: ./backend/src/BIE.Core
+      dockerfile: Dockerfile
+    container_name: api-composer
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-api-composer:${DOCKER_COMPOSE_IMAGES_TAG}
     environment:
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT_STAGE}
       - DB_NAME=${SQL_DB_NAME}
