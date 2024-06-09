@@ -42,6 +42,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api-gateway
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-datapipeline
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-sql-database
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-metadata-database
           tags: |
             type=ref,event=tag
             type=sha

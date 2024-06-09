@@ -5,5 +5,8 @@ FROM mongo:latest
 ENV MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
 ENV MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
 
+# Copy the initialization script
+COPY ./init-db.js /docker-entrypoint-initdb.d/
+
 # Expose the default MongoDB port
 EXPOSE 27017
