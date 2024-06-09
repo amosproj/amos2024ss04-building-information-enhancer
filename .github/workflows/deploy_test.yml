@@ -17,14 +17,34 @@ jobs:
     name: Build and publish Docker images
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        service:
+          [
+            frontend,
+            api-gateway,
+            api-composer,
+            datapipeline,
+            sql-database,
+            metadata-database,
+          ]
+        include:
+          - service: frontend
+            context: ./frontend
+          - service: api-gateway
+            context: ./backend/api-gateway
+          - service: api-composer
+            context: ./backend/src/BIE.Core
+          - service: datapipeline
+            context: ./backend/src/BIE.DataPipeline
+          - service: sql-database
+            context: ./backend/sql-database
+          - service: metadata-database
+            context: ./backend/metadata-database
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
 
       - name: Log in to the container registry
         uses: docker/login-action@v3
@@ -33,17 +53,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata for Docker
+      - name: Extract metadata for Docker - ${{ matrix.service }}
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api-gateway
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api-composer
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-datapipeline
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-sql-database
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-metadata-database
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service }}
           tags: |
             type=ref,event=tag
             type=sha
@@ -51,17 +65,16 @@ jobs:
           labels: |
             stage=${{ env.STAGE }}
 
-      - name: Build and push images using bake
-        uses: docker/bake-action@v4
+      - name: Build and Publish Docker Image - ${{ matrix.service }}
+        uses: docker/build-push-action@v5
         with:
-          files: |
-            ./docker-bake.hcl
-            ${{ steps.meta.outputs.bake-file }}
+          context: ${{ matrix.context }}
+          file: Dockerfile
           push: true
-        env:
-          STAGE: ${{ env.STAGE }}
-          MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}
-          MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            STAGE=${{ env.STAGE }}
 
   deploy-test-env:
     needs: build-and-publish
@@ -71,8 +84,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
 
       - name: Install SSH key
         run: |
