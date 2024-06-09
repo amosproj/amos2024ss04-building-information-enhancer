@@ -71,34 +71,27 @@ namespace BIE.Core.API
                 c.IncludeXmlComments(xmlPath);
             });
 
-
-
             services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
             {
                 builder.AllowAnyOrigin()
                        .AllowAnyMethod()
                        .AllowAnyHeader();
             }));
-
-
         }
 
         private static void InjectInstances(IServiceCollection services)
         {
-            // Repository Factor
+            // Repository Factory
             services.AddTransient<IRepositoryFactory, DBRepositoryFactory>();
-            //services.AddTransient<CourseService>();
-
 
             // Inject Services: get all classes implementing IService interface
             var assemb = typeof(InfrastructureService).Assembly;
-            var iservices = assemb.GetTypes().
-                Where(x => !x.IsAbstract && x.IsClass
-                                    && x.GetInterfaces().Contains(typeof(IService)));
+            var iservices = assemb.GetTypes()
+                .Where(x => !x.IsAbstract && x.IsClass
+                            && x.GetInterfaces().Contains(typeof(IService)));
 
             foreach (var s in iservices)
                 services.Add(new ServiceDescriptor(s, s, ServiceLifetime.Transient));
-
         }
 
         /// <summary>
@@ -115,8 +108,11 @@ namespace BIE.Core.API
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/" + Global.API_VER + "/swagger.json",
-                    "BIE.Core.API " + Global.API_VER));
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/" + Global.API_VER + "/swagger.json", "BIE.Core.API " + Global.API_VER);
+                    c.RoutePrefix = string.Empty; // Set Swagger UI at the root
+                });
             }
 
             // app.UseHttpsRedirection();
@@ -129,7 +125,6 @@ namespace BIE.Core.API
             {
                 endpoints.MapControllers();
             });
-
 
             ConfigureEnviornmentVaraiables();
         }
