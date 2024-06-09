@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
-using api_gateway.Models;
+using APIGateway.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace BIE.Core.API.Controllers
@@ -49,8 +49,8 @@ namespace BIE.Core.API.Controllers
             }
 
             _logger.LogInformation($"Fetching data for DatasetID: {datasetID}, ZoomLevel: {zoomLevel}, Viewport: [{BottomLat}, {BottomLong}] to [{TopLat}, {TopLong}]");
-
-            var targetUrl = $"http://localhost:8081/api/v1.0/Dataset/1/data?ZoomLevel={zoomLevel}&BottomLat={BottomLat}&BottomLong={BottomLong}&TopLat={TopLat}&TopLong={TopLong}";
+            // Here the port 80 is used not 8080. This is due to the docker containers using the interal ports to communicate and not the external ones.
+            var targetUrl = $"http://api-composer:80/api/v1.0/Dataset/1/data?ZoomLevel={zoomLevel}&BottomLat={BottomLat}&BottomLong={BottomLong}&TopLat={TopLat}&TopLong={TopLong}";
 
             try
             {

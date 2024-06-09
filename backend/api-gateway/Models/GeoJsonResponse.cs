@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace api_gateway.Models
+namespace APIGateway.Models
 {
     public class GeoJsonResponse
     {
