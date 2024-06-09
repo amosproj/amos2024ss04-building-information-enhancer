@@ -1,5 +1,5 @@
 group "default" {
-  targets = ["frontend", "api-gateway", "datapipeline", "sql-database"]
+  targets = ["frontend", "api-gateway", "datapipeline", "sql-database", "metadata-database"]
 }
 
 target "docker-metadata-action" {}
@@ -24,6 +24,12 @@ target "datapipeline" {
 
 target "sql-database" {
   inherits = ["docker-metadata-action"]
-  context = "./backend/database"
+  context = "./backend/sql-database"
+  dockerfile = "Dockerfile"
+}
+
+target "metadata-database" {
+  inherits = ["docker-metadata-action"]
+  context = "./backend/metadata-database"
   dockerfile = "Dockerfile"
 }

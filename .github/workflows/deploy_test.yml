@@ -58,6 +58,8 @@ jobs:
           push: true
         env:
           STAGE: ${{ env.STAGE }}
+          MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}
+          MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
 
   deploy-test-env:
     needs: build-and-publish

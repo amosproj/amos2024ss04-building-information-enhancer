@@ -55,19 +55,36 @@ services:
       - sql-db
 
   ## Main SQL DB for storing the datasets
-  sql-db:
+  sql-database:
     build:
-      context: ./backend/database
+      context: ./backend/sql-database
       dockerfile: Dockerfile
-    container_name: sql-db
+    container_name: sql-database
     image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-sql-database:${DOCKER_COMPOSE_IMAGES_TAG}
     networks:
       - bie-network
-#     volumes:
-#       - bie-mssqldata:/var/opt/mssql
+  #     volumes:
+  #       - bie-mssqldata:/var/opt/mssql
+
+  metadata-database:
+    build:
+      context: ./backend/metadata-database
+      dockerfile: Dockerfile
+    container_name: metadata-database
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-metadata-database:${DOCKER_COMPOSE_IMAGES_TAG}
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    ports:
+      - "27017:27017"
+    networks:
+      - bie-network
+#   volumes:
+#     - bie-metadata:/var/opt/metadata
 
 # volumes:
 #   bie-mssqldata:
+#   bie-metadata:
 
 networks:
   bie-network:
