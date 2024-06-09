@@ -20,26 +20,17 @@ jobs:
     strategy:
       matrix:
         service:
-          [
-            frontend,
-            api-gateway,
-            api-composer,
-            datapipeline,
-            sql-database,
-            metadata-database,
-          ]
-        include:
-          - service: frontend
+          - name: frontend
             context: ./frontend
-          - service: api-gateway
+          - name: api-gateway
             context: ./backend/api-gateway
-          - service: api-composer
+          - name: api-composer
             context: ./backend/src/BIE.Core
-          - service: datapipeline
+          - name: datapipeline
             context: ./backend/src/BIE.DataPipeline
-          - service: sql-database
+          - name: sql-database
             context: ./backend/sql-database
-          - service: metadata-database
+          - name: metadata-database
             context: ./backend/metadata-database
 
     steps:
@@ -53,11 +44,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata for Docker - ${{ matrix.service }}
+      - name: Extract metadata for Docker - ${{ matrix.service.name }}
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service.name }}
           tags: |
             type=ref,event=tag
             type=sha
@@ -65,10 +56,10 @@ jobs:
           labels: |
             stage=${{ env.STAGE }}
 
-      - name: Build and Publish Docker Image - ${{ matrix.service }}
+      - name: Build and Publish Docker Image - ${{ matrix.service.name }}
         uses: docker/build-push-action@v5
         with:
-          context: ${{ matrix.context }}
+          context: ${{ matrix.service.context }}
           file: Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
