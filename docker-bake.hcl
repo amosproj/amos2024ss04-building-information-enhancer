@@ -1,3 +1,7 @@
+group "default" {
+  targets = ["frontend", "api-gateway", "datapipeline", "sql-database"]
+}
+
 target "docker-metadata-action" {}
 
 target "frontend" {
