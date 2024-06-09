@@ -1,5 +1,5 @@
 group "default" {
-  targets = ["frontend", "api-gateway", "datapipeline", "sql-database", "metadata-database"]
+  targets = ["frontend", "api-gateway", "api-composer", "datapipeline", "sql-database", "metadata-database"]
 }
 
 target "docker-metadata-action" {}
@@ -11,6 +11,12 @@ target "frontend" {
 }
 
 target "api-gateway" {
+  inherits = ["docker-metadata-action"]
+  context = "./backend/api-gateway"
+  dockerfile = "Dockerfile"
+}
+
+target "api-composer" {
   inherits = ["docker-metadata-action"]
   context = "./backend/src/BIE.Core"
   dockerfile = "Dockerfile"
