@@ -62,6 +62,24 @@ namespace BIE.Core.API.Controllers
         }
 
         /// <summary>
+        /// Gets the metadata for the given dataset. Contains things like icon, visualization types
+        /// </summary>
+        /// <returns>Data for the specified dataset in the provided viewport bounds and zoom level.</returns>
+        [HttpGet("getDatasetMetadata")]
+        [ProducesResponseType(typeof(DatasetListResponse), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+
+        public IActionResult GetDatasetMetadata([FromQuery, Required] int datasetID)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            return Ok(new DatasetMetadata { icon = "ChargingStation", type="marker" });
+        }
+
+        /// <summary>
         /// Loads the location data for the given point or poylgon.
         /// </summary>
         /// <param name="request">Contains the current dataset id and the list of coordinates. 
