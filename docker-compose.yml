@@ -8,8 +8,6 @@ services:
     image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-frontend:${DOCKER_COMPOSE_IMAGES_TAG}
     environment:
       - NODE_ENV=${ENVIRONMENT_STAGE}
-      - VITE_BACKEND_HOST=${VITE_BACKEND_HOST}
-      - VITE_BACKEND_PORT=${VITE_BACKEND_PORT}
     networks:
       - bie-network
     ports:

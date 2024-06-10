@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - sprint-**-release
+    branches:
+      - CI-CD
 
 env:
   REGISTRY: ghcr.io
