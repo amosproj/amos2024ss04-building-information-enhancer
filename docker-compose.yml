@@ -13,27 +13,41 @@ services:
     ports:
       - ${FRONTEND_PORT}:${FRONTEND_PORT}
 
-  # API Gateway for listening for FE requests
+  # API Gateway for listening for the FE requests
   api-gateway:
     build:
-      context: ./backend/src/BIE.Core
+      context: ./backend/api-gateway
       dockerfile: Dockerfile
     container_name: api-gateway
     image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-api-gateway:${DOCKER_COMPOSE_IMAGES_TAG}
     environment:
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT_STAGE}
-      - DB_NAME=BIEDB
-      - DB_PASSWORD=MyPass@1234
-      - DB_SERVER=sql-db
-      - DB_USERNAME=sa
-      - DB_TYPE=SQL
-      - TRUSTED=False
+    ports:
+      - ${BACKEND_API_GATEWAY_PORT}:8080
+    networks:
+      - bie-network
+
+  # API Composer for composing the FE requests
+  api-composer:
+    build:
+      context: ./backend/src/BIE.Core
+      dockerfile: Dockerfile
+    container_name: api-composer
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-api-composer:${DOCKER_COMPOSE_IMAGES_TAG}
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT_STAGE}
+      - DB_NAME=${SQL_DB_NAME}
+      - DB_PASSWORD=${SQL_DB_PASSWORD}
+      - DB_SERVER=${SQL_DB_SERVER}
+      - DB_USERNAME=${SQL_DB_USERNAME}
+      - DB_TYPE=${SQL_DB_TYPE}
+      - TRUSTED=${SQL_TRUSTED}
     ports:
       - ${VITE_BACKEND_PORT}:80
     networks:
       - bie-network
     depends_on:
-      - sql-db
+      - sql-database
 
   ## Data Pipeline for ingesting the datasets
   datapipeline:
@@ -42,32 +56,49 @@ services:
       dockerfile: Dockerfile
     image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-datapipeline:${DOCKER_COMPOSE_IMAGES_TAG}
     environment:
-      - DB_NAME=BIEDB
-      - DB_PASSWORD=MyPass@1234
-      - DB_SERVER=sql-db
-      - DB_USERNAME=sa
-      - DB_TYPE=SQL
-      - TRUSTED=False
+      - DB_NAME=${SQL_DB_NAME}
+      - DB_PASSWORD=${SQL_DB_PASSWORD}
+      - DB_SERVER=${SQL_DB_SERVER}
+      - DB_USERNAME=${SQL_DB_USERNAME}
+      - DB_TYPE=${SQL_DB_TYPE}
+      - TRUSTED=${SQL_TRUSTED}
     container_name: datapipeline
     networks:
       - bie-network
     depends_on:
-      - sql-db
+      - sql-database
 
   ## Main SQL DB for storing the datasets
-  sql-db:
+  sql-database:
     build:
-      context: ./backend/database
+      context: ./backend/sql-database
       dockerfile: Dockerfile
-    container_name: sql-db
+    container_name: sql-database
     image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-sql-database:${DOCKER_COMPOSE_IMAGES_TAG}
     networks:
       - bie-network
-#     volumes:
-#       - bie-mssqldata:/var/opt/mssql
+  # volumes:
+  #   - bie-mssqldata:/var/opt/mssql
 
-# volumes:
-#   bie-mssqldata:
+  metadata-database:
+    build:
+      context: ./backend/metadata-database
+      dockerfile: Dockerfile
+    container_name: metadata-database
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-metadata-database:${DOCKER_COMPOSE_IMAGES_TAG}
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    ports:
+      - "27018:27017"
+    networks:
+      - bie-network
+    volumes:
+      - bie-metadata:/data/db
+
+volumes:
+  bie-metadata:
+  # bie-mssqldata:
 
 networks:
   bie-network:

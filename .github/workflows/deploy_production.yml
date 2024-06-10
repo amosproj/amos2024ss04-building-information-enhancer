@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - sprint-**-release
+    branches:
+      - CI-CD
 
 env:
   REGISTRY: ghcr.io
@@ -11,15 +13,29 @@ env:
   STAGE: production
 
 jobs:
-  build-and-publish-frontend:
-    name: Build and publish - Frontend
+  build-and-publish:
+    name: Build and publish -
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service:
+          - name: frontend
+            context: ./frontend
+          - name: api-gateway
+            context: ./backend/api-gateway
+          - name: api-composer
+            context: ./backend/src/BIE.Core
+          - name: datapipeline
+            context: ./backend/src/BIE.DataPipeline
+          - name: sql-database
+            context: ./backend/sql-database
+          - name: metadata-database
+            context: ./backend/metadata-database
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
 
       - name: Log in to the container registry
         uses: docker/login-action@v3
@@ -28,161 +44,31 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata for Docker
+      - name: Extract metadata for Docker - ${{ matrix.service.name }}
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service.name }}
           tags: |
             type=ref,event=tag
             type=sha
             type=raw,value=${{ env.STAGE }}
-            latest
           labels: |
             stage=${{ env.STAGE }}
 
-      - name: Build and Publish Docker Images
+      - name: Build and Publish Docker Image - ${{ matrix.service.name }}
         uses: docker/build-push-action@v5
         with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
+          context: ${{ matrix.service.context }}
+          file: ${{ matrix.service.context }}/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             STAGE=${{ env.STAGE }}
 
-  build-and-publish-backend-api-gateway:
-    name: Build and publish - API Gateway
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
-
-      - name: Log in to the container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-api-gateway
-          tags: |
-            type=ref,event=tag
-            type=sha
-            type=raw,value=${{ env.STAGE }}
-            latest
-          labels: |
-            stage=${{ env.STAGE }}
-
-      - name: Build and Publish Docker Images
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend/src/BIE.Core
-          file: ./backend/src/BIE.Core/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            STAGE=${{ env.STAGE }}
-
-  build-and-publish-backend-datapipeline:
-    name: Build and publish - Data Pipeline
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
-
-      - name: Log in to the container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-datapipeline
-          tags: |
-            type=ref,event=tag
-            type=sha
-            type=raw,value=${{ env.STAGE }}
-            latest
-          labels: |
-            stage=${{ env.STAGE }}
-
-      - name: Build and Publish Docker Images
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend/src/BIE.DataPipeline
-          file: ./backend/src/BIE.DataPipeline/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            STAGE=${{ env.STAGE }}
-
-  build-and-publish-backend-sql-database:
-    name: Build and publish - SQL Database
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref_name }}
-
-      - name: Log in to the container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-sql-database
-          tags: |
-            type=ref,event=tag
-            type=sha
-            type=raw,value=${{ env.STAGE }}
-            latest
-          labels: |
-            stage=${{ env.STAGE }}
-
-      - name: Build and Publish Docker Images
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend/database
-          file: ./backend/database/Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            STAGE=${{ env.STAGE }}
-
-  deploy-prod-env:
-    needs:
-      [
-        build-and-publish-frontend,
-        build-and-publish-backend-api-gateway,
-        build-and-publish-backend-datapipeline,
-        build-and-publish-backend-sql-database,
-      ]
+  deploy-test-env:
+    needs: build-and-publish
     name: Deploy - Production Environment
     runs-on: ubuntu-latest
 
