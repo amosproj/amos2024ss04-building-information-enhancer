@@ -23,7 +23,7 @@ public class Startup
         {
             options.AddPolicy("AllowLocalhost",
                 builder => builder
-                    .WithOrigins("http://localhost:5173") // URL of your React app
+                    .AllowAnyOrigin()
                     .AllowAnyHeader()
                     .AllowAnyMethod());
         });
