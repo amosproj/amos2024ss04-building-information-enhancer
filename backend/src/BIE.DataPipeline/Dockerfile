@@ -14,7 +14,7 @@ COPY *.csproj .
 RUN dotnet restore
 
 copy . ./
-RUN dotnet publish --output /app/ --configuration Release
+RUN dotnet publish "BIE.DataPipeline.csproj" --output /app/ --configuration Release
 
 from base as final
 workdir /app
