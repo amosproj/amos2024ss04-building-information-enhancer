@@ -78,10 +78,10 @@ namespace BIE.DataPipeline
         {
             if (description.source.data_format == "SHAPE")
             {
-                return @"
-            IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'SpatialData')
+                return $@"
+            IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{description.table_name}')
             BEGIN
-                CREATE TABLE SpatialData (
+                CREATE TABLE {description.table_name} (
                     Id INT PRIMARY KEY IDENTITY(1,1),
                     Location GEOGRAPHY
                 );

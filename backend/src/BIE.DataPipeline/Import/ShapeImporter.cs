@@ -1,20 +1,5 @@
-﻿using Microsoft.VisualBasic.FileIO;
-using MySql.Data.MySqlClient.X.XDevAPI.Common;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Ubiety.Dns.Core;
-using YamlDotNet.Core;
-using System.Data.SqlClient;
-using NetTopologySuite.IO.ShapeFile.Extended;
-using Microsoft.SqlServer;
-using NetTopologySuite.Utilities;
-using System.Diagnostics.Metrics;
+﻿using System.Text;
 using System.IO.Compression;
-using System.Security.Policy;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using NetTopologySuite.IO.Streams;
@@ -35,37 +20,32 @@ namespace BIE.DataPipeline.Import
         private ShapefileDataReader parser;
         DbaseFileHeader header;
         StringBuilder builder;
+        private readonly ICoordinateTransformation? mTransformation;
 
         public ShapeImporter(DataSourceDescription dataSourceDescription)
         {
             //YAML Arguments:
             this.dataSourceDescription = dataSourceDescription;
+            
             builder = new StringBuilder();
-            //Setup Parser
+            
             SetupParser();
 
-            //Skip lines until header
-            // SkipNlines(0); //(dataSourceDescription.options.skip_lines);
-
-            //read header
             fileHeader = ReadFileHeader();
-            ImporterHelper.PrintRow(fileHeader);
-            /*yamlHeader = ImporterHelper.ReadYamlHeader(dataSourceDescription);
-
-            // get all the indexes and descriptions that interest us
-            columnIndexes = new List<(int, int)>();
-            for (int i = 0; i < fileHeader.Length; i++)
-            {
-                for (int j = 0; j < yamlHeader.Length; j++)
-                {
-                    if (fileHeader[i] == yamlHeader[j])
-                    {
-                        columnIndexes.Add((i, j));
-                        // Console.WriteLine($"adding columnindexes: {i}, {j}");
-                        break;
-                    }
-                }
-            }*/
+            
+            // Define the source and target coordinate systems
+            var utmZone32 = CoordinateSystemWktReader
+                    .Parse("PROJCS[\"WGS 84 / UTM zone 32N\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS" +
+                           " 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]]" +
+                           ",PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433," +
+                           "AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION" +
+                           "[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER" +
+                           "[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\"" +
+                           ",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]]" +
+                           ",AUTHORITY[\"EPSG\",\"32632\"]]");
+            var wgs84 = GeographicCoordinateSystem.WGS84;
+            // Create coordinate transformation
+            mTransformation = new CoordinateTransformationFactory().CreateFromCoordinateSystems((CoordinateSystem)utmZone32, wgs84);
         }
 
         public void SetupParser()
@@ -134,38 +114,14 @@ namespace BIE.DataPipeline.Import
                     return false;
                 }
 
-                /*int fieldCount = header.NumFields;
-                for (int i = 0; i < fieldCount; i++)
-                {
-                    var value = parser.GetValue(i);
-                    if (value is string)
-                    {
-                        builder.Append($"'{value.ToString().Replace("'", "''")}'");
-                    }
-                    else if (value is DateTime dateTime)
-                    {
-                        builder.Append($"'{dateTime.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)}'");
-                    }
-                    else if (value is double || value is float)
-                    {
-                        builder.Append($"{Convert.ToDouble(value).ToString(CultureInfo.InvariantCulture)}");
-                    }
-                    else
-                    {
-                        builder.Append(value);
-                    }
-                    if (i < fieldCount - 1)
-                        builder.Append(", ");
-                }*/
-
                 // Append geometry as WKT (Well-Known Text)
                 Geometry geometry = parser.Geometry;
-                geometry = Convert(geometry);
+                geometry = ConvertUtmToLatLong(geometry);
 
                 string geo = ($"geography::STGeomFromText('{geometry.AsText()}', 4326)");
 
                 // Print the SQL insert statement
-                Console.WriteLine(builder.ToString());
+                // Console.WriteLine(builder.ToString());
                 nextLine = geo;
                 return true;
             }
@@ -239,34 +195,26 @@ namespace BIE.DataPipeline.Import
             }
         }
 
-        public static Geometry Convert(Geometry polygon)
+        /// <summary>
+        /// Conver UTM coordinates to Latitude and Longitude
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <returns></returns>
+        public Geometry ConvertUtmToLatLong(Geometry polygon)
         {
-            // Define the source and target coordinate systems
-            IInfo utmZone32 =
-                CoordinateSystemWktReader
-                    .Parse("PROJCS[\"WGS 84 / UTM zone 32N\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AUTHORITY[\"EPSG\",\"32632\"]]");
-            GeographicCoordinateSystem wgs84 = GeographicCoordinateSystem.WGS84;
-
-            // Create coordinate transformation
-            var transformation =
-                new CoordinateTransformationFactory().CreateFromCoordinateSystems((CoordinateSystem)utmZone32, wgs84);
-
-
             // Convert UTM coordinates to latitude and longitude
             foreach (Coordinate coordinate in polygon.Coordinates)
             {
                 double utmEasting = coordinate.X;
                 double utmNorthing = coordinate.Y;
                 double[] utmPoint = { utmEasting, utmNorthing };
-                double[] wgs84Point = transformation.MathTransform.Transform(utmPoint);
+                double[] wgs84Point = mTransformation!.MathTransform.Transform(utmPoint);
 
                 // Extract latitude and longitude
                 double latitude = wgs84Point[1];
                 double longitude = wgs84Point[0];
                 coordinate.X = latitude;
                 coordinate.Y = longitude;
-                //Console.WriteLine("Latitude: " + latitude);
-                //Console.WriteLine("Longitude: " + longitude);
             }
 
             return polygon;

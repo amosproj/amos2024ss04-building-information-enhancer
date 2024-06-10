@@ -8,7 +8,7 @@ var tableInsertBehaviour = InsertBehaviour.none;
 var options = new OptionSet
 {
     {
-        "b|behaviour", @"Behaviour when inserting into a database. Options:
+        "b=|behavior=", @"Behaviour when inserting into a database. Options:
 replace: drop existing table before inserting.
 skip: do not insert when table already exists.
 ignore: always try to insert regardles if table already exists or not.",
@@ -36,7 +36,7 @@ ignore: always try to insert regardles if table already exists or not.",
 options.Parse(args);
 
 Console.WriteLine("Parser Started");
-DataSourceDescription description = YamlImporter.GetSourceDescription(args[0]);
+DataSourceDescription description = YamlImporter.GetSourceDescription(args.Last());
 
 if (tableInsertBehaviour != InsertBehaviour.none)
 {
