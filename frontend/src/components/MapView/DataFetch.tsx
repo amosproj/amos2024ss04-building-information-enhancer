@@ -11,23 +11,8 @@ const geojsonCities: FeatureCollection =
 const geojsonGemeindenPolygons: FeatureCollection =
   defaultPolygonData as FeatureCollection;
 
-// Define the base of the API URL
-const getBaseApiUrl = () => {
-  switch (import.meta.env.VITE_STAGE) {
-    case "production":
-      return `http://${import.meta.env.VITE_API_HOST_PRODUCTION}:${
-        import.meta.env.VITE_API_PORT_PRODUCTION
-      }`;
-    case "test":
-      return `http://${import.meta.env.VITE_API_HOST_TEST}:${
-        import.meta.env.VITE_API_PORT_TEST
-      }`;
-    default:
-  }
-  return `http://${import.meta.env.VITE_API_HOST_DEV}:${
-    import.meta.env.VITE_API_PORT_DEV
-  }`;
-};
+const backendHost = import.meta.env.VITE_BACKEND_HOST;
+const backendPort = import.meta.env.VITE_BACKEND_PORT;
 
 const useGeoData = (
   id: string,
@@ -50,18 +35,13 @@ const useGeoData = (
     switch (id) {
       case "empty_map":
         return "";
-      case "charging_stations":
-        return getBaseApiUrl() + "/api/v1.0/Dataset/1/data";
-      case "house_footprints":
-        return getBaseApiUrl() + "";
       default:
-        // Display alert
-        setCurrentAlertCache({
-          ...currentAlertCache,
-          isAlertOpened: true,
-          text: "Dataset with provided ID does not exist.",
-        });
-        return "";
+        return (
+          (backendHost ? backendHost : "localhost2") +
+          ":" +
+          (backendPort ? backendPort : "8081") +
+          "/api/getDatasetViewportData"
+        );
     }
   };
 
@@ -82,7 +62,6 @@ const useGeoData = (
         onUpdate(geojsonGemeindenPolygons, bounds);
       } else {
         setData(geojsonGemeindenPolygons as FeatureCollection<Geometry>);
-        //console.log("already loaded house_footprints");
       }
 
       return;
@@ -96,10 +75,9 @@ const useGeoData = (
           TopLat: bounds.getNorthEast().lat, //topLat,
           TopLong: bounds.getNorthEast().lng, //topLong,
           ZoomLevel: zoom,
+          datasetID: 1,
         };
-        //console.log(getApiUrlForDataset());
-        const url = `http://localhost:8081/api/v1.0/Dataset/1/data?BottomLat=${params.BottomLat}&BottomLong=${params.BottomLong}&TopLat=${params.TopLat}&TopLong=${params.TopLong}`;
-        console.log(url);
+        console.log(getApiUrlForDataset());
         const response = await axios.get<FeatureCollection<Geometry>>(
           getApiUrlForDataset(),
           {
@@ -110,11 +88,11 @@ const useGeoData = (
         onUpdate(response.data, bounds);
       } catch (error) {
         // Display alert
-        // setCurrentAlertCache({
-        //   ...currentAlertCache,
-        //   isAlertOpened: true,
-        //   text: "Fetching data failed, using local GeoJSON data.",
-        // });
+        setCurrentAlertCache({
+          ...currentAlertCache,
+          isAlertOpened: true,
+          text: "Fetching data failed, using local GeoJSON data.",
+        });
         console.error("Fetching data failed, using local GeoJSON data.", error);
         // Console log the error
         if (axios.isAxiosError(error)) {

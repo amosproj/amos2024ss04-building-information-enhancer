@@ -29,8 +29,12 @@ FROM httpd:2.4
 
 COPY --from=builder /usr/src/app/dist /usr/local/apache2/htdocs/
 
-# Expose the port
-EXPOSE "${PORT}"
+# Add the entrypoint script
+COPY entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Start web server
-CMD ["httpd-foreground"]
+# Expose the port
+EXPOSE 80
+
+# Start web server using the entrypoint script
+ENTRYPOINT ["entrypoint.sh"]
