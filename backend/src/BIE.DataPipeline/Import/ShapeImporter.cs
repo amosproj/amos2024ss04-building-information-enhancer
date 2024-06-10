@@ -12,49 +12,45 @@ namespace BIE.DataPipeline.Import
 {
     internal class ShapeImporter : IImporter
     {
-        private DataSourceDescription dataSourceDescription;
-        private string[] fileHeader;
-        private string[] yamlHeader;
-        private string headerString = "";
-        private List<(int, int)> columnIndexes;
-        private ShapefileDataReader parser;
-        DbaseFileHeader header;
-        StringBuilder builder;
+        private readonly DataSourceDescription mDataSourceDescription;
+        private ShapefileDataReader mParser;
+        private DbaseFileHeader mHeader;
         private readonly ICoordinateTransformation? mTransformation;
 
         public ShapeImporter(DataSourceDescription dataSourceDescription)
         {
             //YAML Arguments:
-            this.dataSourceDescription = dataSourceDescription;
-            
-            builder = new StringBuilder();
-            
+            this.mDataSourceDescription = dataSourceDescription;
+
+            new StringBuilder();
+
             SetupParser();
 
-            fileHeader = ReadFileHeader();
-            
+            ReadFileHeader();
+
             // Define the source and target coordinate systems
             var utmZone32 = CoordinateSystemWktReader
-                    .Parse("PROJCS[\"WGS 84 / UTM zone 32N\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS" +
-                           " 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]]" +
-                           ",PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433," +
-                           "AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION" +
-                           "[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER" +
-                           "[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\"" +
-                           ",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]]" +
-                           ",AUTHORITY[\"EPSG\",\"32632\"]]");
+                .Parse("PROJCS[\"WGS 84 / UTM zone 32N\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS" +
+                       " 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]]" +
+                       ",PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433," +
+                       "AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION" +
+                       "[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER" +
+                       "[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\"" +
+                       ",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]]" +
+                       ",AUTHORITY[\"EPSG\",\"32632\"]]");
             var wgs84 = GeographicCoordinateSystem.WGS84;
             // Create coordinate transformation
-            mTransformation = new CoordinateTransformationFactory().CreateFromCoordinateSystems((CoordinateSystem)utmZone32, wgs84);
+            mTransformation =
+                new CoordinateTransformationFactory().CreateFromCoordinateSystems((CoordinateSystem)utmZone32, wgs84);
         }
 
-        public void SetupParser()
+        private void SetupParser()
         {
             // handle Zip file:
 
-            Console.WriteLine($"Grabbing Webfile {dataSourceDescription.source.location}");
+            Console.WriteLine($"Grabbing Webfile {mDataSourceDescription.source.location}");
             var client = new HttpClient();
-            var zipStream = client.GetStreamAsync(dataSourceDescription.source.location).Result;
+            var zipStream = client.GetStreamAsync(mDataSourceDescription.source.location).Result;
 
             Console.WriteLine("opening Zip file");
             var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Read);
@@ -86,113 +82,60 @@ namespace BIE.DataPipeline.Import
             dbfStream.Position = 0;
             Console.WriteLine("File loaded.");
 
-            parser =
+            mParser =
                 Shapefile.CreateDataReader(
-                                new ShapefileStreamProviderRegistry(
-                                                new ByteStreamProvider(
-                                                                       StreamTypes.Shape, shpStream),
-                                                  new ByteStreamProvider(
-                                                                         StreamTypes.Data, dbfStream),
-                                                true,
-                                                true),
+                                           new ShapefileStreamProviderRegistry(
+                                                                               new ByteStreamProvider(
+                                                                                                      StreamTypes.Shape,
+                                                                                                      shpStream),
+                                                                               new ByteStreamProvider(
+                                                                                                      StreamTypes.Data,
+                                                                                                      dbfStream),
+                                                                               true,
+                                                                               true),
                                            GeometryFactory.Default);
 
             // parser = new ShapefileDataReader(@"D:\datasets\093_Oberpfalz_Hausumringe\hausumringe",
             //                                  NetTopologySuite.Geometries.GeometryFactory.Default);
-            header = parser.DbaseHeader;
+            mHeader = mParser.DbaseHeader;
         }
 
 
+        /// <summary>
+        /// reads the next line from the Shapefile and returns it as WKT (Well known text)
+        /// </summary>
+        /// <param name="nextLine"></param>
+        /// <returns></returns>
         public bool ReadLine(out string nextLine)
         {
             nextLine = "";
-            try
+            if (!mParser.Read())
             {
-                if (!parser.Read())
-                {
-                    Console.WriteLine("EOF");
-                    return false;
-                }
-
-                // Append geometry as WKT (Well-Known Text)
-                Geometry geometry = parser.Geometry;
-                geometry = ConvertUtmToLatLong(geometry);
-
-                string geo = ($"geography::STGeomFromText('{geometry.AsText()}', 4326)");
-
-                // Print the SQL insert statement
-                // Console.WriteLine(builder.ToString());
-                nextLine = geo;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                nextLine = "";
+                Console.WriteLine("EOF");
                 return false;
             }
+
+            // Append geometry as WKT (Well-Known Text)
+            var geometry = mParser.Geometry;
+            geometry = ConvertUtmToLatLong(geometry);
+
+            nextLine = $"geography::STGeomFromText('{geometry.AsText()}', 4326)";
+
+            return true;
         }
 
         private string[] ReadFileHeader()
         {
-            int fieldCount = header.NumFields;
-            string[] res = new string[fieldCount];
+            var fieldCount = mHeader.NumFields;
+            var res = new string[fieldCount];
 
             // Append column names
             for (int i = 0; i < fieldCount; i++)
             {
-                res[i] = header.Fields[i].Name;
+                res[i] = mHeader.Fields[i].Name;
             }
 
             return res;
-        }
-
-
-        private void SkipNlines(int noLines)
-        {
-            for (int i = 0; i < noLines; i++)
-            {
-                // Read and discard line
-                if (!parser.Read())
-                {
-                    // Handle case where file has less than 10 lines
-                    Console.WriteLine(string.Format("File has less than {0} lines", noLines));
-                    return;
-                }
-            }
-        }
-
-        public string GetTableName()
-        {
-            return this.dataSourceDescription.table_name;
-        }
-
-        public string GetHeaderString()
-        {
-            if (headerString.Equals(""))
-            {
-                foreach (DataSourceDescription.DataSourceColumn col in this.dataSourceDescription.table_cols)
-                {
-                    headerString += col.name_in_table + ",";
-                }
-
-                //remove last ,
-                headerString = RemoveLastComma(headerString);
-            }
-
-            return headerString;
-        }
-
-        private static string RemoveLastComma(string input)
-        {
-            int lastCommaIndex = input.LastIndexOf(',');
-            if (lastCommaIndex != -1)
-            {
-                return input.Remove(lastCommaIndex, 1);
-            }
-            else
-            {
-                return input; // No comma found, return original string
-            }
         }
 
         /// <summary>
@@ -200,7 +143,7 @@ namespace BIE.DataPipeline.Import
         /// </summary>
         /// <param name="polygon"></param>
         /// <returns></returns>
-        public Geometry ConvertUtmToLatLong(Geometry polygon)
+        private Geometry ConvertUtmToLatLong(Geometry polygon)
         {
             // Convert UTM coordinates to latitude and longitude
             foreach (Coordinate coordinate in polygon.Coordinates)

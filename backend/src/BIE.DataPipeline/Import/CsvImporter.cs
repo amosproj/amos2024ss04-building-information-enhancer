@@ -36,26 +36,26 @@ namespace BIE.DataPipeline.Import
 
             // create the stringbuilder used for creating the strings.
             builder = new StringBuilder();
-            
+
             //read header
             fileHeader = ReadFileHeader();
             yamlHeader = ImporterHelper.ReadYamlHeader(dataSourceDescription);
-            
+
             // get all the indexes and descriptions that interest us
             columnIndexes = new List<(int, int)>();
             for (int i = 0; i < fileHeader.Length; i++)
             {
                 for (int j = 0; j < yamlHeader.Length; j++)
                 {
-                    if (fileHeader[i] == yamlHeader[j])
+                    if (fileHeader[i] != yamlHeader[j])
                     {
-                        columnIndexes.Add((i, j));
-                        // Console.WriteLine($"adding columnindexes: {i}, {j}");
-                        break;
+                        continue;
                     }
+
+                    columnIndexes.Add((i, j));
+                    break;
                 }
             }
-
         }
 
         //tablename = name
@@ -66,22 +66,22 @@ namespace BIE.DataPipeline.Import
 
         public string GetHeaderString()
         {
-            if (headerString.Equals(""))
+            if (!headerString.Equals(""))
             {
-                foreach (DataSourceDescription.DataSourceColumn col in this.dataSourceDescription.table_cols)
-                {
-                    headerString += col.name_in_table + ",";
-                }
-
-                //remove last ,
-                headerString = RemoveLastComma(headerString);
+                return headerString;
             }
+
+            foreach (var col in dataSourceDescription.table_cols)
+            {
+                headerString += col.name_in_table + ",";
+            }
+
+            //remove last ,
+            headerString = RemoveLastComma(headerString);
 
             return headerString;
         }
 
-        //column = col1,col2
-        //string = 'name',1,'string2';
         public bool ReadLine(out string nextLine)
         {
             string[]? line;
@@ -90,7 +90,6 @@ namespace BIE.DataPipeline.Import
 
             while (builder.Length == 0)
             {
-                
                 // Console.Write($"trying to write");
 
                 // if (parser.EndOfData)
@@ -126,34 +125,20 @@ namespace BIE.DataPipeline.Import
                         break;
                     }
 
-                    try
-                    {
-                        line[i] = line[i].Replace("'", "''");
-                        line[i] = line[i].Replace(",", ".");
+                    line[i] = line[i].Replace("'", "''");
+                    line[i] = line[i].Replace(",", ".");
 
-                        if (columnTypes[i] == typeof(string))
-                        {
-                            // nextLine += $"'{line[i]}',";
-                            builder.Append($"'{line[i]}',");
-                            continue;
-                        }
-
-                        // nextLine += string.Format("{0},", Convert.ChangeType(line[i], columnTypes[i]));
-                        // nextLine += $"{line[i]},";
-                        builder.Append($"{line[i]},");
-                    }
-                    catch (System.FormatException ex)
+                    if (columnTypes[i] == typeof(string))
                     {
-                        Console.Error.WriteLine(string.Format("{3} Fauld parsing {0} to type {1} in column {2}",
-                                                              line[i],
-                                                              columnTypes[yamlIndex],
-                                                              fileHeader[i],
-                                                              i));
-                        nextLine = "";
-                        return false;
+                        // nextLine += $"'{line[i]}',";
+                        builder.Append($"'{line[i]}',");
+                        continue;
                     }
+
+                    // nextLine += string.Format("{0},", Convert.ChangeType(line[i], columnTypes[i]));
+                    // nextLine += $"{line[i]},";
+                    builder.Append($"{line[i]},");
                 }
-
             }
 
             builder.Length--; // this removes the last comma
@@ -190,10 +175,10 @@ namespace BIE.DataPipeline.Import
             else
             {
                 //Http path
-                Console.WriteLine($"Grabbing Webfile {dataSourceDescription.source.location}");
+                Console.WriteLine($"Grabbing Web file {dataSourceDescription.source.location}");
                 var client = new HttpClient();
                 var stream = client.GetStreamAsync(dataSourceDescription.source.location).Result;
-                // var stream = client.OpenRead(dataSourceDescription.source.location);
+
                 parser = new TextFieldParser(stream);
 
                 Console.WriteLine("File loaded.");
@@ -205,21 +190,23 @@ namespace BIE.DataPipeline.Import
 
         private void ValidateFilePath(DataSourceDescription.DataSourceLocation sourceLocation)
         {
-            if (sourceLocation.type.Equals("filepath"))
+            if (!sourceLocation.type.Equals("filepath"))
             {
-                if (!File.Exists(sourceLocation.location))
-                {
-                    throw new FileNotFoundException("The given file is not found");
-                }
+                return;
+            }
+
+            if (!File.Exists(sourceLocation.location))
+            {
+                throw new FileNotFoundException("The given file is not found");
             }
         }
 
         private string[] ReadFileHeader()
         {
             //check if parser has reached end of the file
-            if (parser.EndOfData)
+            if (parser == null || parser.EndOfData)
             {
-                //Handel case of no data
+                //Handle case of no data
                 throw new Exception("No header found");
             }
 
@@ -235,7 +222,7 @@ namespace BIE.DataPipeline.Import
                 if (parser.EndOfData)
                 {
                     // Handle case where file has less than 10 lines
-                    Console.WriteLine(string.Format("File has less than {0} lines", noLines));
+                    Console.WriteLine($"File has less than {noLines} lines");
                     return;
                 }
 

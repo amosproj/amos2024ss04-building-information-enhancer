@@ -8,6 +8,13 @@ namespace BIE.DataPipeline.Import
 {
     public static class YamlImporter
     {
+        /// <summary>
+        /// read in a file and extract the datasource description from it.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="FormatException"></exception>
         public static DataSourceDescription GetSourceDescription(string path)
         {
             path = Path.GetFullPath(path);
@@ -22,7 +29,6 @@ namespace BIE.DataPipeline.Import
                 throw new FormatException(path + " is not a yaml file");
             }
 
-            // var yaml = File.ReadAllText(path, Encoding.GetEncoding("iso-8859-1"));
             var yaml = File.ReadAllText(path);
 
             var deserializer = new Deserializer();
