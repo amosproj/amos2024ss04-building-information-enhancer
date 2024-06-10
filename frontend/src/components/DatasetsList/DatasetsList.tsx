@@ -12,7 +12,7 @@ import {
   Blueprint,
   MapTrifold,
 } from "@phosphor-icons/react";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
 
 import "./DatasetsList.css";
@@ -22,6 +22,7 @@ import L, { Icon as LIcon, DivIcon, LatLngBounds } from "leaflet";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import { MarkersTypes } from "./MarkersTypes";
+import axios from "axios";
 
 // Dataset Type
 export type Dataset = {
@@ -58,46 +59,44 @@ const divIconChargingStation: DivIcon = L.divIcon({
   iconAnchor: [17, 17], // Adjust the anchor point as needed
 });
 
-const datasetsData: Dataset[] = [
-  {
-    id: "empty_map",
-    displayName: "Empty Map",
-    description: "An empty, default map of Germany, with no data loaded.",
-    type: MarkersTypes.None,
-    datasetIcon: MapTrifold,
-    markerIcon: undefined,
-    data: emptyFeatureCollection,
-    lastDataRequestBounds: L.latLngBounds(L.latLng(0, 0), L.latLng(0, 0)),
-  },
-  {
-    id: "charging_stations",
-    displayName: "Charging stations",
-    description: "Locations of all charging stations in Germany.",
-    type: MarkersTypes.Markers,
-    datasetIcon: ChargingStation,
-    markerIcon: divIconChargingStation,
-    data: emptyFeatureCollection,
-    lastDataRequestBounds: L.latLngBounds(L.latLng(0, 0), L.latLng(0, 0)),
-  },
-  {
-    id: "house_footprints",
-    displayName: "House Footprints",
-    description: "Footprints for the hauses.",
-    type: MarkersTypes.Areas,
-    datasetIcon: Blueprint,
-    markerIcon: undefined,
-    data: emptyFeatureCollection,
-    lastDataRequestBounds: L.latLngBounds(L.latLng(0, 0), L.latLng(0, 0)),
-  },
-];
-
 interface DatasetsListProps {
   closeDialog: () => void;
 }
 
 const DatasetsList: React.FC<DatasetsListProps> = ({ closeDialog }) => {
+  const [datasets, setDatasets] = useState<Dataset[]>([]);
   const { currentTabsCache, setCurrentTabsCache } = useContext(TabsContext);
   const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
+
+  useEffect(() => {
+    const fetchDatasets = async () => {
+      try {
+        const response = await axios.get(
+          "https://localhost:5001/api/getDatasetList"
+        );
+        const datasetsData = response.data.basicInfoList.map(
+          (dataset: any) => ({
+            id: dataset.datasetId,
+            displayName: dataset.name,
+            description: dataset.description,
+            type: MarkersTypes.None, // This should be updated based on your logic
+            datasetIcon: MapTrifold, // You should update this to map the correct icon
+            markerIcon: divIconChargingStation, // Update this as needed
+            data: emptyFeatureCollection,
+            lastDataRequestBounds: L.latLngBounds(
+              L.latLng(0, 0),
+              L.latLng(0, 0)
+            ),
+          })
+        );
+        setDatasets(datasetsData);
+      } catch (error) {
+        console.error("Error fetching datasets:", error);
+      }
+    };
+
+    fetchDatasets();
+  }, []);
 
   // Opens a new tab
   const openNewTab = (dataset: Dataset) => {
@@ -129,7 +128,7 @@ const DatasetsList: React.FC<DatasetsListProps> = ({ closeDialog }) => {
     <div className="datasets-list-container">
       <Divider style={{ marginTop: "1rem" }} />
       <List sx={{ width: "100%", bgcolor: "background.paper", padding: 0 }}>
-        {datasetsData.map((dataset) => {
+        {datasets.map((dataset) => {
           return (
             <Fragment key={dataset.id}>
               <ListItemButton

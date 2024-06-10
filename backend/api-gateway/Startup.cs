@@ -18,7 +18,15 @@ public class Startup
     {
         services.AddControllers();
         services.AddHttpClient();
-
+        // Add CORS services
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowLocalhost",
+                builder => builder
+                    .WithOrigins("http://localhost:5173") // URL of your React app
+                    .AllowAnyHeader()
+                    .AllowAnyMethod());
+        });
         // Add Swagger services
         services.AddSwaggerGen(c =>
         {
@@ -48,6 +56,8 @@ public class Startup
             c.RoutePrefix = string.Empty; // Set Swagger UI at the root
         });
 
+        // Use the CORS policy
+        app.UseCors("AllowLocalhost");
         app.UseRouting();
 
         app.UseEndpoints(endpoints =>
