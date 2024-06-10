@@ -81,7 +81,7 @@ try
             break;
 
         default:
-            Console.WriteLine($"Unknown data format: {description.source.data_format}");
+            Console.WriteLine($"Unknown or missing data format: {description.source.data_format}");
             return 1;
     }
 }
