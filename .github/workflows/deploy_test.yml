@@ -53,6 +53,8 @@ jobs:
             type=ref,event=tag
             type=sha
             type=raw,value=${{ env.STAGE }}
+          labels: |
+            stage=${{ env.STAGE }}
 
       - name: Build and Publish Docker Image - ${{ matrix.service.name }}
         uses: docker/build-push-action@v5
