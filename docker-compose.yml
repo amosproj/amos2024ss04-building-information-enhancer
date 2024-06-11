@@ -5,7 +5,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: frontend
-    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-frontend:${DOCKER_COMPOSE_IMAGES_TAG}
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-frontend
     environment:
       - NODE_ENV=${ENVIRONMENT_STAGE}
       - API_GATEWAY_HOST=${API_GATEWAY_HOST}
@@ -21,7 +21,7 @@ services:
       context: ./backend/api-gateway
       dockerfile: Dockerfile
     container_name: api-gateway
-    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-api-gateway:${DOCKER_COMPOSE_IMAGES_TAG}
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-api-gateway
     environment:
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT_STAGE}
     ports:
@@ -35,7 +35,7 @@ services:
       context: ./backend/src/BIE.Core
       dockerfile: Dockerfile
     container_name: api-composer
-    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-api-composer:${DOCKER_COMPOSE_IMAGES_TAG}
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-api-composer
     environment:
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT_STAGE}
       - DB_NAME=${SQL_DB_NAME}
@@ -56,7 +56,7 @@ services:
     build:
       context: ./backend/src/BIE.DataPipeline
       dockerfile: Dockerfile
-    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-datapipeline:${DOCKER_COMPOSE_IMAGES_TAG}
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-datapipeline
     environment:
       - DB_NAME=${SQL_DB_NAME}
       - DB_PASSWORD=${SQL_DB_PASSWORD}
@@ -76,7 +76,7 @@ services:
       context: ./backend/sql-database
       dockerfile: Dockerfile
     container_name: sql-database
-    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-sql-database:${DOCKER_COMPOSE_IMAGES_TAG}
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-sql-database
     networks:
       - bie-network
   # volumes:
@@ -88,7 +88,7 @@ services:
       context: ./backend/metadata-database
       dockerfile: Dockerfile
     container_name: metadata-database
-    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-metadata-database:${DOCKER_COMPOSE_IMAGES_TAG}
+    image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-metadata-database
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
