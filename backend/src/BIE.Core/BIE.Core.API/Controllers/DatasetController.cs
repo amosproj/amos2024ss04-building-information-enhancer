@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json.Linq;
 using Accord.MachineLearning;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace BIE.Core.API.Controllers
 {
@@ -175,22 +176,31 @@ namespace BIE.Core.API.Controllers
                 // Console.WriteLine(command);
                 foreach (var row in DbHelper.GetData(formattedQuery))
                 {
-                    var location = row["Location"]
-    .Replace("POLYGON ((", "").Replace("))", "")
-    .Split(',')
-    .Select(coord => coord.Trim().Split(' ')
-    .Select(double.Parse).ToArray()).ToList();
+                    //Console.WriteLine(row["Location"]);
+                    var location = new List<double[]>();
+                    try
+                    {
+                         location = row["Location"]
+                     .Replace("POLYGON ((", "").Replace("))", "")
+                     .Split(',')
+                     .Select(coord => coord.Trim().Split(' ')
+                     .Select(double.Parse).ToArray()).ToList();
 
+                    }
+                    catch (Exception ex)
+                    {
+                        continue;
+                    }
                     spatialDataList.Add(new SpatialData
                     {
-                        Id = Convert.ToInt16(row["Id"]),
+                        Id = Convert.ToInt32(row["Id"]),
                         Coordinates = location,
                         Type = row["Type"]
                     });
                 }
-                var clusters = QueryParameters.ClusterData(spatialDataList,Convert.ToInt16(parameters.ZoomLevel));
+                var clusters = QueryParameters.ClusterData(spatialDataList,Convert.ToInt32(parameters.ZoomLevel));
                 var geoJson = QueryParameters.ConvertToGeoJson(clusters);
-                return Ok(JsonConvert.SerializeObject(geoJson));
+                return Ok(geoJson);
             }
             catch (ServiceException se)
             {
@@ -283,39 +293,55 @@ namespace BIE.Core.API.Controllers
                 return clusteredData;
             }
 
-            public static GeoJsonFeatureCollection ConvertToGeoJson(List<List<SpatialData>> clusters)
-            {
-                var featureCollection = new GeoJsonFeatureCollection();
 
+            public static string ConvertToGeoJson(List<List<SpatialData>> clusters)
+            {
+                var sb = new StringBuilder();
+                sb.Append("{\"type\":\"FeatureCollection\",\"features\":[");
+
+                bool firstFeature = true;
                 foreach (var cluster in clusters)
                 {
                     foreach (var spatialData in cluster)
                     {
-                        var coordinates = new JArray(spatialData.Coordinates.Select(coord => new JArray(coord)));
-
-                        var geometry = new JObject
+                        foreach (var polygon in spatialData.Coordinates)
                         {
-                            ["type"] = spatialData.Type,
-                            ["coordinates"] = new JArray(coordinates)
-                        };
+                            if (!firstFeature)
+                            {
+                                sb.Append(",");
+                            }
+                            else
+                            {
+                                firstFeature = false;
+                            }
 
-                        var properties = new JObject
-                        {
-                            ["Id"] = spatialData.Id,
-                            ["ClusterId"] = spatialData.ClusterId  
-                        };
+                            sb.Append("{\"type\":\"Feature\",\"geometry\":{");
+                            sb.Append("\"type\":\"Polygon\",\"coordinates\":[[");
 
-                        var feature = new GeoJsonFeature
-                        {
-                            Geometry = geometry,
-                            Properties = properties
-                        };
+                            bool firstCoordinate = true;
+                            //foreach (var coord in polygon)
+                            {
+                                if (!firstCoordinate)
+                                {
+                                    sb.Append(",");
+                                }
+                                else
+                                {
+                                    firstCoordinate = false;
+                                }
 
-                        featureCollection.Features.Add(feature);
+                                sb.Append($"[{polygon[0]},{polygon[1]}]");
+                            }
+
+                            sb.Append("]]},\"properties\":{");
+                            sb.Append($"\"Id\":{spatialData.Id},\"ClusterId\":{spatialData.ClusterId}");
+                            sb.Append("}}");
+                        }
                     }
                 }
 
-                return featureCollection;
+                sb.Append("]}");
+                return sb.ToString();
             }
 
         }
