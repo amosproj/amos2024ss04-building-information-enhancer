@@ -1,5 +1,4 @@
 import L, { LatLng } from "leaflet";
-//import { RawResult } from "leaflet-geosearch/dist/providers/openStreetMapProvider.js";
 import React, { createContext, useState, ReactNode } from "react";
 import { GeoJSON } from 'geojson';
 export declare type PointTuple = [number, number];

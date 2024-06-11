@@ -15,7 +15,6 @@ import { OpenStreetMapProvider } from "leaflet-geosearch";
 import { LatLng} from "leaflet";
 import { MapContext } from "../../contexts/MapContext";
 import L from 'leaflet';
-import { RawResult } from "leaflet-geosearch/dist/providers/openStreetMapProvider.js";
 
 
 import { GeoJSON } from 'geojson';
