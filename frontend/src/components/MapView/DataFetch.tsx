@@ -40,6 +40,7 @@ const useGeoData = (
         return "";
       default:
         return (
+          "http://" +
           currentEnvironment.apiBaseHost +
           ":" +
           currentEnvironment.apiBasePort +

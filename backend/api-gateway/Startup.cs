@@ -19,13 +19,18 @@ public class Startup
         services.AddControllers();
         services.AddHttpClient();
 
-        // Add CORS services to allow all origins
+        // Add CORS services to allow specific origins
         services.AddCors(options =>
         {
-            options.AddPolicy("AllowAll",
+            options.AddPolicy("AllowSpecificOrigins",
                 builder =>
                 {
-                    builder.AllowAnyOrigin()
+                    builder.WithOrigins("http://localhost",
+                        "http://test.amos.b-ci.de",
+                        "http://prod.amos.b-ci.de",
+                        "http://test.amos.b-ci.de:*",
+                        "http://prod.amos.b-ci.de:*",
+                        "http://localhost:*")
                            .AllowAnyHeader()
                            .AllowAnyMethod();
                 });
@@ -61,7 +66,7 @@ public class Startup
         });
 
         // Enable CORS
-        app.UseCors("AllowAll");
+        app.UseCors("AllowSpecificOrigins");
 
         app.UseRouting();
 
