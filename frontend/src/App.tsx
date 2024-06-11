@@ -40,7 +40,7 @@ function App() {
           <div className={`multi-map ${!dataViewVisible ? "full-width" : ""}`}>
           <div className="multimap-container">
           
-          <Tooltip title={dataViewVisible ? "Hide Data View" : "Show Data View"}>
+          <Tooltip title={dataViewVisible ? "Hide Data View" : "Show Data View"} arrow>
                   <button onClick={toggleDataView} className="toggle-button">
                     {dataViewVisible ? (
                       <CaretRight/>
