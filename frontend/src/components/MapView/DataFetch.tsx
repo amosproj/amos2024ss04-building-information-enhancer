@@ -33,7 +33,8 @@ const useGeoData = (
     (tab) => tab.dataset.id === id
   );
 
-  // Returns the API URL of the endpoint for a specific dataset
+  // Returns the API URL of the endpoint for a specific dataset.
+  // The .join() function ensures that this strings will not be replace by the .sh script.
   const getApiUrlForDataset = (): string => {
     switch (id) {
       case "empty_map":
