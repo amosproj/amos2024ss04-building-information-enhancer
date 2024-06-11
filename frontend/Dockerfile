@@ -33,8 +33,8 @@ COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 RUN dos2unix /usr/local/apache2/htdocs/replace_api_url.sh && chmod +x /usr/local/apache2/htdocs/replace_api_url.sh
 
 # Set default values for environment variables
-ENV API_GATEWAY_HOST="default_host_value"
-ENV API_GATEWAY_PORT="default_port_value"
+ENV API_GATEWAY_HOST="localhost"
+ENV API_GATEWAY_PORT="8081"
 
 # Expose the port
 EXPOSE "${PORT}"
