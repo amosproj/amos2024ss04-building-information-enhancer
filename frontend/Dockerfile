@@ -9,7 +9,6 @@ ARG STAGE
 ENV VITE_STAGE=${STAGE}
 
 ### Install dependencies ###
-
 # Copy package.json and package-lock.json to the working directory
 COPY package.json ./
 COPY package-lock.json ./
@@ -22,15 +21,14 @@ ADD . .
 
 RUN npm run build
 
-### Deploy the server ###
-
-# Use Apache HTTP server
+### Deploy the Apache HTTP ###
 FROM httpd:2.4
 
 COPY --from=builder /usr/src/app/dist /usr/local/apache2/htdocs/
+COPY replace_api_url.sh /usr/local/apache2/htdocs/
 
 # Expose the port
 EXPOSE "${PORT}"
 
 # Start web server
-CMD ["httpd-foreground"]
+CMD ["sh", "/usr/local/apache2/htdocs/replace_api_url.sh"]
