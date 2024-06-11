@@ -161,7 +161,7 @@ namespace BIE.Core.API.Controllers
                 DbHelper.CreateDbConnection();
 
                 string command = @"
-         SELECT Id, Location.STAsText() AS Location, Location.STGeometryType() AS Type
+         SELECT Top(1000) Id, Location.STAsText() AS Location, Location.STGeometryType() AS Type
          FROM dbo.Hausumringe_mittelfranken
          WHERE Location.STIntersects(geography::STGeomFromText('POLYGON((
             {0} {1},
@@ -176,7 +176,6 @@ namespace BIE.Core.API.Controllers
                 // Console.WriteLine(command);
                 foreach (var row in DbHelper.GetData(formattedQuery))
                 {
-                    //Console.WriteLine(row["Location"]);
                     var location = new List<double[]>();
                     try
                     {
@@ -200,7 +199,7 @@ namespace BIE.Core.API.Controllers
                 }
                 var clusters = QueryParameters.ClusterData(spatialDataList,Convert.ToInt32(parameters.ZoomLevel));
                 var geoJson = QueryParameters.ConvertToGeoJson(clusters);
-                return Ok(geoJson);
+                return Ok(JsonConvert.SerializeObject(geoJson));
             }
             catch (ServiceException se)
             {
@@ -294,56 +293,42 @@ namespace BIE.Core.API.Controllers
             }
 
 
-            public static string ConvertToGeoJson(List<List<SpatialData>> clusters)
+            public static GeoJsonFeatureCollection ConvertToGeoJson(List<List<SpatialData>> clusters)
             {
-                var sb = new StringBuilder();
-                sb.Append("{\"type\":\"FeatureCollection\",\"features\":[");
+                var featureCollection = new GeoJsonFeatureCollection();
 
-                bool firstFeature = true;
                 foreach (var cluster in clusters)
                 {
                     foreach (var spatialData in cluster)
                     {
-                        foreach (var polygon in spatialData.Coordinates)
+                        var coordinates = new JArray(spatialData.Coordinates.Select(coord => new JArray(coord)));
+
+                        var geometry = new JObject
                         {
-                            if (!firstFeature)
-                            {
-                                sb.Append(",");
-                            }
-                            else
-                            {
-                                firstFeature = false;
-                            }
+                            ["type"] = spatialData.Type,
+                            ["coordinates"] = new JArray(coordinates)
+                        };
 
-                            sb.Append("{\"type\":\"Feature\",\"geometry\":{");
-                            sb.Append("\"type\":\"Polygon\",\"coordinates\":[[");
+                        var properties = new JObject
+                        {
+                            ["Id"] = spatialData.Id,
+                            ["ClusterId"] = spatialData.ClusterId
+                        };
 
-                            bool firstCoordinate = true;
-                            //foreach (var coord in polygon)
-                            {
-                                if (!firstCoordinate)
-                                {
-                                    sb.Append(",");
-                                }
-                                else
-                                {
-                                    firstCoordinate = false;
-                                }
+                        var feature = new GeoJsonFeature
+                        {
+                            Geometry = geometry,
+                            Properties = properties
+                        };
 
-                                sb.Append($"[{polygon[0]},{polygon[1]}]");
-                            }
-
-                            sb.Append("]]},\"properties\":{");
-                            sb.Append($"\"Id\":{spatialData.Id},\"ClusterId\":{spatialData.ClusterId}");
-                            sb.Append("}}");
-                        }
+                        featureCollection.Features.Add(feature);
                     }
                 }
 
-                sb.Append("]}");
-                return sb.ToString();
+                return featureCollection;
             }
 
         }
+
     }
-}
+    }
