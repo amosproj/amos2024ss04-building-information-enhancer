@@ -28,10 +28,6 @@ RUN dotnet publish "BIE.Core.API.csproj" -c Release -o /app/publish
 ### DEPLOY ###
 FROM base AS final
 
-# Set the environment variables TO-DO
-#ENV TRUSTED="true"
-#ENV DB_TYPE="SQL"
-
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "BIE.Core.API.dll"]

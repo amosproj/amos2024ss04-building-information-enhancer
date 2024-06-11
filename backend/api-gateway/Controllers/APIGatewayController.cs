@@ -36,7 +36,7 @@ namespace BIE.Core.API.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> GetDatasetViewportData(
-            [FromQuery, Required] int datasetID, 
+            [FromQuery, Required] string datasetID, 
             [FromQuery] int zoomLevel, 
             [FromQuery, Required] float BottomLat, 
             [FromQuery, Required] float BottomLong, 
@@ -49,8 +49,21 @@ namespace BIE.Core.API.Controllers
             }
 
             _logger.LogInformation($"Fetching data for DatasetID: {datasetID}, ZoomLevel: {zoomLevel}, Viewport: [{BottomLat}, {BottomLong}] to [{TopLat}, {TopLong}]");
-            // Here the port 80 is used not 8080. This is due to the docker containers using the interal ports to communicate and not the external ones.
-            var targetUrl = $"http://api-composer:80/api/v1.0/Dataset/1/data?ZoomLevel={zoomLevel}&BottomLat={BottomLat}&BottomLong={BottomLong}&TopLat={TopLat}&TopLong={TopLong}";
+            
+            string targetUrl;
+            if (datasetID == "charging_stations")
+            {
+                targetUrl = $"http://api-composer:80/api/v1.0/Dataset/1/data?ZoomLevel={zoomLevel}&BottomLat={BottomLat}&BottomLong={BottomLong}&TopLat={TopLat}&TopLong={TopLong}";
+            }
+            else if (datasetID == "house_footprints")
+            {
+                targetUrl = $"http://api-composer:80/api/v1.0/Dataset/2/data?ZoomLevel={zoomLevel}&BottomLat={BottomLat}&BottomLong={BottomLong}&TopLat={TopLat}&TopLong={TopLong}";
+            }
+            else
+            {
+                _logger.LogError($"Unsupported dataset ID of {datasetID}");
+                return StatusCode(400, $"Unsupported dataset ID of {datasetID}");
+            }
 
             try
             {

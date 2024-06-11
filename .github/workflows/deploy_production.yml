@@ -53,6 +53,7 @@ jobs:
             type=ref,event=tag
             type=sha
             type=raw,value=${{ env.STAGE }}
+            latest
           labels: |
             stage=${{ env.STAGE }}
 
