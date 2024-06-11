@@ -197,6 +197,10 @@ namespace BIE.Core.API.Controllers
                         Type = row["Type"]
                     });
                 }
+                if (spatialDataList.Count == 0)
+                {
+                    return Ok("{\"type\":\"FeatureCollection\",\"features\":[]}");
+                }
                 var clusters = QueryParameters.ClusterData(spatialDataList,Convert.ToInt32(parameters.ZoomLevel));
                 var geoJson = QueryParameters.ConvertToGeoJson(clusters);
                 return Ok(JsonConvert.SerializeObject(geoJson));
