@@ -32,8 +32,12 @@ COPY httpd.conf /usr/local/apache2/conf/httpd.conf
 # Convert line endings and ensure the script is executable
 RUN dos2unix /usr/local/apache2/htdocs/replace_api_url.sh && chmod +x /usr/local/apache2/htdocs/replace_api_url.sh
 
+# Set default values for environment variables
+ENV API_GATEWAY_HOST="default_host_value"
+ENV API_GATEWAY_PORT="default_port_value"
+
 # Expose the port
 EXPOSE "${PORT}"
 
 # Start web server after running the script
-CMD sh /usr/local/apache2/htdocs/replace_api_url.sh && httpd-foreground
+CMD sh /usr/local/apache2/htdocs/replace_api_url.sh "${API_GATEWAY_HOST}" "${API_GATEWAY_PORT}"
