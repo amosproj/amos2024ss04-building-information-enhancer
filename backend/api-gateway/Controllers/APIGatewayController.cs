@@ -50,7 +50,7 @@ namespace BIE.Core.API.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
 
-        public IActionResult GetDatasetMetadata([FromQuery, Required] int datasetID)
+        public IActionResult GetDatasetMetadata([FromQuery, Required] string datasetID)
         {
             if (!ModelState.IsValid)
             {
