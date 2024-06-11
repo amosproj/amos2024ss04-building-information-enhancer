@@ -129,12 +129,11 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
             />
           </div>
         )}
-        {tabProps && tabProps.dataset.type === MarkersTypes.Markers && (
-          <ZoomWarningLabel
-            label="Zoom in to see the markers"
-            minZoom={minZoomForLabel}
-          />
-        )}
+
+        <ZoomWarningLabel
+          label="Zoom in to see the markers"
+          minZoom={minZoomForLabel}
+        />
       </MapContainer>
     </div>
   );

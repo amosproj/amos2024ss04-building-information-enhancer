@@ -22,8 +22,7 @@ public class Startup
         services.AddCors(options =>
         {
             options.AddPolicy("AllowLocalhost",
-                builder => builder
-                    .AllowAnyOrigin()
+                builder => builder.WithOrigins("http://localhost:5173")
                     .AllowAnyHeader()
                     .AllowAnyMethod());
         });

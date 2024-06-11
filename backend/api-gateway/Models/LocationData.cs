@@ -3,12 +3,7 @@
     public class LocationDataRequest
     {
         public string DatasetId { get; set; }
-        public LocationData Location { get; set; }
-    }
-
-    public class LocationData
-    {
-        public List<Coordinate> Coordinates { get; set; }
+        public List<Coordinate> Location { get; set; }
     }
 
     public class Coordinate

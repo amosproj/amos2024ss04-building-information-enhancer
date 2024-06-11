@@ -6,13 +6,7 @@ import {
   ListItemButton,
   ListItemText,
 } from "@mui/material";
-import {
-  ChargingStation,
-  Icon,
-  Blueprint,
-  MapTrifold,
-} from "@phosphor-icons/react";
-import * as P from "@phosphor-icons/react";
+import { Icon, MapPin, MapTrifold } from "@phosphor-icons/react";
 import { useContext, useEffect, useState } from "react";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
 
@@ -25,7 +19,6 @@ import { flushSync } from "react-dom";
 import { MarkersTypes } from "./MarkersTypes";
 import axios from "axios";
 import { DatasetBasicData, DatasetListResponse } from "./DatasetTypes";
-import { renderToStaticMarkup } from "react-dom/server";
 
 // Dataset Type
 export type Dataset = {
@@ -37,18 +30,6 @@ export type Dataset = {
   markerIcon: LIcon | DivIcon | undefined;
   data: FeatureCollection;
   lastDataRequestBounds: LatLngBounds;
-};
-
-const fetchDatasets = async () => {
-  try {
-    const response = await axios.get<DatasetListResponse>(
-      "https://localhost:5001/api/getDatasetList"
-    );
-    return response.data.basicInfoList;
-  } catch (error) {
-    console.error("Error fetching datasets:", error);
-    return [];
-  }
 };
 
 // Define an empty FeatureCollection
@@ -67,10 +48,8 @@ const renderToHtml = (Component: React.FC) => {
   return div.innerHTML;
 };
 
-// Define a type for the keys of the P object
-type PhosphorIconName = keyof typeof P;
-
 const createDivIcon = (iconName: string) => {
+  console.log(iconName);
   return L.divIcon({
     html: iconName,
     className: "", // Optional: add a custom class name
@@ -79,8 +58,8 @@ const createDivIcon = (iconName: string) => {
   });
 };
 
-const divIconChargingStation: DivIcon = L.divIcon({
-  html: renderToHtml(() => <ChargingStation size={32} weight="duotone" />),
+const divIcondefault: DivIcon = L.divIcon({
+  html: renderToHtml(() => <MapPin size={32} weight="duotone" />),
   className: "", // Optional: add a custom class name
   iconSize: [34, 34],
   iconAnchor: [17, 17], // Adjust the anchor point as needed
@@ -100,10 +79,7 @@ const DatasetsList: React.FC<DatasetsListProps> = ({ closeDialog }) => {
       try {
         // Make the API call with the expected response type
         const response = await axios.get<DatasetListResponse>(
-          "https://localhost:5001/api/getDatasetList"
-        );
-        const test: DivIcon = createDivIcon(
-          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><rect width="256" height="256" fill="none"/><path d="M216,112v16c0,53-88,88-88,112,0-24-88-59-88-112V112" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/><path d="M80,56h96a48,48,0,0,1,48,48v0a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8v0A48,48,0,0,1,80,56Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/><path d="M128,56V48a32,32,0,0,1,32-32" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/></svg>'
+          "https://localhost:49922/api/getDatasetList"
         );
         const datasetsData = response.data.basicInfoList.map(
           (dataset: DatasetBasicData) => {
@@ -113,7 +89,9 @@ const DatasetsList: React.FC<DatasetsListProps> = ({ closeDialog }) => {
               description: dataset.description,
               type: MarkersTypes.None, // This should be updated based on your logic
               datasetIcon: MapTrifold, // You should update this to map the correct icon
-              markerIcon: test, // Update this as needed
+              markerIcon: dataset.icon
+                ? createDivIcon(dataset.icon)
+                : divIcondefault, // Update this as needed
               data: emptyFeatureCollection,
               lastDataRequestBounds: L.latLngBounds(
                 L.latLng(0, 0),
