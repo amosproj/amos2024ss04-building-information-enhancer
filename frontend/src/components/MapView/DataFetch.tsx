@@ -33,26 +33,28 @@ const useGeoData = (
     (tab) => tab.dataset.id === id
   );
 
-  // Returns the API URL of the endpoint for a specific dataset.
+  // Returns the API Gateway URL for a specific deployment environment
   // The .join() function ensures that this strings will not be replace by the .sh script.
-  const getApiUrlForDataset = (): string => {
+  const getAPIGatewayURL = (): string => {
+    return (
+      "http://" +
+      (currentEnvironment.apiGatewayHost === ["API_", "GATEWAY_", "HOST"].join()
+        ? currentEnvironment.apiGatewayHost
+        : "localhost") +
+      ":" +
+      (currentEnvironment.apiGatewayPort === ["API_", "GATEWAY_", "PORT"].join()
+        ? currentEnvironment.apiGatewayPort
+        : "8081")
+    );
+  };
+
+  // Returns the API Gateway URL of the endpoint for a specific dataset.
+  const getViewportDatasetEndpoint = (): string => {
     switch (id) {
       case "empty_map":
         return "";
       default:
-        return (
-          "http://" +
-          (currentEnvironment.apiGatewayHost ===
-          ["API_", "GATEWAY_", "HOST"].join()
-            ? currentEnvironment.apiGatewayHost
-            : "localhost") +
-          ":" +
-          (currentEnvironment.apiGatewayPort ===
-          ["API_", "GATEWAY_", "PORT"].join()
-            ? currentEnvironment.apiGatewayPort
-            : "8081") +
-          "/api/getDatasetViewportData"
-        );
+        return getAPIGatewayURL() + "/api/getDatasetViewportData";
     }
   };
 
@@ -89,9 +91,9 @@ const useGeoData = (
           ZoomLevel: zoom,
           datasetID: id,
         };
-        console.log(getApiUrlForDataset());
+        console.log(getViewportDatasetEndpoint());
         const response = await axios.get<FeatureCollection<Geometry>>(
-          getApiUrlForDataset(),
+          getViewportDatasetEndpoint(),
           {
             params,
           }
