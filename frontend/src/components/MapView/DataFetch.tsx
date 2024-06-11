@@ -1,21 +1,10 @@
 import { FeatureCollection, Geometry } from "geojson";
-import defaultCityLocationData from "./FeatureCollection.json";
-import defaultPolygonData from "./output1000.json";
 import { LatLngBounds } from "leaflet";
 import { useContext, useEffect, useState } from "react";
 import { TabsContext } from "../../contexts/TabsContext";
 import { AlertContext } from "../../contexts/AlertContext";
 import axios from "axios";
-const geojsonCities: FeatureCollection =
-  defaultCityLocationData as FeatureCollection;
-const geojsonGemeindenPolygons: FeatureCollection =
-  defaultPolygonData as FeatureCollection;
-
-// These values will be replaced after build with the .sh script when spinning up docker container.
-export const currentEnvironment = {
-  apiGatewayHost: "API_GATEWAY_HOST",
-  apiGatewayPort: "API_GATEWAY_PORT",
-};
+import { getAPIGatewayURL } from "../../utils";
 
 const useGeoData = (
   id: string,
@@ -32,21 +21,6 @@ const useGeoData = (
   const tabProps = currentTabsCache.openedTabs.find(
     (tab) => tab.dataset.id === id
   );
-
-  // Returns the API Gateway URL for a specific deployment environment
-  // The .join() function ensures that this strings will not be replace by the .sh script.
-  const getAPIGatewayURL = (): string => {
-    return (
-      "http://" +
-      (currentEnvironment.apiGatewayHost === ["API_", "GATEWAY_", "HOST"].join()
-        ? currentEnvironment.apiGatewayHost
-        : "localhost") +
-      ":" +
-      (currentEnvironment.apiGatewayPort === ["API_", "GATEWAY_", "PORT"].join()
-        ? currentEnvironment.apiGatewayPort
-        : "8081")
-    );
-  };
 
   // Returns the API Gateway URL of the endpoint for a specific dataset.
   const getViewportDatasetEndpoint = (): string => {
@@ -102,19 +76,6 @@ const useGeoData = (
           console.error("Axios error fetching data:", error.message);
         } else {
           console.error("Unknown error fetching data:", error);
-        }
-        // Load the static data
-        switch (id) {
-          case "charging_stations":
-            setData(geojsonCities as FeatureCollection<Geometry>);
-            onUpdate(geojsonCities, bounds);
-            return;
-          case "house_footprints":
-            setData(geojsonGemeindenPolygons as FeatureCollection<Geometry>);
-            onUpdate(geojsonGemeindenPolygons, bounds);
-            return;
-          default:
-            return;
         }
       }
     };
