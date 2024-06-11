@@ -109,6 +109,10 @@
   padding: 1.1rem 1rem 0.8rem 1rem !important;
 }
 
+.MuiTab-root:focus {
+  outline: none;
+}
+
 .MuiTab-root + .MuiTab-root {
   border-left: none !important;
 }

@@ -34,15 +34,9 @@ const MultiMap = () => {
 
   const [selectedTabId, setSelectedTabId] = useState<string | null>(null);
 
-
   // Handles the change of the current tab id
-  const handleChange = (event: React.SyntheticEvent, newTabID: string) => {
-
-    if ((event.target as HTMLInputElement).type !== "button") {
-      console.log("inside if");
-      setCurrentTabsCache({ ...currentTabsCache, currentTabID: newTabID });
-    }
-
+  const handleChange = (newTabID: string) => {
+    setCurrentTabsCache({ ...currentTabsCache, currentTabID: newTabID });
   };
 
   return (
@@ -52,7 +46,6 @@ const MultiMap = () => {
           <TabList
             variant="scrollable"
             scrollButtons="auto"
-            onChange={handleChange}
             aria-label="lab API multimap tabs"
             selectionFollowsFocus
           >
@@ -84,14 +77,14 @@ const MultiMap = () => {
                           <Fragment />
                         )}
                         <Tooltip title="Tab Options" arrow>
-                          <DotsThreeOutline
+                          <span><DotsThreeOutline
                             weight="fill"
                             className={`options-tab-icon ${isMenuOpen ? 'options-tab-icon-inverted' : ''}`}
                             onClick={(event) => {
                                 handleMenuClick(event, tab.id);
                               }
                             }
-                          />
+                          /></span>
                         </Tooltip>
                       </div>
                     </div>
@@ -100,6 +93,7 @@ const MultiMap = () => {
                   key={tab.id}
                   disableRipple
                   disableFocusRipple
+                  onClick={() => handleChange(tab.id)} 
                 ></Tab>
               );
             })}
