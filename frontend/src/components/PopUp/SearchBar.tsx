@@ -14,12 +14,23 @@ import { MapSelection, SearchContext } from "../../contexts/SearchContext";
 import { OpenStreetMapProvider } from "leaflet-geosearch";
 import { LatLng} from "leaflet";
 import { MapContext } from "../../contexts/MapContext";
+import L from 'leaflet';
+import { RawResult } from "leaflet-geosearch/dist/providers/openStreetMapProvider.js";
+
+
+import { GeoJSON } from 'geojson';
+
+declare module 'leaflet-geosearch/dist/providers/openStreetMapProvider.js' {
+  interface RawResult {
+    geojson: GeoJSON;
+  }
+}
 
 
 const SearchBar: React.FC = () => {
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState<Array<MapSelection>>([]);
-  const { currentMapCache } = useContext(MapContext);
+  const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
   const { currentSearchCache, setCurrentSearchCache } = useContext(SearchContext);
   const [loading, setLoading] = useState(false);
   
@@ -34,8 +45,7 @@ const SearchBar: React.FC = () => {
             "accept-language": "de",
             countrycodes: "de",
             addressdetails: 1,
-            //polygon_geojson: 1,
-            //polygon_threshold: 3,
+            polygon_geojson: 1,
           },
         });
         if (query === "") {
@@ -43,12 +53,13 @@ const SearchBar: React.FC = () => {
           return;
         }
         const results = await provider.search({ query });
-        console.log(results);
+        console.log(results[0].raw.geojson);
         const transformedResults: MapSelection[] = results.map((result) => ({
           coordinates: new LatLng(result.y, result.x),
           displayName: result.label,
           bounds: result.bounds,
           area: (result.raw.class === "boundary"),
+          polygon: result.raw.geojson,
         }));
         callback(transformedResults);
       }, 400),
@@ -104,14 +115,20 @@ const SearchBar: React.FC = () => {
     const targetPosition = new LatLng(item.coordinates.lat, item.coordinates.lng);
 
     const { mapInstance } = currentMapCache;
-    //const {selectedCoordinates} = currentMapCache;
+
 
     if (mapInstance) {
-        //TODO if polygon then flyToBounds
+
         currentMapCache.selectedCoordinates = targetPosition; //Set Marker
 
         if(item.area && item.bounds){
             mapInstance.flyToBounds(item.bounds, { animate: true, duration: 5 });
+            const drawPolygon = L.geoJSON(item.polygon) ;
+            drawPolygon.addTo(mapInstance);
+            setCurrentMapCache({
+              ...currentMapCache,
+              polygon: drawPolygon
+            });
         }else{
             mapInstance.flyTo(targetPosition, 13, { animate: true, duration: 5 });
         }
@@ -154,6 +171,7 @@ const SearchBar: React.FC = () => {
             displayName: newValue.displayName,
             bounds: newValue.bounds,
             area: newValue.area,
+            polygon: newValue.polygon,
           };
           onItemSelected(selectedLocation);
         }
@@ -161,6 +179,11 @@ const SearchBar: React.FC = () => {
 
       onInputChange={(_event, newInputValue) => {
         setInputValue(newInputValue);
+        currentMapCache.polygon?.remove();
+          setCurrentMapCache({
+            ...currentMapCache,
+            polygon: null,
+          });
       }}
       renderInput={(params) => (
 
@@ -227,12 +250,14 @@ const SearchBar: React.FC = () => {
                           displayName: option.displayName,
                           bounds: option.bounds,
                           area: option.area,
+                          polygon: option.polygon,
                         })
                       : addToFavourites({
                           coordinates: option.coordinates,
                           displayName: option.displayName,
                           bounds: option.bounds,
                           area: option.area,
+                          polygon: option.polygon,
                         })
                   }
                 }

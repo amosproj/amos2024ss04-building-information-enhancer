@@ -1,6 +1,7 @@
 import L, { LatLng } from "leaflet";
 //import { RawResult } from "leaflet-geosearch/dist/providers/openStreetMapProvider.js";
 import React, { createContext, useState, ReactNode } from "react";
+import { GeoJSON } from 'geojson';
 export declare type PointTuple = [number, number];
 export declare type LatLngBoundsLiteralBoundsTuple = [PointTuple, PointTuple];
 
@@ -16,6 +17,7 @@ export type MapSelection = {
   displayName: string;
   bounds: LatLngBoundsLiteral | null;
   area: boolean; // everything that is not a building is an area
+  polygon: null | GeoJSON;
 };
 
 // Search Cache Type
@@ -45,6 +47,7 @@ const defaultSearchCache: SearchCacheProps = {
       displayName: "Nuremberg",
       bounds: [[40,50],[50,60]],
       area: false,
+      polygon: null,
     },
     // {
     //   coordinates: L.latLng([49.5732, 13.0288]),

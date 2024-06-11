@@ -37,9 +37,11 @@ const MapEventsHandler = () => {
   useMapEvents({
     click: (event) => {
       console.log(event);
+      currentMapCache.polygon?.remove();
       setCurrentMapCache({
         ...currentMapCache,
         selectedCoordinates: event.latlng,
+        polygon: null,
       });
     },
     moveend: (event) => {
