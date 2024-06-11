@@ -12,7 +12,7 @@ import MainMenu from "./components/MainMenu/MainMenu";
 import ErrorAlert from "./components/Alerts/ErrorAlert";
 
 import Tooltip from '@mui/material/Tooltip';
-import { CaretLeft, CaretRight } from "@phosphor-icons/react";
+import { CaretDoubleLeft, CaretDoubleRight } from "@phosphor-icons/react";
 
 import { MapContext } from "./contexts/MapContext";
 
@@ -43,9 +43,9 @@ function App() {
           <Tooltip title={dataViewVisible ? "Hide Data View" : "Show Data View"} arrow>
                   <button onClick={toggleDataView} className="toggle-button">
                     {dataViewVisible ? (
-                      <CaretRight/>
+                      <CaretDoubleRight/>
                     ) : (
-                      <CaretLeft />
+                      <CaretDoubleLeft />
                     )}
                   </button>
                 </Tooltip>
