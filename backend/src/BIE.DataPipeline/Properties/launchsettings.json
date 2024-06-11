@@ -1,0 +1,17 @@
+{
+  "profiles": {
+    "BIE.DataPipeline": {
+      "commandName": "Project",
+      "commandLineArgs": "--behavior=skip Faulty.yaml",
+      "workingDirectory": "yaml",
+      "environmentVariables": {
+        "DB_SERVER": "localhost",
+        "DB_NAME": "BIEDB",
+        "DB_PASSWORD": "MyPass@1234",
+        "DB_USERNAME": "db_user1",
+        "DB_TYPE": "SQL",
+        "TRUSTED": "True"
+      }
+    }
+  }
+}
