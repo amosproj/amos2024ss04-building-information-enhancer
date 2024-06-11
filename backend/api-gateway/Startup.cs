@@ -19,6 +19,18 @@ public class Startup
         services.AddControllers();
         services.AddHttpClient();
 
+        // Add CORS services to allow all origins
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll",
+                builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyHeader()
+                           .AllowAnyMethod();
+                });
+        });
+
         // Add Swagger services
         services.AddSwaggerGen(c =>
         {
@@ -47,6 +59,9 @@ public class Startup
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Gateway V1");
             c.RoutePrefix = string.Empty; // Set Swagger UI at the root
         });
+
+        // Enable CORS
+        app.UseCors("AllowAll");
 
         app.UseRouting();
 
