@@ -53,7 +53,6 @@ const SearchBar: React.FC = () => {
           return;
         }
         const results = await provider.search({ query });
-        console.log(results[0].raw.geojson);
         const transformedResults: MapSelection[] = results.map((result) => ({
           coordinates: new LatLng(result.y, result.x),
           displayName: result.label,
@@ -107,7 +106,6 @@ const SearchBar: React.FC = () => {
     setTimeout(() => {
       flyToLocation(item);
     }, 400);
-    //console.log(item.raw);
   };
 
   const flyToLocation = (item: MapSelection) => {

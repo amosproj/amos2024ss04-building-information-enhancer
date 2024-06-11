@@ -36,7 +36,6 @@ const MapEventsHandler = () => {
   // Add events
   useMapEvents({
     click: (event) => {
-      console.log(event);
       currentMapCache.polygon?.remove();
       setCurrentMapCache({
         ...currentMapCache,
@@ -45,7 +44,6 @@ const MapEventsHandler = () => {
       });
     },
     moveend: (event) => {
-      console.log("updates");
       setCurrentMapCache({
         ...currentMapCache,
         mapCenter: event.target.getCenter(),
