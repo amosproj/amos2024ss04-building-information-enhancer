@@ -8,6 +8,8 @@ services:
     image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-frontend:${DOCKER_COMPOSE_IMAGES_TAG}
     environment:
       - NODE_ENV=${ENVIRONMENT_STAGE}
+      - API_GATEWAY_HOST=${API_GATEWAY_HOST}
+      - API_GATEWAY_PORT=${API_GATEWAY_PORT}
     networks:
       - bie-network
     ports:
@@ -23,7 +25,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT_STAGE}
     ports:
-      - ${BACKEND_API_GATEWAY_PORT}:8080
+      - ${API_GATEWAY_PORT}:8080
     networks:
       - bie-network
 
@@ -43,7 +45,7 @@ services:
       - DB_TYPE=${SQL_DB_TYPE}
       - TRUSTED=${SQL_TRUSTED}
     ports:
-      - ${VITE_BACKEND_PORT}:80
+      - ${API_COMPOSER_PORT}:80
     networks:
       - bie-network
     depends_on:
@@ -80,6 +82,7 @@ services:
   # volumes:
   #   - bie-mssqldata:/var/opt/mssql
 
+  ## The database for storing datasets metadata, accessible by multiple services
   metadata-database:
     build:
       context: ./backend/metadata-database
@@ -90,15 +93,15 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     ports:
-      - "27018:27017"
+      - ${METADATA_DATABASE_PORT}:27017
     networks:
       - bie-network
-    volumes:
-      - bie-metadata:/data/db
+    # volumes:
+    #   - bie-metadata:/data/db
 
-volumes:
-  bie-metadata:
-  # bie-mssqldata:
+# volumes:
+#   bie-metadata:
+#   bie-mssqldata:
 
 networks:
   bie-network:

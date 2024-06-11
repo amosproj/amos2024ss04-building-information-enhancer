@@ -18,14 +18,24 @@ public class Startup
     {
         services.AddControllers();
         services.AddHttpClient();
-        // Add CORS services
+
+        // Add CORS services to allow specific origins
         services.AddCors(options =>
         {
-            options.AddPolicy("AllowLocalhost",
-                builder => builder.WithOrigins("http://localhost:5173")
-                    .AllowAnyHeader()
-                    .AllowAnyMethod());
+            options.AddPolicy("AllowSpecificOrigins",
+                builder =>
+                {
+                    builder.WithOrigins("http://localhost",
+                        "http://test.amos.b-ci.de",
+                        "http://prod.amos.b-ci.de",
+                        "http://test.amos.b-ci.de:*",
+                        "http://prod.amos.b-ci.de:*",
+                        "http://localhost:*")
+                           .AllowAnyHeader()
+                           .AllowAnyMethod();
+                });
         });
+
         // Add Swagger services
         services.AddSwaggerGen(c =>
         {
@@ -55,8 +65,9 @@ public class Startup
             c.RoutePrefix = string.Empty; // Set Swagger UI at the root
         });
 
-        // Use the CORS policy
-        app.UseCors("AllowLocalhost");
+        // Enable CORS
+        app.UseCors("AllowSpecificOrigins");
+
         app.UseRouting();
 
         app.UseEndpoints(endpoints =>

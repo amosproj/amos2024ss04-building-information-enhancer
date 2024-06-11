@@ -21,13 +21,15 @@ const TabOptions: React.FC<TabOptionsProps> = ({
   // Tab Info Popup
   // Stores the state of if the search popup is open
   const [ifOpenedDialog, setIfOpenedDialog] = useState(false);
+
   const toggleIfOpenedDialog = () => {
-    if (!ifOpenedDialog) {
+    if (ifOpenedDialog === true) {
       // Handle the closing of the menu
       handleClose();
-    }
+   }
     setIfOpenedDialog(!ifOpenedDialog);
   };
+
 
   // Access the tabs context
   const { currentTabsCache, setCurrentTabsCache } = useContext(TabsContext);
@@ -108,7 +110,10 @@ const TabOptions: React.FC<TabOptionsProps> = ({
           >
             <MenuItem
               className="tab-options-item-container"
-              onClick={toggleIfOpenedDialog}
+              onClick={() => {
+                toggleIfOpenedDialog();
+              }
+              }
             >
               <Info size={18} />
               Info
@@ -116,7 +121,7 @@ const TabOptions: React.FC<TabOptionsProps> = ({
             <MenuItem
               className="tab-options-item-container"
               onClick={() => {
-                toggleTabPinned(currentTabsCache.currentTabID);
+                toggleTabPinned(currentTab.id);
               }}
             >
               {currentTab.ifPinned ? (
@@ -133,7 +138,7 @@ const TabOptions: React.FC<TabOptionsProps> = ({
             <MenuItem
               className="tab-options-item-container"
               onClick={() => {
-                closeTab(currentTabsCache.currentTabID);
+                closeTab(currentTab.id);
               }}
             >
               <X size={18} />
