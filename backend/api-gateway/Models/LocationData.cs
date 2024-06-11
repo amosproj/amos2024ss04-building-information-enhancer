@@ -16,14 +16,16 @@
     {
         public List<DatasetItem> CurrentDatasetData { get; set; }
         public List<DatasetItem> GeneralData { get; set; }
-
+        public object ExtraRows { get; internal set; }
     }
 
     public class DatasetItem
     {
-        public string key { get; set; }
-        public string value { get; set; }
-        public string mapId { get; set; } // Optional  -> for "open in map" functionality
+        public string Id { get; set; }
+
+        public string Key { get; set; }
+        public string Value { get; set; }
+        public string MapId { get; set; } // Optional  -> for "open in map" functionality
     }
 
 

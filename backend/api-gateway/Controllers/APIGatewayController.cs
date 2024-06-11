@@ -100,31 +100,44 @@ namespace BIE.Core.API.Controllers
             }
 
             _logger.LogInformation($"Fetching data for DatasetID: {request.DatasetId}");
-            // Here the port 80 is used not 8080. This is due to the docker containers using the interal ports to communicate and not the external ones.
-            // cant do anything at the moment
-            // Mock data for current dataset
-            var currentDatasetData = new List<DatasetItem>
-            {
-                new DatasetItem { key = "Charging Station 1 (distance)", value = "234 m", mapId = "charging_stations" },
-                new DatasetItem { key = "Charging Station 2 (distance)", value = "542 m", mapId = "charging_stations" },
-                new DatasetItem { key = "Charging Station 3 (distance)", value = "789 m", mapId = "charging_stations" }
-            };
 
-            // Mock data for general data from other datasets
-            var generalData = new List<DatasetItem>
-            {
-                new DatasetItem { key = "House 1 (distance)", value = "50 m", mapId = "house_footprints" },
-                new DatasetItem { key = "House 2 (distance)", value = "100 m", mapId = "house_footprints" },
-                new DatasetItem { key = "Empty Area (distance)", value = "300 m", mapId = "empty_map" }
-            };
+            // Generate mock data for the current dataset
+            var currentDatasetData = GenerateMockData("charging_stations", 3);
+
+            // Generate mock data for general data from other datasets
+            var generalData = GenerateMockData("house_footprints", 3);
+
+            var extraRows = GenerateMockData("extra_dataset", 1);
 
             var response = new LocationDataResponse
             {
                 CurrentDatasetData = currentDatasetData,
-                GeneralData = generalData
+                GeneralData = generalData,
+                ExtraRows = extraRows
             };
 
             return Ok(response);
+        }
+
+        // Helper method to generate mock data
+        private List<DatasetItem> GenerateMockData(string mapId, int count)
+        {
+            var random = new Random();
+            var data = new List<DatasetItem>();
+
+            for (int i = 0; i < count; i++)
+            {
+                var item = new DatasetItem
+                {
+                    Id = Guid.NewGuid().ToString(), // Generate a unique ID
+                    Key = $"{mapId} Item {i + 1} (distance)",
+                    Value = $"{random.Next(50, 1000)} m",
+                    MapId = mapId
+                };
+                data.Add(item);
+            }
+
+            return data;
         }
 
         /// <summary>
@@ -163,7 +176,8 @@ namespace BIE.Core.API.Controllers
             }
             else if (datasetID == "house_footprints")
             {
-                targetUrl = $"http://api-composer:80/api/v1.0/Dataset/2/data?ZoomLevel={zoomLevel}&BottomLat={BottomLat}&BottomLong={BottomLong}&TopLat={TopLat}&TopLong={TopLong}";
+                return Ok(MockData.MockHouseFootprints);
+                //targetUrl = $"http://api-composer:80/api/v1.0/Dataset/2/data?ZoomLevel={zoomLevel}&BottomLat={BottomLat}&BottomLong={BottomLong}&TopLat={TopLat}&TopLong={TopLong}";
             }
             else
             {

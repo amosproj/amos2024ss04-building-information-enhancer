@@ -69,17 +69,6 @@ const useGeoData = (
       console.log("too far away");
       return;
     }
-    if (id === "house_footprints") {
-      if (tabProps?.dataset.data.features.length == 0) {
-        setData(geojsonGemeindenPolygons as FeatureCollection<Geometry>);
-        onUpdate(geojsonGemeindenPolygons, bounds);
-      } else {
-        setData(geojsonGemeindenPolygons as FeatureCollection<Geometry>);
-        //console.log("already loaded house_footprints");
-      }
-
-      return;
-    }
     const fetchData = async (bounds: LatLngBounds): Promise<void> => {
       try {
         // Define the query parameters
