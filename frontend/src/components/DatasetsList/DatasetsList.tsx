@@ -20,6 +20,12 @@ import { MarkersTypes } from "./MarkersTypes";
 import axios from "axios";
 import { DatasetBasicData, DatasetListResponse } from "./DatasetTypes";
 
+// These values will be replaced after build with the .sh script when spinning up docker container.
+export const currentEnvironment = {
+  apiBaseHost: "API_GATEWAY_HOST",
+  apiBasePort: "API_GATEWAY_PORT",
+};
+
 // Dataset Type
 export type Dataset = {
   id: string;
@@ -79,7 +85,11 @@ const DatasetsList: React.FC<DatasetsListProps> = ({ closeDialog }) => {
       try {
         // Make the API call with the expected response type
         const response = await axios.get<DatasetListResponse>(
-          "https://localhost:49922/api/getDatasetList"
+          "http://" +
+            currentEnvironment.apiBaseHost +
+            ":" +
+            currentEnvironment.apiBasePort +
+            "/api/getDatasetList"
         );
         const datasetsData = response.data.basicInfoList.map(
           (dataset: DatasetBasicData) => {

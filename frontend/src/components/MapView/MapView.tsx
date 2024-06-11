@@ -19,7 +19,6 @@ import { Dataset } from "../DatasetsList/DatasetsList";
 import MapDatasetVisualizer from "./MapDatasetVisualizer";
 import MapEventsHandler from "./MapEventsHandler";
 import ZoomWarningLabel from "./ZoomWarningLabel";
-import { MarkersTypes } from "../DatasetsList/MarkersTypes";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
