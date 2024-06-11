@@ -3,6 +3,7 @@ source:
   # link | filepath
   type: URL
   location: https://data.bundesnetzagentur.de/Bundesnetzagentur/SharedDocs/Downloads/DE/Sachgebiete/Energie/Unternehmen_Institutionen/E_Mobilitaet/Ladesaeulenregister.csv
+  data_format: CSV
 options:
   # skip lines at the beginning
   skip_lines: 10

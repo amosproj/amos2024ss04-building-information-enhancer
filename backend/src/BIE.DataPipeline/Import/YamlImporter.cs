@@ -6,8 +6,15 @@ using YamlDotNet.Serialization;
 
 namespace BIE.DataPipeline.Import
 {
-    internal static class YamlImporter
+    public static class YamlImporter
     {
+        /// <summary>
+        /// read in a file and extract the datasource description from it.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        /// <exception cref="FileNotFoundException"></exception>
+        /// <exception cref="FormatException"></exception>
         public static DataSourceDescription GetSourceDescription(string path)
         {
             path = Path.GetFullPath(path);
@@ -22,7 +29,6 @@ namespace BIE.DataPipeline.Import
                 throw new FormatException(path + " is not a yaml file");
             }
 
-            // var yaml = File.ReadAllText(path, Encoding.GetEncoding("iso-8859-1"));
             var yaml = File.ReadAllText(path);
 
             var deserializer = new Deserializer();
@@ -110,13 +116,6 @@ namespace BIE.DataPipeline.Import
                 get => mIf_table_exists;
                 set => mIf_table_exists = value;
             }
-
-            public enum InsertBehaviour
-            {
-                ignore,
-                skip,
-                replace
-            }
         }
 
         public class DataSourceColumn
@@ -147,5 +146,13 @@ namespace BIE.DataPipeline.Import
             [DefaultValue(false)]
             public bool is_not_nullable { get; set; }
         }
+    }
+
+    public enum InsertBehaviour
+    {
+        ignore,
+        skip,
+        replace,
+        none
     }
 }

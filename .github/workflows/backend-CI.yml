@@ -7,21 +7,38 @@ on:
       - main
     paths:
       - "backend/**"
+  push:
+    branches:
+      - '**'
 
 jobs:
   linting:
     name: Check linting
-    runs-on: ubuntu-latest
-
+    runs-on: windows-latest
     steps:
-      - name: Echo Linting
-        run: echo "linting"
+      - name: Checkout repository
+        uses: actions/checkout@v2.1.0
+        
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: backend\src\BIE.DataPipeline
+      
+      - name: Linting 
+        run: dotnet format BIE.DataPipeline.sln
+        working-directory: backend\src\BIE.DataPipeline
 
   tests:
     needs: linting
     name: Run Tests
-    runs-on: ubuntu-latest
-
+    runs-on: windows-latest
     steps:
-      - name: Echo Test
-        run: echo "test"
+      - name: Checkout repository
+        uses: actions/checkout@v2.1.0
+        
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: backend\src\BIE.DataPipeline
+      
+      - name: Run unit tests 
+        run: dotnet test
+        working-directory: backend\src\BIE.DataPipeline
