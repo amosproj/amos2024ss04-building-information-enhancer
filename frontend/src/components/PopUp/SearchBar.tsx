@@ -116,17 +116,17 @@ const SearchBar: React.FC = () => {
 
     if (mapInstance) {
 
-        currentMapCache.selectedCoordinates = targetPosition; //Set Marker
-
         if(item.area && item.bounds){
             mapInstance.flyToBounds(item.bounds, { animate: true, duration: 5 });
             const drawPolygon = L.geoJSON(item.polygon) ;
             drawPolygon.addTo(mapInstance);
             setCurrentMapCache({
               ...currentMapCache,
-              polygon: drawPolygon
+              polygon: drawPolygon,
+              selectedCoordinates: null,
             });
         }else{
+            currentMapCache.selectedCoordinates = targetPosition;
             mapInstance.flyTo(targetPosition, 13, { animate: true, duration: 5 });
         }
 
@@ -176,11 +176,6 @@ const SearchBar: React.FC = () => {
 
       onInputChange={(_event, newInputValue) => {
         setInputValue(newInputValue);
-        currentMapCache.polygon?.remove();
-          setCurrentMapCache({
-            ...currentMapCache,
-            polygon: null,
-          });
       }}
       renderInput={(params) => (
 

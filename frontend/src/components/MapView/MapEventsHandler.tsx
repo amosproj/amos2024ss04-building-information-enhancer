@@ -62,6 +62,7 @@ const MapEventsHandler = () => {
             map
               .locate({ setView: true })
               .on("locationfound", function (event) {
+                //currentMapCache.polygon?.remove();
                 setPosition(event.latlng);
                 map.flyTo(event.latlng, map.getZoom(), {
                   animate: true,
