@@ -7,6 +7,20 @@ const currentEnvironment = {
 // Returns the API Gateway URL for a specific deployment environment
 // The .join() function ensures that this strings will not be replace by the .sh script.
 export const getAPIGatewayURL = (): string => {
+  console.log(
+    `APIGateway URL provided: ${currentEnvironment.apiGatewayHost}:${currentEnvironment.apiGatewayPort}`
+  );
+  console.log(
+    "Final APIGateway: " +
+      "http://" +
+      (currentEnvironment.apiGatewayHost === ["API_", "GATEWAY_", "HOST"].join()
+        ? currentEnvironment.apiGatewayHost
+        : "localhost") +
+      ":" +
+      (currentEnvironment.apiGatewayPort === ["API_", "GATEWAY_", "PORT"].join()
+        ? currentEnvironment.apiGatewayPort
+        : "8081")
+  );
   return (
     "http://" +
     (currentEnvironment.apiGatewayHost === ["API_", "GATEWAY_", "HOST"].join()
