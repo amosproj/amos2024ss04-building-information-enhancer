@@ -11,6 +11,7 @@ export type MapCacheProps = {
   mapCenter: LatLng;
   mapBounds: LatLngBounds;
   zoom: number;
+  polygon: L.GeoJSON | null;
 };
 
 // Map Context Type
@@ -34,6 +35,7 @@ const defaultMapCache: MapCacheProps = {
   mapCenter: L.latLng([49.5732, 11.0288]),
   mapBounds: L.latLngBounds([49.5732, 11.0288], [49.5732, 11.0288]),
   zoom: 13,
+  polygon: null,
 };
 
 // Actual value of the context
