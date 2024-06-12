@@ -9,7 +9,9 @@ on:
       - "backend/**"
   push:
     branches:
-      - '**'
+      - "**"
+    paths:
+      - "backend/**"
 
 jobs:
   linting:
@@ -18,12 +20,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2.1.0
-        
+
       - name: Restore dependencies
         run: dotnet restore
         working-directory: backend\src\BIE.DataPipeline
-      
-      - name: Linting 
+
+      - name: Linting
         run: dotnet format BIE.DataPipeline.sln
         working-directory: backend\src\BIE.DataPipeline
 
@@ -34,11 +36,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2.1.0
-        
+
       - name: Restore dependencies
         run: dotnet restore
         working-directory: backend\src\BIE.DataPipeline
-      
-      - name: Run unit tests 
+
+      - name: Run unit tests
         run: dotnet test
         working-directory: backend\src\BIE.DataPipeline
