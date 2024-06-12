@@ -4,3 +4,10 @@ export interface DatasetBasicData {
   description: string;
   icon: string;
 }
+
+export interface DatasetMetaData {
+  icon: string;
+  type: string;
+  minZoomLevel: number;
+  displayProperty: string;
+}
