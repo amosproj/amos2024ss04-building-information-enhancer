@@ -4,7 +4,3 @@ export interface DatasetBasicData {
   description: string;
   icon: string;
 }
-
-export interface DatasetListResponse {
-  basicInfoList: DatasetBasicData[];
-}

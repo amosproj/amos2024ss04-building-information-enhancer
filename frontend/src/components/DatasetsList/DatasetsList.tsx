@@ -6,7 +6,7 @@ import {
   ListItemButton,
   ListItemText,
 } from "@mui/material";
-import { Icon, MapPin, MapTrifold } from "@phosphor-icons/react";
+import { MapPin } from "@phosphor-icons/react";
 import { useContext, useEffect, useState } from "react";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
 
@@ -18,8 +18,9 @@ import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import { MarkersTypes } from "./MarkersTypes";
 import axios from "axios";
-import { DatasetBasicData, DatasetListResponse } from "./DatasetTypes";
+import { DatasetBasicData } from "./DatasetTypes";
 import { getAPIGatewayURL } from "../../utils";
+import CustomSvgIcon from "./CustomSvgIcon";
 
 // Dataset Type
 export type Dataset = {
@@ -27,7 +28,7 @@ export type Dataset = {
   displayName: string;
   description: string;
   type: MarkersTypes;
-  datasetIcon: Icon;
+  datasetIcon: JSX.Element;
   markerIcon: LIcon | DivIcon | undefined;
   data: FeatureCollection;
   lastDataRequestBounds: LatLngBounds;
@@ -79,29 +80,29 @@ const DatasetsList: React.FC<DatasetsListProps> = ({ closeDialog }) => {
     const fetchDatasets = async () => {
       try {
         // Make the API call with the expected response type
-        const response = await axios.get<DatasetListResponse>(
+        const response = await axios.get<DatasetBasicData[]>(
           getAPIGatewayURL() + "/api/getDatasetList"
         );
-        const datasetsData = response.data.basicInfoList.map(
-          (dataset: DatasetBasicData) => {
-            const data: Dataset = {
-              id: dataset.datasetId,
-              displayName: dataset.name,
-              description: dataset.description,
-              type: MarkersTypes.None,
-              datasetIcon: MapTrifold,
-              markerIcon: dataset.icon
-                ? createDivIcon(dataset.icon)
-                : divIcondefault,
-              data: emptyFeatureCollection,
-              lastDataRequestBounds: L.latLngBounds(
-                L.latLng(0, 0),
-                L.latLng(0, 0)
-              ),
-            };
-            return data;
-          }
-        );
+        const datasetsData = response.data.map((dataset: DatasetBasicData) => {
+          const data: Dataset = {
+            id: dataset.datasetId,
+            displayName: dataset.name,
+            description: dataset.description,
+            type: MarkersTypes.None,
+            datasetIcon: (
+              <CustomSvgIcon svgString={dataset.icon} fontSize="large" />
+            ),
+            markerIcon: dataset.icon
+              ? createDivIcon(dataset.icon)
+              : divIcondefault,
+            data: emptyFeatureCollection,
+            lastDataRequestBounds: L.latLngBounds(
+              L.latLng(0, 0),
+              L.latLng(0, 0)
+            ),
+          };
+          return data;
+        });
         setDatasets(datasetsData);
       } catch (error) {
         console.error("Error fetching datasets:", error);
@@ -150,9 +151,7 @@ const DatasetsList: React.FC<DatasetsListProps> = ({ closeDialog }) => {
                   openNewTab(dataset);
                 }}
               >
-                <ListItemAvatar>
-                  <dataset.datasetIcon size={30} className="dataset-icon" />
-                </ListItemAvatar>
+                <ListItemAvatar>{dataset.datasetIcon}</ListItemAvatar>
                 <ListItemText
                   primary={dataset.displayName}
                   secondary={dataset.description}
