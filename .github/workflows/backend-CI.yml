@@ -7,11 +7,6 @@ on:
       - main
     paths:
       - "backend/**"
-  push:
-    branches:
-      - "**"
-    paths:
-      - "backend/**"
 
 jobs:
   linting:
