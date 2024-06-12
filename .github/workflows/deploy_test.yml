@@ -6,6 +6,7 @@ on:
       - sprint-**-release-candidate
     branches:
       - CI-CD
+      - sprint-release
 
 env:
   REGISTRY: ghcr.io
