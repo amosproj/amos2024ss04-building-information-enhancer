@@ -25,14 +25,27 @@ public class Startup
             options.AddPolicy("AllowSpecificOrigins",
                 builder =>
                 {
-                    builder.WithOrigins("http://localhost",
+                    builder.WithOrigins(
+                        "http://localhost",
+                        "http://localhost:80", // Common HTTP frontend port
+                        "http://localhost:443", // Common HTTPS frontend port 
+                        "http://localhost:3000", // Common React development server port
+                        "http://localhost:5173", // Vite development server port
+                        "http://localhost:8080", // Other common development port
+                        "http://localhost:8081", // Another common port
+                        "http://localhost:4200", // Angular default development port
+                        "http://localhost:5000", // Common port for some setups
+                        "http://localhost:5500", // Common port for live server
                         "http://test.amos.b-ci.de",
                         "http://prod.amos.b-ci.de",
-                        "http://test.amos.b-ci.de:*",
-                        "http://prod.amos.b-ci.de:*",
-                        "http://localhost:*")
-                           .AllowAnyHeader()
-                           .AllowAnyMethod();
+                        "http://test.amos.b-ci.de:80",
+                        "http://test.amos.b-ci.de:443",
+                        "http://prod.amos.b-ci.de:80",
+                        "http://prod.amos.b-ci.de:443"
+                    )
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
                 });
         });
 

@@ -8,27 +8,19 @@ const currentEnvironment = {
 // The .join() function ensures that this strings will not be replace by the .sh script.
 export const getAPIGatewayURL = (): string => {
   console.log(
-    `APIGateway URL provided: ${currentEnvironment.apiGatewayHost}:${currentEnvironment.apiGatewayPort}`
+    `Read APIGateway URL: http://${currentEnvironment.apiGatewayHost}:${currentEnvironment.apiGatewayPort}`
   );
   console.log(
-    "Final APIGateway: " +
+    "Final APIGateway URL: " +
       "http://" +
-      (currentEnvironment.apiGatewayHost === ["API_", "GATEWAY_", "HOST"].join()
-        ? currentEnvironment.apiGatewayHost
-        : "localhost") +
+      (import.meta.env.DEV ? "localhost" : currentEnvironment.apiGatewayHost) +
       ":" +
-      (currentEnvironment.apiGatewayPort === ["API_", "GATEWAY_", "PORT"].join()
-        ? currentEnvironment.apiGatewayPort
-        : "8081")
+      (import.meta.env.DEV ? "8081" : currentEnvironment.apiGatewayPort)
   );
   return (
     "http://" +
-    (currentEnvironment.apiGatewayHost === ["API_", "GATEWAY_", "HOST"].join()
-      ? currentEnvironment.apiGatewayHost
-      : "localhost") +
+    (import.meta.env.DEV ? "localhost" : currentEnvironment.apiGatewayHost) +
     ":" +
-    (currentEnvironment.apiGatewayPort === ["API_", "GATEWAY_", "PORT"].join()
-      ? currentEnvironment.apiGatewayPort
-      : "8081")
+    (import.meta.env.DEV ? "8081" : currentEnvironment.apiGatewayPort)
   );
 };
