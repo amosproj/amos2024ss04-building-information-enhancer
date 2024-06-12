@@ -6,13 +6,8 @@ import {
   ListItemButton,
   ListItemText,
 } from "@mui/material";
-import {
-  ChargingStation,
-  Icon,
-  Blueprint,
-  MapTrifold,
-} from "@phosphor-icons/react";
-import { useContext } from "react";
+import { Icon, MapPin, MapTrifold } from "@phosphor-icons/react";
+import { useContext, useEffect, useState } from "react";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
 
 import "./DatasetsList.css";
@@ -22,6 +17,9 @@ import L, { Icon as LIcon, DivIcon, LatLngBounds } from "leaflet";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import { MarkersTypes } from "./MarkersTypes";
+import axios from "axios";
+import { DatasetBasicData, DatasetListResponse } from "./DatasetTypes";
+import { getAPIGatewayURL } from "../../utils";
 
 // Dataset Type
 export type Dataset = {
@@ -51,53 +49,67 @@ const renderToHtml = (Component: React.FC) => {
   return div.innerHTML;
 };
 
-const divIconChargingStation: DivIcon = L.divIcon({
-  html: renderToHtml(() => <ChargingStation size={32} weight="duotone" />),
+const createDivIcon = (iconName: string) => {
+  console.log(iconName);
+  return L.divIcon({
+    html: iconName,
+    className: "", // Optional: add a custom class name
+    iconSize: [34, 34],
+    iconAnchor: [17, 17], // Adjust the anchor point as needed
+  });
+};
+
+const divIcondefault: DivIcon = L.divIcon({
+  html: renderToHtml(() => <MapPin size={32} weight="duotone" />),
   className: "", // Optional: add a custom class name
   iconSize: [34, 34],
   iconAnchor: [17, 17], // Adjust the anchor point as needed
 });
-
-const datasetsData: Dataset[] = [
-  {
-    id: "empty_map",
-    displayName: "Empty Map",
-    description: "An empty, default map of Germany, with no data loaded.",
-    type: MarkersTypes.None,
-    datasetIcon: MapTrifold,
-    markerIcon: undefined,
-    data: emptyFeatureCollection,
-    lastDataRequestBounds: L.latLngBounds(L.latLng(0, 0), L.latLng(0, 0)),
-  },
-  {
-    id: "charging_stations",
-    displayName: "Charging stations",
-    description: "Locations of all charging stations in Germany.",
-    type: MarkersTypes.Markers,
-    datasetIcon: ChargingStation,
-    markerIcon: divIconChargingStation,
-    data: emptyFeatureCollection,
-    lastDataRequestBounds: L.latLngBounds(L.latLng(0, 0), L.latLng(0, 0)),
-  },
-  {
-    id: "house_footprints",
-    displayName: "House Footprints",
-    description: "Footprints for the hauses.",
-    type: MarkersTypes.Areas,
-    datasetIcon: Blueprint,
-    markerIcon: undefined,
-    data: emptyFeatureCollection,
-    lastDataRequestBounds: L.latLngBounds(L.latLng(0, 0), L.latLng(0, 0)),
-  },
-];
 
 interface DatasetsListProps {
   closeDialog: () => void;
 }
 
 const DatasetsList: React.FC<DatasetsListProps> = ({ closeDialog }) => {
+  const [datasets, setDatasets] = useState<Dataset[]>([]);
   const { currentTabsCache, setCurrentTabsCache } = useContext(TabsContext);
   const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
+
+  useEffect(() => {
+    const fetchDatasets = async () => {
+      try {
+        // Make the API call with the expected response type
+        const response = await axios.get<DatasetListResponse>(
+          getAPIGatewayURL() + "/api/getDatasetList"
+        );
+        const datasetsData = response.data.basicInfoList.map(
+          (dataset: DatasetBasicData) => {
+            const data: Dataset = {
+              id: dataset.datasetId,
+              displayName: dataset.name,
+              description: dataset.description,
+              type: MarkersTypes.None,
+              datasetIcon: MapTrifold,
+              markerIcon: dataset.icon
+                ? createDivIcon(dataset.icon)
+                : divIcondefault,
+              data: emptyFeatureCollection,
+              lastDataRequestBounds: L.latLngBounds(
+                L.latLng(0, 0),
+                L.latLng(0, 0)
+              ),
+            };
+            return data;
+          }
+        );
+        setDatasets(datasetsData);
+      } catch (error) {
+        console.error("Error fetching datasets:", error);
+      }
+    };
+
+    fetchDatasets();
+  }, []);
 
   // Opens a new tab
   const openNewTab = (dataset: Dataset) => {
@@ -129,7 +141,7 @@ const DatasetsList: React.FC<DatasetsListProps> = ({ closeDialog }) => {
     <div className="datasets-list-container">
       <Divider style={{ marginTop: "1rem" }} />
       <List sx={{ width: "100%", bgcolor: "background.paper", padding: 0 }}>
-        {datasetsData.map((dataset) => {
+        {datasets.map((dataset) => {
           return (
             <Fragment key={dataset.id}>
               <ListItemButton

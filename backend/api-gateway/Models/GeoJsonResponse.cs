@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 namespace APIGateway.Models
 {
+
     public class GeoJsonResponse
     {
         public string type { get; set; }
