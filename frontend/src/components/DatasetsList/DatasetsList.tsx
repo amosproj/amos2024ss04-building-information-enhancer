@@ -63,9 +63,9 @@ const DatasetsList: React.FC<DatasetsListProps> = ({ closeDialog }) => {
             description: dataset.description,
             type: MarkersTypes.None,
             datasetIcon: dataset.icon ? (
-              <CustomSvgIcon svgString={dataset.icon} />
+              <CustomSvgIcon svgString={dataset.icon} size={24} />
             ) : (
-              <CustomSvgIcon svgString={svgIconDefault} />
+              <CustomSvgIcon svgString={svgIconDefault} size={24} />
             ),
             metaData: undefined,
             data: emptyFeatureCollection,
