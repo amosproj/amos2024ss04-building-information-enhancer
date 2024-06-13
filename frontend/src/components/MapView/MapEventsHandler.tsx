@@ -36,14 +36,14 @@ const MapEventsHandler = () => {
   // Add events
   useMapEvents({
     click: (event) => {
-      console.log(event);
+      currentMapCache.polygon?.remove();
       setCurrentMapCache({
         ...currentMapCache,
         selectedCoordinates: event.latlng,
+        polygon: null,
       });
     },
     moveend: (event) => {
-      console.log("updates");
       setCurrentMapCache({
         ...currentMapCache,
         mapCenter: event.target.getCenter(),
@@ -62,6 +62,7 @@ const MapEventsHandler = () => {
             map
               .locate({ setView: true })
               .on("locationfound", function (event) {
+                //currentMapCache.polygon?.remove();
                 setPosition(event.latlng);
                 map.flyTo(event.latlng, map.getZoom(), {
                   animate: true,
