@@ -15,7 +15,7 @@ namespace BIE.DataPipeline.Import
         /// </summary>
         /// <param name="dataSourceDescription">The dataSourceDescription.</param>
         /// <returns>The array of C# types.</returns>
-        public static Type[] ParseColumnTypes(DataSourceDescription dataSourceDescription)
+        public static Type[] ParseColumnTypes(DataSourceDescription? dataSourceDescription)
         {
             Type[] res = new Type[dataSourceDescription.table_cols.Count];
             for (int i = 0; i < dataSourceDescription.table_cols.Count; i++)
@@ -77,7 +77,7 @@ namespace BIE.DataPipeline.Import
         /// </summary>
         /// <param name="dataSourceDescription">The description of the source file.</param>
         /// <returns>The array with the header names.</returns>
-        public static string[] ReadYamlHeader(DataSourceDescription dataSourceDescription)
+        public static string[] ReadYamlHeader(DataSourceDescription? dataSourceDescription)
         {
             string[] res = new string[dataSourceDescription.table_cols.Count];
             for (int i = 0; i < dataSourceDescription.table_cols.Count; i++)
