@@ -20,10 +20,11 @@ namespace BIE.Data
         DataSet LoadData(DbCommand cmd);
         object ExecuteScalar(DbCommand command);
         void Execute(DbCommand command);
+        bool CheckConnection();
 
     }
 
-    public class Database : IDatabase
+    public sealed class Database : IDatabase
     {
         private static Database _instance;
         private DatabaseFactory _factoryCreator;
@@ -37,34 +38,31 @@ namespace BIE.Data
 
         public static IDatabase Instance
         {
-            get
-            {
-                if (_instance is null)
-                {
-                    _instance = new Database();
-                }
-
-                return _instance;
-            }
+            get { return _instance ??= new Database(); }
         }
 
         public void SetConnectionString(DatabaseType dbType, string dbServer, string dbName,
                                                 string userId, string password,
                                                 bool trustedConnection)
         {
-            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+            var builder = new SqlConnectionStringBuilder();
             builder.DataSource = dbServer;
             builder.InitialCatalog = dbName;
+            
             if (trustedConnection)
+            {
                 builder.IntegratedSecurity = true;
+            }
             else
             {
                 builder.IntegratedSecurity = false;
                 builder.UserID = userId;
                 builder.Password = password;
             }
-            this.SetConnectionString(dbType, builder.ConnectionString);
+            
+            SetConnectionString(dbType, builder.ConnectionString);
         }
+        
         public void SetConnectionString(DatabaseType dbType, string connectionString)
         {
             _dbType = dbType;
@@ -74,9 +72,32 @@ namespace BIE.Data
             Factory = _factoryCreator.GetFactory(dbType);
         }
 
+        public bool CheckConnection()
+        {
+            var connection = Factory.CreateConnection();
+            if (connection == null)
+            {
+                return false;
+            }
+            
+            connection.ConnectionString = $"{_connectionString};Connect Timeout=10";
+
+            try
+            {
+                connection.Open();
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            
+            connection.Close();
+            return true;
+        }
+        
         private DbConnection CreateConnection()
         {
-            DbConnection con = Factory.CreateConnection();
+            var con = Factory.CreateConnection();
             con.ConnectionString = _connectionString;
             return con;
         }
@@ -90,12 +111,18 @@ namespace BIE.Data
             cmd.CommandText = spName;
 
             if (trans != null)
-                cmd.Transaction = trans;
-
-            if (parameters != null)
             {
-                foreach (DbParameter p in parameters)
-                    cmd.Parameters.Add(p);
+                cmd.Transaction = trans;
+            }
+
+            if (parameters == null)
+            {
+                return cmd;
+            }
+
+            foreach (DbParameter p in parameters)
+            {
+                cmd.Parameters.Add(p);
             }
 
             return cmd;
@@ -107,7 +134,9 @@ namespace BIE.Data
             cmd.CommandText = query;
 
             if (trans != null)
+            {
                 cmd.Transaction = trans;
+            }
 
             return cmd;
         }
@@ -141,13 +170,13 @@ namespace BIE.Data
 
         public void Execute(DbCommand command)
         {
-            using (DbConnection con = this.CreateConnection())
-            {
-                con.Open();
-                command.Connection = con;
-                command.ExecuteNonQuery();
-                con.Close();
-            }
+            using var con = CreateConnection();
+            con.Open();
+            
+            command.Connection = con;
+            command.ExecuteNonQuery();
+            
+            con.Close();
         }
 
         public DataSet LoadData(DbCommand command)
