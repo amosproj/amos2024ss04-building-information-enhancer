@@ -30,5 +30,24 @@ namespace BIE.Tests
             string actual = csvImporter.GetHeaderString();
             Assert.That(actual, Is.EqualTo(expected));
         }
+
+        [Test]
+        public void TestReadLine()
+        {
+            string[] expected =
+            {
+                "'name1','1',1.5,true,,,,,",
+                "'name3','3',3.5,true,,,,,",
+                "'name4','4',4.5,false,,,,,",
+                "'name5','5',5.5,false,,,,,",
+                string.Empty,
+            };
+
+            for (int i = 0; i < 5; i++) {
+                string actual = "";
+                csvImporter.ReadLine(out actual);
+                Assert.That(actual, Is.EqualTo(expected[i]));
+            }
+        }
     }
 }

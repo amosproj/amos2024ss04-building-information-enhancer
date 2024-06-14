@@ -92,6 +92,11 @@ namespace BIE.DataPipeline.Import
             return headerString;
         }
 
+        /// <summary>
+        /// Reads a line from the csv file.
+        /// </summary>
+        /// <param name="nextLine">An output parameter that returns a line or an empty string.</param>
+        /// <returns>A boolean indicating if the end of the file has been reached.</returns>
         public bool ReadLine(out string nextLine)
         {
             string[]? line;
@@ -100,13 +105,6 @@ namespace BIE.DataPipeline.Import
 
             while (builder.Length == 0)
             {
-                // Console.Write($"trying to write");
-
-                // if (parser.EndOfData)
-                // {
-                //     return false;
-                // }
-
                 line = parser.ReadFields();
                 if (line == null)
                 {
@@ -116,7 +114,6 @@ namespace BIE.DataPipeline.Import
 
                 if (line.Length == 0)
                 {
-                    //TODO what to do with empty lines
                     Console.WriteLine("Line is empty");
                     //Read next line
                     nextLine = "";
@@ -126,12 +123,21 @@ namespace BIE.DataPipeline.Import
 
                 foreach (var (i, yamlIndex)in columnIndexes)
                 {
+                    //checks if the line has not enougth content for the expected yaml columns.
+                    if(i >= line.Length)
+                    {
+                        Console.WriteLine("Line does not match the number of expected columns");
+                        //Read next line
+                        builder.Clear();
+                        break;
+                    }
+
                     //check if the value can be empty
                     if (dataSourceDescription.table_cols[yamlIndex].is_not_nullable && line[i] == "")
                     {
                         Console.WriteLine("Line does not match not null criteria");
                         //Read next line
-                        nextLine = "";
+                        builder.Clear();
                         break;
                     }
 
@@ -140,20 +146,16 @@ namespace BIE.DataPipeline.Import
 
                     if (columnTypes[i] == typeof(string))
                     {
-                        // nextLine += $"'{line[i]}',";
                         builder.Append($"'{line[i]}',");
                         continue;
                     }
 
-                    // nextLine += string.Format("{0},", Convert.ChangeType(line[i], columnTypes[i]));
-                    // nextLine += $"{line[i]},";
                     builder.Append($"{line[i]},");
                 }
             }
 
             builder.Length--; // this removes the last comma
 
-            // nextLine = RemoveLastComma(nextLine);
             nextLine = builder.ToString();
 
             return true;
