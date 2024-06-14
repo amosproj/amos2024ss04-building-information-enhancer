@@ -44,9 +44,9 @@ namespace BIE.DataPipeline.Import
 
             // get all the indexes and descriptions that interest us
             columnIndexes = new List<(int, int)>();
-            for (int i = 0; i < fileHeader.Length; i++)
+            for (int j = 0; j < yamlHeader.Length; j++)
             {
-                for (int j = 0; j < yamlHeader.Length; j++)
+                for (int i = 0; i < fileHeader.Length; i++)
                 {
                     if (fileHeader[i] != yamlHeader[j])
                     {
@@ -75,6 +75,11 @@ namespace BIE.DataPipeline.Import
             foreach (var col in dataSourceDescription.table_cols)
             {
                 headerString += col.name_in_table + ",";
+            }
+
+            if(dataSourceDescription.options.location_to_SQL_point != null)
+            {
+                headerString += dataSourceDescription.options.location_to_SQL_point.name_in_table + ",";
             }
 
             //remove last ,
@@ -129,7 +134,7 @@ namespace BIE.DataPipeline.Import
                     line[fileIndex] = line[fileIndex].Replace("'", "''");
                     line[fileIndex] = line[fileIndex].Replace(",", ".");
 
-                    if (columnTypes[fileIndex] == typeof(string))
+                    if (columnTypes[yamlIndex] == typeof(string))
                     {
                         // nextLine += $"'{line[i]}',";
                         builder.Append($"'{line[fileIndex]}',");
@@ -150,11 +155,12 @@ namespace BIE.DataPipeline.Import
                 {
                     double lon;
                     double lat;
-                    bool success = double.TryParse(line[8], out lon);
-                    success = double.TryParse(line[9], out lat) && success;
+                    bool success = double.TryParse(line[dataSourceDescription.options.location_to_SQL_point.index_lon], out lon);
+                    success = double.TryParse(line[dataSourceDescription.options.location_to_SQL_point.index_lat], out lat) && success;
                     if(success)
                     {
-                        Console.WriteLine(LocationToPoint(lon,lat) + " ----------------");
+                        Console.WriteLine(LocationToPoint(lon, lat) + "-----------");
+                        builder.Append($"{LocationToPoint(lon, lat)},");
                     }
                 }
             }
