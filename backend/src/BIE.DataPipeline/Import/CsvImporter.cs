@@ -69,8 +69,13 @@ namespace BIE.DataPipeline.Import
             return this.dataSourceDescription.table_name;
         }
 
+        /// <summary>
+        /// Creates a comma seperated sting with all column names for the SQL table.
+        /// </summary>
+        /// <returns>The SQL column name string.</returns>
         public string GetHeaderString()
         {
+            //if the string is not empty the result can be returned instantly
             if (!headerString.Equals(""))
             {
                 return headerString;

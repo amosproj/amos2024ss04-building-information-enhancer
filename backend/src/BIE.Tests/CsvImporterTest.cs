@@ -22,5 +22,13 @@ namespace BIE.Tests
         {
             Assert.That(csvImporter.GetTableName(), Is.EqualTo("unitTestTable"));
         }
+
+        [Test]
+        public void TestGetHeaderString()
+        {
+            string expected = "testDefault,testVarChar,checkValue,testBoolean,testInt,testInteger,testFloat,testDouble,testDecimal";
+            string actual = csvImporter.GetHeaderString();
+            Assert.That(actual, Is.EqualTo(expected));
+        }
     }
 }
