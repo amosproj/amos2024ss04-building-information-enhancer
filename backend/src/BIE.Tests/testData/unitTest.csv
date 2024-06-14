@@ -1,0 +1,12 @@
+Some Title
+blank #1
+blank #2
+blank #3
+blank #4
+blank #5
+blank #6
+header1;header2;testBool;testBoolean;testInt;testInteger;testFloat;testDouble;testDecimal
+name1;1;1.5;true
+name2;2;2.5;false
+name3;3;3.5;true
+name4;4;4.5;false

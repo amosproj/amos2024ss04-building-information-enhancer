@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection.PortableExecutable;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BIE.DataPipeline;
 using Microsoft.VisualBasic.FileIO;
 
+[assembly: InternalsVisibleTo("BIE.Tests")]
 namespace BIE.DataPipeline.Import
 {
     internal class CsvImporter : IImporter
@@ -58,7 +60,10 @@ namespace BIE.DataPipeline.Import
             }
         }
 
-        //tablename = name
+        /// <summary>
+        /// Returns the SQL table name for the data set given by the yaml file.
+        /// </summary>
+        /// <returns>The SQL table name.</returns>
         public string GetTableName()
         {
             return this.dataSourceDescription.table_name;
