@@ -11,6 +11,10 @@ options:
   discard_null_rows: false
   # how to deal with existing table. Options: ignore, replace, skip (default).
   if_table_exists: replace
+  location_to_SQL_point:
+    name_in_table: location
+    index_lon: 8
+    index_lat: 9
 table_name: EV_charging_stations
 delimiter: ";"
 

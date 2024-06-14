@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BIE.DataPipeline;
 using Microsoft.VisualBasic.FileIO;
+using NetTopologySuite.Geometries;
 
 namespace BIE.DataPipeline.Import
 {
@@ -84,7 +85,7 @@ namespace BIE.DataPipeline.Import
 
         public bool ReadLine(out string nextLine)
         {
-            string[]? line;
+            string[]? line = new string[0];
 
             builder.Clear();
 
@@ -114,10 +115,10 @@ namespace BIE.DataPipeline.Import
                 }
 
 
-                foreach (var (i, yamlIndex)in columnIndexes)
+                foreach (var (fileIndex, yamlIndex)in columnIndexes)
                 {
                     //check if the value can be empty
-                    if (dataSourceDescription.table_cols[yamlIndex].is_not_nullable && line[i] == "")
+                    if (dataSourceDescription.table_cols[yamlIndex].is_not_nullable && line[fileIndex] == "")
                     {
                         Console.WriteLine("Line does not match not null criteria");
                         //Read next line
@@ -125,21 +126,39 @@ namespace BIE.DataPipeline.Import
                         break;
                     }
 
-                    line[i] = line[i].Replace("'", "''");
-                    line[i] = line[i].Replace(",", ".");
+                    line[fileIndex] = line[fileIndex].Replace("'", "''");
+                    line[fileIndex] = line[fileIndex].Replace(",", ".");
 
-                    if (columnTypes[i] == typeof(string))
+                    if (columnTypes[fileIndex] == typeof(string))
                     {
                         // nextLine += $"'{line[i]}',";
-                        builder.Append($"'{line[i]}',");
+                        builder.Append($"'{line[fileIndex]}',");
                         continue;
                     }
 
                     // nextLine += string.Format("{0},", Convert.ChangeType(line[i], columnTypes[i]));
                     // nextLine += $"{line[i]},";
-                    builder.Append($"{line[i]},");
+                    builder.Append($"{line[fileIndex]},");
+
+                }
+
+            }
+
+            if(dataSourceDescription.options.location_to_SQL_point != null)
+            {
+                if(line.Length != 0)
+                {
+                    double lon;
+                    double lat;
+                    bool success = double.TryParse(line[8], out lon);
+                    success = double.TryParse(line[9], out lat) && success;
+                    if(success)
+                    {
+                        Console.WriteLine(LocationToPoint(lon,lat) + " ----------------");
+                    }
                 }
             }
+
 
             builder.Length--; // this removes the last comma
 
@@ -160,6 +179,15 @@ namespace BIE.DataPipeline.Import
             {
                 return input; // No comma found, return original string
             }
+        }
+
+        private string LocationToPoint(double longitude, double latitude)
+        {
+            //GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+            
+            //return geometryFactory.CreatePoint(new Coordinate(longitude, latitude));
+
+            return "GEOGRAPHY::Point({ " + latitude + "}, { " + longitude + "}, 4326)";
         }
 
 

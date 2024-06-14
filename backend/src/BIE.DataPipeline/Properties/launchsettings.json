@@ -2,7 +2,7 @@
   "profiles": {
     "BIE.DataPipeline": {
       "commandName": "Project",
-      "commandLineArgs": "--behavior=skip Faulty.yaml",
+      "commandLineArgs": "test.yaml",
       "workingDirectory": "yaml",
       "environmentVariables": {
         "DB_SERVER": "localhost",
