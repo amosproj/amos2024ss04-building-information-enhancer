@@ -2,7 +2,7 @@
 {
     public class DatasetListResponse
     {
-        public List<DatasetBasicData> basicInfoList { get; set; }
+        public List<DatasetBasicData> datasetBasicDataList { get; set; }
 
     }
 
