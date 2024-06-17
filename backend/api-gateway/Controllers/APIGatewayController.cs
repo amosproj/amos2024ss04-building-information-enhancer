@@ -23,7 +23,7 @@ namespace BIE.Core.API.Controllers
         }
 
         /// <summary>
-        /// Gets the list of available datasets with id, name and description
+        /// Gets the list of available datasets with id, Name and Description
         /// </summary>
         /// <returns>Data for the specified dataset in the provided viewport bounds and zoom level.</returns>
         [HttpGet("getDatasetList")]
@@ -36,33 +36,44 @@ namespace BIE.Core.API.Controllers
                 return BadRequest(ModelState);
             }
 
-            var datasetInfoList = MockData.DataSetDescription;
+            // Extract the basic data from the dataset data
+            var datasetBasicDataList = MockData.datasetData
+                .Select(d => d.basicData)
+                .ToList();
 
-            return Ok(datasetInfoList);
+            return Ok(datasetBasicDataList);
         }
 
         /// <summary>
-        /// Gets the metadata for the given dataset. Contains things like icon, visualization types
+        /// Gets the metadata for the given dataset. Contains things like Icon, visualization types
         /// </summary>
-        /// <returns>Data for the specified dataset in the provided viewport bounds and zoom level.</returns>
+        /// <param Name="datasetID">The ID of the dataset</param>
+        /// <returns>Metadata for the specified dataset</returns>
         [HttpGet("getDatasetMetadata")]
-        [ProducesResponseType(typeof(DatasetListResponse), 200)]
+        [ProducesResponseType(typeof(DatasetMetadata), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-
         public IActionResult GetDatasetMetadata([FromQuery, Required] string datasetID)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            return Ok(new DatasetMetadata { icon = "", type="marker" });
+
+            var dataset = MockData.datasetData.FirstOrDefault(d => d.basicData.DatasetId == datasetID);
+            if (dataset == null)
+            {
+                return NotFound($"Dataset with ID {datasetID} not found.");
+            }
+
+            return Ok(dataset.metaData);
         }
+
 
         /// <summary>
         /// Loads the location data for the given point or poylgon.
         /// </summary>
-        /// <param name="request">Contains the current dataset id and the list of coordinates. 
+        /// <param Name="request">Contains the current dataset id and the list of coordinates. 
         /// In case of a single point a list with a single element.</param>
         /// <returns>Data for the specified point/polygon as a list of key/values.</returns>
         [HttpPut("loadLocationData")]
@@ -120,12 +131,12 @@ namespace BIE.Core.API.Controllers
         /// <summary>
         /// Gets the dataset viewport data based on the provided parameters.
         /// </summary>
-        /// <param name="datasetID">The ID of the dataset.</param>
-        /// <param name="zoomLevel">The zoom level.</param>
-        /// <param name="BottomLat">The bottom latitude of the viewport.</param>
-        /// <param name="BottomLong">The bottom longitude of the viewport.</param>
-        /// <param name="TopLat">The top latitude of the viewport.</param>
-        /// <param name="TopLong">The top longitude of the viewport.</param>
+        /// <param Name="datasetID">The ID of the dataset.</param>
+        /// <param Name="zoomLevel">The zoom level.</param>
+        /// <param Name="BottomLat">The bottom latitude of the viewport.</param>
+        /// <param Name="BottomLong">The bottom longitude of the viewport.</param>
+        /// <param Name="TopLat">The top latitude of the viewport.</param>
+        /// <param Name="TopLong">The top longitude of the viewport.</param>
         /// <returns>Data for the specified dataset in the provided viewport bounds and zoom level.</returns>
         [HttpGet("getDatasetViewportData")]
         [ProducesResponseType(typeof(GeoJsonResponse), 200)]

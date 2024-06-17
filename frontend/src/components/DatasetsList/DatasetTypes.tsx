@@ -5,6 +5,9 @@ export interface DatasetBasicData {
   icon: string;
 }
 
-export interface DatasetListResponse {
-  basicInfoList: DatasetBasicData[];
+export interface DatasetMetaData {
+  icon: string;
+  type: string;
+  minZoomLevel: number;
+  displayProperty: string;
 }

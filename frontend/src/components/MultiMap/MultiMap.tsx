@@ -1,4 +1,4 @@
-import { Fragment, useContext, useState } from "react";
+import { Fragment, useContext, useState, cloneElement } from "react";
 import "./MultiMap.css";
 import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
@@ -20,7 +20,8 @@ const MultiMap = () => {
     useState<null | HTMLElement>(null);
 
   const handleMenuClick = (
-    event: React.MouseEvent<SVGSVGElement, MouseEvent>,   tabId: string
+    event: React.MouseEvent<SVGSVGElement, MouseEvent>,
+    tabId: string
   ) => {
     event.stopPropagation();
     setAnchorElementTabOptions(event.currentTarget as unknown as HTMLElement);
@@ -50,13 +51,16 @@ const MultiMap = () => {
             selectionFollowsFocus
           >
             {currentTabsCache.openedTabs.map((tab) => {
-              const isMenuOpen = anchorElementTabOptions && tab.id === selectedTabId;
+              const isMenuOpen =
+                anchorElementTabOptions && tab.id === selectedTabId;
               return (
                 <Tab
                   label={
                     <div className="tab-title-container">
                       <div className="tab-title">
-                        <tab.dataset.datasetIcon size={20} />
+                        {cloneElement(tab.dataset.datasetIcon, {
+                          fontSize: "small",
+                        })}
                         <span>{tab.dataset.displayName}</span>
                       </div>
                       <div className="tab-icons-container">
@@ -77,14 +81,17 @@ const MultiMap = () => {
                           <Fragment />
                         )}
                         <Tooltip title="Tab Options" arrow>
-                          <span><DotsThreeOutline
-                            weight="fill"
-                            className={`options-tab-icon ${isMenuOpen ? 'options-tab-icon-inverted' : ''}`}
-                            onClick={(event) => {
+                          <span>
+                            <DotsThreeOutline
+                              weight="fill"
+                              className={`options-tab-icon ${
+                                isMenuOpen ? "options-tab-icon-inverted" : ""
+                              }`}
+                              onClick={(event) => {
                                 handleMenuClick(event, tab.id);
-                              }
-                            }
-                          /></span>
+                              }}
+                            />
+                          </span>
                         </Tooltip>
                       </div>
                     </div>
@@ -93,7 +100,7 @@ const MultiMap = () => {
                   key={tab.id}
                   disableRipple
                   disableFocusRipple
-                  onClick={() => handleChange(tab.id)} 
+                  onClick={() => handleChange(tab.id)}
                 ></Tab>
               );
             })}
