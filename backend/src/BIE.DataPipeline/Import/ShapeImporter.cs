@@ -12,12 +12,12 @@ namespace BIE.DataPipeline.Import
 {
     internal class ShapeImporter : IImporter
     {
-        private readonly DataSourceDescription mDataSourceDescription;
+        private readonly DataSourceDescription? mDataSourceDescription;
         private ShapefileDataReader mParser;
         private DbaseFileHeader mHeader;
         private readonly ICoordinateTransformation? mTransformation;
 
-        public ShapeImporter(DataSourceDescription dataSourceDescription)
+        public ShapeImporter(DataSourceDescription? dataSourceDescription)
         {
             //YAML Arguments:
             this.mDataSourceDescription = dataSourceDescription;

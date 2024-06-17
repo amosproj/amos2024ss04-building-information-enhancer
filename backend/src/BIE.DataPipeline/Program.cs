@@ -4,67 +4,50 @@ using Mono.Options;
 
 // setup command line options.
 var tableInsertBehaviour = InsertBehaviour.none;
-var options = new OptionSet
-{
-    {
-        "b=|behavior=", @"Behaviour when inserting into a database. Options:
-replace: drop existing table before inserting.
-skip: do not insert when table already exists.
-ignore: always try to insert regardles if table already exists or not.",
-        behaviour =>
-        {
-            switch (behaviour)
-            {
-                case "replace":
-                    tableInsertBehaviour = InsertBehaviour.replace;
-                    break;
-                case "skip":
-                    tableInsertBehaviour = InsertBehaviour.skip;
-                    break;
-                case "ignore":
-                    tableInsertBehaviour = InsertBehaviour.ignore;
-                    break;
-                default:
-                    Console.WriteLine($"{behaviour} is not a recognized behaviour.\navailable options: replace, skip, ignore");
-                    Environment.Exit(1);
-                    break;
-            }
-        }
-    }
-};
 
-// parse command line options
-var rest = options.Parse(args);
-if (rest == null || rest.Count != 1)
-{
-    Console.WriteLine("Could not determine filename: too many or not enough arguments.");
-    Console.WriteLine("Usage: BIE.DataPipeline [options] filename.yaml");
-    options.WriteOptionDescriptions(Console.Out);
-    Environment.Exit(1);
-}
+var filename = HandleCliArguments();
 
-Console.WriteLine("Parser Started");
+Console.WriteLine("Starting datapipeline");
 
-DataSourceDescription description;
-try
+var description = GetDataSourceDescription(filename);
+if (description == null)
 {
-     description = YamlImporter.GetSourceDescription(rest[0]);
-}
-catch (Exception e)
-{
-    Console.WriteLine(e);
     return 1;
 }
+
+Console.WriteLine($@"Running with {filename}:
+type:       {description.source.type}
+format:     {description.source.data_format}
+location:   {description.source.location}
+table name: {description.table_name}
+
+");
 
 if (tableInsertBehaviour != InsertBehaviour.none)
 {
     description.options.if_table_exists = tableInsertBehaviour;
-    Console.WriteLine($"Overwriting Yaml: Using {tableInsertBehaviour} Behaviour for insertion.");
+    Console.WriteLine($"Overwriting Description: Using {tableInsertBehaviour} Behaviour for insertion.");
 }
 
-var dbHelper = new DBHelper();
-IImporter importer;
+// create connection to database;
+var dbHelper = new DbHelper();
 
+// End if Connection not possible.
+if (!dbHelper.CheckConnection())
+{
+    Console.WriteLine("Could not establish Database Connection, exiting...");
+    return 1;
+}
+Console.WriteLine("Established Database Connection.");
+
+// End if Dataset can be skipped
+if (dbHelper.CanSkip(description))
+{
+    return 1;
+}
+Console.WriteLine("Starting Importer");
+
+IImporter importer;
 try
 {
     switch (description.source.data_format)
@@ -77,7 +60,7 @@ try
 
         case "SHAPE":
             importer = new ShapeImporter(description);
-            dbHelper.SetInfo( description.table_name, "Location");
+            dbHelper.SetInfo(description.table_name, "Location");
             break;
 
         default:
@@ -124,3 +107,62 @@ catch (Exception e)
 }
 
 return 0;
+
+string HandleCliArguments()
+{
+    var options = new OptionSet
+    {
+        {
+            "b=|behavior=", @"Behaviour when inserting into a database. Options:
+replace: drop existing table before inserting.
+skip: do not insert when table already exists.
+ignore: always try to insert regardles if table already exists or not.",
+            behaviour =>
+            {
+                switch (behaviour)
+                {
+                    case "replace":
+                        tableInsertBehaviour = InsertBehaviour.replace;
+                        break;
+                    case "skip":
+                        tableInsertBehaviour = InsertBehaviour.skip;
+                        break;
+                    case "ignore":
+                        tableInsertBehaviour = InsertBehaviour.ignore;
+                        break;
+                    default:
+                        Console.WriteLine($"{behaviour} is not a recognized behaviour.\navailable options: replace, skip, ignore");
+                        Environment.Exit(1);
+                        break;
+                }
+            }
+        }
+    };
+
+// parse command line options
+    var remainingArgs = options.Parse(args);
+    if (remainingArgs == null || remainingArgs.Count != 1)
+    {
+        Console.WriteLine("Could not determine filename: too many or not enough arguments.");
+        Console.WriteLine("Usage: BIE.DataPipeline [options] filename.yaml");
+        options.WriteOptionDescriptions(Console.Out);
+        Environment.Exit(1);
+        return "";
+    }
+
+    return remainingArgs[0];
+}
+
+DataSourceDescription? GetDataSourceDescription(string name)
+{
+    try
+    {
+        return YamlImporter.GetSourceDescription(name);
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine($"Could not get valid description from {name}");
+        // Console.Error.WriteLine(e);
+        return null;
+    }
+}
