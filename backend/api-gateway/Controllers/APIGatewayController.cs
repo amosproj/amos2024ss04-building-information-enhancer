@@ -27,11 +27,11 @@ namespace BIE.Core.API.Controllers
         }
 
         /// <summary>
-        /// Gets the list of available datasets with id, Name and Description
+        /// Gets the list of available datasets with id, name and description.
         /// </summary>
-        /// <returns>Data for the specified dataset in the provided viewport bounds and zoom level.</returns>
+        /// <returns>A list of available datasets</returns>
         [HttpGet("getDatasetList")]
-        [ProducesResponseType(typeof(DatasetListResponse), 200)]
+        [ProducesResponseType(typeof(List<DatasetBasicData>), 200)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetDataSetList()
         {
@@ -44,12 +44,7 @@ namespace BIE.Core.API.Controllers
             var datasets = await collection.Find(_ => true).ToListAsync();
             var datasetBasicDataList = datasets.Select(d => d.BasicData).ToList();
 
-            var response = new DatasetListResponse
-            {
-                datasetBasicDataList = datasetBasicDataList
-            };
-
-            return Ok(response);
+            return Ok(datasetBasicDataList);
         }
 
         /// <summary>
