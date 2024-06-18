@@ -1,6 +1,5 @@
 // init-db.js
 db = db.getSiblingDB("bci-metadata");
-db.createCollection("datasets");
 
 // Insert the datasets
 const datasets = [
@@ -45,3 +44,10 @@ const datasets = [
 ];
 
 db.datasets.insertMany(datasets);
+
+// Create read-only user
+db.createUser({
+  user: "readonly_user",
+  pwd: "readonly_password",
+  roles: [{ role: "read", db: "bci-metadata" }],
+});
