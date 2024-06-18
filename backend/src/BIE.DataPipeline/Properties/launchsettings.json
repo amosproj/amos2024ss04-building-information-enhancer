@@ -2,7 +2,7 @@
   "profiles": {
     "BIE.DataPipeline": {
       "commandName": "Project",
-      "commandLineArgs": "--behavior=skip Faulty.yaml",
+      "commandLineArgs": "--behavior=skip hausumringe_unterfranken.yaml",
       "workingDirectory": "yaml",
       "environmentVariables": {
         "DB_SERVER": "localhost",

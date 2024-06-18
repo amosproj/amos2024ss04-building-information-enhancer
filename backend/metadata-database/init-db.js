@@ -1,8 +1,14 @@
-// init-db.js
+// Switch to the target database
 db = db.getSiblingDB("bci-metadata");
-db.createCollection("datasets");
 
-// Insert the datasets
+// Create read only user
+db.createUser({
+  user: "readonly",
+  pwd: "readonly",
+  roles: [{ role: "read", db: "bci-metadata" }],
+});
+
+// Define the datasets
 const datasets = [
   {
     basicData: {
@@ -44,4 +50,11 @@ const datasets = [
   },
 ];
 
-db.datasets.insertMany(datasets);
+// Iterate over datasets and insert only if DatasetId does not exist
+datasets.forEach((dataset) => {
+  if (
+    !db.datasets.findOne({ "basicData.DatasetId": dataset.basicData.DatasetId })
+  ) {
+    db.datasets.insertOne(dataset);
+  }
+});

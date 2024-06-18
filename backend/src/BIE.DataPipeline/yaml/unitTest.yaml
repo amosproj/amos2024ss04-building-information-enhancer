@@ -1,24 +1,24 @@
 # describe the source
 source:
   # link | filepath
-  type: URL
-  location: https://data.bundesnetzagentur.de/Bundesnetzagentur/SharedDocs/Downloads/DE/Sachgebiete/Energie/Unternehmen_Institutionen/E_Mobilitaet/Ladesaeulenregister.csv
+  type: filepath
+  location: .\..\..\..\testData\unitTest.csv
   data_format: CSV
 options:
   # skip lines at the beginning
-  skip_lines: 10
+  skip_lines: 7
   # discard any rows that have null values
   discard_null_rows: false
   # how to deal with existing table. Options: ignore, replace, skip (default).
   if_table_exists: replace
-table_name: EV_charging_stations
+table_name: unitTestTable
 delimiter: ";"
 
 table_cols:
-  - name: testDefault
+  - name: header1
     name_in_table: testDefault
     is_not_nullable: true
-  - name: testVarChar
+  - name: header2
     name_in_table: testVarChar
     type: VARCHAR
   - name: testBool
