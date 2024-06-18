@@ -10,7 +10,7 @@ options:
   # discard any rows that have null values
   discard_null_rows: false
   # how to deal with existing table. Options: ignore, replace, skip (default).
-  if_table_exists: replace
+  if_table_exists: skip
 table_name: unitTestTable
 delimiter: ";"
 
@@ -18,5 +18,3 @@ table_cols:
   - name: colName
     name_in_table: colTableName
     type: VARCHAR
-  
-  
