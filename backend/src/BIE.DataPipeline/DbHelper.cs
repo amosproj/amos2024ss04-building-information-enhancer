@@ -127,6 +127,11 @@ BEGIN CREATE TABLE {description.table_name} (";
                 query += $" {column.name_in_table} {column.type}, ";
             }
 
+            if(description.options.location_to_SQL_point != null)
+            {
+                query += $" {description.options.location_to_SQL_point.name_in_table} GEOGRAPHY,";
+            }
+
             query += "); END";
 
             return query;
