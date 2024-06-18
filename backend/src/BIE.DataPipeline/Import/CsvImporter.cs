@@ -155,10 +155,12 @@ namespace BIE.DataPipeline.Import
                 {
                     double lon;
                     double lat;
-                    bool success = double.TryParse(line[dataSourceDescription.options.location_to_SQL_point.index_lon], out lon);
-                    success = double.TryParse(line[dataSourceDescription.options.location_to_SQL_point.index_lat], out lat) && success;
+                    bool success = double.TryParse(Regex.Replace(line[dataSourceDescription.options.location_to_SQL_point.index_lon], ",", "."), out lon);
+                    success = double.TryParse(Regex.Replace(line[dataSourceDescription.options.location_to_SQL_point.index_lat], ",", "."), out lat) && success;
                     if(success)
                     {
+                        Console.WriteLine(lon + " lon"); 
+                        Console.WriteLine(lat + " lat"); 
                         Console.WriteLine(LocationToPoint(lon, lat) + "-----------");
                         builder.Append($"{LocationToPoint(lon, lat)},");
                     }
@@ -193,7 +195,7 @@ namespace BIE.DataPipeline.Import
             
             //return geometryFactory.CreatePoint(new Coordinate(longitude, latitude));
 
-            return "GEOGRAPHY::Point({ " + latitude + "}, { " + longitude + "}, 4326)";
+            return "GEOGRAPHY::Point(" + latitude + "," + longitude + ", 4326)";
         }
 
 
