@@ -1,11 +1,22 @@
-// init-db.js
+// Connect to the admin database to create the read-only user
+adminDb = db.getSiblingDB("admin");
+
+// Create read-only user with access to all databases
+adminDb.createUser({
+  user: "readonly_user",
+  pwd: "readonly_password",
+  roles: [{ role: "readAnyDatabase", db: "admin" }],
+});
+
+// Switch to the target database
 db = db.getSiblingDB("bci-metadata");
+
+// Ensure the collection exists
 db.createCollection("datasets");
 
-// Define the datasets with DatasetId as _id
+// Define the datasets
 const datasets = [
   {
-    _id: "empty_map",
     basicData: {
       DatasetId: "empty_map",
       Name: "Empty Map",
@@ -17,7 +28,6 @@ const datasets = [
     },
   },
   {
-    _id: "charging_stations",
     basicData: {
       DatasetId: "charging_stations",
       Name: "Charging stations",
@@ -32,7 +42,6 @@ const datasets = [
     },
   },
   {
-    _id: "house_footprints",
     basicData: {
       DatasetId: "house_footprints",
       Name: "House Footprints",
@@ -47,16 +56,11 @@ const datasets = [
   },
 ];
 
-// Iterate over datasets and insert only if _id does not exist
+// Iterate over datasets and insert only if DatasetId does not exist
 datasets.forEach((dataset) => {
-  if (!db.datasets.findOne({ _id: dataset._id })) {
+  if (
+    !db.datasets.findOne({ "basicData.DatasetId": dataset.basicData.DatasetId })
+  ) {
     db.datasets.insertOne(dataset);
   }
-});
-
-// Create read-only user
-db.createUser({
-  user: "readonly_user",
-  pwd: "readonly_password",
-  roles: [{ role: "read", db: "bci-metadata" }],
 });
