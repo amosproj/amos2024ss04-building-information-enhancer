@@ -147,6 +147,71 @@ namespace BIE.Core.API.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [HttpGet("3/data")]
+        public ActionResult GetActualUseData([FromQuery] QueryParameters parameters)
+        {
+            try
+            {
+                var bottomLat = parameters.BottomLat;
+                var bottomLong = parameters.BottomLong;
+                var topLat = parameters.TopLat;
+                var topLong = parameters.TopLong;
+
+                DbHelper.CreateDbConnection();
+
+                string command = @"
+         SELECT top 1000 Id, Location.STAsText() AS Location, Location.STGeometryType() AS Type
+         FROM dbo.Tatsachliche_Nutzung
+         WHERE Location.STIntersects(geography::STGeomFromText('POLYGON((
+            {0} {1},
+            {0} {3},
+            {2} {3},
+            {2} {1},
+            {0} {1}
+         ))', 4326)) = 1";
+
+                string formattedQuery = string.Format(command, bottomLong, bottomLat, topLong, topLat);
+
+                List<object> features = new List<object>();
+                foreach (var row in DbHelper.GetData(formattedQuery))
+                {
+                    var feature = new
+                    {
+                        type = "Feature",
+                        geometry = new
+                        {
+                            type = (string)row["Type"],
+                            coordinates = QueryParameters.GetPolygonCordinates(row["Location"])
+                        },
+                        properties = new
+                        {
+                            id = (string)row["Id"]
+                        }
+                    };
+                    features.Add(feature);
+                }
+
+                var featureCollection = new
+                {
+                    type = "FeatureCollection",
+                    features = features
+                };
+
+                var jsonResponse = JsonConvert.SerializeObject(featureCollection);
+                return Ok(jsonResponse);
+            }
+            catch (ServiceException se)
+            {
+                return BadRequest(se.Message);
+            }
+        }
+
+
+        /// <summary>
+        /// Get a record
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("2/clustereddata")]
         public ActionResult GetHausumringeClusteredData([FromQuery] QueryParameters parameters)
         {

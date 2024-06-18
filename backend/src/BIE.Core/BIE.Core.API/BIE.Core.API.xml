@@ -23,6 +23,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:BIE.Core.API.Controllers.DatasetController.GetActualUseData(BIE.Core.API.Controllers.DatasetController.QueryParameters)">
+            <summary>
+            Get a record
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:BIE.Core.API.Controllers.DatasetController.GetHausumringeClusteredData(BIE.Core.API.Controllers.DatasetController.QueryParameters)">
             <summary>
             Get a record
