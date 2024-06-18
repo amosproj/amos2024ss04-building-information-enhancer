@@ -96,12 +96,12 @@ services:
       - ${METADATA_DATABASE_PORT}:27017
     networks:
       - bie-network
-    # volumes:
-    #   - bie-metadata:/data/db
+    volumes:
+      - bie-metadata:/data/db
 
 volumes:
   bie-mssqldata:
-#   bie-metadata:
+  bie-metadata:
 
 networks:
   bie-network:

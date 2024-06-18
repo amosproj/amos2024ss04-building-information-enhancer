@@ -1,9 +1,11 @@
 // init-db.js
 db = db.getSiblingDB("bci-metadata");
+db.createCollection("datasets");
 
-// Insert the datasets
+// Define the datasets with DatasetId as _id
 const datasets = [
   {
+    _id: "empty_map",
     basicData: {
       DatasetId: "empty_map",
       Name: "Empty Map",
@@ -15,6 +17,7 @@ const datasets = [
     },
   },
   {
+    _id: "charging_stations",
     basicData: {
       DatasetId: "charging_stations",
       Name: "Charging stations",
@@ -29,6 +32,7 @@ const datasets = [
     },
   },
   {
+    _id: "house_footprints",
     basicData: {
       DatasetId: "house_footprints",
       Name: "House Footprints",
@@ -43,7 +47,12 @@ const datasets = [
   },
 ];
 
-db.datasets.insertMany(datasets);
+// Iterate over datasets and insert only if _id does not exist
+datasets.forEach((dataset) => {
+  if (!db.datasets.findOne({ _id: dataset._id })) {
+    db.datasets.insertOne(dataset);
+  }
+});
 
 // Create read-only user
 db.createUser({
