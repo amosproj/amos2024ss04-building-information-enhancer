@@ -86,6 +86,6 @@ jobs:
           scp ./docker-compose.yml ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}}:/var/lib/bie
           scp ./.env.production ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}}:/var/lib/bie/.env
       - name: Connect and Pull
-        run: ssh ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}} "cd /var/lib/bie && docker-compose down --remove-orphans && docker compose pull && docker compose up -d --remove-orphans && exit"
+        run: ssh ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}} "cd /var/lib/bie && docker compose down --remove-orphans && docker compose pull && docker compose up -d --remove-orphans && exit"
       - name: Cleanup
         run: rm -rf ~/.ssh
