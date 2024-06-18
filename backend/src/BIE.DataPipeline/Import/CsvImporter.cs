@@ -159,9 +159,6 @@ namespace BIE.DataPipeline.Import
                     success = double.TryParse(Regex.Replace(line[dataSourceDescription.options.location_to_SQL_point.index_lat], ",", "."), out lat) && success;
                     if(success)
                     {
-                        Console.WriteLine(lon + " lon"); 
-                        Console.WriteLine(lat + " lat"); 
-                        Console.WriteLine(LocationToPoint(lon, lat) + "-----------");
                         builder.Append($"{LocationToPoint(lon, lat)},");
                     }
                 }

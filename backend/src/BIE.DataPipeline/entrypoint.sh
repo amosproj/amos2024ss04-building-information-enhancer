@@ -6,7 +6,7 @@ echo "insert data sets"
 
 directory="./yaml"
 yamlfiles=$(find "$directory" -type f -name "*.yaml")
-excludeFiles=("unitTest.yaml" "example.yaml")
+excludeFiles=("unitTest.yaml" "evChargingStationNoGeography.yaml")
 
 # Check if yaml_files is not empty
 if [ -n "$yamlfiles" ]; then
