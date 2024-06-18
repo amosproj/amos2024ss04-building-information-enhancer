@@ -10,7 +10,7 @@ namespace BIE.Core.API.Services
 
         public MongoDBService(IConfiguration configuration)
         {
-            var client = new MongoClient("mongodb://metadata-database:27017");
+            var client = new MongoClient("mongodb://readonly_user:readonly_password@metadata-database:27017");
             _database = client.GetDatabase("bci-metadata");
         }
 
