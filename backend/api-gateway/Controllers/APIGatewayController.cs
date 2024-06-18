@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using System.Text.Json;
+using System.Linq;
 using APIGateway.Models;
+using System.Text.Json;
+using BIE.Core.API.Services;
+using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
-using System.Data;
 
 namespace BIE.Core.API.Controllers
 {
@@ -15,52 +17,65 @@ namespace BIE.Core.API.Controllers
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<APIGatewayController> _logger;
+        private readonly MongoDBService _mongoDBService;
 
-        public APIGatewayController(HttpClient httpClient, ILogger<APIGatewayController> logger)
+        public APIGatewayController(HttpClient httpClient, ILogger<APIGatewayController> logger, MongoDBService mongoDBService)
         {
             _httpClient = httpClient;
             _logger = logger;
+            _mongoDBService = mongoDBService;
         }
 
         /// <summary>
-        /// Gets the list of available datasets with id, name and description
+        /// Gets the list of available datasets with id, name and description.
         /// </summary>
-        /// <returns>Data for the specified dataset in the provided viewport bounds and zoom level.</returns>
+        /// <returns>A list of available datasets</returns>
         [HttpGet("getDatasetList")]
-        [ProducesResponseType(typeof(DatasetListResponse), 200)]
+        [ProducesResponseType(typeof(List<DatasetBasicData>), 200)]
         [ProducesResponseType(400)]
-        public IActionResult GetDataSetList()
+        public async Task<IActionResult> GetDataSetList()
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var datasetInfoList = MockData.DataSetDescription;
+            var collection = _mongoDBService.GetDatasetsCollection();
+            var datasets = await collection.Find(_ => true).ToListAsync();
+            var datasetBasicDataList = datasets.Select(d => d.BasicData).ToList();
 
-            return Ok(datasetInfoList);
+            return Ok(datasetBasicDataList);
         }
 
         /// <summary>
-        /// Gets the metadata for the given dataset. Contains things like icon, visualization types
+        /// Gets the metadata for the given dataset. Contains things like Icon, visualization types
         /// </summary>
-        /// <returns>Data for the specified dataset in the provided viewport bounds and zoom level.</returns>
+        /// <param name="datasetID">The ID of the dataset</param>
+        /// <returns>Metadata for the specified dataset</returns>
         [HttpGet("getDatasetMetadata")]
-        [ProducesResponseType(typeof(DatasetListResponse), 200)]
+        [ProducesResponseType(typeof(DatasetMetadata), 200)]
         [ProducesResponseType(400)]
-        [ProducesResponseType(500)]
-
-        public IActionResult GetDatasetMetadata([FromQuery, Required] string datasetID)
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> GetDatasetMetadata([FromQuery, Required] string datasetID)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            return Ok(new DatasetMetadata { icon = "", type="marker" });
+
+            var collection = _mongoDBService.GetDatasetsCollection();
+            var dataset = await collection.Find(d => d.BasicData.DatasetId == datasetID).FirstOrDefaultAsync();
+            
+            if (dataset == null)
+            {
+                return NotFound($"Dataset with ID {datasetID} not found.");
+            }
+
+            return Ok(dataset.MetaData);
         }
 
         /// <summary>
-        /// Loads the location data for the given point or poylgon.
+        /// Loads the location data for the given point or polygon.
         /// </summary>
         /// <param name="request">Contains the current dataset id and the list of coordinates. 
         /// In case of a single point a list with a single element.</param>

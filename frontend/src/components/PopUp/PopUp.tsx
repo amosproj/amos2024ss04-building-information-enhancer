@@ -6,7 +6,6 @@ import {
   DialogContent,
   Button,
 } from "@mui/material";
-import { Icon } from "@phosphor-icons/react";
 
 import "./PopUp.css";
 
@@ -15,7 +14,7 @@ interface PopUpProps {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
-  titleIcon: Icon | undefined;
+  titleIcon: JSX.Element | undefined;
 }
 
 // This is the partent component for all PopUps.
@@ -44,7 +43,11 @@ const PopUp: React.FC<PopUpProps> = ({
       onClose={onClose}
     >
       <DialogTitle className="popup-name" style={{ paddingBottom: 8 }}>
-        {titleIcon ? React.createElement(titleIcon) : <Fragment />}
+        {titleIcon ? (
+          <span style={{ marginRight: 8 }}>{titleIcon}</span>
+        ) : (
+          <Fragment />
+        )}
         {title}
       </DialogTitle>
       <DialogContent>{children}</DialogContent>

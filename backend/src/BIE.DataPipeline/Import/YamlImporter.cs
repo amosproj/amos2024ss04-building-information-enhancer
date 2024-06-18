@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text;
 using YamlDotNet.Serialization;
 
 // ReSharper disable InconsistentNaming
 
+[assembly: InternalsVisibleTo("BIE.Tests")]
 namespace BIE.DataPipeline.Import
 {
     public static class YamlImporter
@@ -73,6 +75,22 @@ namespace BIE.DataPipeline.Import
         /// </summary>
         public List<DataSourceColumn> table_cols { get; set; }
 
+        public override bool Equals(object? obj)
+        {
+            if (obj == null) return false;
+
+            DataSourceDescription des = obj as DataSourceDescription;
+
+            if (!this.source.Equals(des.source)) return false;
+            if (!this.options.Equals(des.options)) return false;
+            if (!this.table_name.Equals(des.table_name)) return false;
+            for (int i = 0; i < this.table_cols.Count; i++)
+            {
+                if (!this.table_cols[i].Equals(des.table_cols[i])) return false;
+            }
+            return true;
+        }
+
         public class DataSourceLocation
         {
             /// <summary>
@@ -89,6 +107,18 @@ namespace BIE.DataPipeline.Import
             /// the format of the data
             /// </summary>
             public string data_format { get; set; }
+
+            public override bool Equals(object? obj)
+            {
+                if (obj == null) return false;
+
+                DataSourceLocation des = obj as DataSourceLocation;
+
+                if (this.type != des.type) return false;
+                if (this.location != des.location) return false;
+                if (this.data_format != des.data_format) return false;
+                return true;
+            }
         }
 
         public class DataSourceOptions
@@ -117,8 +147,22 @@ namespace BIE.DataPipeline.Import
                 set => mIf_table_exists = value;
             }
 
+
             [DefaultValue(null)]
             public LocationToSQLPoint location_to_SQL_point { get; set; }
+
+            public override bool Equals(object? obj)
+            {
+                if (obj == null) return false;
+
+                DataSourceOptions des = obj as DataSourceOptions;
+
+                if (this.skip_lines != des.skip_lines) return false;
+                if (this.discard_null_rows != des.discard_null_rows) return false;
+                if (this.if_table_exists != des.if_table_exists) return false;
+                return true;
+            }
+
         }
 
         public class DataSourceColumn
@@ -148,6 +192,20 @@ namespace BIE.DataPipeline.Import
             /// </summary>
             [DefaultValue(false)]
             public bool is_not_nullable { get; set; }
+
+
+            public override bool Equals(object? obj)
+            {
+                if (obj == null) return false;
+
+                DataSourceColumn des = obj as DataSourceColumn;
+
+                if (this.name != des.name) return false;
+                if (this.name_in_table != des.name_in_table) return false;
+                if (this.type != des.type) return false;
+                if (this.is_not_nullable != des.is_not_nullable) return false;
+                return true;
+            }
         }
 
         public class LocationToSQLPoint
