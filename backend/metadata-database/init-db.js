@@ -5,7 +5,7 @@ adminDb = db.getSiblingDB("admin");
 adminDb.createUser({
   user: "readonly_user",
   pwd: "readonly_password",
-  roles: [{ role: "readAnyDatabase", db: "admin" }],
+  roles: [{ role: "read", db: "bci-metadata" }],
 });
 
 // Switch to the target database
