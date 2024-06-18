@@ -238,6 +238,72 @@ namespace BIE.Core.API.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [HttpGet("3/data")]
+        public ActionResult GetActualUseData([FromQuery] QueryParameters parameters)
+        {
+            try
+            {
+                var bottomLat = parameters.BottomLat;
+                var bottomLong = parameters.BottomLong;
+                var topLat = parameters.TopLat;
+                var topLong = parameters.TopLong;
+                var stateName = parameters.StateName;
+
+                DbHelper.CreateDbConnection();
+
+                string command = @"
+         SELECT top 1000 Id, Location.STAsText() AS Location, Location.STGeometryType() AS Type
+         FROM dbo.actual_use_{4}
+         WHERE Location.STIntersects(geography::STGeomFromText('POLYGON((
+            {0} {1},
+            {0} {3},
+            {2} {3},
+            {2} {1},
+            {0} {1}
+         ))', 4326)) = 1";
+
+                string formattedQuery = string.Format(command, bottomLong, bottomLat, topLong, topLat,stateName);
+
+                List<object> features = new List<object>();
+                foreach (var row in DbHelper.GetData(formattedQuery))
+                {
+                    var feature = new
+                    {
+                        type = "Feature",
+                        geometry = new
+                        {
+                            type = (string)row["Type"],
+                            coordinates = QueryParameters.GetPolygonCordinates(row["Location"])
+                        },
+                        properties = new
+                        {
+                            id = (string)row["Id"]
+                        }
+                    };
+                    features.Add(feature);
+                }
+
+                var featureCollection = new
+                {
+                    type = "FeatureCollection",
+                    features = features
+                };
+
+                var jsonResponse = JsonConvert.SerializeObject(featureCollection);
+                return Ok(jsonResponse);
+            }
+            catch (ServiceException se)
+            {
+                return BadRequest(se.Message);
+            }
+        }
+
+
+        /// <summary>
+        /// Get a record
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("2/clustereddata")]
         public ActionResult GetHausumringeClusteredData([FromQuery] QueryParameters parameters)
         {
@@ -331,7 +397,8 @@ namespace BIE.Core.API.Controllers
             [BindRequired] public float BottomLong { get; set; }
             [BindRequired] public float TopLat { get; set; }
             [BindRequired] public float TopLong { get; set; }
-            
+            public string StateName { get; set; }
+
             public float ZoomLevel { get; set; }
 
             public static string GetPolygonCordinates(string cordinate)

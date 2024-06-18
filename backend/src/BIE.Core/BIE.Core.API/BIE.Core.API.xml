@@ -25,6 +25,13 @@
             In case of a single point a list with a single element.</param>
             <returns>Data for the specified point/polygon as a list of key/values.</returns>
         </member>
+        <member name="M:BIE.Core.API.Controllers.DatasetController.GetActualUseData(BIE.Core.API.Controllers.DatasetController.QueryParameters)">
+            <summary>
+            Get a record
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:BIE.Core.API.Controllers.DatasetController.GetHausumringeClusteredData(BIE.Core.API.Controllers.DatasetController.QueryParameters)">
             <summary>
             WIP: DO NOT USE, Get a record
