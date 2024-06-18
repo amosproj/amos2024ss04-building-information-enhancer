@@ -193,7 +193,8 @@ namespace BIE.Core.API.Controllers
                 string command = @"
             SELECT TOP 5
                 Id, 
-                Location.STArea() AS Area, 
+                Location.STArea() AS Area,
+                Location.STAsText() AS Location,
                 geography::Point({0}, {1}, 4326).STDistance(Location) AS Distance
             FROM 
                 dbo.Hausumringe_mittelfranken
