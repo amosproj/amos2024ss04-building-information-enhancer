@@ -156,12 +156,13 @@ namespace BIE.Core.API.Controllers
                 var bottomLong = parameters.BottomLong;
                 var topLat = parameters.TopLat;
                 var topLong = parameters.TopLong;
+                var stateName = parameters.StateName;
 
                 DbHelper.CreateDbConnection();
 
                 string command = @"
          SELECT top 1000 Id, Location.STAsText() AS Location, Location.STGeometryType() AS Type
-         FROM dbo.Tatsachliche_Nutzung
+         FROM dbo.actual_use_{4}
          WHERE Location.STIntersects(geography::STGeomFromText('POLYGON((
             {0} {1},
             {0} {3},
@@ -170,7 +171,7 @@ namespace BIE.Core.API.Controllers
             {0} {1}
          ))', 4326)) = 1";
 
-                string formattedQuery = string.Format(command, bottomLong, bottomLat, topLong, topLat);
+                string formattedQuery = string.Format(command, bottomLong, bottomLat, topLong, topLat,stateName);
 
                 List<object> features = new List<object>();
                 foreach (var row in DbHelper.GetData(formattedQuery))
@@ -304,7 +305,8 @@ namespace BIE.Core.API.Controllers
             [BindRequired] public float BottomLong { get; set; }
             [BindRequired] public float TopLat { get; set; }
             [BindRequired] public float TopLong { get; set; }
-            
+            public string StateName { get; set; }
+
             public float ZoomLevel { get; set; }
 
             public static string GetPolygonCordinates(string cordinate)

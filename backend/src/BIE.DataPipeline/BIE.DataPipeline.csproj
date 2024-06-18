@@ -42,7 +42,6 @@
 
 
   <ItemGroup>
-    <None Remove="yaml\Tatsächliche_Nutzung.yaml" />
     <None Remove="yaml\unitTest.yaml" />
   </ItemGroup>
 
