@@ -12,7 +12,7 @@
     "setup:backend:linux": "./backend_build.sh linux-x64",
     "setup:backend:macos": "./backend_build.sh osx-x64",
     "deploy": "docker compose pull && docker compose up -d",
-    "deploy:build": "docker compose up --build -d",
+    "deploy:build": "docker compose up --build -d --remove-orphans --force-recreate",
     "deploy:frontend:dev": "cd frontend/ && npm run dev",
     "deploy:backend:api": "cd backend/src/BIE.Core/BIE.Core.API/bin/build && BIE.Core.API"
   }

@@ -1,18 +1,12 @@
-// Connect to the admin database to create the read-only user
-adminDb = db.getSiblingDB("admin");
-
-// Create read-only user with access to all databases
-adminDb.createUser({
-  user: "readonly_user",
-  pwd: "readonly_password",
-  roles: [{ role: "read", db: "bci-metadata" }],
-});
-
 // Switch to the target database
 db = db.getSiblingDB("bci-metadata");
 
-// Ensure the collection exists
-db.createCollection("datasets");
+// Create read only user
+db.createUser({
+  user: "readonly",
+  pwd: "readonly",
+  roles: [{ role: "read", db: "bci-metadata" }],
+});
 
 // Define the datasets
 const datasets = [
