@@ -5,7 +5,7 @@ using BIE.DataPipeline.Import;
 
 namespace BIE.DataPipeline
 {
-    internal sealed class DbHelper
+    internal class DBHelper
     {
         private string mInputQueryString;
         private readonly StringBuilder mStringBuilder;
@@ -13,58 +13,14 @@ namespace BIE.DataPipeline
         private int mCount;
         private const int MaxCount = 900;
 
-        public DbHelper()
+        public DBHelper()
         {
             ConfigureEnvironmentVariables();
             mStringBuilder = new StringBuilder();
         }
 
         /// <summary>
-        /// Check if a connection to the database is possible.
-        /// </summary>
-        /// <returns></returns>
-        public bool CheckConnection()
-        {
-            var db = Database.Instance;
-            return db.CheckConnection();
-        }
-
-        public bool CanSkip(DataSourceDescription description)
-        {
-            var db = Database.Instance;
-            // Handle Table Behavior
-            if (description.options.if_table_exists == InsertBehaviour.skip && TableExists(description.table_name, db))
-            {
-                Console.WriteLine($"Table {description.table_name} already exists, stopping...");
-                return true;
-            }
-
-            if (description.options.if_table_exists == InsertBehaviour.replace)
-            {
-                Console.WriteLine($"Dropping table {description.table_name} if it exists.");
-                db.ExecuteScalar(db.CreateCommand($"DROP TABLE IF EXISTS {description.table_name}"));
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Checks if a table exists in the database
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <param name="db"></param>
-        /// <returns></returns>
-        private static bool TableExists(string tableName, IDatabase db)
-        {
-            var exists = (int)db.ExecuteScalar(db.CreateCommand($"SELECT count(*) as Exist" +
-                                                                $" from INFORMATION_SCHEMA.TABLES" +
-                                                                $" where table_name = '{tableName}'"));
-            return exists == 1;
-        }
-
-        /// <summary>
         /// Set the main INSERT INTO QueryString.
-        /// Sets the table name and the necessary column names.
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="columnNames"></param>
@@ -86,6 +42,26 @@ namespace BIE.DataPipeline
                 Console.WriteLine("Creating Table...");
                 var db = Database.Instance;
 
+                // Handle Table Behavior
+                if (description.options.if_table_exists == InsertBehaviour.skip)
+                {
+                    var tableExists =
+                        (int)db.ExecuteScalar(db.CreateCommand($"SELECT count(*) as Exist" +
+                                                               $" from INFORMATION_SCHEMA.TABLES" +
+                                                               $" where table_name = '{description.table_name}'"));
+
+                    if (tableExists == 1)
+                    {
+                        Console.WriteLine($"Table {description.table_name} already exists, stopping...");
+                        return false;
+                    }
+                }
+
+                if (description.options.if_table_exists == InsertBehaviour.replace)
+                {
+                    Console.WriteLine($"Dropping table {description.table_name} if it exists.");
+                    db.ExecuteScalar(db.CreateCommand($"DROP TABLE IF EXISTS {description.table_name}"));
+                }
 
                 var query = GetCreationQuery(description);
 
@@ -99,12 +75,12 @@ namespace BIE.DataPipeline
             catch (Exception e)
             {
                 Console.WriteLine("Error while creating Table:");
-                Console.Error.WriteLine(e);
+                Console.WriteLine(e);
                 return false;
             }
         }
 
-        private string GetCreationQuery(DataSourceDescription? description)
+        private string GetCreationQuery(DataSourceDescription description)
         {
             if (description.source.data_format == "SHAPE")
             {
@@ -196,7 +172,7 @@ BEGIN CREATE TABLE {description.table_name} (";
             {
                 throw new ExternalException("Could not get Environment Variables.");
             }
-
+            
             Database.Instance.SetConnectionString(dbType,
                                                   dbServer,
                                                   dbName,

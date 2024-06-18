@@ -15,7 +15,7 @@ namespace BIE.DataPipeline.Import
         /// <returns></returns>
         /// <exception cref="FileNotFoundException"></exception>
         /// <exception cref="FormatException"></exception>
-        public static DataSourceDescription? GetSourceDescription(string path)
+        public static DataSourceDescription GetSourceDescription(string path)
         {
             path = Path.GetFullPath(path);
 

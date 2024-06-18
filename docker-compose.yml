@@ -79,8 +79,8 @@ services:
     image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-sql-database:${DOCKER_COMPOSE_IMAGES_TAG}
     networks:
       - bie-network
-    volumes:
-      - bie-mssqldata:/var/opt/mssql
+  # volumes:
+  #   - bie-mssqldata:/var/opt/mssql
 
   ## The database for storing datasets metadata, accessible by multiple services
   metadata-database:
@@ -89,6 +89,9 @@ services:
       dockerfile: Dockerfile
     container_name: metadata-database
     image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-metadata-database:${DOCKER_COMPOSE_IMAGES_TAG}
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     ports:
       - ${METADATA_DATABASE_PORT}:27017
     networks:
@@ -96,9 +99,9 @@ services:
     # volumes:
     #   - bie-metadata:/data/db
 
-volumes:
-  bie-mssqldata:
+# volumes:
 #   bie-metadata:
+#   bie-mssqldata:
 
 networks:
   bie-network:

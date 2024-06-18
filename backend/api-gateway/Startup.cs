@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using BIE.Core.API.Services;
 
 public class Startup
 {
@@ -19,9 +18,6 @@ public class Startup
     {
         services.AddControllers();
         services.AddHttpClient();
-
-        // Register MongoDBService
-        services.AddSingleton<MongoDBService>();
 
         // Add CORS services to allow specific origins
         services.AddCors(options =>

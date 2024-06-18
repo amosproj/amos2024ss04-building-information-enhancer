@@ -1,13 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
-using APIGateway.Models;
-using System.Text.Json;
-using BIE.Core.API.Services;
-using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
-using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using System.Text.Json;
+using APIGateway.Models;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 
 namespace BIE.Core.API.Controllers
 {
@@ -17,32 +15,31 @@ namespace BIE.Core.API.Controllers
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<APIGatewayController> _logger;
-        private readonly MongoDBService _mongoDBService;
 
-        public APIGatewayController(HttpClient httpClient, ILogger<APIGatewayController> logger, MongoDBService mongoDBService)
+        public APIGatewayController(HttpClient httpClient, ILogger<APIGatewayController> logger)
         {
             _httpClient = httpClient;
             _logger = logger;
-            _mongoDBService = mongoDBService;
         }
 
         /// <summary>
-        /// Gets the list of available datasets with id, name and description.
+        /// Gets the list of available datasets with id, Name and Description
         /// </summary>
-        /// <returns>A list of available datasets</returns>
+        /// <returns>Data for the specified dataset in the provided viewport bounds and zoom level.</returns>
         [HttpGet("getDatasetList")]
-        [ProducesResponseType(typeof(List<DatasetBasicData>), 200)]
+        [ProducesResponseType(typeof(DatasetListResponse), 200)]
         [ProducesResponseType(400)]
-        public async Task<IActionResult> GetDataSetList()
+        public IActionResult GetDataSetList()
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var collection = _mongoDBService.GetDatasetsCollection();
-            var datasets = await collection.Find(_ => true).ToListAsync();
-            var datasetBasicDataList = datasets.Select(d => d.BasicData).ToList();
+            // Extract the basic data from the dataset data
+            var datasetBasicDataList = MockData.datasetData
+                .Select(d => d.basicData)
+                .ToList();
 
             return Ok(datasetBasicDataList);
         }
@@ -50,34 +47,33 @@ namespace BIE.Core.API.Controllers
         /// <summary>
         /// Gets the metadata for the given dataset. Contains things like Icon, visualization types
         /// </summary>
-        /// <param name="datasetID">The ID of the dataset</param>
+        /// <param Name="datasetID">The ID of the dataset</param>
         /// <returns>Metadata for the specified dataset</returns>
         [HttpGet("getDatasetMetadata")]
         [ProducesResponseType(typeof(DatasetMetadata), 200)]
         [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        public async Task<IActionResult> GetDatasetMetadata([FromQuery, Required] string datasetID)
+        [ProducesResponseType(500)]
+        public IActionResult GetDatasetMetadata([FromQuery, Required] string datasetID)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var collection = _mongoDBService.GetDatasetsCollection();
-            var dataset = await collection.Find(d => d.BasicData.DatasetId == datasetID).FirstOrDefaultAsync();
-            
+            var dataset = MockData.datasetData.FirstOrDefault(d => d.basicData.DatasetId == datasetID);
             if (dataset == null)
             {
                 return NotFound($"Dataset with ID {datasetID} not found.");
             }
 
-            return Ok(dataset.MetaData);
+            return Ok(dataset.metaData);
         }
 
+
         /// <summary>
-        /// Loads the location data for the given point or polygon.
+        /// Loads the location data for the given point or poylgon.
         /// </summary>
-        /// <param name="request">Contains the current dataset id and the list of coordinates. 
+        /// <param Name="request">Contains the current dataset id and the list of coordinates. 
         /// In case of a single point a list with a single element.</param>
         /// <returns>Data for the specified point/polygon as a list of key/values.</returns>
         [HttpPut("loadLocationData")]
@@ -135,12 +131,12 @@ namespace BIE.Core.API.Controllers
         /// <summary>
         /// Gets the dataset viewport data based on the provided parameters.
         /// </summary>
-        /// <param name="datasetID">The ID of the dataset.</param>
-        /// <param name="zoomLevel">The zoom level.</param>
-        /// <param name="BottomLat">The bottom latitude of the viewport.</param>
-        /// <param name="BottomLong">The bottom longitude of the viewport.</param>
-        /// <param name="TopLat">The top latitude of the viewport.</param>
-        /// <param name="TopLong">The top longitude of the viewport.</param>
+        /// <param Name="datasetID">The ID of the dataset.</param>
+        /// <param Name="zoomLevel">The zoom level.</param>
+        /// <param Name="BottomLat">The bottom latitude of the viewport.</param>
+        /// <param Name="BottomLong">The bottom longitude of the viewport.</param>
+        /// <param Name="TopLat">The top latitude of the viewport.</param>
+        /// <param Name="TopLong">The top longitude of the viewport.</param>
         /// <returns>Data for the specified dataset in the provided viewport bounds and zoom level.</returns>
         [HttpGet("getDatasetViewportData")]
         [ProducesResponseType(typeof(GeoJsonResponse), 200)]
