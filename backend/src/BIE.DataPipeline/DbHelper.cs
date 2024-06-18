@@ -104,6 +104,51 @@ namespace BIE.DataPipeline
             }
         }
 
+        /// <summary>
+        /// Create indexes for shape dataset on location column
+        /// </summary>
+        /// <param name="description"></param>
+        internal bool CreateIndexes(DataSourceDescription description)
+        {
+            try
+            {
+                Console.WriteLine("Creating Index...");
+                var db = Database.Instance;
+
+
+                var query = "USE BIEDB;" +
+                    " \r\n " +
+                    " SET QUOTED_IDENTIFIER ON; " +
+                    "\r\n " +
+                    " IF NOT EXISTS (" +
+                    " SELECT *" +
+                    "  FROM sys.indexes " +
+                    "  WHERE name = 'SI_"+description.table_name+"_Location' " +
+                    "   AND object_id = OBJECT_ID('dbo."+description.table_name+"')" +
+                    " ) " +
+                    " BEGIN" +
+                    "   CREATE SPATIAL INDEX SI_"+description.table_name+"_Location " +
+                    " ON dbo."+description.table_name+"(Location); " +
+                    " END " +
+                    " \r\n"+
+                    " UPDATE STATISTICS dbo." +description.table_name+"; " +
+                    " \r\n";
+
+                var cmd = db.CreateCommand(query);
+                db.Execute(cmd);
+
+                Console.WriteLine("Index created.");
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error while creating Table:");
+                Console.Error.WriteLine(e);
+                return false;
+            }
+        }
+
         private string GetCreationQuery(DataSourceDescription? description)
         {
             if (description.source.data_format == "SHAPE")
