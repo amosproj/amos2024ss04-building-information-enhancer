@@ -65,8 +65,8 @@ namespace BIE.Tests
         public void TestReadYamlHeader()
         {
             string[] expected = {
-            "testDefault",
-            "testVarChar",
+            "header1",
+            "header2",
             "testBool",
             "testBoolean",
             "testInt",
