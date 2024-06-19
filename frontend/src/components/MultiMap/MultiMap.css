@@ -1,9 +1,12 @@
 .multimap-container {
   height: 100%;
-  width: 50%;
-  max-width: 50%;
+  width: 100%;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
+  padding-left:20px;
+  padding-right:10px;
+  padding-top: 3px;
 }
 
 .tab-list-container {
@@ -85,6 +88,7 @@
   min-height: 2rem;
   width: 2rem;
   height: 2rem;
+  margin-right: 2rem;
 }
 
 .add-tab-button:hover {
@@ -107,6 +111,10 @@
   background-color: rgb(238, 238, 238) !important;
   text-transform: none !important;
   padding: 1.1rem 1rem 0.8rem 1rem !important;
+}
+
+.MuiTab-root:focus {
+  outline: none;
 }
 
 .MuiTab-root + .MuiTab-root {

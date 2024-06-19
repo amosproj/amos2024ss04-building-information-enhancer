@@ -19,7 +19,6 @@ import { Dataset } from "../DatasetsList/DatasetsList";
 import MapDatasetVisualizer from "./MapDatasetVisualizer";
 import MapEventsHandler from "./MapEventsHandler";
 import ZoomWarningLabel from "./ZoomWarningLabel";
-import { MarkersTypes } from "../DatasetsList/MarkersTypes";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -129,12 +128,11 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
             />
           </div>
         )}
-        {tabProps && tabProps.dataset.type === MarkersTypes.Markers && (
-          <ZoomWarningLabel
-            label="Zoom in to see the markers"
-            minZoom={minZoomForLabel}
-          />
-        )}
+
+        <ZoomWarningLabel
+          label="Zoom in to see the markers"
+          minZoom={minZoomForLabel}
+        />
       </MapContainer>
     </div>
   );
