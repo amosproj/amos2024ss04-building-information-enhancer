@@ -192,15 +192,15 @@ namespace BIE.Core.API.Controllers
 
                 string command = @"
             SELECT TOP 5
-                Id, 
-                Location.STArea() AS Area,
+        Id,
+        Location.STArea() AS Area,
                 Location.STAsText() AS Location,
                 geography::Point({0}, {1}, 4326).STDistance(Location) AS Distance
-            FROM 
-                dbo.Hausumringe_mittelfranken
-            WHERE 
+    FROM 
+        dbo.Hausumringe_mittelfranken
+    WHERE
                 geography::Point({0}, {1}, 4326).STBuffer({2}).STIntersects(Location) = 1
-            ORDER BY 
+ORDER BY 
                 geography::Point({0}, {1}, 4326).STDistance(Location);";
 
                 string formattedQuery = string.Format(command, latitude, longitude, radius);
@@ -210,7 +210,7 @@ namespace BIE.Core.API.Controllers
                     CurrentDatasetData = new List<DatasetItem>()
                 };
 
-                foreach (var row in DbHelper.GetData(formattedQuery))
+                foreach (var row in DbHelper.GetData(formattedQuery,600))
                 {
                     var area = row["Area"];
                     var distance = row["Distance"];

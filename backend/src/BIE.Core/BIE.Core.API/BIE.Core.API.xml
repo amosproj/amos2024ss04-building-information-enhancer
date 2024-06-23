@@ -11,7 +11,7 @@
         </member>
         <member name="M:BIE.Core.API.Controllers.DatasetController.GetDatasetViewportData(BIE.Core.API.Controllers.DatasetController.QueryParameters)">
             <summary>
-            Load data
+            Get viewport data. so Data for a specific rectangle returned as featurecollection
             </summary>
             <param name="parameters">Nice</param>
             <returns></returns>
@@ -27,14 +27,14 @@
         </member>
         <member name="M:BIE.Core.API.Controllers.DatasetController.GetActualUseData(BIE.Core.API.Controllers.DatasetController.QueryParameters)">
             <summary>
-            Get a record
+            WIP: DO NOT USE, Get a record
             </summary>
             <param name="id"></param>
             <returns></returns>
         </member>
         <member name="M:BIE.Core.API.Controllers.DatasetController.GetHausumringeClusteredData(BIE.Core.API.Controllers.DatasetController.QueryParameters)">
             <summary>
-            WIP: DO NOT USE, Get a record
+            Get a record
             </summary>
             <param name="id"></param>
             <returns></returns>
