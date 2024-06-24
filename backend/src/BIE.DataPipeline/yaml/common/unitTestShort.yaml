@@ -2,7 +2,7 @@
 source:
   # link | filepath
   type: filepath
-  location: .\..\..\..\..\testData\unitTest.csv
+  location: .\..\..\..\testData\unitTest.csv
   data_format: CSV
 options:
   # skip lines at the beginning
