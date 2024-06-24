@@ -14,7 +14,7 @@ namespace BIE.Tests
         [SetUp]
         public void SetUpCsvImporter()
         {
-            csvImporter = new CsvImporter(YamlImporter.GetSourceDescription(@".\yaml\unitTest.yaml"));
+            csvImporter = new CsvImporter(YamlImporter.GetSourceDescription(@".\yaml\common\unitTest.yaml"));
         }
 
         [Test]
