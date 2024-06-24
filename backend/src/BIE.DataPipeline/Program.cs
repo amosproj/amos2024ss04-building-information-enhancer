@@ -2,12 +2,9 @@
 using BIE.DataPipeline.Import;
 using Mono.Options;
 
-// setup command line options.
+// Setup the command line options
 var tableInsertBehaviour = InsertBehaviour.none;
-
 var filename = HandleCliArguments();
-
-Console.WriteLine("Starting datapipeline");
 
 var description = GetDataSourceDescription(filename);
 if (description == null)
@@ -15,38 +12,39 @@ if (description == null)
     return 1;
 }
 
-Console.WriteLine($@"Running with {filename}:
+Console.WriteLine($@"Starting the Data Pipeline for {filename}:
 type:       {description.source.type}
 format:     {description.source.data_format}
 location:   {description.source.location}
 table name: {description.table_name}
-
 ");
 
+// Check if the table insert behaviour is overwritten
 if (tableInsertBehaviour != InsertBehaviour.none)
 {
     description.options.if_table_exists = tableInsertBehaviour;
-    Console.WriteLine($"Overwriting Description: Using {tableInsertBehaviour} Behaviour for insertion.");
+    Console.WriteLine($"Overwriting description: Using {tableInsertBehaviour} Behaviour for insertion.");
 }
 
-// create connection to database;
+// Create the connection to the database
 var dbHelper = new DbHelper();
 
-// End if Connection not possible.
+// Exit when the connection is not possible
 if (!dbHelper.CheckConnection())
 {
-    Console.WriteLine("Could not establish Database Connection, exiting...");
+    Console.WriteLine("Could not establish database connection, exiting...");
     return 1;
 }
-Console.WriteLine("Established Database Connection.");
+Console.WriteLine("Established the database connection.");
 
-// End if Dataset can be skipped
+// Exit if the dataset can be skipped
 if (dbHelper.CanSkip(description))
 {
     return 1;
 }
-Console.WriteLine("Starting Importer");
+Console.WriteLine("Starting the importer...");
 
+// Import the data based on the specified data type
 IImporter importer;
 try
 {
@@ -70,7 +68,7 @@ try
 }
 catch (Exception e)
 {
-    Console.WriteLine("Error While setting up Importer.");
+    Console.WriteLine("Error while setting up the importer.");
     Console.WriteLine(e);
     return 1;
 }
@@ -84,31 +82,32 @@ try
 {
     var line = "";
     var notEof = importer.ReadLine(out line);
+    Console.WriteLine("Inserting the data into the database...");
 
-    Console.WriteLine("Inserting into Database");
-
+    // Read all lines
     var count = 0;
     while (notEof)
     {
         dbHelper.InsertData(line);
         notEof = importer.ReadLine(out line);
         count++;
-        Console.Write($"\rLines: {count}");
+        if (count % 10000 == 0)
+        {
+            Console.WriteLine($"Insertion in progress [Inserted {count} lines]...");
+        }
     }
-
-    Console.WriteLine();
-    Console.WriteLine("Finished Inserting");
+    Console.WriteLine("Finished inserting the data.");
     if (description.source.data_format == "SHAPE")
     {
-        Console.WriteLine("Creating Indexes");
+        Console.WriteLine("Creating indexes...");
         dbHelper.CreateIndexes(description);
-        Console.WriteLine("Indexes Created");
+        Console.WriteLine("Indexes created.");
     }
-
+    Console.WriteLine("--------------------------------------------------------------");
 }
 catch (Exception e)
 {
-    Console.WriteLine("Error inserting into Database:");
+    Console.WriteLine("Error inserting the data into the database:");
     Console.WriteLine(e);
     return 1;
 }

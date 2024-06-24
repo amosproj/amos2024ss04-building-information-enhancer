@@ -52,7 +52,7 @@ namespace BIE.DataPipeline.Import
             var client = new HttpClient();
             var zipStream = client.GetStreamAsync(mDataSourceDescription.source.location).Result;
 
-            Console.WriteLine("opening Zip file");
+            Console.WriteLine("Opening the Zip file...");
             var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Read);
 
             var shpStream = new MemoryStream();
@@ -75,7 +75,7 @@ namespace BIE.DataPipeline.Import
 
             if (shpStream == null || dbfStream == null)
             {
-                throw new FileNotFoundException("the required .shp and .bdf files could not be found.");
+                throw new FileNotFoundException("The required .shp and .bdf files could not be found.");
             }
 
             shpStream.Position = 0;
@@ -111,7 +111,7 @@ namespace BIE.DataPipeline.Import
             nextLine = "";
             if (!mParser.Read())
             {
-                Console.WriteLine("EOF");
+                Console.WriteLine("Reached EOF, finishing.");
                 return false;
             }
 
