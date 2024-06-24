@@ -2,7 +2,7 @@
 source:
   # link | filepath
   type: filepath
-  location: ./yaml-data/hausumringe_mittelfranken_4.zip
+  location: ./yaml-data/hausumringe_mittelfranken_small.zip
   data_format: SHAPE
 options:
   # skip lines at the beginning
