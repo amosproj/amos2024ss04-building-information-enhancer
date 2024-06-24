@@ -98,6 +98,13 @@ try
 
     Console.WriteLine();
     Console.WriteLine("Finished Inserting");
+    if (description.source.data_format == "SHAPE")
+    {
+        Console.WriteLine("Creating Indexes");
+        dbHelper.CreateIndexes(description);
+        Console.WriteLine("Indexes Created");
+    }
+
 }
 catch (Exception e)
 {

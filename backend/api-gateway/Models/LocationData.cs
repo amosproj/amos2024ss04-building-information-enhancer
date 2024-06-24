@@ -16,7 +16,6 @@
     {
         public List<DatasetItem> CurrentDatasetData { get; set; }
         public List<DatasetItem> GeneralData { get; set; }
-        public object ExtraRows { get; internal set; }
     }
 
     public class DatasetItem

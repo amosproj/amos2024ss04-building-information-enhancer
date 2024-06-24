@@ -83,7 +83,42 @@ namespace BIE.Core.DBRepository
             
             connection.Close();
         }
-        
+        public static IEnumerable<Dictionary<string, string>> GetData(string sqlQuery, int commandTimeout)
+        {
+            var command = Database.Instance.CreateCommand(sqlQuery,commandTimeout);
+            var (reader, connection) = Database.Instance.ExecuteReader(command);
+
+            if (!reader.HasRows)
+            {
+                Console.WriteLine("Reader has found no rows...");
+                connection.Close();
+                yield break;
+            }
+
+            // get the column names
+            var columnNames = new string[reader.FieldCount];
+
+            for (int i = 0; i < reader.FieldCount; i++)
+            {
+                columnNames[i] = reader.GetName(i);
+            }
+
+            // read the results and return lazy
+            while (reader.Read())
+            {
+                var dict = new Dictionary<string, string>();
+
+                for (int i = 0; i < reader.FieldCount; i++)
+                {
+                    dict[columnNames[i]] = reader[i].ToString();
+                }
+                yield return dict;
+            }
+
+            connection.Close();
+        }
+
+
     }
 }
 
