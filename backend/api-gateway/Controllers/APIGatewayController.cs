@@ -50,7 +50,7 @@ namespace BIE.Core.API.Controllers
         }
 
         /// <summary>
-        /// Gets the metadata for the given dataset. Contains things like Icon, visualization types
+        /// Gets the metadata for the given dataset. Contains things like Icon, visualization types and max zoom level
         /// </summary>
         /// <param name="datasetID">The ID of the dataset</param>
         /// <returns>Metadata for the specified dataset</returns>
@@ -77,7 +77,7 @@ namespace BIE.Core.API.Controllers
         }
 
         /// <summary>
-        /// Loads the location data for the given point or polygon.
+        /// Loads the location data for the given point or polygon. 
         /// </summary>
         /// <param name="request">Contains the current dataset id and the list of coordinates. 
         /// In case of a single point a list with a single element.</param>
