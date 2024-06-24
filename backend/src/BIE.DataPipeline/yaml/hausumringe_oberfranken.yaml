@@ -14,4 +14,4 @@ options:
 table_name: Hausumringe_oberfranken
 
 table_cols:
-dataset: hausumringe
+dataset: house_footprints

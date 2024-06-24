@@ -12,4 +12,4 @@ options:
 table_name: Hausumringe_schwaben
 
 table_cols:
-dataset: hausumringe
+dataset: house_footprints
