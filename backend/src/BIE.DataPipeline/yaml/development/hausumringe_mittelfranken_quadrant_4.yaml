@@ -1,0 +1,17 @@
+﻿# describe the source
+source:
+  # link | filepath
+  type: filepath
+  location: .\..\..\yaml-data\hausumringe_mittelfranken_4.zip
+  data_format: SHAPE
+options:
+  # skip lines at the beginning
+  skip_lines: 0
+  # discard any rows that have null values
+  discard_null_rows: false
+  # how to deal with existing table. Options: ignore, replace, skip (default).
+  if_table_exists: skip
+table_name: Hausumringe_mittelfranken_quadrant_4
+
+table_cols:
+dataset: house_footprints

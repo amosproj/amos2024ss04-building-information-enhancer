@@ -6,15 +6,18 @@ echo "Inserting datasets..."
 
 common_directory="./yaml/common"
 production_directory="./yaml/production"
+development_directory="./yaml/development"
 yamlfiles=$(find "$common_directory" -type f -name "*.yaml")
 excludeFiles=("unitTest.yaml" "unitTestShort.yaml")
 
 if [ "$ENVIRONMENT_STAGE" = "production" ]; then
-	echo "Production environment detected, loading all datasets..."
+    echo "Production environment detected, loading all datasets..."
     production_yamlfiles=$(find "$production_directory" -type f -name "*.yaml")
     yamlfiles="$yamlfiles $production_yamlfiles"
 else
-	echo "Developement environment detected, loading only common datasets..."
+    echo "Development environment detected, loading common and development datasets..."
+    development_yamlfiles=$(find "$development_directory" -type f -name "*.yaml")
+    yamlfiles="$yamlfiles $development_yamlfiles"
 fi
 
 echo "--------------------------------------------------------------"
@@ -30,7 +33,7 @@ if [ -n "$yamlfiles" ]; then
         fi
     done
 else
-    echo "No YAML files found in $common_directory or $production_directory"
+    echo "No YAML files found in $common_directory, $production_directory, or $development_directory"
 fi
 
 echo "Data insertion completed! Data Pipeline has finished."

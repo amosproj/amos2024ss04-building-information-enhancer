@@ -2,7 +2,7 @@
 source:
   # link | filepath
   type: filepath
-  location: .\..\..\..\testData\unitTest.csv
+  location: .\..\..\..\..\testData\unitTest.csv
   data_format: CSV
 options:
   # skip lines at the beginning
@@ -10,7 +10,7 @@ options:
   # discard any rows that have null values
   discard_null_rows: false
   # how to deal with existing table. Options: ignore, replace, skip (default).
-  if_table_exists: replace
+  if_table_exists: skip
 table_name: unitTestTable
 dataset: unitTestShort
 delimiter: ";"
