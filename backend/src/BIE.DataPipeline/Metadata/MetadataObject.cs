@@ -19,11 +19,11 @@ public class MetadataObject
         public string Name { get; set; }
         public string Description { get; set; }
         public string Icon { get; set; }
-        public List<string> Tables { get; set; }
+        public List<TableData> Tables { get; set; }
 
         public BasicData()
         {
-            Tables = new List<string>();
+            Tables = new List<TableData>();
         }
     }
 
@@ -32,5 +32,11 @@ public class MetadataObject
         public string Icon { get; set; }
         public string Type { get; set; }
         public int MinZoomLevel { get; set; }
+    }
+    
+    public class TableData
+    {
+        public string Name { get; set; }
+        public int NumberOfLines { get; set; }
     }
 }

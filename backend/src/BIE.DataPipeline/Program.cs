@@ -32,13 +32,6 @@ if (tableInsertBehaviour != InsertBehaviour.none)
 
 // create connection to database;
 var dbHelper = new DbHelper();
-var metadataDbHelper = new MetadataDbHelper();
-
-var result = metadataDbHelper.GetMetadata(description);
-
-Console.WriteLine(result.basicData.Description);
-
-return 0;
 
 // End if Connection not possible.
 if (!dbHelper.CheckConnection())
@@ -53,6 +46,15 @@ if (DbHelper.CanSkip(description))
 {
     return 1;
 }
+
+// Establish Connection to Metadata DB
+var metadataDbHelper = new MetadataDbHelper();
+if (!metadataDbHelper.CreateConnection())
+{
+    // maybe make optional?
+    return 1;
+}
+
 Console.WriteLine("Starting Importer");
 
 IImporter importer;
@@ -112,7 +114,10 @@ try
         dbHelper.CreateIndexes(description);
         Console.WriteLine("Indexes Created");
     }
-
+    
+    Console.WriteLine("Updating Metadata");
+    metadataDbHelper.UpdateMetadata(description, count);
+    Console.WriteLine("Metadata updated");
 }
 catch (Exception e)
 {
@@ -121,7 +126,21 @@ catch (Exception e)
     return 1;
 }
 
+try
+{
+}
+catch (Exception e)
+{
+    Console.WriteLine("Could not insert into Metadata DB");
+    Console.WriteLine(e);
+    throw;
+}
+
 return 0;
+
+// -------------------------------------------------------
+// FUNCTIONS
+// -------------------------------------------------------
 
 string HandleCliArguments()
 {
