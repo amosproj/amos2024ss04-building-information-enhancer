@@ -1,14 +1,15 @@
 ﻿// ReSharper disable InconsistentNaming
+
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
 namespace BIE.DataPipeline.Metadata;
 
 public class MetadataObject
 {
-    public MetadataObject(BasicData basicData, MetaData metaData)
-    {
-        this.basicData = basicData;
-        this.metaData = metaData;
-    }
-
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string _id { get; set; }
+    
     public BasicData basicData { get; set; }
     public MetaData metaData { get; set; }
     

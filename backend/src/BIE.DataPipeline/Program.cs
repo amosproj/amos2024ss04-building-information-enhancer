@@ -1,5 +1,6 @@
 ﻿using BIE.DataPipeline;
 using BIE.DataPipeline.Import;
+using BIE.DataPipeline.Metadata;
 using Mono.Options;
 
 // setup command line options.
@@ -31,6 +32,13 @@ if (tableInsertBehaviour != InsertBehaviour.none)
 
 // create connection to database;
 var dbHelper = new DbHelper();
+var metadataDbHelper = new MetadataDbHelper();
+
+var result = metadataDbHelper.GetMetadata(description);
+
+Console.WriteLine(result.basicData.Description);
+
+return 0;
 
 // End if Connection not possible.
 if (!dbHelper.CheckConnection())
@@ -41,7 +49,7 @@ if (!dbHelper.CheckConnection())
 Console.WriteLine("Established Database Connection.");
 
 // End if Dataset can be skipped
-if (dbHelper.CanSkip(description))
+if (DbHelper.CanSkip(description))
 {
     return 1;
 }
