@@ -150,7 +150,7 @@ namespace BIE.DataPipeline
             }
         }
 
-        private string GetCreationQuery(DataSourceDescription? description)
+        private string GetCreationQuery(DataSourceDescription description)
         {
             if (description.source.data_format == "SHAPE")
             {

@@ -2,7 +2,7 @@
   "profiles": {
     "BIE.DataPipeline": {
       "commandName": "Project",
-      "commandLineArgs": "--behavior=skip actual_use_Kreisfreie_Stadt_Schweinfurt.yaml",
+      "commandLineArgs": "--behavior=replace actual_use_Kreisfreie_Stadt_Schweinfurt.yaml",
       "workingDirectory": "yaml",
       "environmentVariables": {
         "DB_SERVER": "localhost",

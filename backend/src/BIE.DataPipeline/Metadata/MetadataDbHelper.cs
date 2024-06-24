@@ -38,6 +38,11 @@ public class MetadataDbHelper
         }
     }
 
+    /// <summary>
+    /// Get the Metadata for a dataset.
+    /// </summary>
+    /// <param name="description"></param>
+    /// <returns></returns>
     public MetadataObject GetMetadata(DataSourceDescription description)
     {
         var collection = mDatabase.GetCollection<MetadataObject>("datasets");
@@ -60,6 +65,11 @@ public class MetadataDbHelper
         return obj;
     }
 
+    /// <summary>
+    /// Update the Metadata Database based on the description and the number of files.
+    /// </summary>
+    /// <param name="description"></param>
+    /// <param name="numberOfLines"></param>
     public void UpdateMetadata(DataSourceDescription description, int numberOfLines)
     {
         var collection = mDatabase.GetCollection<MetadataObject>("datasets");
