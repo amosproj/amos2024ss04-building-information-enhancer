@@ -72,6 +72,8 @@ services:
     depends_on:
       sql-database:
         condition: service_healthy
+      metadata-database:
+        condition: service_healthy
 
   ## Main SQL DB for storing the datasets
   sql-database:
@@ -111,6 +113,12 @@ services:
       - ${METADATA_DATABASE_PORT}:27017
     networks:
       - bie-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
 volumes:
   bie-mssqldata:
