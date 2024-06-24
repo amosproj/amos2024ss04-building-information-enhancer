@@ -57,6 +57,11 @@ namespace BIE.DataPipeline.Import
         /// The name of the database table associated with the data source.
         /// </summary>
         public string table_name { get; set; }
+        
+        /// <summary>
+        /// The name of the associated dataset this source belongs to
+        /// </summary>
+        public string dataset { get; set; }
 
 
         private char mDelimiter = ';';
@@ -77,16 +82,34 @@ namespace BIE.DataPipeline.Import
 
         public override bool Equals(object? obj)
         {
-            if (obj == null) return false;
+            if (obj == null)
+            {
+                return false;
+            }
 
             DataSourceDescription des = obj as DataSourceDescription;
 
-            if (!this.source.Equals(des.source)) return false;
-            if (!this.options.Equals(des.options)) return false;
-            if (!this.table_name.Equals(des.table_name)) return false;
-            for (int i = 0; i < this.table_cols.Count; i++)
+            if (!source.Equals(des.source))
             {
-                if (!this.table_cols[i].Equals(des.table_cols[i])) return false;
+                return false;
+            }
+
+            if (!options.Equals(des.options))
+            {
+                return false;
+            }
+
+            if (!table_name.Equals(des.table_name))
+            {
+                return false;
+            }
+
+            for (int i = 0; i < table_cols.Count; i++)
+            {
+                if (!table_cols[i].Equals(des.table_cols[i]))
+                {
+                    return false;
+                }
             }
             return true;
         }
@@ -110,13 +133,28 @@ namespace BIE.DataPipeline.Import
 
             public override bool Equals(object? obj)
             {
-                if (obj == null) return false;
+                if (obj == null)
+                {
+                    return false;
+                }
 
                 DataSourceLocation des = obj as DataSourceLocation;
 
-                if (this.type != des.type) return false;
-                if (this.location != des.location) return false;
-                if (this.data_format != des.data_format) return false;
+                if (type != des.type)
+                {
+                    return false;
+                }
+
+                if (location != des.location)
+                {
+                    return false;
+                }
+
+                if (data_format != des.data_format)
+                {
+                    return false;
+                }
+
                 return true;
             }
         }
@@ -149,13 +187,28 @@ namespace BIE.DataPipeline.Import
 
             public override bool Equals(object? obj)
             {
-                if (obj == null) return false;
+                if (obj == null)
+                {
+                    return false;
+                }
 
                 DataSourceOptions des = obj as DataSourceOptions;
 
-                if (this.skip_lines != des.skip_lines) return false;
-                if (this.discard_null_rows != des.discard_null_rows) return false;
-                if (this.if_table_exists != des.if_table_exists) return false;
+                if (skip_lines != des.skip_lines)
+                {
+                    return false;
+                }
+
+                if (discard_null_rows != des.discard_null_rows)
+                {
+                    return false;
+                }
+
+                if (if_table_exists != des.if_table_exists)
+                {
+                    return false;
+                }
+
                 return true;
             }
         }
@@ -191,14 +244,33 @@ namespace BIE.DataPipeline.Import
 
             public override bool Equals(object? obj)
             {
-                if (obj == null) return false;
+                if (obj == null)
+                {
+                    return false;
+                }
 
                 DataSourceColumn des = obj as DataSourceColumn;
 
-                if (this.name != des.name) return false;
-                if (this.name_in_table != des.name_in_table) return false;
-                if (this.type != des.type) return false;
-                if (this.is_not_nullable != des.is_not_nullable) return false;
+                if (name != des.name)
+                {
+                    return false;
+                }
+
+                if (name_in_table != des.name_in_table)
+                {
+                    return false;
+                }
+
+                if (type != des.type)
+                {
+                    return false;
+                }
+
+                if (is_not_nullable != des.is_not_nullable)
+                {
+                    return false;
+                }
+
                 return true;
             }
         }

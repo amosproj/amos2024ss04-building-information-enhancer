@@ -2,7 +2,7 @@
   "profiles": {
     "BIE.DataPipeline": {
       "commandName": "Project",
-      "commandLineArgs": "--behavior=skip hausumringe_unterfranken.yaml",
+      "commandLineArgs": "--behavior=skip actual_use_Kreisfreie_Stadt_Schweinfurt.yaml",
       "workingDirectory": "yaml",
       "environmentVariables": {
         "DB_SERVER": "localhost",
@@ -10,7 +10,8 @@
         "DB_PASSWORD": "MyPass@1234",
         "DB_USERNAME": "db_user1",
         "DB_TYPE": "SQL",
-        "TRUSTED": "True"
+        "TRUSTED": "True",
+        "METADATA_DB_URL": "localhost:27017"
       }
     }
   }

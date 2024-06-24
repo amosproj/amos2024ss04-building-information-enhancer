@@ -13,6 +13,7 @@ namespace BIE.DataPipeline
         private int mCount;
         private const int MaxCount = 900;
 
+
         public DbHelper()
         {
             ConfigureEnvironmentVariables();
@@ -29,7 +30,7 @@ namespace BIE.DataPipeline
             return db.CheckConnection();
         }
 
-        public bool CanSkip(DataSourceDescription description)
+        public static bool CanSkip(DataSourceDescription description)
         {
             var db = Database.Instance;
             // Handle Table Behavior
@@ -224,7 +225,7 @@ BEGIN CREATE TABLE {description.table_name} (";
         }
 
         /// <summary>
-        /// To set enviornment variables
+        /// Get Database Settings from Environment Variables.
         /// </summary>
         private void ConfigureEnvironmentVariables()
         {
@@ -237,6 +238,7 @@ BEGIN CREATE TABLE {description.table_name} (";
                                                   Environment.GetEnvironmentVariable("DB_TYPE") ??
                                                   throw new Exception("Could not get EnvironmentVariable DB_TYPE"));
 
+            
             if (dbServer == null || dbName == null || dbUser == null || dbPassword == null)
             {
                 throw new ExternalException("Could not get Environment Variables.");
