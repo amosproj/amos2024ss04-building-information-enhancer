@@ -12,6 +12,7 @@ options:
   # how to deal with existing table. Options: ignore, replace, skip (default).
   if_table_exists: skip
 table_name: EV_charging_stations
+dataset: EV_charging_stations
 delimiter: ";"
 
 table_cols:

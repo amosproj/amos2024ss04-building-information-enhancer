@@ -12,6 +12,6 @@ options:
   # how to deal with existing table. Options: ignore, replace, skip (default).
   if_table_exists: skip
 table_name: actual_use_Kreisfreie_Stadt_Amberg
+dataset: actual_use
 
 table_cols:
-
