@@ -65,6 +65,7 @@ services:
       - DB_USERNAME=${SQL_DB_USERNAME}
       - DB_TYPE=${SQL_DB_TYPE}
       - TRUSTED=${SQL_TRUSTED}
+      - METADATA_DB_URL="metadata-database:${METADATA_DATABASE_PORT}"
     container_name: datapipeline
     networks:
       - bie-network

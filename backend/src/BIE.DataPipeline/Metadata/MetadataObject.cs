@@ -1,14 +1,15 @@
 ﻿// ReSharper disable InconsistentNaming
+
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
 namespace BIE.DataPipeline.Metadata;
 
 public class MetadataObject
 {
-    public MetadataObject(BasicData basicData, MetaData metaData)
-    {
-        this.basicData = basicData;
-        this.metaData = metaData;
-    }
-
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string _id { get; set; }
+    
     public BasicData basicData { get; set; }
     public MetaData metaData { get; set; }
     
@@ -18,11 +19,11 @@ public class MetadataObject
         public string Name { get; set; }
         public string Description { get; set; }
         public string Icon { get; set; }
-        public List<string> Tables { get; set; }
+        public List<TableData> Tables { get; set; }
 
         public BasicData()
         {
-            Tables = new List<string>();
+            Tables = new List<TableData>();
         }
     }
 
@@ -31,5 +32,11 @@ public class MetadataObject
         public string Icon { get; set; }
         public string Type { get; set; }
         public int MinZoomLevel { get; set; }
+    }
+    
+    public class TableData
+    {
+        public string Name { get; set; }
+        public int NumberOfLines { get; set; }
     }
 }
