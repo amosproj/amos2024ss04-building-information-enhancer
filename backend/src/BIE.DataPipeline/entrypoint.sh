@@ -1,7 +1,4 @@
 #!/bin/bash
-
-sleep 10s
-
 echo "Inserting datasets..."
 
 common_directory="./yaml/common"
@@ -26,7 +23,6 @@ if [ -n "$yamlfiles" ]; then
     # Loop through each file in yaml_files
     for file in $yamlfiles; do
         filename=$(basename "$file")
-        
         # Check if the filename is in the exclude list
         if [[ ! " ${excludeFiles[@]} " =~ " ${filename} " ]]; then
             dotnet BIE.DataPipeline.dll $file

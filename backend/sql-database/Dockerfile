@@ -17,5 +17,3 @@ RUN chmod +x /run-script.sh
 
 ENTRYPOINT ["/bin/bash","entrypoint.sh"]
 CMD ["/opt/mssql/bin/sqlservr"]
-
-
