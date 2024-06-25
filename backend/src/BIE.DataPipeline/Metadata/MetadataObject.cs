@@ -8,14 +8,14 @@ public class MetadataObject
     [BsonRepresentation(BsonType.ObjectId)]
     public string _id { get; set; } = string.Empty;
     
-    [BsonElement("metadataBasicData")]
-    public MetadataBasicData metadataBasicData { get; set; } = new MetadataBasicData();
+    [BsonElement("basicData")]
+    public BasicData basicData { get; set; } = new BasicData();
 
-    [BsonElement("metadataAdditionalData")]
-    public MetadataAdditionalData metadataAdditionalData { get; set; } = new MetadataAdditionalData();
+    [BsonElement("additionalData")]
+    public AdditionalData additionalData { get; set; } = new AdditionalData();
     
     // The general and most important data about a dataset.
-    public class MetadataBasicData
+    public class BasicData
     {
         public string DatasetId { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
@@ -24,7 +24,7 @@ public class MetadataObject
     }
 
     // The additional data for each of the datasets, queried at a request.
-    public class MetadataAdditionalData
+    public class AdditionalData
     {
         public string Icon { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty;
@@ -33,7 +33,7 @@ public class MetadataObject
 
         // Zoom level is higher the closer you look at something. If current zoom level is below this, it shouldn't display any value.
         public int MinZoomLevel { get; set; } = 0;
-
+        
         // The zoom threshold where areas start to turn into markers
         public int MarkersThreshold { get; set; } = 0;
 

@@ -46,7 +46,7 @@ public class MetadataDbHelper
 
         // Find the dataset object with the given ID
         var metadataObject = collection
-            .Find(g => g.metadataBasicData.DatasetId == description.dataset)
+            .Find(g => g.basicData.DatasetId == description.dataset)
             .FirstOrDefault();
 
         return metadataObject;
@@ -59,17 +59,17 @@ public class MetadataDbHelper
 
         // Find the dataset object
         var metadataObject = collection
-            .Find(g => g.metadataBasicData.DatasetId == description.dataset)
+            .Find(g => g.basicData.DatasetId == description.dataset)
             .FirstOrDefault();
 
         // Load the existing table
-        var existingTable = metadataObject.metadataAdditionalData.Tables.Find(t => t.Name == description.table_name);
+        var existingTable = metadataObject.additionalData.Tables.Find(t => t.Name == description.table_name);
         if (existingTable == null)
         {
             // Create a new table object if not present
             var newTable = new MetadataObject.TableData() { Name = description.table_name, NumberOfLines = numberOfLines };
-            metadataObject.metadataAdditionalData.Tables.Add(newTable);
-            collection.ReplaceOne(g => g.metadataBasicData.DatasetId == description.dataset, metadataObject);
+            metadataObject.additionalData.Tables.Add(newTable);
+            collection.ReplaceOne(g => g.basicData.DatasetId == description.dataset, metadataObject);
             return;
         }
 
@@ -78,6 +78,6 @@ public class MetadataDbHelper
             ? numberOfLines
             : existingTable.NumberOfLines;
 
-        collection.ReplaceOne(g => g.metadataBasicData.DatasetId == description.dataset, metadataObject);
+        collection.ReplaceOne(g => g.basicData.DatasetId == description.dataset, metadataObject);
     }
 }
