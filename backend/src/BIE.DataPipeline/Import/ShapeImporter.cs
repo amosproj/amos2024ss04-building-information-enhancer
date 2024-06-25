@@ -119,7 +119,7 @@ namespace BIE.DataPipeline.Import
             var geometry = mParser.Geometry;
             geometry = ConvertUtmToLatLong(geometry);
 
-            nextLine = $"geography::STGeomFromText('{geometry.AsText()}', 4326)";
+            nextLine = $"GEOMETRY::STGeomFromText('{geometry.AsText()}', 4326)";
 
             return true;
         }
