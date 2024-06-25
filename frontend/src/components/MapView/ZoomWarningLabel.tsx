@@ -12,7 +12,6 @@ const ZoomWarningLabel: React.FC<CenterLabelProps> = ({ label, minZoom }) => {
 
   useEffect(() => {
     const onZoomEnd = () => {
-      console.log("check label");
       const currentZoom = map.getZoom();
       const labelElement = document.getElementById("center-label");
 

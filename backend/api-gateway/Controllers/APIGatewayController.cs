@@ -33,7 +33,7 @@ namespace BIE.Core.API.Controllers
         /// </summary>
         /// <returns>A list of available datasets</returns>
         [HttpGet("getDatasetList")]
-        [ProducesResponseType(typeof(List<DatasetBasicData>), 200)]
+        [ProducesResponseType(typeof(List<MetadataObject.BasicData>), 200)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetDataSetList()
         {
@@ -44,7 +44,7 @@ namespace BIE.Core.API.Controllers
 
             var collection = _mongoDBService.GetDatasetsCollection();
             var datasets = await collection.Find(_ => true).ToListAsync();
-            var datasetBasicDataList = datasets.Select(d => d.BasicData).ToList();
+            var datasetBasicDataList = datasets.Select(d => d.basicData).ToList();
 
             return Ok(datasetBasicDataList);
         }
@@ -55,7 +55,7 @@ namespace BIE.Core.API.Controllers
         /// <param name="datasetID">The ID of the dataset</param>
         /// <returns>Metadata for the specified dataset</returns>
         [HttpGet("getDatasetMetadata")]
-        [ProducesResponseType(typeof(DatasetMetadata), 200)]
+        [ProducesResponseType(typeof(MetadataObject), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetDatasetMetadata([FromQuery, Required] string datasetID)
@@ -66,14 +66,14 @@ namespace BIE.Core.API.Controllers
             }
 
             var collection = _mongoDBService.GetDatasetsCollection();
-            var dataset = await collection.Find(d => d.BasicData.DatasetId == datasetID).FirstOrDefaultAsync();
+            var dataset = await collection.Find(d => d.basicData.DatasetId == datasetID).FirstOrDefaultAsync();
             
             if (dataset == null)
             {
                 return NotFound($"Dataset with ID {datasetID} not found.");
             }
 
-            return Ok(dataset.MetaData);
+            return Ok(dataset.additionalData);
         }
 
         /// <summary>
