@@ -214,7 +214,7 @@ namespace BIE.DataPipeline.Import
 
             //return geometryFactory.CreatePoint(new Coordinate(longitude, latitude));
 
-            return "GEOGRAPHY::Point(" + latitude.ToString(cultureInfo) + "," + longitude.ToString(cultureInfo) + ", 4326)";
+            return "GEOMETRY::Point(" + latitude.ToString(cultureInfo) + "," + longitude.ToString(cultureInfo) + ", 4326)";
         }
 
 

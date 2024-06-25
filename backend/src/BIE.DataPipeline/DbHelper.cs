@@ -159,7 +159,7 @@ IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{desc
 BEGIN
     CREATE TABLE {description.table_name} (
         Id INT PRIMARY KEY IDENTITY(1,1),
-        Location GEOGRAPHY
+        Location GEOMETRY
     );
 END";
             }
@@ -175,7 +175,7 @@ BEGIN CREATE TABLE {description.table_name} (";
 
             if(description.options.location_to_SQL_point != null)
             {
-                query += $" {description.options.location_to_SQL_point.name_in_table} GEOGRAPHY,";
+                query += $" {description.options.location_to_SQL_point.name_in_table} GEOMETRY,";
             }
 
             query += "); END";
