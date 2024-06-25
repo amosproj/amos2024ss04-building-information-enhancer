@@ -116,26 +116,66 @@ namespace BIE.DataPipeline
                 Console.WriteLine("Creating Index...");
                 var db = Database.Instance;
 
+                string bboxQuery = @"
+            USE BIEDB;
+            DECLARE @MinX FLOAT, @MinY FLOAT, @MaxX FLOAT, @MaxY FLOAT;
 
-                var query = "USE BIEDB;" +
-                    " \r\n " +
-                    " SET QUOTED_IDENTIFIER ON; " +
-                    "\r\n " +
-                    " IF NOT EXISTS (" +
-                    " SELECT *" +
-                    "  FROM sys.indexes " +
-                    "  WHERE name = 'SI_"+description.table_name+"_Location' " +
-                    "   AND object_id = OBJECT_ID('dbo."+description.table_name+"')" +
-                    " ) " +
-                    " BEGIN" +
-                    "   CREATE SPATIAL INDEX SI_"+description.table_name+"_Location " +
-                    " ON dbo."+description.table_name+"(Location); " +
-                    " END " +
-                    " \r\n"+
-                    " UPDATE STATISTICS dbo." +description.table_name+"; " +
-                    " \r\n";
+            WITH ConvertedGeography AS (
+                SELECT Location.STAsText() AS WKT
+                FROM dbo." + description.table_name + @"
+            )
+            SELECT
+                @MinX = geometry::EnvelopeAggregate(geometry::STGeomFromText(WKT, 4326)).STPointN(1).STX,
+                @MinY = geometry::EnvelopeAggregate(geometry::STGeomFromText(WKT, 4326)).STPointN(1).STY,
+                @MaxX = geometry::EnvelopeAggregate(geometry::STGeomFromText(WKT, 4326)).STPointN(3).STX,
+                @MaxY = geometry::EnvelopeAggregate(geometry::STGeomFromText(WKT, 4326)).STPointN(3).STY
+            FROM ConvertedGeography;
+            
+            SELECT @MinX AS MinX, @MinY AS MinY, @MaxX AS MaxX, @MaxY AS MaxY;
+        ";
 
-                var cmd = db.CreateCommand(query);
+                var bboxCmd = db.CreateCommand(bboxQuery);
+                var (bboxReader, bboxConnection) = db.ExecuteReader(bboxCmd);
+
+                double minX = 0, minY = 0, maxX = 0, maxY = 0;
+
+                if (bboxReader.Read())
+                {
+                    minX = (double)bboxReader["MinX"];
+                    minY = (double)bboxReader["MinY"];
+                    maxX = (double)bboxReader["MaxX"];
+                    maxY = (double)bboxReader["MaxY"];
+                }
+
+                bboxReader.Close();
+                bboxConnection.Close();
+
+                string indexQuery = @"
+            USE BIEDB;
+            SET QUOTED_IDENTIFIER ON;
+            IF NOT EXISTS (
+                SELECT *
+                FROM sys.indexes
+                WHERE name = 'SI_" + description.table_name + @"_Location'
+                AND object_id = OBJECT_ID('dbo." + description.table_name + @"')
+            )
+            BEGIN
+                CREATE SPATIAL INDEX SI_" + description.table_name + @"_Location
+                ON dbo." + description.table_name + @"(Location)
+                USING GEOMETRY_AUTO_GRID
+                WITH (
+                    BOUNDING_BOX = (
+                        XMIN = " + minX + @",
+                        YMIN = " + minY + @",
+                        XMAX = " + maxX + @",
+                        YMAX = " + maxY + @"
+                    )
+                );
+            END;
+            UPDATE STATISTICS dbo." + description.table_name + @";
+        ";
+
+                var cmd = db.CreateCommand(indexQuery);
                 db.Execute(cmd);
 
                 Console.WriteLine("Index created.");
