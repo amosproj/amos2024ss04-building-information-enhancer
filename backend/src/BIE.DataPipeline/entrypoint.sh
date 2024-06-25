@@ -32,4 +32,5 @@ else
     echo "No YAML files found in $common_directory, $production_directory, or $development_directory"
 fi
 
+echo "--------------------------------------------------------------"
 echo "Data insertion completed! Data Pipeline has finished."
