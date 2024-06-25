@@ -117,20 +117,8 @@ const SearchBar: React.FC = () => {
     if (mapInstance) {
 
         if(item.area && item.bounds){
-            currentMapCache.polygon?.remove();
-            setCurrentMapCache({
-              ...currentMapCache,
-              polygon: null,
-            });
             mapInstance.flyToBounds(item.bounds, { animate: true, duration: 5 });
-            const drawPolygon = L.geoJSON(item.polygon, {
-              style: {
-                color: '#ff0000', // Red Border color like marker
-                weight: 2,       // Border width
-                fillOpacity: 0   // No overlay over area
-              }
-            }
-            ) ;
+            const drawPolygon = L.geoJSON(item.polygon) ;
             drawPolygon.addTo(mapInstance);
             setCurrentMapCache({
               ...currentMapCache,
@@ -153,19 +141,10 @@ const SearchBar: React.FC = () => {
     return Array.from(uniqueOptions.values());
   };
 
-  const handleSearchIconClick = () => {
-    if (options.length > 0) {
-      onItemSelected(options[0]);
-    } else {
-      console.log("No suggestions available.");
-    }
-  };
-
-
   return (
     <>
     <Autocomplete
-      id="search-bar"
+      id="search-popup"
       noOptionsText="No locations"
       sx={{ width: 400 }}
       getOptionLabel={(option) => (typeof option === "string" ? option : option.displayName)}
@@ -177,7 +156,8 @@ const SearchBar: React.FC = () => {
       autoComplete
       includeInputInList
       filterSelectedOptions
-      //value={null}
+      value={null}
+      disableClearable={false}
       onChange={(_event, newValue) => {
         if (typeof newValue === "string"){
             return;
@@ -195,13 +175,6 @@ const SearchBar: React.FC = () => {
       }}
 
       onInputChange={(_event, newInputValue) => {
-        if (newInputValue === ""){
-          currentMapCache.polygon?.remove();
-      setCurrentMapCache({
-        ...currentMapCache,
-        polygon: null,
-      });
-        }
         setInputValue(newInputValue);
       }}
       renderInput={(params) => (
@@ -223,17 +196,6 @@ const SearchBar: React.FC = () => {
             transition: 'width 0s',
             backgroundColor:'white',
           }}
-          InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <>
-                  <IconButton onClick={handleSearchIconClick}>
-                    <MagnifyingGlass size={20} />
-                  </IconButton>
-                  {params.InputProps.endAdornment}
-                </>
-              ),
-            }}
     />
 
 

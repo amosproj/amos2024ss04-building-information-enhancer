@@ -36,11 +36,9 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
   const { currentTabsCache } = useContext(TabsContext);
   const [map, setMap] = useState<L.Map | null>(null);
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
-
-  const [mapType, setMapType] = useState<"normal" | "satellite" | "parzellar">("normal");
-
-  const handleMapTypeChange = (type: "normal" | "satellite" | "parzellar") => {
-    setMapType(type);
+  const [showSatellite, setShowSatellite] = useState<boolean>(false);
+  const toggleShowSatellite = () => {
+    setShowSatellite((prevShowSatellite: boolean) => !prevShowSatellite);
   };
 
   useEffect(() => {
@@ -77,7 +75,7 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
 
   return (
     <div className="tab-map-container">
-      <MapOptions onMapTypeChange={handleMapTypeChange} />
+      <MapOptions toggleShowSatellite={toggleShowSatellite} />
       <MapContainer
         center={currentMapCache.mapCenter}
         zoom={currentMapCache.zoom}
@@ -98,7 +96,7 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
 
         <MapEventsHandler />
 
-        {mapType === "satellite" && (
+        {showSatellite ? (
           <div>
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.de/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
@@ -121,8 +119,7 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
               bounds={L.latLngBounds([47.141, 5.561], [55.054, 15.579])}
             />
           </div>
-         )}
-         {mapType === "normal" && (
+        ) : (
           <div>
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.de/copyright">OpenStreetMap</a> contributors'
