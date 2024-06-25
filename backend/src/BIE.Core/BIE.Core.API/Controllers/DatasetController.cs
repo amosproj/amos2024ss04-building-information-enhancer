@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using BIE.Core.BaseRepository;
 using BIE.Core.DataObjects;
 using BIE.Core.Services;
@@ -24,35 +25,46 @@ namespace BIE.Core.API.Controllers
     [ApiController]
     public class DatasetController : Controller
     {
+        private readonly ILogger<DatasetController> _logger;
+
+        public DatasetController(ILogger<DatasetController> logger)
+        {
+            _logger = logger;
+        }
+
         /// <summary>
         /// Get viewport data. so Data for a specific rectangle returned as featurecollection
         /// </summary>
-        /// <param name="parameters">Nice</param>
         /// <returns></returns>
-        /// 
         [HttpGet("getDatasetViewportData")]
         [ProducesResponseType(typeof(GeoJsonFeatureCollection), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         public ActionResult GetDatasetViewportData([FromQuery] QueryParameters parameters)
         {
+            _logger.LogInformation("Received request for GetDatasetViewportData with parameters: {parameters}", parameters);
+
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("Invalid model state: {ModelState}", ModelState);
                 return BadRequest(ModelState);
             }
+
             switch (parameters.Id)
             {
                 case "house_footprints":
                     return GetHouseFootprintsData(parameters);
-                case "charging_stations":
+                case "EV_charging_stations":
                     return GetChargingStations(parameters);
                 default:
+                    _logger.LogWarning("Unsupported dataset ID: {Id}", parameters.Id);
                     return StatusCode(400, $"Unsupported dataset ID of {parameters.Id}");
             }
         }
 
         private ActionResult GetChargingStations(QueryParameters parameters)
         {
+            _logger.LogInformation("Fetching charging stations with parameters: {parameters}", parameters);
             try
             {
                 var bottomLat = parameters.BottomLat;
@@ -69,7 +81,6 @@ namespace BIE.Core.API.Controllers
                     $" longitude > {bottomLong} AND longitude < {topLong};";
 
                 command = command.Replace(",", ".");
-                // Console.WriteLine(command);
                 var response = "{\"type\": \"FeatureCollection\",\n\"features\": [";
                 foreach (var row in DbHelper.GetData(command))
                 {
@@ -88,22 +99,24 @@ namespace BIE.Core.API.Controllers
 
                 if (response.Last() == ',')
                 {
-                    // chop of last ,
                     response = response[..^1];
                 }
 
                 response += "]}";
 
+                _logger.LogInformation("Charging stations data fetched successfully.");
                 return Ok(response);
             }
             catch (ServiceException se)
             {
+                _logger.LogError(se, "ServiceException occurred while fetching charging stations data.");
                 return BadRequest(se.Message);
             }
         }
 
         private ActionResult GetHouseFootprintsData([FromQuery] QueryParameters parameters)
         {
+            _logger.LogInformation("Fetching house footprints with parameters: {parameters}", parameters);
             try
             {
                 var bottomLat = parameters.BottomLat;
@@ -125,8 +138,6 @@ namespace BIE.Core.API.Controllers
          ))', 4326)) = 1";
 
                 string formattedQuery = string.Format(command, bottomLong, bottomLat, topLong, topLat);
-
-                // Console.WriteLine(command);
                 var response = "{\"type\": \"FeatureCollection\",\n\"features\": [";
                 foreach (var row in DbHelper.GetData(formattedQuery))
                 {
@@ -145,16 +156,17 @@ namespace BIE.Core.API.Controllers
 
                 if (response.Last() == ',')
                 {
-                    // chop of last ,
                     response = response[..^1];
                 }
 
                 response += "]}";
 
+                _logger.LogInformation("House footprints data fetched successfully.");
                 return Ok(response);
             }
             catch (ServiceException se)
             {
+                _logger.LogError(se, "ServiceException occurred while fetching house footprints data.");
                 return BadRequest(se.Message);
             }
         }
@@ -171,8 +183,11 @@ namespace BIE.Core.API.Controllers
         [ProducesResponseType(500)]
         public IActionResult LoadLocationData([FromBody, Required] LocationDataRequest request)
         {
+            _logger.LogInformation("Received request to load location data: {request}", request);
+
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("Invalid model state: {ModelState}", ModelState);
                 return BadRequest(ModelState);
             }
 
@@ -181,6 +196,7 @@ namespace BIE.Core.API.Controllers
                 var coordinate = request.Location.FirstOrDefault();
                 if (coordinate == null)
                 {
+                    _logger.LogWarning("Location coordinates are required.");
                     return BadRequest("Location coordinates are required.");
                 }
 
@@ -192,25 +208,24 @@ namespace BIE.Core.API.Controllers
 
                 string command = @"
             SELECT TOP 5
-        Id,
-        Location.STArea() AS Area,
+                Id,
+                Location.STArea() AS Area,
                 Location.STAsText() AS Location,
                 geography::Point({0}, {1}, 4326).STDistance(Location) AS Distance
-    FROM 
-        dbo.Hausumringe_mittelfranken
-    WHERE
+            FROM 
+                dbo.Hausumringe_mittelfranken
+            WHERE
                 geography::Point({0}, {1}, 4326).STBuffer({2}).STIntersects(Location) = 1
-ORDER BY 
+            ORDER BY 
                 geography::Point({0}, {1}, 4326).STDistance(Location);";
 
                 string formattedQuery = string.Format(command, latitude, longitude, radius);
-
                 var response = new LocationDataResponse
                 {
                     CurrentDatasetData = new List<DatasetItem>()
                 };
 
-                foreach (var row in DbHelper.GetData(formattedQuery,600))
+                foreach (var row in DbHelper.GetData(formattedQuery, 600))
                 {
                     var area = row["Area"];
                     var distance = row["Distance"];
@@ -225,11 +240,12 @@ ORDER BY
                     });
                 }
 
+                _logger.LogInformation("Location data loaded successfully.");
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                // Log the error details for further analysis
+                _logger.LogError(ex, "Exception occurred while loading location data.");
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
@@ -242,6 +258,7 @@ ORDER BY
         [HttpGet("3/data")]
         public ActionResult GetActualUseData([FromQuery] QueryParameters parameters)
         {
+            _logger.LogInformation("Fetching actual use data with parameters: {parameters}", parameters);
             try
             {
                 var bottomLat = parameters.BottomLat;
@@ -263,8 +280,7 @@ ORDER BY
             {0} {1}
          ))', 4326)) = 1";
 
-                string formattedQuery = string.Format(command, bottomLong, bottomLat, topLong, topLat,stateName);
-
+                string formattedQuery = string.Format(command, bottomLong, bottomLat, topLong, topLat, stateName);
                 List<object> features = new List<object>();
                 foreach (var row in DbHelper.GetData(formattedQuery))
                 {
@@ -291,14 +307,15 @@ ORDER BY
                 };
 
                 var jsonResponse = JsonConvert.SerializeObject(featureCollection);
+                _logger.LogInformation("Actual use data fetched successfully.");
                 return Ok(jsonResponse);
             }
             catch (ServiceException se)
             {
+                _logger.LogError(se, "ServiceException occurred while fetching actual use data.");
                 return BadRequest(se.Message);
             }
         }
-
 
         /// <summary>
         /// Get a record
@@ -308,6 +325,7 @@ ORDER BY
         [HttpGet("2/clustereddata")]
         public ActionResult GetHausumringeClusteredData([FromQuery] QueryParameters parameters)
         {
+            _logger.LogInformation("Fetching clustered data with parameters: {parameters}", parameters);
             try
             {
                 var bottomLat = parameters.BottomLat;
@@ -330,8 +348,6 @@ ORDER BY
          ))', 4326)) = 1";
 
                 string formattedQuery = string.Format(command, bottomLong, bottomLat, topLong, topLat);
-
-                // Console.WriteLine(command);
                 foreach (var row in DbHelper.GetData(formattedQuery))
                 {
                     var location = new List<double[]>();
@@ -346,6 +362,7 @@ ORDER BY
                     }
                     catch (Exception ex)
                     {
+                        _logger.LogWarning(ex, "Error parsing location coordinates.");
                         continue;
                     }
                     spatialDataList.Add(new SpatialData
@@ -357,14 +374,17 @@ ORDER BY
                 }
                 if (spatialDataList.Count == 0)
                 {
+                    _logger.LogInformation("No spatial data found.");
                     return Ok("{\"type\":\"FeatureCollection\",\"features\":[]}");
                 }
-                var clusters = QueryParameters.ClusterData(spatialDataList,Convert.ToInt32(parameters.ZoomLevel));
+                var clusters = QueryParameters.ClusterData(spatialDataList, Convert.ToInt32(parameters.ZoomLevel));
                 var geoJson = QueryParameters.ConvertToGeoJson(clusters);
+                _logger.LogInformation("Clustered data fetched successfully.");
                 return Ok(JsonConvert.SerializeObject(geoJson));
             }
             catch (ServiceException se)
             {
+                _logger.LogError(se, "ServiceException occurred while fetching clustered data.");
                 return BadRequest(se.Message);
             }
         }
