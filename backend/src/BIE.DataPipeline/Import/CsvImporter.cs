@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Reflection.PortableExecutable;
@@ -9,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BIE.DataPipeline;
 using Microsoft.VisualBasic.FileIO;
+using NetTopologySuite.Geometries;
 
 [assembly: InternalsVisibleTo("BIE.Tests")]
 namespace BIE.DataPipeline.Import
@@ -22,11 +24,15 @@ namespace BIE.DataPipeline.Import
         private string[] yamlHeader;
         private string headerString = "";
         private List<(int, int)> columnIndexes;
+        private CultureInfo cultureInfo;
 
         private StringBuilder builder;
 
         public CsvImporter(DataSourceDescription? dataSourceDescription)
         {
+            //CultureInfo
+            cultureInfo = new CultureInfo("en-US");
+
             //YAML Arguments:
             this.dataSourceDescription = dataSourceDescription;
             columnTypes = ImporterHelper.ParseColumnTypes(dataSourceDescription);
@@ -45,9 +51,9 @@ namespace BIE.DataPipeline.Import
 
             // get all the indexes and descriptions that interest us
             columnIndexes = new List<(int, int)>();
-            for (int i = 0; i < fileHeader.Length; i++)
+            for (int j = 0; j < yamlHeader.Length; j++)
             {
-                for (int j = 0; j < yamlHeader.Length; j++)
+                for (int i = 0; i < fileHeader.Length; i++)
                 {
                     if (fileHeader[i] != yamlHeader[j])
                     {
@@ -86,6 +92,11 @@ namespace BIE.DataPipeline.Import
                 headerString += col.name_in_table + ",";
             }
 
+            if(dataSourceDescription.options.location_to_SQL_point != null)
+            {
+                headerString += dataSourceDescription.options.location_to_SQL_point.name_in_table + ",";
+            }
+
             //remove last ,
             headerString = RemoveLastComma(headerString);
 
@@ -99,7 +110,7 @@ namespace BIE.DataPipeline.Import
         /// <returns>A boolean indicating if the end of the file has been reached.</returns>
         public bool ReadLine(out string nextLine)
         {
-            string[]? line;
+            string[]? line = new string[0];
 
             builder.Clear();
 
@@ -121,10 +132,10 @@ namespace BIE.DataPipeline.Import
                 }
 
 
-                foreach (var (i, yamlIndex)in columnIndexes)
+                foreach (var (fileIndex, yamlIndex)in columnIndexes)
                 {
                     //checks if the line has not enougth content for the expected yaml columns.
-                    if(i >= line.Length)
+                    if(fileIndex >= line.Length)
                     {
                         Console.WriteLine("Line does not match the number of expected columns");
                         //Read next line
@@ -133,7 +144,7 @@ namespace BIE.DataPipeline.Import
                     }
 
                     //check if the value can be empty
-                    if (dataSourceDescription.table_cols[yamlIndex].is_not_nullable && line[i] == "")
+                    if (dataSourceDescription.table_cols[yamlIndex].is_not_nullable && line[fileIndex] == "")
                     {
                         Console.WriteLine("Line does not match not null criteria");
                         //Read next line
@@ -141,18 +152,41 @@ namespace BIE.DataPipeline.Import
                         break;
                     }
 
-                    line[i] = line[i].Replace("'", "''");
-                    line[i] = line[i].Replace(",", ".");
+                    line[fileIndex] = line[fileIndex].Replace("'", "''");
+                    line[fileIndex] = line[fileIndex].Replace(",", ".");
 
-                    if (columnTypes[i] == typeof(string))
+                    if (columnTypes[yamlIndex] == typeof(string))
                     {
-                        builder.Append($"'{line[i]}',");
+
+                        // nextLine += $"'{line[i]}',";
+                        builder.Append($"'{line[fileIndex]}',");
                         continue;
                     }
 
-                    builder.Append($"{line[i]},");
+                    // nextLine += string.Format("{0},", Convert.ChangeType(line[i], columnTypes[i]));
+                    // nextLine += $"{line[i]},";
+                    builder.Append($"{line[fileIndex]},");
+
+
+                }
+
+            }
+
+            if(dataSourceDescription.options.location_to_SQL_point != null)
+            {
+                if(line.Length != 0)
+                {
+                    double lon;
+                    double lat;
+                    bool success = double.TryParse(Regex.Replace(line[dataSourceDescription.options.location_to_SQL_point.index_lon], ",", "."), NumberStyles.Any, cultureInfo, out lon);
+                    success = double.TryParse(Regex.Replace(line[dataSourceDescription.options.location_to_SQL_point.index_lat], ",", "."), NumberStyles.Any, cultureInfo, out lat) && success;
+                    if (success)
+                    {
+                        builder.Append($"{LocationToPoint(lon, lat)},");
+                    }
                 }
             }
+
 
             builder.Length--; // this removes the last comma
 
@@ -172,6 +206,15 @@ namespace BIE.DataPipeline.Import
             {
                 return input; // No comma found, return original string
             }
+        }
+
+        private string LocationToPoint(double longitude, double latitude)
+        {
+            //GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+
+            //return geometryFactory.CreatePoint(new Coordinate(longitude, latitude));
+
+            return "GEOGRAPHY::Point(" + latitude.ToString(cultureInfo) + "," + longitude.ToString(cultureInfo) + ", 4326)";
         }
 
 

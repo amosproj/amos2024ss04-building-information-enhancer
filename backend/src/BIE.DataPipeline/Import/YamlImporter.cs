@@ -185,6 +185,10 @@ namespace BIE.DataPipeline.Import
                 set => mIf_table_exists = value;
             }
 
+
+            [DefaultValue(null)]
+            public LocationToSQLPoint location_to_SQL_point { get; set; }
+
             public override bool Equals(object? obj)
             {
                 if (obj == null)
@@ -211,6 +215,7 @@ namespace BIE.DataPipeline.Import
 
                 return true;
             }
+
         }
 
         public class DataSourceColumn
@@ -273,6 +278,24 @@ namespace BIE.DataPipeline.Import
 
                 return true;
             }
+        }
+
+        public class LocationToSQLPoint
+        {
+            /// <summary>
+            /// The name of the column in the database table.
+            /// </summary>
+            public string name_in_table { get; set; }
+
+            /// <summary>
+            /// The index of the lonitude column in the file .
+            /// </summary>
+            public int index_lon { get; set; }
+
+            /// <summary>
+            /// The index of the latitude column in the file .
+            /// </summary>
+            public int index_lat { get; set; }
         }
     }
 
