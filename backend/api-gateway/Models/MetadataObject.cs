@@ -19,7 +19,7 @@ public class MetadataObject
     {
         public string DatasetId { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
+        public string ShortDescription { get; set; } = string.Empty;
         public string Icon { get; set; } = string.Empty;
     }
 
@@ -29,8 +29,13 @@ public class MetadataObject
         public string Icon { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty;
 
+        public string LongDescription { get; set; } = string.Empty;
+
         // Zoom level is higher the closer you look at something. If current zoom level is below this, it shouldn't display any value.
         public int MinZoomLevel { get; set; } = 0;
+        
+        // The zoom threshold where areas start to turn into markers
+        public int MarkersThreshold { get; set; } = 0;
 
         // The display property is the property that should be shown in a popup.
         public string DisplayProperty { get; set; } = string.Empty;

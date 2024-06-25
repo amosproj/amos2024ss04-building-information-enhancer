@@ -33,7 +33,7 @@ const TabInfoPopUp: React.FC<TabInfoPopUpProps> = ({
           <Article size={20} /> Dataset Description
         </span>
         <span className="secondary-text" style={{ paddingBottom: "1rem" }}>
-          {currentTab.dataset.description}
+          {currentTab.dataset.metaData?.longDescription}
         </span>
         <Divider />
         <span
