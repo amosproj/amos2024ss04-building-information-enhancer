@@ -38,12 +38,6 @@ table_cols:
     name_in_table: state
   - name: Kreis/kreisfreie Stadt
     name_in_table: district
-  - name: Breitengrad
-    name_in_table: latitude
-    type: DECIMAL(8,6)
-  - name: Längengrad
-    name_in_table: longitude
-    type: DECIMAL(9,6)
   - name: Inbetriebnahmedatum
     name_in_table: commissioning_date
   - name: Nennleistung Ladeeinrichtung [kW]
