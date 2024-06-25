@@ -11,5 +11,10 @@ export interface DatasetMetaData {
   longDescription: string;
   minZoomLevel: number;
   displayProperty: string;
-  tables: [];
+  tables: Table[];
+}
+
+export interface Table {
+  name: string;
+  numberOfLines: number;
 }
