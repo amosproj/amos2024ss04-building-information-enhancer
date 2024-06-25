@@ -101,12 +101,8 @@ try
         dbHelper.InsertData(line);
         notEof = importer.ReadLine(out line);
         count++;
-        if (count % 10000 == 0)
-        {
-            Console.WriteLine($"Insertion in progress [Inserted {count} lines]...");
-        }
     }
-    Console.WriteLine("Finished inserting the data.");
+    Console.WriteLine($"Finished inserting {count} lines of data.");
     if (description.source.data_format == "SHAPE")
     {
         Console.WriteLine("Creating indexes...");

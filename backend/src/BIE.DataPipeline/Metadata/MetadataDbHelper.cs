@@ -27,7 +27,8 @@ public class MetadataDbHelper
     {
         try
         {
-            var client = new MongoClient("mongodb://datapipeline:datapipeline@metadata-database:27017/bci-metadata");
+            var connectionString = $"mongodb://datapipeline:datapipeline@{mMetaDataDbUrl}/bci-metadata";
+            var client = new MongoClient(connectionString);
             mDatabase = client.GetDatabase("bci-metadata");
             return true;
         }
