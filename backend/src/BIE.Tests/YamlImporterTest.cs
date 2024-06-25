@@ -37,7 +37,7 @@ namespace BIE.Tests
             };
             expected.table_name = "unitTestTable";
 
-            DataSourceDescription actual = YamlImporter.GetSourceDescription(@".\yaml\unitTestShort.yaml");
+            DataSourceDescription actual = YamlImporter.GetSourceDescription(@".\yaml\common\unitTestShort.yaml");
             Assert.True(actual.Equals(expected));
         }
     }

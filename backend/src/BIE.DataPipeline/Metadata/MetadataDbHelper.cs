@@ -27,13 +27,14 @@ public class MetadataDbHelper
     {
         try
         {
-            var client = new MongoClient($"mongodb://datapipeline:datapipeline@{mMetaDataDbUrl}/bci-metadata");
+            var connectionString = $"mongodb://datapipeline:datapipeline@{mMetaDataDbUrl}/bci-metadata";
+            var client = new MongoClient(connectionString);
             mDatabase = client.GetDatabase("bci-metadata");
             return true;
         }
         catch (Exception e)
         {
-            Console.WriteLine("Could not establish Connection to Metadata Database");
+            Console.WriteLine($"Could not establish the connection to Metadata Database.");
             return false;
         }
     }

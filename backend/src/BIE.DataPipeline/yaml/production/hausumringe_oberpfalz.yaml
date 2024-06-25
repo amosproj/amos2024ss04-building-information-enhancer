@@ -2,14 +2,16 @@
 source:
   # link | filepath
   type: URL
-  location: https://geodaten.bayern.de/odd/m/3/daten/hausumringe/bezirk/data/097_Schwaben_Hausumringe.zip
+  location: https://geodaten.bayern.de/odd/m/3/daten/hausumringe/bezirk/data/093_Oberpfalz_Hausumringe.zip
   data_format: SHAPE
 options:
   # skip lines at the beginning
   skip_lines: 0
   # discard any rows that have null values
   discard_null_rows: false
-table_name: Hausumringe_schwaben
+  # how to deal with existing table. Options: ignore, replace, skip (default).
+  if_table_exists: skip
+table_name: Hausumringe_oberpfalz
 
 table_cols:
 dataset: house_footprints

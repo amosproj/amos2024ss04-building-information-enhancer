@@ -146,7 +146,7 @@ namespace BIE.DataPipeline.Import
                     //check if the value can be empty
                     if (dataSourceDescription.table_cols[yamlIndex].is_not_nullable && line[fileIndex] == "")
                     {
-                        Console.WriteLine("Line does not match not null criteria");
+                        Console.WriteLine("Line does not match not null criteria, skipping...");
                         //Read next line
                         builder.Clear();
                         break;
