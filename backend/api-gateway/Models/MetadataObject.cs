@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace BIE.DataPipeline.Metadata;
+namespace APIGateway.Models;
 
 public class MetadataObject
 {
