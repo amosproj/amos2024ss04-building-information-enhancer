@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Reflection.PortableExecutable;
@@ -23,11 +24,15 @@ namespace BIE.DataPipeline.Import
         private string[] yamlHeader;
         private string headerString = "";
         private List<(int, int)> columnIndexes;
+        private CultureInfo cultureInfo;
 
         private StringBuilder builder;
 
         public CsvImporter(DataSourceDescription? dataSourceDescription)
         {
+            //CultureInfo
+            cultureInfo = new CultureInfo("en-US");
+
             //YAML Arguments:
             this.dataSourceDescription = dataSourceDescription;
             columnTypes = ImporterHelper.ParseColumnTypes(dataSourceDescription);
@@ -173,9 +178,9 @@ namespace BIE.DataPipeline.Import
                 {
                     double lon;
                     double lat;
-                    bool success = double.TryParse(Regex.Replace(line[dataSourceDescription.options.location_to_SQL_point.index_lon], ",", "."), out lon);
-                    success = double.TryParse(Regex.Replace(line[dataSourceDescription.options.location_to_SQL_point.index_lat], ",", "."), out lat) && success;
-                    if(success)
+                    bool success = double.TryParse(Regex.Replace(line[dataSourceDescription.options.location_to_SQL_point.index_lon], ",", "."), NumberStyles.Any, cultureInfo, out lon);
+                    success = double.TryParse(Regex.Replace(line[dataSourceDescription.options.location_to_SQL_point.index_lat], ",", "."), NumberStyles.Any, cultureInfo, out lat) && success;
+                    if (success)
                     {
                         builder.Append($"{LocationToPoint(lon, lat)},");
                     }
@@ -206,10 +211,10 @@ namespace BIE.DataPipeline.Import
         private string LocationToPoint(double longitude, double latitude)
         {
             //GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
-            
+
             //return geometryFactory.CreatePoint(new Coordinate(longitude, latitude));
 
-            return "GEOGRAPHY::Point(" + latitude + "," + longitude + ", 4326)";
+            return "GEOGRAPHY::Point(" + latitude.ToString(cultureInfo) + "," + longitude.ToString(cultureInfo) + ", 4326)";
         }
 
 
