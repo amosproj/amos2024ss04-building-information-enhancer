@@ -5,7 +5,7 @@ common_directory="./yaml/common"
 production_directory="./yaml/production"
 development_directory="./yaml/development"
 yamlfiles=$(find "$common_directory" -type f -name "*.yaml")
-excludeFiles=("unitTest.yaml" "unitTestShort.yaml")
+excludeFiles=("unitTest.yaml" "unitTestShort.yaml" "evChargingStationNoGeography.yaml")
 
 if [ "$ENVIRONMENT_STAGE" = "production" ]; then
     echo "Production environment detected, loading all datasets..."
