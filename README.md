@@ -42,8 +42,14 @@ In order to deploy and/or develop one or more services, follow the instructions 
 
 ### Developement
 
-1. If you want to develop the frontend service, run the `npm run deploy:backend:api` to deploy the backend, and in a new terminal run the `npm run deploy:frontend:dev` command to deploy the frontend development server.
-2. If you want to develop one of the backend services, instead you need to make the changes and re-build the backend executables afterward. To do so, go to the `backend` folder and open the corresponding `.sln` file. To build all services type, go back to the root folder and type `npm run deploy:backend:api`.
+By following the micro-service architecture, each of the services can be deployed and developed separately. However, some of the services depend on each other. Follow instructions below to develop a specific service:
+
+- **Frontend**: To develop the frontend service, one can run the `npm run deploy:frontend:dev` to deploy the VITE development server (with hot reloading). The code is located in the `frontend` folder. At a minimum, the frontend depends on the API Gateway and the MongoDB metadata database. If you want to query the datasets, the API Composer and the Geospatial DB needs to be deployed too.
+- **API Gateway**: To develop the C# API Gateway, first make your changes in the `backend/API-Gateway` folder and run inside of it the `dotnet build` command to build the executables. Finally, to run the Gateway run type the `dotnet run` command. The API Gateway can run on its own, however, to use one of its API endpoints, one needs to deploy the corresponding service (for more information about the endpoints, read our [System Architecture](https://github.com/amosproj/amos2024ss04-building-information-enhancer/wiki/System-Architecture) wiki page).
+- **API Composer**: Similarly to the API Gateway, go to the corresponding folder in the `backend` directory, make the changes, and run `dotnet build` and `dotnet run`.
+- **Data Pipeline**: Similarly to the API Gateway, go to the corresponding folder in the `backend` directory, make the changes, and run `dotnet build` and `dotnet run`.
+- **Metadata Database**: To deploy the MongoDB database one needs to use the Docker `docker compose up --build -d metadata-database` command in the root folder.
+- **Geospatial Databases**: To deploy the Geospatial databases one needs to use the Docker `docker compose up --build -d sql-database` command in the root folder.
 
 ## 👥 The Team
 
