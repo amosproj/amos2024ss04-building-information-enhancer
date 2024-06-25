@@ -1,5 +1,6 @@
 ﻿using BIE.DataPipeline;
 using BIE.DataPipeline.Import;
+using BIE.DataPipeline.Metadata;
 using Mono.Options;
 
 // setup command line options.
@@ -41,10 +42,19 @@ if (!dbHelper.CheckConnection())
 Console.WriteLine("Established Database Connection.");
 
 // End if Dataset can be skipped
-if (dbHelper.CanSkip(description))
+if (DbHelper.CanSkip(description))
 {
     return 1;
 }
+
+// Establish Connection to Metadata DB
+var metadataDbHelper = new MetadataDbHelper();
+if (!metadataDbHelper.CreateConnection())
+{
+    // maybe make optional?
+    return 1;
+}
+
 Console.WriteLine("Starting Importer");
 
 IImporter importer;
@@ -104,7 +114,10 @@ try
         dbHelper.CreateIndexes(description);
         Console.WriteLine("Indexes Created");
     }
-
+    
+    Console.WriteLine("Updating Metadata");
+    metadataDbHelper.UpdateMetadata(description, count);
+    Console.WriteLine("Metadata updated");
 }
 catch (Exception e)
 {
@@ -113,7 +126,21 @@ catch (Exception e)
     return 1;
 }
 
+try
+{
+}
+catch (Exception e)
+{
+    Console.WriteLine("Could not insert into Metadata DB");
+    Console.WriteLine(e);
+    throw;
+}
+
 return 0;
+
+// -------------------------------------------------------
+// FUNCTIONS
+// -------------------------------------------------------
 
 string HandleCliArguments()
 {

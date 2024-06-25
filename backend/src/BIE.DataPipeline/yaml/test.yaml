@@ -16,6 +16,7 @@ options:
     index_lon: 8
     index_lat: 9
 table_name: EV_charging_stations
+dataset: EV_charging_stations
 delimiter: ";"
 
 table_cols:
