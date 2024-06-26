@@ -19,5 +19,3 @@ table_cols:
   - name: colName
     name_in_table: colTableName
     type: VARCHAR
-  
-  

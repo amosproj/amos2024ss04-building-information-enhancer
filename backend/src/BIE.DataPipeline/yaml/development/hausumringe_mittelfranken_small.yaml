@@ -1,8 +1,8 @@
 ﻿# describe the source
 source:
   # link | filepath
-  type: URL
-  location: https://geodaten.bayern.de/odd/m/3/daten/hausumringe/bezirk/data/093_Oberpfalz_Hausumringe.zip
+  type: filepath
+  location: ./yaml-data/hausumringe_mittelfranken_small.zip
   data_format: SHAPE
 options:
   # skip lines at the beginning
@@ -10,8 +10,8 @@ options:
   # discard any rows that have null values
   discard_null_rows: false
   # how to deal with existing table. Options: ignore, replace, skip (default).
-#  if_table_exists: replace
-table_name: Hausumringe_oberpfalz
+  if_table_exists: skip
+table_name: Hausumringe_mittelfranken_small
 
 table_cols:
 dataset: house_footprints

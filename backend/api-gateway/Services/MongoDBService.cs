@@ -14,9 +14,9 @@ namespace BIE.Core.API.Services
             _database = client.GetDatabase("bci-metadata");
         }
 
-        public IMongoCollection<DatasetData> GetDatasetsCollection()
+        public IMongoCollection<MetadataObject> GetDatasetsCollection()
         {
-            return _database.GetCollection<DatasetData>("datasets");
+            return _database.GetCollection<MetadataObject>("datasets");
         }
     }
 }

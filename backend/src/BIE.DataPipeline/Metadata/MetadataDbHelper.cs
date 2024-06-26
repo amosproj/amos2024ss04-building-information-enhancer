@@ -27,81 +27,57 @@ public class MetadataDbHelper
     {
         try
         {
-            var client = new MongoClient($"mongodb://datapipeline:datapipeline@{mMetaDataDbUrl}/bci-metadata");
+            var connectionString = $"mongodb://datapipeline:datapipeline@{mMetaDataDbUrl}/bci-metadata";
+            var client = new MongoClient(connectionString);
             mDatabase = client.GetDatabase("bci-metadata");
             return true;
         }
         catch (Exception e)
         {
-            Console.WriteLine("Could not establish Connection to Metadata Database");
+            Console.WriteLine($"Could not establish the connection to Metadata Database.");
             return false;
         }
     }
 
     public MetadataObject GetMetadata(DataSourceDescription description)
     {
+        // Get the collection
         var collection = mDatabase.GetCollection<MetadataObject>("datasets");
 
-        var obj = collection
+        // Find the dataset object with the given ID
+        var metadataObject = collection
             .Find(g => g.basicData.DatasetId == description.dataset)
             .FirstOrDefault();
 
-        if (obj == null)
-        {
-            obj = new MetadataObject()
-            {
-                basicData = new MetadataObject.BasicData()
-                {
-                    DatasetId = description.dataset
-                }
-            };
-        }
-
-        return obj;
+        return metadataObject;
     }
 
     public void UpdateMetadata(DataSourceDescription description, int numberOfLines)
     {
+        // Load the collection
         var collection = mDatabase.GetCollection<MetadataObject>("datasets");
 
-        var metadata = collection
+        // Find the dataset object
+        var metadataObject = collection
             .Find(g => g.basicData.DatasetId == description.dataset)
             .FirstOrDefault();
 
-        var newTable = new MetadataObject.TableData() { Name = description.table_name, NumberOfLines = numberOfLines };
-
-        if (metadata == null)
-        {
-            metadata = new MetadataObject()
-            {
-                basicData = new MetadataObject.BasicData()
-                {
-                    DatasetId = description.dataset,
-                    Tables = new List<MetadataObject.TableData>() { newTable }
-                }
-            };
-
-            collection.InsertOne(metadata);
-            return;
-        }
-
-        var existingTable = metadata.basicData.Tables.Find(t => t.Name == description.table_name);
-
+        // Load the existing table
+        var existingTable = metadataObject.additionalData.Tables.Find(t => t.Name == description.table_name);
         if (existingTable == null)
         {
-            metadata.basicData.Tables.Add(newTable);
-
-            collection.ReplaceOne(g => g.basicData.DatasetId == description.dataset, metadata);
+            // Create a new table object if not present
+            var newTable = new MetadataObject.TableData() { Name = description.table_name, NumberOfLines = numberOfLines };
+            metadataObject.additionalData.Tables.Add(newTable);
+            collection.ReplaceOne(g => g.basicData.DatasetId == description.dataset, metadataObject);
             return;
         }
 
-        // table info already exists.
-        // for now just choose the larger number of lines number.
+        // Table info already exists, for now just choose the larger number of lines number.
         existingTable.NumberOfLines = existingTable.NumberOfLines < numberOfLines
             ? numberOfLines
             : existingTable.NumberOfLines;
 
-
-        collection.ReplaceOne(g => g.basicData.DatasetId == description.dataset, metadata);
+        collection.ReplaceOne(g => g.basicData.DatasetId == description.dataset, metadataObject);
     }
 }

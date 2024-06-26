@@ -43,5 +43,3 @@ table_cols:
   - name: testDecimal
     name_in_table: testDecimal
     type: DECIMAL
-  
-  
