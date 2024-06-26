@@ -42,12 +42,14 @@ const TabInfoPopUp: React.FC<TabInfoPopUpProps> = ({
             style={{ paddingBottom: "1rem" }}
           >
             <MapPin size={20} weight="bold" />
-            <b>Marker Type: </b>
+            <b>Display Type: </b>
             <span
               className="secondary-text"
               style={{ textTransform: "capitalize" }}
             >
-              {currentTab.dataset.type}
+              {currentTab.dataset.metaData
+                ? currentTab.dataset.metaData.type
+                : "None"}
             </span>
           </span>
           <span

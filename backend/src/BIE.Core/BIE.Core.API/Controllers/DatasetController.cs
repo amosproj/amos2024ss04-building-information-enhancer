@@ -128,7 +128,7 @@ namespace BIE.Core.API.Controllers
 
                 string command = @"
          SELECT Id, Location.STAsText() AS Location, Location.STGeometryType() AS Type
-         FROM dbo.Hausumringe_mittelfranken
+         FROM dbo.Hausumringe_mittelfranken_small
          WHERE Location.STIntersects(geography::STGeomFromText('POLYGON((
             {0} {1},
             {0} {3},
