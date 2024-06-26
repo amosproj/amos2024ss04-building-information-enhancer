@@ -13,6 +13,7 @@ using System.ComponentModel.DataAnnotations;
 
 using System.Globalization;
 using System.Text;
+using Microsoft.Extensions.Logging;
 
 namespace BIE.Core.API.Controllers
 {
