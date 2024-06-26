@@ -1,19 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using BIE.Core.BaseRepository;
-using BIE.Core.DataObjects;
 using BIE.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using BIE.Core.DBRepository;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json.Linq;
 using Accord.MachineLearning;
 using Newtonsoft.Json;
-using System.Text;
 using System.Data;
 using System.ComponentModel.DataAnnotations;
+
+using System.Globalization;
+using System.Text;
 
 namespace BIE.Core.API.Controllers
 {
@@ -59,48 +58,62 @@ namespace BIE.Core.API.Controllers
                 var bottomLong = parameters.BottomLong;
                 var topLat = parameters.TopLat;
                 var topLong = parameters.TopLong;
-                
-                DbHelper.CreateDbConnection();
 
-                var command =
-                    "SELECT * " +
-                    "FROM dbo.EV_charging_stations" +
-                    $" WHERE latitude > {bottomLat} AND latitude < {topLat} AND" +
-                    $" longitude > {bottomLong} AND longitude < {topLong};";
+                // Create polygon WKT from bounding box
+                var polygonWkt = $"POLYGON(({bottomLong.ToString(new CultureInfo("en-US"))} {bottomLat.ToString(new CultureInfo("en-US"))}, {topLong.ToString(new CultureInfo("en-US"))} {bottomLat.ToString(new CultureInfo("en-US"))}, {topLong.ToString(new CultureInfo("en-US"))} {topLat.ToString(new CultureInfo("en-US"))}, {bottomLong.ToString(new CultureInfo("en-US"))} {topLat.ToString(new CultureInfo("en-US"))}, {bottomLong.ToString(new CultureInfo("en-US"))} {bottomLat.ToString(new CultureInfo("en-US"))}))";
 
-                command = command.Replace(",", ".");
-                // Console.WriteLine(command);
-                var response = "{\"type\": \"FeatureCollection\",\n\"features\": [";
-                foreach (var row in DbHelper.GetData(command))
+                // SQL Query to find intersecting points
+                var sqlQuery = $@"
+        SELECT operator, Location.AsTextZM() AS Location
+        FROM dbo.EV_charging_stations
+        WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
+        ";
+
+                Console.WriteLine(sqlQuery);
+                // Get data from database
+                var data = DbHelper.GetData(sqlQuery);
+
+                // Construct GeoJSON response
+                var response = new StringBuilder();
+                response.Append("{\"type\": \"FeatureCollection\",\n\"features\": [");
+
+                foreach (var row in data)
                 {
-                    response += $@"
-{{
-  ""type"": ""Feature"",
-  ""geometry"": {{
-    ""type"": ""Point"",
-    ""coordinates"": [{row["longitude"]}, {row["latitude"]}]
-  }},
-  ""properties"": {{
-    ""name"": ""{row["operator"]}""
-}}
-}},";
+                    var location = row["Location"].ToString();
+                    // Extract the coordinates from the POINT string
+                    var coordinates = location.Replace("POINT (", "").Replace(")", "").Split(' ');
+                    var longitude = coordinates[0];
+                    var latitude = coordinates[1];
+
+                    response.Append($@"
+            {{
+                ""type"": ""Feature"",
+                ""geometry"": {{
+                    ""type"": ""Point"",
+                    ""coordinates"": [{longitude}, {latitude}]
+                }},
+                ""properties"": {{
+                    ""name"": ""{row["operator"]}""
+                }}
+            }},");
                 }
 
-                if (response.Last() == ',')
+                if (response[response.Length - 1] == ',')
                 {
-                    // chop of last ,
-                    response = response[..^1];
+                    response.Length--; // Remove the trailing comma
                 }
 
-                response += "]}";
+                response.Append("]}");
 
-                return Ok(response);
+                return Ok(response.ToString());
             }
-            catch (ServiceException se)
+            catch (Exception ex)
             {
-                return BadRequest(se.Message);
+                return BadRequest(ex.Message);
             }
         }
+
+
 
         private ActionResult GetHouseFootprintsData([FromQuery] QueryParameters parameters)
         {
@@ -114,9 +127,9 @@ namespace BIE.Core.API.Controllers
                 DbHelper.CreateDbConnection();
 
                 string command = @"
-         SELECT Id, Location.STAsText() AS Location, Location.STGeometryType() AS Type
+         SELECT Location.STAsText() AS Location, Location.STGeometryType() AS Type
          FROM dbo.Hausumringe_mittelfranken
-         WHERE Location.STIntersects(geography::STGeomFromText('POLYGON((
+         WHERE Location.STIntersects(geometry::STGeomFromText('POLYGON((
             {0} {1},
             {0} {3},
             {2} {3},
@@ -125,7 +138,7 @@ namespace BIE.Core.API.Controllers
          ))', 4326)) = 1";
 
                 string formattedQuery = string.Format(command, bottomLong, bottomLat, topLong, topLat);
-
+                Console.WriteLine(formattedQuery);
                 // Console.WriteLine(command);
                 var response = "{\"type\": \"FeatureCollection\",\n\"features\": [";
                 foreach (var row in DbHelper.GetData(formattedQuery))
@@ -138,7 +151,7 @@ namespace BIE.Core.API.Controllers
     ""coordinates"": [{QueryParameters.GetPolygonCordinates(row["Location"])}]
   }},
   ""properties"": {{
-    ""id"": ""{row["Id"]}""
+    ""text"": ""{row["Type"]}""
 }}
 }},";
                 }
