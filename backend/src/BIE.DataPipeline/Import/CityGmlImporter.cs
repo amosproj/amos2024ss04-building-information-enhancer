@@ -86,10 +86,17 @@ namespace BIE.DataPipeline.Import
             if(this.buildingIndex < buildingNodes.Count)
             {
                 XmlNode buildingNode = buildingNodes[this.buildingIndex];
-                XmlNode groundSurfaceNode = buildingNode.SelectSingleNode("//bldg:GroundSurface", this.nsmgr);
+                XmlNode groundSurfaceNode = buildingNode.SelectSingleNode(".//bldg:GroundSurface", this.nsmgr); 
+                XmlNode positionNode = groundSurfaceNode.SelectSingleNode(".//gml:posList", this.nsmgr);
 
-                XmlNode pos = groundSurfaceNode.SelectSingleNode("//gml:posList", this.nsmgr);
-                string utmCoordinates = pos.InnerText;
+                Console.WriteLine();
+                if(groundSurfaceNode == null || positionNode == null)
+                {
+                    throw new Exception("nodes not foiund :(");
+                }
+
+                string utmCoordinates = positionNode.InnerText;
+                Console.WriteLine(utmCoordinates);
                 //Parse Coordinate string
                 var coordPairs = new List<(double Easting, double Northing)>();
                 var coords = utmCoordinates.Split(' ');
@@ -142,12 +149,15 @@ namespace BIE.DataPipeline.Import
                 var geometryFactory = new GeometryFactory();
                 var linearRing = new LinearRing(coordinateArray);
                 Geometry geometry = new Polygon(linearRing);
-
-                geometry = ConvertUtmToLatLong(geometry);
+                    Console.WriteLine();
+                foreach(Coordinate c in geometry.Coordinates)
+                {
+                    Console.WriteLine(c.X + " " + c.Y);
+                }
+                    Console.WriteLine();
 
                 nextLine = $"geography::STGeomFromText('{geometry.AsText()}', 4326)";
                 nextLine += string.Format(",'{0}'", buildingNode.InnerXml);
-                Console.WriteLine(pos.InnerText);
 
                 this.buildingIndex++;
                 return true;
