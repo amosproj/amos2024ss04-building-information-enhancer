@@ -8,6 +8,8 @@ using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using System.Net.Mime;
+using System.Text;
 
 namespace BIE.Core.API.Controllers
 {
@@ -31,7 +33,7 @@ namespace BIE.Core.API.Controllers
         /// </summary>
         /// <returns>A list of available datasets</returns>
         [HttpGet("getDatasetList")]
-        [ProducesResponseType(typeof(List<DatasetBasicData>), 200)]
+        [ProducesResponseType(typeof(List<MetadataObject.BasicData>), 200)]
         [ProducesResponseType(400)]
         public async Task<IActionResult> GetDataSetList()
         {
@@ -42,18 +44,18 @@ namespace BIE.Core.API.Controllers
 
             var collection = _mongoDBService.GetDatasetsCollection();
             var datasets = await collection.Find(_ => true).ToListAsync();
-            var datasetBasicDataList = datasets.Select(d => d.BasicData).ToList();
+            var datasetBasicDataList = datasets.Select(d => d.basicData).ToList();
 
             return Ok(datasetBasicDataList);
         }
 
         /// <summary>
-        /// Gets the metadata for the given dataset. Contains things like Icon, visualization types
+        /// Gets the metadata for the given dataset. Contains things like Icon, visualization types and max zoom level
         /// </summary>
         /// <param name="datasetID">The ID of the dataset</param>
         /// <returns>Metadata for the specified dataset</returns>
         [HttpGet("getDatasetMetadata")]
-        [ProducesResponseType(typeof(DatasetMetadata), 200)]
+        [ProducesResponseType(typeof(MetadataObject), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         public async Task<IActionResult> GetDatasetMetadata([FromQuery, Required] string datasetID)
@@ -64,18 +66,18 @@ namespace BIE.Core.API.Controllers
             }
 
             var collection = _mongoDBService.GetDatasetsCollection();
-            var dataset = await collection.Find(d => d.BasicData.DatasetId == datasetID).FirstOrDefaultAsync();
+            var dataset = await collection.Find(d => d.basicData.DatasetId == datasetID).FirstOrDefaultAsync();
             
             if (dataset == null)
             {
                 return NotFound($"Dataset with ID {datasetID} not found.");
             }
 
-            return Ok(dataset.MetaData);
+            return Ok(dataset.additionalData);
         }
 
         /// <summary>
-        /// Loads the location data for the given point or polygon.
+        /// Loads the location data for the given point or polygon. 
         /// </summary>
         /// <param name="request">Contains the current dataset id and the list of coordinates. 
         /// In case of a single point a list with a single element.</param>
@@ -84,7 +86,7 @@ namespace BIE.Core.API.Controllers
         [ProducesResponseType(typeof(LocationDataResponse), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
-        public IActionResult LoadLocationData([FromBody, Required] LocationDataRequest request)
+        public async Task<IActionResult> LoadLocationData([FromBody, Required] LocationDataRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -93,22 +95,46 @@ namespace BIE.Core.API.Controllers
 
             _logger.LogInformation($"Fetching data for DatasetID: {request.DatasetId}");
 
-            // Generate mock data for the current dataset
-            var currentDatasetData = GenerateMockData("charging_stations", 3);
-
-            // Generate mock data for general data from other datasets
-            var generalData = GenerateMockData("house_footprints", 3);
-
-            var extraRows = GenerateMockData("extra_dataset", 1);
-
-            var response = new LocationDataResponse
+            // Get the first coordinate from the list for now
+            var coordinate = request.Location.FirstOrDefault();
+            if (coordinate == null)
             {
-                CurrentDatasetData = currentDatasetData,
-                GeneralData = generalData,
-                ExtraRows = extraRows
-            };
+                return BadRequest("No coordinates provided.");
+            }
 
-            return Ok(response);
+            // Construct the target URL with query parameters
+
+            try
+            {
+                var request1 = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Put,
+                    RequestUri = new Uri("http://api-composer:80/api/v1.0/Dataset/loadLocationData"),
+                    Content = new StringContent(
+        JsonSerializer.Serialize(request),
+        Encoding.UTF8,
+        MediaTypeNames.Application.Json), // or "application/json" in older versions
+                };
+
+                var response = await _httpClient.SendAsync(request1);
+                response.EnsureSuccessStatusCode(); // Throw if not a success code.
+
+                var content = await response.Content.ReadAsStringAsync();
+                var locationDataResponse = JsonSerializer.Deserialize<LocationDataResponse>(content);
+
+                return Ok(locationDataResponse);
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Error fetching data from the target service.");
+                return StatusCode(500, "Error fetching data from the target service.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred.");
+            }
+            
         }
 
         // Helper method to generate mock data
@@ -161,30 +187,14 @@ namespace BIE.Core.API.Controllers
 
             _logger.LogInformation($"Fetching data for DatasetID: {datasetID}, ZoomLevel: {zoomLevel}, Viewport: [{BottomLat}, {BottomLong}] to [{TopLat}, {TopLong}]");
             
-            string targetUrl;
-            if (datasetID == "charging_stations")
-            {
-                targetUrl = $"http://api-composer:80/api/v1.0/Dataset/1/data?ZoomLevel={zoomLevel}&BottomLat={BottomLat}&BottomLong={BottomLong}&TopLat={TopLat}&TopLong={TopLong}";
-            }
-            else if (datasetID == "house_footprints")
-            {
-                return Ok(MockData.MockHouseFootprints);
-                //targetUrl = $"http://api-composer:80/api/v1.0/Dataset/2/data?ZoomLevel={zoomLevel}&BottomLat={BottomLat}&BottomLong={BottomLong}&TopLat={TopLat}&TopLong={TopLong}";
-            }
-            else
-            {
-                _logger.LogError($"Unsupported dataset ID of {datasetID}");
-                return StatusCode(400, $"Unsupported dataset ID of {datasetID}");
-            }
+            string targetUrl = $"http://api-composer:80/api/v1.0/Dataset/getDatasetViewportData?Id={datasetID}&ZoomLevel={zoomLevel}&BottomLat={BottomLat}&BottomLong={BottomLong}&TopLat={TopLat}&TopLong={TopLong}";
 
             try
             {
                 var response = await _httpClient.GetAsync(targetUrl);
                 response.EnsureSuccessStatusCode(); // Throw if not a success code.
                 var content = await response.Content.ReadAsStringAsync();
-                var geoJsonResponse = JsonSerializer.Deserialize<GeoJsonResponse>(content);
-
-                return Ok(geoJsonResponse);
+                return Ok(content);
             }
             catch (HttpRequestException ex)
             {

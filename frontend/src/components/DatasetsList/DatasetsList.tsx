@@ -23,7 +23,7 @@ import CustomSvgIcon from "./CustomSvgIcon";
 export type Dataset = {
   id: string;
   displayName: string;
-  description: string;
+  shortDescription: string;
   type: MarkersTypes;
   datasetIcon: JSX.Element;
   data: FeatureCollection;
@@ -60,7 +60,7 @@ const DatasetsList: React.FC<DatasetsListProps> = ({ closeDialog }) => {
           const data: Dataset = {
             id: dataset.datasetId,
             displayName: dataset.name,
-            description: dataset.description,
+            shortDescription: dataset.shortDescription,
             type: MarkersTypes.None,
             datasetIcon: dataset.icon ? (
               <CustomSvgIcon svgString={dataset.icon} size={24} />
@@ -127,7 +127,7 @@ const DatasetsList: React.FC<DatasetsListProps> = ({ closeDialog }) => {
                 <ListItemAvatar>{dataset.datasetIcon}</ListItemAvatar>
                 <ListItemText
                   primary={dataset.displayName}
-                  secondary={dataset.description}
+                  secondary={dataset.shortDescription}
                 />
               </ListItemButton>
               <Divider />

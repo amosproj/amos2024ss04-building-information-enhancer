@@ -62,7 +62,6 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
 
   // Function to fetch metadata for the dataset
   const fetchMetadata = useCallback(async () => {
-    console.log("HEYYYYOOOOOOOO");
     try {
       setMetadataLoading(true); // Set loading state to true
       const params = {

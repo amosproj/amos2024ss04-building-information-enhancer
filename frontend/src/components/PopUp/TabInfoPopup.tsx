@@ -2,7 +2,7 @@ import React from "react";
 import PopUp from "./PopUp";
 import { TabProps } from "../../contexts/TabsContext";
 import { Divider } from "@mui/material";
-import { Article, MapPin } from "@phosphor-icons/react";
+import { Article, MapPin, Hash } from "@phosphor-icons/react";
 
 import "./TabInfoPopUp.css";
 
@@ -30,25 +30,47 @@ const TabInfoPopUp: React.FC<TabInfoPopUpProps> = ({
           className="overline text-header"
           style={{ paddingBottom: "1rem" }}
         >
-          <Article size={20} /> Dataset Description
+          <Article size={20} weight="bold" /> <b>Dataset Description</b>
         </span>
         <span className="secondary-text" style={{ paddingBottom: "1rem" }}>
-          {currentTab.dataset.description}
+          {currentTab.dataset.metaData?.longDescription}
         </span>
         <Divider />
-        <span
-          className="overline text-header"
-          style={{ paddingBottom: "1rem" }}
-        >
-          <MapPin size={20} />
-          Marker Type
-        </span>
-        <span
-          className="secondary-text"
-          style={{ paddingBottom: "1rem", textTransform: "capitalize" }}
-        >
-          {currentTab.dataset.type}
-        </span>
+        <div className="tab-info-additional">
+          <span
+            className="overline text-header"
+            style={{ paddingBottom: "1rem" }}
+          >
+            <MapPin size={20} weight="bold" />
+            <b>Display Type: </b>
+            <span
+              className="secondary-text"
+              style={{ textTransform: "capitalize" }}
+            >
+              {currentTab.dataset.metaData
+                ? currentTab.dataset.metaData.type
+                : "None"}
+            </span>
+          </span>
+          <span
+            className="overline text-header"
+            style={{ paddingBottom: "1rem" }}
+          >
+            <Hash size={20} weight="bold" />
+            <b>Total Data Points: </b>
+            <span
+              className="secondary-text"
+              style={{ textTransform: "capitalize" }}
+            >
+              {currentTab.dataset.metaData
+                ? currentTab.dataset.metaData.tables.reduce(
+                    (sum, table) => sum + table.numberOfLines,
+                    0
+                  )
+                : "0"}
+            </span>
+          </span>
+        </div>
       </div>
     </PopUp>
   );
