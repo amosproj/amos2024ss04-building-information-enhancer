@@ -110,6 +110,7 @@ namespace BIE.Data
             var con = CreateConnection();
             con.Open();
             command.Connection = con;
+            command.CommandTimeout = 600;
             r = command.ExecuteReader();
 
             return (r, con);
@@ -185,6 +186,7 @@ namespace BIE.Data
             con.Open();
             
             command.Connection = con;
+            command.CommandTimeout = 600;
             command.ExecuteNonQuery();
             
             con.Close();

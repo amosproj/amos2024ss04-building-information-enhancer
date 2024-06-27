@@ -132,29 +132,26 @@ namespace BIE.Core.API.Controllers
             _logger.LogInformation("Fetching house footprints with parameters: {parameters}", parameters);
             try
             {
-                var bottomLat = parameters.BottomLat;
-                var bottomLong = parameters.BottomLong;
-                var topLat = parameters.TopLat;
-                var topLong = parameters.TopLong;
+                var bottomLong = parameters.BottomLat;
+                var bottomLat = parameters.BottomLong;
+                var topLong = parameters.TopLat;
+                var topLat = parameters.TopLong;
 
                 DbHelper.CreateDbConnection();
 
-                string command = @"
-         SELECT Location.STAsText() AS Location, Location.STGeometryType() AS Type
-         FROM dbo.Hausumringe_mittelfranken
-         WHERE Location.STIntersects(geometry::STGeomFromText('POLYGON((
-            {0} {1},
-            {0} {3},
-            {2} {3},
-            {2} {1},
-            {0} {1}
-         ))', 4326)) = 1";
+                // Create polygon WKT from bounding box
+                var polygonWkt = $"POLYGON(({bottomLong.ToString(new CultureInfo("en-US"))} {bottomLat.ToString(new CultureInfo("en-US"))}, {topLong.ToString(new CultureInfo("en-US"))} {bottomLat.ToString(new CultureInfo("en-US"))}, {topLong.ToString(new CultureInfo("en-US"))} {topLat.ToString(new CultureInfo("en-US"))}, {bottomLong.ToString(new CultureInfo("en-US"))} {topLat.ToString(new CultureInfo("en-US"))}, {bottomLong.ToString(new CultureInfo("en-US"))} {bottomLat.ToString(new CultureInfo("en-US"))}))";
 
-                string formattedQuery = string.Format(command, bottomLong, bottomLat, topLong, topLat);
-                Console.WriteLine(formattedQuery);
+                // SQL Query to find intersecting points
+                var sqlQuery = $@"
+SELECT Location.AsTextZM() AS Location, Location.STGeometryType() AS Type
+FROM dbo.Hausumringe_mittelfranken
+WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
+";
+                Console.WriteLine(sqlQuery);
                 // Console.WriteLine(command);
                 var response = "{\"type\": \"FeatureCollection\",\n\"features\": [";
-                foreach (var row in DbHelper.GetData(formattedQuery))
+                foreach (var row in DbHelper.GetData(sqlQuery))
                 {
                     response += $@"
 {{
@@ -444,8 +441,9 @@ namespace BIE.Core.API.Controllers
                 var lstcordinate = cordinate.Split(',');
                 for (int i = 0;i<lstcordinate.Length; i++)
                 {
-                    lstcordinate[i] = lstcordinate[i].Replace(" ",",");
-
+                    lstcordinate[i] = lstcordinate[i].Trim().Replace(" ",",");
+                    var pairOfCoordinates = lstcordinate[i].Split(',');
+                    lstcordinate[i] = pairOfCoordinates[1] + ',' + pairOfCoordinates[0];
                 }
 
                 cordinate = string.Join("],[", lstcordinate);

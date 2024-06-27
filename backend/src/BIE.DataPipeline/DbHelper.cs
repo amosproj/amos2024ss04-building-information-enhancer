@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using BIE.Data;
 using BIE.DataPipeline.Import;
@@ -116,23 +117,60 @@ namespace BIE.DataPipeline
                 Console.WriteLine("Creating Index...");
                 var db = Database.Instance;
 
-                string bboxQuery = @"
-            USE BIEDB;
-            DECLARE @MinX FLOAT, @MinY FLOAT, @MaxX FLOAT, @MaxY FLOAT;
+                // Step 1: Check if the ID column exists, and add it if it doesn't
+                string addColumnQuery = @"
+    USE BIEDB;
+    IF NOT EXISTS (
+        SELECT * 
+        FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_NAME = '" + description.table_name + @"' 
+        AND COLUMN_NAME = 'ID'
+    )
+    BEGIN
+        ALTER TABLE dbo." + description.table_name + @" 
+        ADD ID INT IDENTITY(1,1);
+    END;
+";
 
-            WITH ConvertedGeography AS (
-                SELECT Location.STAsText() AS WKT
-                FROM dbo." + description.table_name + @"
-            )
-            SELECT
-                @MinX = geometry::EnvelopeAggregate(geometry::STGeomFromText(WKT, 4326)).STPointN(1).STX,
-                @MinY = geometry::EnvelopeAggregate(geometry::STGeomFromText(WKT, 4326)).STPointN(1).STY,
-                @MaxX = geometry::EnvelopeAggregate(geometry::STGeomFromText(WKT, 4326)).STPointN(3).STX,
-                @MaxY = geometry::EnvelopeAggregate(geometry::STGeomFromText(WKT, 4326)).STPointN(3).STY
-            FROM ConvertedGeography;
-            
-            SELECT @MinX AS MinX, @MinY AS MinY, @MaxX AS MaxX, @MaxY AS MaxY;
-        ";
+                var addColumnCmd = db.CreateCommand(addColumnQuery);
+                db.Execute(addColumnCmd);
+
+                // Step 2: Ensure the ID column is the primary key
+                string primaryKeyQuery = @"
+    USE BIEDB;
+    IF NOT EXISTS (
+        SELECT * 
+        FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS 
+        WHERE TABLE_NAME = '" + description.table_name + @"' 
+        AND CONSTRAINT_TYPE = 'PRIMARY KEY'
+    )
+    BEGIN
+        ALTER TABLE dbo." + description.table_name + @" 
+        ADD CONSTRAINT PK_" + description.table_name + @"_ID PRIMARY KEY CLUSTERED (ID);
+    END;
+";
+
+                var pkCmd = db.CreateCommand(primaryKeyQuery);
+                db.Execute(pkCmd);
+
+                // Step 3: Calculate the bounding box
+                string bboxQuery = @"
+    USE BIEDB;
+    DECLARE @MinX FLOAT, @MinY FLOAT, @MaxX FLOAT, @MaxY FLOAT;
+
+    WITH ConvertedGeography AS (
+        SELECT Location.STAsText() AS WKT
+        FROM dbo." + description.table_name + @"
+    )
+    SELECT
+        @MinX = geometry::EnvelopeAggregate(geometry::STGeomFromText(WKT, 4326)).STPointN(1).STX,
+        @MinY = geometry::EnvelopeAggregate(geometry::STGeomFromText(WKT, 4326)).STPointN(1).STY,
+        @MaxX = geometry::EnvelopeAggregate(geometry::STGeomFromText(WKT, 4326)).STPointN(3).STX,
+        @MaxY = geometry::EnvelopeAggregate(geometry::STGeomFromText(WKT, 4326)).STPointN(3).STY
+    FROM ConvertedGeography;
+    
+    SELECT @MinX AS MinX, @MinY AS MinY, @MaxX AS MaxX, @MaxY AS MaxY;
+";
 
                 var bboxCmd = db.CreateCommand(bboxQuery);
                 var (bboxReader, bboxConnection) = db.ExecuteReader(bboxCmd);
@@ -147,33 +185,37 @@ namespace BIE.DataPipeline
                     maxY = (double)bboxReader["MaxY"];
                 }
 
+                var cultureInfo = new CultureInfo("en-US");
+                Console.WriteLine($"BBox: MinX = {minX.ToString(cultureInfo)}, MinY = {minY.ToString(cultureInfo)}, MaxX = {maxX.ToString(cultureInfo)}, MaxY = {maxY.ToString(cultureInfo)}");
+
                 bboxReader.Close();
                 bboxConnection.Close();
 
+                // Step 4: Create the spatial index
                 string indexQuery = @"
-            USE BIEDB;
-            SET QUOTED_IDENTIFIER ON;
-            IF NOT EXISTS (
-                SELECT *
-                FROM sys.indexes
-                WHERE name = 'SI_" + description.table_name + @"_Location'
-                AND object_id = OBJECT_ID('dbo." + description.table_name + @"')
+    USE BIEDB;
+    SET QUOTED_IDENTIFIER ON;
+    IF NOT EXISTS (
+        SELECT *
+        FROM sys.indexes
+        WHERE name = 'SI_" + description.table_name + @"_Location'
+        AND object_id = OBJECT_ID('dbo." + description.table_name + @"')
+    )
+    BEGIN
+        CREATE SPATIAL INDEX SI_" + description.table_name + @"_Location
+        ON dbo." + description.table_name + @"(Location)
+        USING GEOMETRY_AUTO_GRID
+        WITH (
+            BOUNDING_BOX = (
+                XMIN = " + minX.ToString(cultureInfo) + @",
+                YMIN = " + minY.ToString(cultureInfo) + @",
+                XMAX = " + maxX.ToString(cultureInfo) + @",
+                YMAX = " + maxY.ToString(cultureInfo) + @"
             )
-            BEGIN
-                CREATE SPATIAL INDEX SI_" + description.table_name + @"_Location
-                ON dbo." + description.table_name + @"(Location)
-                USING GEOMETRY_AUTO_GRID
-                WITH (
-                    BOUNDING_BOX = (
-                        XMIN = " + minX + @",
-                        YMIN = " + minY + @",
-                        XMAX = " + maxX + @",
-                        YMAX = " + maxY + @"
-                    )
-                );
-            END;
-            UPDATE STATISTICS dbo." + description.table_name + @";
-        ";
+        );
+    END;
+    UPDATE STATISTICS dbo." + description.table_name + @";
+";
 
                 var cmd = db.CreateCommand(indexQuery);
                 db.Execute(cmd);
@@ -189,6 +231,7 @@ namespace BIE.DataPipeline
                 return false;
             }
         }
+
 
         private string GetCreationQuery(DataSourceDescription? description)
         {
