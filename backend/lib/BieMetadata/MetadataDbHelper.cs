@@ -7,6 +7,8 @@ public class MetadataDbHelper
     private string mMetaDataDbUrl;
 
     private IMongoDatabase mDatabase;
+    
+    public bool Connected { get; private set; }
 
     public MetadataDbHelper()
     {
@@ -28,6 +30,7 @@ public class MetadataDbHelper
             var connectionString = $"mongodb://datapipeline:datapipeline@{mMetaDataDbUrl}/bci-metadata";
             var client = new MongoClient(connectionString);
             mDatabase = client.GetDatabase("bci-metadata");
+            Connected = true;
             return true;
         }
         catch (Exception e)
@@ -37,7 +40,12 @@ public class MetadataDbHelper
         }
     }
 
-    public MetadataObject GetMetadata(string dataset)
+    /// <summary>
+    /// get the Metadata for a specified dataset. Returns null if dataset is not found.
+    /// </summary>
+    /// <param name="dataset"></param>
+    /// <returns></returns>
+    public MetadataObject? GetMetadata(string dataset)
     {
         // Get the collection
         var collection = mDatabase.GetCollection<MetadataObject>("datasets");

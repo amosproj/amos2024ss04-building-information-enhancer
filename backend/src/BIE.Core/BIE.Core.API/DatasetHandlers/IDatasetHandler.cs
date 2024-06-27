@@ -1,6 +1,8 @@
-﻿namespace BIE.Core.API.DatasetHandlers;
+﻿using BieMetadata;
+
+namespace BIE.Core.API.DatasetHandlers;
 
 public interface IDatasetHandler
 {
-    public string GetDataInsideArea(float minX, float minY, float maxX, float maxY);
+    public string GetDataInsideArea(string dataset, BoundingBox boundingBox);
 }

@@ -3,8 +3,8 @@ namespace BieMetadata;
 
 public struct BoundingBox
 {
-    public string minX;
-    public string minY;
-    public string maxX;
-    public string maxY;
+    public float minX;
+    public float minY;
+    public float maxX;
+    public float maxY;
 }
