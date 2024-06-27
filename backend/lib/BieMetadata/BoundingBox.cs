@@ -1,5 +1,5 @@
 ﻿// ReSharper disable InconsistentNaming
-namespace BIE.DataPipeline.Metadata;
+namespace BieMetadata;
 
 public struct BoundingBox
 {

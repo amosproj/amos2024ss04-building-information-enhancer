@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using BIE.DataPipeline;
 using Microsoft.VisualBasic.FileIO;
 using NetTopologySuite.Geometries;
+// ReSharper disable InconsistentNaming
 
 [assembly: InternalsVisibleTo("BIE.Tests")]
 

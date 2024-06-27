@@ -48,4 +48,11 @@
     <None Remove="yaml\unitTestShort.yaml" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <Reference Include="BieMetadata">
+      <HintPath>..\..\lib\BieMetadata\bin\Debug\net6.0\BieMetadata.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using BIE.Data;
 using BIE.DataPipeline.Import;
-using BIE.DataPipeline.Metadata;
+using BieMetadata;
 
 namespace BIE.DataPipeline
 {

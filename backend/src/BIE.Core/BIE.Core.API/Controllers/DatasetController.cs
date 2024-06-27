@@ -41,11 +41,11 @@ namespace BIE.Core.API.Controllers
         [ProducesResponseType(500)]
         public ActionResult GetDatasetViewportData([FromQuery] QueryParameters parameters)
         {
-            _logger.LogInformation("Received request for GetDatasetViewportData with parameters: {parameters}", parameters);
+            _logger.LogInformation($"Received request for GetDatasetViewportData with parameters: {parameters}");
 
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning("Invalid model state: {ModelState}", ModelState);
+                _logger.LogWarning($"Invalid model state: {ModelState}");
                 return BadRequest(ModelState);
             }
 

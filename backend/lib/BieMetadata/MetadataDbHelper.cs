@@ -1,8 +1,6 @@
-﻿using BIE.DataPipeline.Import;
-using MongoDB.Bson;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 
-namespace BIE.DataPipeline.Metadata;
+namespace BieMetadata;
 
 public class MetadataDbHelper
 {
@@ -39,48 +37,48 @@ public class MetadataDbHelper
         }
     }
 
-    public MetadataObject GetMetadata(DataSourceDescription description)
+    public MetadataObject GetMetadata(string dataset)
     {
         // Get the collection
         var collection = mDatabase.GetCollection<MetadataObject>("datasets");
 
         // Find the dataset object with the given ID
         var metadataObject = collection
-            .Find(g => g.basicData.DatasetId == description.dataset)
+            .Find(g => g.basicData.DatasetId == dataset)
             .FirstOrDefault();
 
         return metadataObject;
     }
 
-    public bool UpdateMetadata(DataSourceDescription description, int numberOfLines, BoundingBox boundingBox)
+    public bool UpdateMetadata(string dataset, string tableName, int numberOfLines, BoundingBox boundingBox)
     {
         // Load the collection
         var collection = mDatabase.GetCollection<MetadataObject>("datasets");
 
         // Find the dataset object
         var metadataObject = collection
-            .Find(g => g.basicData.DatasetId == description.dataset)
+            .Find(g => g.basicData.DatasetId == dataset)
             .FirstOrDefault();
 
         if (metadataObject == null)
         {
-            Console.WriteLine($"Could not find Metadata for dataset {description.dataset}.");
+            Console.WriteLine($"Could not find Metadata for dataset {dataset}.");
             return false;
         }
 
         // Load the existing table
-        var existingTable = metadataObject.additionalData.Tables.Find(t => t.Name == description.table_name);
+        var existingTable = metadataObject.additionalData.Tables.Find(t => t.Name == tableName);
         if (existingTable == null)
         {
             // Create a new table object if not present
             var newTable = new MetadataObject.TableData()
             {
-                Name = description.table_name,
+                Name = tableName,
                 NumberOfLines = numberOfLines,
                 BoundingBox = boundingBox
             };
             metadataObject.additionalData.Tables.Add(newTable);
-            collection.ReplaceOne(g => g.basicData.DatasetId == description.dataset, metadataObject);
+            collection.ReplaceOne(g => g.basicData.DatasetId == dataset, metadataObject);
             return true;
         }
 
@@ -92,7 +90,7 @@ public class MetadataDbHelper
         // always write the current Bounding box
         existingTable.BoundingBox = boundingBox;
 
-        collection.ReplaceOne(g => g.basicData.DatasetId == description.dataset, metadataObject);
+        collection.ReplaceOne(g => g.basicData.DatasetId == dataset, metadataObject);
         return true;
     }
 }

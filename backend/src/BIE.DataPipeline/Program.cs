@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using BIE.DataPipeline;
 using BIE.DataPipeline.Import;
-using BIE.DataPipeline.Metadata;
+using BieMetadata;
 using Mono.Options;
 
 // set the culture to be always en-US
@@ -127,7 +127,7 @@ try
 
     Console.WriteLine("Updating the metadata...");
     var boundingBox = dbHelper.GetBoundingBox(description.table_name);
-    if (!metadataDbHelper.UpdateMetadata(description, count, boundingBox))
+    if (!metadataDbHelper.UpdateMetadata(description.dataset, description.table_name, count, boundingBox))
     {
         return 1;
     }

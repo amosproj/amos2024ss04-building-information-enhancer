@@ -1,7 +1,8 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+// ReSharper disable InconsistentNaming
 
-namespace BIE.DataPipeline.Metadata;
+namespace BieMetadata;
 
 public class MetadataObject
 {
