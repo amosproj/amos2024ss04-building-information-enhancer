@@ -209,7 +209,6 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
         map.removeLayer(markerClusterGroup);
       };
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataset, currentMapCache.zoom, map, geoData]);
 
   return null;
