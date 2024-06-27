@@ -14,7 +14,9 @@ public class MetadataObject
     [BsonElement("additionalData")]
     public AdditionalData additionalData { get; set; } = new AdditionalData();
     
-    // The general and most important data about a dataset.
+    /// <summary>
+    /// The general and most important data about a dataset.
+    /// </summary>
     public class BasicData
     {
         public string DatasetId { get; set; } = string.Empty;
@@ -23,7 +25,9 @@ public class MetadataObject
         public string Icon { get; set; } = string.Empty;
     }
 
-    // The additional data for each of the datasets, queried at a request.
+    /// <summary>
+    /// The additional data for each of the datasets, queried at a request.
+    /// </summary>
     public class AdditionalData
     {
         public string Icon { get; set; } = string.Empty;
@@ -44,12 +48,16 @@ public class MetadataObject
         public List<TableData> Tables { get; set; } = new List<TableData>();
     }
     
-    // Table data populated by the data pipeline. Contains the name and the size of the all .yaml files correlated to that specific dataset.
+    /// <summary>
+    /// Table data populated by the data pipeline. Contains the name and the size of the all .yaml files correlated to that specific dataset.
+    /// </summary>
     public class TableData
     {
         // The name of the .yaml file
         public string Name { get; set; } = string.Empty;
         // The number of lines of data in that file.
         public int NumberOfLines { get; set; } = 0;
+        
+        public BoundingBox? BoundingBox { get; set; }
     }
 }

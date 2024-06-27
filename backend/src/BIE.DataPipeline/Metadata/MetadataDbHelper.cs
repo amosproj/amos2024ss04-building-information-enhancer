@@ -52,7 +52,7 @@ public class MetadataDbHelper
         return metadataObject;
     }
 
-    public void UpdateMetadata(DataSourceDescription description, int numberOfLines)
+    public bool UpdateMetadata(DataSourceDescription description, int numberOfLines, BoundingBox boundingBox)
     {
         // Load the collection
         var collection = mDatabase.GetCollection<MetadataObject>("datasets");
@@ -62,15 +62,26 @@ public class MetadataDbHelper
             .Find(g => g.basicData.DatasetId == description.dataset)
             .FirstOrDefault();
 
+        if (metadataObject == null)
+        {
+            Console.WriteLine($"Could not find Metadata for dataset {description.dataset}.");
+            return false;
+        }
+
         // Load the existing table
         var existingTable = metadataObject.additionalData.Tables.Find(t => t.Name == description.table_name);
         if (existingTable == null)
         {
             // Create a new table object if not present
-            var newTable = new MetadataObject.TableData() { Name = description.table_name, NumberOfLines = numberOfLines };
+            var newTable = new MetadataObject.TableData()
+            {
+                Name = description.table_name,
+                NumberOfLines = numberOfLines,
+                BoundingBox = boundingBox
+            };
             metadataObject.additionalData.Tables.Add(newTable);
             collection.ReplaceOne(g => g.basicData.DatasetId == description.dataset, metadataObject);
-            return;
+            return true;
         }
 
         // Table info already exists, for now just choose the larger number of lines number.
@@ -78,6 +89,10 @@ public class MetadataDbHelper
             ? numberOfLines
             : existingTable.NumberOfLines;
 
+        // always write the current Bounding box
+        existingTable.BoundingBox = boundingBox;
+
         collection.ReplaceOne(g => g.basicData.DatasetId == description.dataset, metadataObject);
+        return true;
     }
 }

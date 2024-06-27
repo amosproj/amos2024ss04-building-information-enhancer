@@ -19,7 +19,7 @@ namespace BIE.DataPipeline.Import
     internal class CsvImporter : IImporter
     {
         private TextFieldParser parser;
-        private DataSourceDescription? dataSourceDescription;
+        private DataSourceDescription dataSourceDescription;
         private Type[] columnTypes;
         private string[] fileHeader;
         private string[] yamlHeader;
@@ -29,7 +29,7 @@ namespace BIE.DataPipeline.Import
 
         private StringBuilder builder;
 
-        public CsvImporter(DataSourceDescription? dataSourceDescription)
+        public CsvImporter(DataSourceDescription dataSourceDescription)
         {
             // CultureInfo
             cultureInfo = new CultureInfo("en-US");
