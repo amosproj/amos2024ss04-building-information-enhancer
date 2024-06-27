@@ -98,18 +98,27 @@ try
     var count = 0;
     while (notEof)
     {
-        dbHelper.InsertData(line);
-        notEof = importer.ReadLine(out line);
-        count++;
+        try
+        {
+            dbHelper.InsertData(line);
+            notEof = importer.ReadLine(out line);
+            count++;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error inserting line {count} into the database:");
+            Console.WriteLine(e.Message);
+            break;
+            // Optionally, you can decide to break the loop or continue based on the type of error
+        }
     }
     Console.WriteLine($"Finished inserting {count} lines of data.");
-    if (description.source.data_format == "SHAPE")
+
+    if (dbHelper.CheckIfColumnExists(description))
     {
-        Console.WriteLine("Creating indexes...");
+
         dbHelper.CreateIndexes(description);
-        Console.WriteLine("Indexes created.");
-    }
-    
+    }    
     Console.WriteLine("Updating the metadata...");
     metadataDbHelper.UpdateMetadata(description, count);
     Console.WriteLine("The metadata was updated.");
