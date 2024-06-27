@@ -76,7 +76,7 @@ namespace BIE.Core.API.Controllers
 
                 // SQL Query to find intersecting points
                 var sqlQuery = $@"
-        SELECT operator, Location.AsTextZM() AS Location
+        SELECT top 1000  operator, Location.AsTextZM() AS Location
         FROM dbo.EV_charging_stations
         WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
         ";
@@ -144,8 +144,8 @@ namespace BIE.Core.API.Controllers
 
                 // SQL Query to find intersecting points
                 var sqlQuery = $@"
-SELECT Location.AsTextZM() AS Location, Location.STGeometryType() AS Type
-FROM dbo.Hausumringe_mittelfranken
+SELECT top 1000  Location.AsTextZM() AS Location, Location.STGeometryType() AS Type
+FROM dbo.Hausumringe_mittelfranken_small
 WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
 ";
                 Console.WriteLine(sqlQuery);
@@ -225,7 +225,7 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
                 Location.STAsText() AS Location,
                 geography::Point({0}, {1}, 4326).STDistance(Location) AS Distance
             FROM 
-                dbo.Hausumringe_mittelfranken
+                dbo.Hausumringe_mittelfranken_small
             WHERE
                 geography::Point({0}, {1}, 4326).STBuffer({2}).STIntersects(Location) = 1
             ORDER BY 
@@ -350,7 +350,7 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
 
                 string command = @"
          SELECT Top(1000) Id, Location.STAsText() AS Location, Location.STGeometryType() AS Type
-         FROM dbo.Hausumringe_mittelfranken
+         FROM dbo.Hausumringe_mittelfranken_small
          WHERE Location.STIntersects(geography::STGeomFromText('POLYGON((
             {0} {1},
             {0} {3},
@@ -444,10 +444,11 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
                     lstcordinate[i] = lstcordinate[i].Trim().Replace(" ",",");
                     var pairOfCoordinates = lstcordinate[i].Split(',');
                     lstcordinate[i] = pairOfCoordinates[1] + ',' + pairOfCoordinates[0];
+                    lstcordinate[i] = lstcordinate[i].Trim().Replace("(", "").Replace(")", "");
                 }
 
                 cordinate = string.Join("],[", lstcordinate);
-                cordinate ="["+cordinate+"]";
+                cordinate ="[["+cordinate+"]]";
                 return cordinate;
             }
             public static double[] CalculateCentroid(List<double[]> coordinates)
