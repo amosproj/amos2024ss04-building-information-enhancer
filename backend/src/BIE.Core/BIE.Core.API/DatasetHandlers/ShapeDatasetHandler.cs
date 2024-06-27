@@ -4,6 +4,6 @@ public class ShapeDatasetHandler : IDatasetHandler
 {
     public string GetDataInsideArea(float minX, float minY, float maxX, float maxY)
     {
-        
+        return "";
     }
 }

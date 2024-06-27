@@ -11,18 +11,19 @@ RUN apt-get update && apt-get install -y dos2unix
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /app
 
-COPY *.csproj .
-RUN dotnet restore
+COPY "./src/BIE.DataPipeline/BIE.DataPipeline.csproj" "./src/BIE.DataPipeline/"
+RUN dotnet restore "./src/BIE.DataPipeline/BIE.DataPipeline.csproj"
 
-COPY . ./
+COPY "./src/BIE.DataPipeline" "./src/BIE.DataPipeline"
+COPY ./lib/BieMetadata/bin ./lib/BieMetadata/bin
 
-RUN dotnet publish "BIE.DataPipeline.csproj" --output /app/ --configuration Release
+RUN dotnet publish "src/BIE.DataPipeline/BIE.DataPipeline.csproj" --output /app/ --configuration Release
 
 # Run the project
 FROM base AS final
 WORKDIR /app
 COPY --from=build /app .
 
-RUN dos2unix entrypoint.sh
+RUN dos2unix "src/BIE.DataPipeline/entrypoint.sh"
 
-ENTRYPOINT ["/bin/bash","entrypoint.sh"]
+ENTRYPOINT ["/bin/bash","src/BIE.DataPipeline/entrypoint.sh"]

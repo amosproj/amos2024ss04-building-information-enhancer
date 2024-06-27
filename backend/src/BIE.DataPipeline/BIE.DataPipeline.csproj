@@ -51,7 +51,7 @@
 
   <ItemGroup>
     <Reference Include="BieMetadata">
-      <HintPath>..\..\lib\BieMetadata\bin\Debug\net6.0\BieMetadata.dll</HintPath>
+      <HintPath>..\..\lib\BieMetadata\bin\Release\net6.0\BieMetadata.dll</HintPath>
     </Reference>
   </ItemGroup>
 

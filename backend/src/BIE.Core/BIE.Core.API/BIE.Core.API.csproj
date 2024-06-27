@@ -26,4 +26,10 @@
     <ProjectReference Include="..\BIE.Core.Services\BIE.Core.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="BieMetadata">
+      <HintPath>..\..\..\lib\BieMetadata\bin\Release\net6.0\BieMetadata.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
