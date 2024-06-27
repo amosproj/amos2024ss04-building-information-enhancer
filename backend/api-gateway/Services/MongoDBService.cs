@@ -18,5 +18,17 @@ namespace BIE.Core.API.Services
         {
             return _database.GetCollection<DatasetData>("datasets");
         }
+
+        /// <summary>
+        /// Get the Metadata for a specific dataset.
+        /// </summary>
+        /// <param name="dataset"></param>
+        /// <returns></returns>
+        public DatasetData? GetDatasetMetadata(string dataset)
+        {
+            var collection = GetDatasetsCollection();
+
+            return collection.Find(g => g.BasicData.DatasetId == dataset).FirstOrDefault();
+        }
     }
 }
