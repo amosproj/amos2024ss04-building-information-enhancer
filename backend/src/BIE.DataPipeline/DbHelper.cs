@@ -105,6 +105,35 @@ namespace BIE.DataPipeline
                 return false;
             }
         }
+        /// <summary>
+        /// Check if location column exists
+        /// </summary>
+        /// <param name="description"></param>
+        public bool CheckIfColumnExists(DataSourceDescription description)
+        {
+            string query = @"
+            SELECT t.name AS table_name, c.name AS column_name, ty.name AS data_type
+            FROM sys.columns c
+            JOIN sys.tables t ON c.object_id = t.object_id
+            JOIN sys.types ty ON c.user_type_id = ty.user_type_id
+            WHERE t.name = '"+description.table_name+"' AND c.name = 'Location' AND ty.name = 'geometry';";
+            var db = Database.Instance;
+
+            using (var command = db.CreateCommand(query))
+            {
+                var (reader, connection) = db.ExecuteReader(command);
+
+                try
+                {
+                    return reader.HasRows;
+                }
+                finally
+                {
+                    reader.Close();
+                    connection.Close();
+                }
+            }
+        }
 
         /// <summary>
         /// Create indexes for shape dataset on location column

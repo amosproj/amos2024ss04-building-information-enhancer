@@ -114,8 +114,11 @@ try
     }
     Console.WriteLine($"Finished inserting {count} lines of data.");
 
-    dbHelper.CreateIndexes(description);
-    
+    if (dbHelper.CheckIfColumnExists(description))
+    {
+
+        dbHelper.CreateIndexes(description);
+    }    
     Console.WriteLine("Updating the metadata...");
     metadataDbHelper.UpdateMetadata(description, count);
     Console.WriteLine("The metadata was updated.");
