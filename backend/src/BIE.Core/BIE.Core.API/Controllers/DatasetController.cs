@@ -76,6 +76,15 @@ namespace BIE.Core.API.Controllers
                 return BadRequest(ModelState);
             }
 
+            // check if the dataset is present in the Metadata
+            var metadata = MetadataDbHelper.GetMetadata(parameters.Id);
+            if (metadata == null)
+            {
+                return StatusCode(400, $"Unsupported dataset: {parameters.Id}");
+            }
+            
+            
+
             switch (parameters.Id)
             {
                 case "actual_use":
