@@ -4,5 +4,5 @@ namespace BIE.Core.API.DatasetHandlers;
 
 public interface IDatasetHandler
 {
-    public string GetDataInsideArea(string dataset, BoundingBox boundingBox);
+    public string GetDataInsideArea(BoundingBox boundingBox);
 }

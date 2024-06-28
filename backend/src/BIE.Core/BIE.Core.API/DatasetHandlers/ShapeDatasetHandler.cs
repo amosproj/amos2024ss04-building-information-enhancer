@@ -10,7 +10,16 @@ namespace BIE.Core.API.DatasetHandlers;
 
 public class ShapeDatasetHandler : IDatasetHandler
 {
-    public MetadataDbHelper MetadataDb { get; set; }
+    private MetadataObject mMetadata;
+
+    /// <summary>
+    /// Handler for the Shape Dataset Type. Scans multiple Tables and combines results.
+    /// </summary>
+    /// <param name="metadata"></param>
+    public ShapeDatasetHandler(MetadataObject metadata)
+    {
+        mMetadata = metadata;
+    }
 
     /// <summary>
     /// Get the data inside a bounding box
@@ -18,28 +27,14 @@ public class ShapeDatasetHandler : IDatasetHandler
     /// <param name="dataset"></param>
     /// <param name="boundingBox"></param>
     /// <returns></returns>
-    public string GetDataInsideArea(string dataset, BoundingBox boundingBox)
+    public string GetDataInsideArea(BoundingBox boundingBox)
     {
-        if (MetadataDb == null || !MetadataDb.Connected)
-        {
-            Console.WriteLine("Metadata DB is not reachable or not set.");
-            return "";
-        }
-
-        var metadata = MetadataDb.GetMetadata(dataset);
-
-        if (metadata == null)
-        {
-            Console.WriteLine($"Dataset {dataset} is not present in the metadata");
-            return "";
-        }
-
         var polygon = ApiHelper.GetPolygonFromBoundingBox(boundingBox);
 
         // the list of features from combined datasets.
         var features = new List<Dictionary<string, object>>();
 
-        foreach (var table in metadata.additionalData.Tables)
+        foreach (var table in mMetadata.additionalData.Tables)
         {
             if (!table.BoundingBox.HasValue)
             {

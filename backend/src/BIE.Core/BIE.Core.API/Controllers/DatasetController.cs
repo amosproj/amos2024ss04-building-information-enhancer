@@ -82,26 +82,25 @@ namespace BIE.Core.API.Controllers
             {
                 return StatusCode(400, $"Unsupported dataset: {parameters.Id}");
             }
-            
-            
 
-            switch (parameters.Id)
+            IDatasetHandler handler;
+
+            switch (metadata.additionalData.DataType)
             {
-                case "actual_use":
-                case "house_footprints":
-                    var handler = new ShapeDatasetHandler
-                    {
-                        MetadataDb = MetadataDbHelper
-                    };
-                    var boundingBox = ApiHelper.GetBoundingBoxFromParameters(parameters);
-                    return Ok(handler.GetDataInsideArea(parameters.Id, boundingBox));
-                // return GetHouseFootprintsData(parameters);
-                case "EV_charging_stations":
-                    return GetChargingStations(parameters);
+                case "SHAPE":
+                    handler = new ShapeDatasetHandler(metadata);
+                    break;
+                case "CSV":
+                    // TODO
+                    return StatusCode(500, "Datatype CSV not implemented");
+                    break;
                 default:
-                    _logger.LogWarning("Unsupported dataset ID: {Id}", parameters.Id);
-                    return StatusCode(400, $"Unsupported dataset ID of {parameters.Id}");
+                    Console.WriteLine($"Datatype {metadata.additionalData.DataType} is not known.");
+                    return StatusCode(400, $"Unsupported dataset type: {metadata.additionalData.DataType}");
             }
+
+            var boundingBox = ApiHelper.GetBoundingBoxFromParameters(parameters);
+            return Ok(handler.GetDataInsideArea(boundingBox));
         }
 
         private ActionResult GetChargingStations(QueryParameters parameters)
