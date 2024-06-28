@@ -257,15 +257,15 @@ namespace BIE.DataPipeline
             var bboxCmd = db.CreateCommand(bboxQuery);
             var (bboxReader, bboxConnection) = db.ExecuteReader(bboxCmd);
 
-            string minX = "", minY = "", maxX = "", maxY = "";
+            float minX = 0 , minY = 0, maxX = 0, maxY = 0;
 
             if (bboxReader.Read())
             {
-                var cultureInfo = new CultureInfo("en-US");
-                minX = ((double)bboxReader["MinX"]).ToString(cultureInfo);
-                minY = ((double)bboxReader["MinY"]).ToString(cultureInfo);
-                maxX = ((double)bboxReader["MaxX"]).ToString(cultureInfo);
-                maxY = ((double)bboxReader["MaxY"]).ToString(cultureInfo);
+                var culture = new CultureInfo("en-US");
+                minX = float.Parse(bboxReader["MinX"].ToString()!, culture);
+                minY = float.Parse(bboxReader["MinY"].ToString()!, culture);
+                maxX = float.Parse(bboxReader["MaxX"].ToString()!, culture);
+                maxY = float.Parse(bboxReader["MaxY"].ToString()!, culture);
             }
 
 
