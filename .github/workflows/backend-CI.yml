@@ -37,5 +37,5 @@ jobs:
         working-directory: backend\src\BIE.DataPipeline
 
       - name: Run unit tests
-        run: dotnet test "\src\BIE.DataPipeline"
+        run: dotnet test ".\src\BIE.DataPipeline"
         working-directory: backend
