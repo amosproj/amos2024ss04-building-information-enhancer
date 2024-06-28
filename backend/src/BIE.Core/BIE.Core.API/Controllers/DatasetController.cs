@@ -195,11 +195,9 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
         [ProducesResponseType(500)]
         public IActionResult LoadLocationData([FromBody, Required] LocationDataRequest request)
         {
-            _logger.LogInformation("Received request to load location data: {request}", request);
 
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning("Invalid model state: {ModelState}", ModelState);
                 return BadRequest(ModelState);
             }
 
@@ -208,59 +206,31 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
                 var coordinate = request.Location.FirstOrDefault();
                 if (coordinate == null)
                 {
-                    _logger.LogWarning("Location coordinates are required.");
                     return BadRequest("Location coordinates are required.");
                 }
 
                 var latitude = coordinate.Latitude;
                 var longitude = coordinate.Longitude;
                 var radius = 10000000; // Define the radius as needed
+                var buffer = 1000; // Define the buffer as needed
 
-                DbHelper.CreateDbConnection();
+                var houseFootprints = QueryParameters.GetHouseFootprints(latitude, longitude, radius);
+                var evChargingStations = QueryParameters.GetEVChargingStations(latitude, longitude, buffer);
 
-                string command = @"
-            SELECT TOP 5
-                Id,
-                Location.STArea() AS Area,
-                Location.STAsText() AS Location,
-                geography::Point({0}, {1}, 4326).STDistance(Location) AS Distance
-            FROM 
-                dbo.Hausumringe_mittelfranken_small
-            WHERE
-                geography::Point({0}, {1}, 4326).STBuffer({2}).STIntersects(Location) = 1
-            ORDER BY 
-                geography::Point({0}, {1}, 4326).STDistance(Location);";
-
-                string formattedQuery = string.Format(command, latitude, longitude, radius);
-                var response = new LocationDataResponse
+                var response = new
                 {
-                    CurrentDatasetData = new List<DatasetItem>()
+                    HouseFootprints = houseFootprints,
+                    EVChargingStations = evChargingStations
                 };
 
-                foreach (var row in DbHelper.GetData(formattedQuery, 600))
-                {
-                    var area = row["Area"];
-                    var distance = row["Distance"];
-                    var location = row["Location"];
-
-                    response.CurrentDatasetData.Add(new DatasetItem
-                    {
-                        Id = row["Id"].ToString(),
-                        Key = location,
-                        Value = $"{distance}m, {area}m^2",
-                        MapId = "house_footprints"
-                    });
-                }
-
-                _logger.LogInformation("Location data loaded successfully.");
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Exception occurred while loading location data.");
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
 
         /// <summary>
         /// WIP: DO NOT USE, Get a record
@@ -464,6 +434,44 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
 
                 return new double[] { centroidX / pointCount, centroidY / pointCount };
             }
+
+            public static List<Dictionary<string, string>> GetEVChargingStations(double latitude, double longitude, int buffer)
+            {
+                string command = @"
+        SELECT TOP 5
+            Id,
+            Location.STAsText() AS Location,
+            geometry::Point({0}, {1}, 4326).STDistance(Location) AS Distance
+        FROM 
+            dbo.EV_charging_stations
+        WHERE
+            geometry::Point({0}, {1}, 4326).STBuffer({2}).STIntersects(Location) = 1
+        ORDER BY 
+            geometry::Point({0}, {1}, 4326).STDistance(Location);";
+
+                string formattedQuery = string.Format(command, latitude, longitude, buffer);
+                return DbHelper.GetData(formattedQuery).ToList();
+            }
+
+            public static List<Dictionary<string, string>> GetHouseFootprints(double latitude, double longitude, int radius)
+            {
+                string command = @"
+        SELECT TOP 5
+            Id,
+            Location.STArea() AS Area,
+            Location.STAsText() AS Location,
+            geometry::Point({0}, {1}, 4326).STDistance(Location) AS Distance
+        FROM 
+            dbo.Hausumringe_mittelfranken_small
+        WHERE
+            geometry::Point({0}, {1}, 4326).STBuffer({2}).STIntersects(Location) = 1
+        ORDER BY 
+            geometry::Point({0}, {1}, 4326).STDistance(Location);";
+
+                string formattedQuery = string.Format(command, latitude, longitude, radius);
+                return DbHelper.GetData(formattedQuery).ToList();
+            }
+
             public static List<List<SpatialData>> ClusterData(List<SpatialData> data, int numberOfClusters)
             {
                 var centroids = data.Select(d => CalculateCentroid(d.Coordinates)).ToArray();
