@@ -37,7 +37,7 @@ jobs:
         working-directory: backend\src\BIE.DataPipeline
 
       - name: Build required Libraries
-        run: dotnet build "./BieMetadata.csproj"
+        run: dotnet build "./BieMetadata.csproj" -c Release
         working-directory: backend\lib\BieMetadata
 
       - name: Run unit tests
