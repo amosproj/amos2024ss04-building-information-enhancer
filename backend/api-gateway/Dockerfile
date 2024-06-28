@@ -13,7 +13,9 @@ RUN dotnet restore ./api-gateway/APIGateway.csproj
 # Copy the remaining source code
 COPY ./api-gateway ./api-gateway
 # Copy the Metadata Library
-COPY ./lib/BieMetadata/bin ./lib/BieMetadata/bin
+# Copy and build metadata library
+COPY ./lib/BieMetadata ./lib/BieMetadata
+RUN dotnet build "./lib/BieMetadata/BieMetadata.csproj" -c Release
 
 # Build the application
 RUN dotnet publish ./api-gateway/APIGateway.csproj -c Release -o out

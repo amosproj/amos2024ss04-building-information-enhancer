@@ -15,7 +15,10 @@ COPY "./src/BIE.DataPipeline/BIE.DataPipeline.csproj" "./src/BIE.DataPipeline/"
 RUN dotnet restore "./src/BIE.DataPipeline/BIE.DataPipeline.csproj"
 
 COPY "./src/BIE.DataPipeline" "./src/BIE.DataPipeline"
-COPY ./lib/BieMetadata/bin ./lib/BieMetadata/bin
+
+# Copy and build metadata library
+COPY ./lib/BieMetadata ./lib/BieMetadata
+RUN dotnet build "./lib/BieMetadata/BieMetadata.csproj" -c Release
 
 RUN dotnet publish "src/BIE.DataPipeline/BIE.DataPipeline.csproj" --output /app/ --configuration Release
 

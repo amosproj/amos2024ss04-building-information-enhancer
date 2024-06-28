@@ -17,9 +17,12 @@ COPY ["src/BIE.Core/BIE.Core.DBRepository/BIE.Core.DBRepository.csproj", "src/BI
 COPY ["src/BIE.Core/BIE.Data/BIE.Data.csproj", "src/BIE.Core/BIE.Data/"]
 RUN dotnet restore "src/BIE.Core/BIE.Core.API/BIE.Core.API.csproj"
 COPY "./src/BIE.Core" "./src/BIE.Core"
-COPY ./lib/BieMetadata/bin ./lib/BieMetadata/bin
 
 ### BUILD ###
+# Copy and build metadata library
+COPY ./lib/BieMetadata ./lib/BieMetadata
+RUN dotnet build "./lib/BieMetadata/BieMetadata.csproj" -c Release
+
 WORKDIR "/source/src/BIE.Core/BIE.Core.API"
 RUN dotnet build "BIE.Core.API.csproj" -c Release -o /app/build
 
