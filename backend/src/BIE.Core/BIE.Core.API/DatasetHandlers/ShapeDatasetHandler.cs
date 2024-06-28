@@ -54,11 +54,8 @@ public class ShapeDatasetHandler : IDatasetHandler
 
             // SQL Query to find intersecting points
 
-            var sqlQuery = $@"
-SELECT top 1000  Location.AsTextZM() AS Location, Location.STGeometryType() AS Type
-FROM dbo.{table.Name}
-WHERE Location.STIntersects(geometry::STGeomFromText('{polygon}', 4326)) = 1;";
-
+            var sqlQuery = $"SELECT top 1000  Location.AsTextZM() AS Location, Location.STGeometryType() AS Type" +
+                           ApiHelper.FromTableIntersectsPolygon(table.Name, polygon);
 
             foreach (var row in DbHelper.GetData(sqlQuery))
             {

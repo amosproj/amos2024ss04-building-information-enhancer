@@ -24,7 +24,7 @@ public static class ApiHelper
 
         return boundingBox;
     }
-    
+
     /// <summary>
     /// get the WKT (well known text) polygon from a bounding box.
     /// </summary>
@@ -56,7 +56,7 @@ public static class ApiHelper
     public static string GetPolygonFromQueryParameters(DatasetController.QueryParameters parameters)
     {
         var boundingBox = GetBoundingBoxFromParameters(parameters);
-        
+
         // Create polygon WKT from bounding box
         return GetPolygonFromBoundingBox(boundingBox);
     }
@@ -73,14 +73,27 @@ public static class ApiHelper
         var bottom1 = box1.minY;
         var right1 = box1.maxX;
         var top1 = box1.maxY;
-        
+
         var left2 = box2.minX;
         var bottom2 = box2.minY;
         var right2 = box2.maxX;
         var top2 = box2.maxY;
-        
+
         Console.WriteLine($"left1: {left1}, left2: {left2}");
 
         return !(right1 < left2 || right2 < left1 || top1 < bottom2 || top2 < bottom1);
+    }
+
+    /// <summary>
+    /// Gets the Query to filter a table via polygon Intersection. Presents the FROM part of a Query.
+    /// </summary>
+    /// <param name="tableName">the name of the table to filter</param>
+    /// <param name="polygon">the polygon string</param>
+    /// <returns></returns>
+    public static string FromTableIntersectsPolygon(string tableName, string polygon)
+    {
+        return $@"
+FROM dbo.{tableName}
+WHERE Location.STIntersects(geometry::STGeomFromText('{polygon}', 4326)) = 1;";
     }
 }

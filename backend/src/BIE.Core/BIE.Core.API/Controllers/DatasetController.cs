@@ -83,8 +83,8 @@ namespace BIE.Core.API.Controllers
                 return StatusCode(400, $"Unsupported dataset: {parameters.Id}");
             }
 
+            // select the correct Handler
             IDatasetHandler handler;
-
             switch (metadata.additionalData.DataType)
             {
                 case "SHAPE":
@@ -92,7 +92,7 @@ namespace BIE.Core.API.Controllers
                     break;
                 case "CSV":
                     // TODO
-                    return StatusCode(500, "Datatype CSV not implemented");
+                    handler = new CsvDatasetHandler(metadata);
                     break;
                 default:
                     Console.WriteLine($"Datatype {metadata.additionalData.DataType} is not known.");
