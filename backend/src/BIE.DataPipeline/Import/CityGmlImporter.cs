@@ -87,74 +87,23 @@ namespace BIE.DataPipeline.Import
             {
                 XmlNode buildingNode = buildingNodes[this.buildingIndex];
                 XmlNode groundSurfaceNode = buildingNode.SelectSingleNode(".//bldg:GroundSurface", this.nsmgr); 
+                if(groundSurfaceNode == null)
+                {
+                    Console.WriteLine("No Ground surface found");
+                    this.buildingIndex++;
+                    nextLine = "";
+                    return true;
+                }
                 XmlNode positionNode = groundSurfaceNode.SelectSingleNode(".//gml:posList", this.nsmgr);
-
-                Console.WriteLine();
-                if(groundSurfaceNode == null || positionNode == null)
+                if (positionNode == null)
                 {
-                    throw new Exception("nodes not foiund :(");
+                    Console.WriteLine("The ground surface has no position");
+                    this.buildingIndex++;
+                    nextLine = "";
+                    return true;
                 }
 
-                string utmCoordinates = positionNode.InnerText;
-                Console.WriteLine(utmCoordinates);
-                //Parse Coordinate string
-                var coordPairs = new List<(double Easting, double Northing)>();
-                var coords = utmCoordinates.Split(' ');
-
-                for (int i = 0; i < coords.Length; i += 3)
-                {
-                    if (double.TryParse(coords[i], out double easting) && double.TryParse(coords[i + 1], out double northing))
-                    {
-                        coordPairs.Add((easting, northing));
-                    }
-                }
-
-                //convert to wgs84
-                var wgs84Coordinates = new List<(double Lon, double Lat)>();
-
-                var csFactory = new CoordinateSystemFactory();
-                var utmZone32 = CoordinateSystemWktReader
-                .Parse("PROJCS[\"WGS 84 / UTM zone 32N\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS" +
-                       " 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]]" +
-                       ",PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433," +
-                       "AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION" +
-                       "[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER" +
-                       "[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\"" +
-                       ",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]]" +
-                       ",AUTHORITY[\"EPSG\",\"32632\"]]");
-                var utm32 = csFactory.CreateFromWkt(utmZone32.ToString());
-                var wgs84 = GeographicCoordinateSystem.WGS84;
-
-                var transform = new CoordinateTransformationFactory().CreateFromCoordinateSystems(utm32, wgs84).MathTransform;
-
-                foreach (var utmCoord in coordPairs)
-                {
-                    double[] utmPoint = { utmCoord.Easting, utmCoord.Northing };
-                    double[] wgs84Point = transform.Transform(utmPoint);
-                    wgs84Coordinates.Add((wgs84Point[0], wgs84Point[1]));
-                }
-
-                //Convert to polygon
-                if (wgs84Coordinates.Count < 4 || !wgs84Coordinates[0].Equals(wgs84Coordinates[wgs84Coordinates.Count - 1]))
-                {
-                    throw new ArgumentException("The coordinates must form a closed ring with at least 4 points.");
-                }
-
-                var coordinateArray = new Coordinate[wgs84Coordinates.Count];
-                for (int i = 0; i < wgs84Coordinates.Count; i++)
-                {
-                    coordinateArray[i] = new Coordinate(wgs84Coordinates[i].Lon, wgs84Coordinates[i].Lat);
-                }
-
-                var geometryFactory = new GeometryFactory();
-                var linearRing = new LinearRing(coordinateArray);
-                Geometry geometry = new Polygon(linearRing);
-                    Console.WriteLine();
-                foreach(Coordinate c in geometry.Coordinates)
-                {
-                    Console.WriteLine(c.X + " " + c.Y);
-                }
-                    Console.WriteLine();
+                Geometry geometry = UtmCoordinatesToGeometry(positionNode.InnerText);
 
                 nextLine = $"geography::STGeomFromText('{geometry.AsText()}', 4326)";
                 nextLine += string.Format(",'{0}'", buildingNode.InnerXml);
@@ -167,6 +116,63 @@ namespace BIE.DataPipeline.Import
                 nextLine = "";
                 return false;
             }
+        }
+
+        private Geometry UtmCoordinatesToGeometry(string utmCoordinates)
+        {
+            //Console.WriteLine(utmCoordinates);
+            //Parse Coordinate string
+            var coordPairs = new List<(double Easting, double Northing)>();
+            var coords = utmCoordinates.Split(' ');
+
+            for (int i = 0; i < coords.Length; i += 3)
+            {
+                if (double.TryParse(coords[i], out double easting) && double.TryParse(coords[i + 1], out double northing))
+                {
+                    coordPairs.Add((easting, northing));
+                }
+            }
+
+            //convert to wgs84
+            var wgs84Coordinates = new List<(double Lon, double Lat)>();
+
+            var csFactory = new CoordinateSystemFactory();
+            var utmZone32 = CoordinateSystemWktReader
+            .Parse("PROJCS[\"WGS 84 / UTM zone 32N\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS" +
+                   " 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]]" +
+                   ",PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433," +
+                   "AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION" +
+                   "[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER" +
+                   "[\"central_meridian\",9],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\"" +
+                   ",500000],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]]" +
+                   ",AUTHORITY[\"EPSG\",\"32632\"]]");
+            var utm32 = csFactory.CreateFromWkt(utmZone32.ToString());
+            var wgs84 = GeographicCoordinateSystem.WGS84;
+
+            var transform = new CoordinateTransformationFactory().CreateFromCoordinateSystems(utm32, wgs84).MathTransform;
+
+            foreach (var utmCoord in coordPairs)
+            {
+                double[] utmPoint = { utmCoord.Easting, utmCoord.Northing };
+                double[] wgs84Point = transform.Transform(utmPoint);
+                wgs84Coordinates.Add((wgs84Point[0], wgs84Point[1]));
+            }
+
+            //Convert to polygon
+            if (wgs84Coordinates.Count < 4 || !wgs84Coordinates[0].Equals(wgs84Coordinates[wgs84Coordinates.Count - 1]))
+            {
+                throw new ArgumentException("The coordinates must form a closed ring with at least 4 points.");
+            }
+
+            var coordinateArray = new Coordinate[wgs84Coordinates.Count];
+            for (int i = 0; i < wgs84Coordinates.Count; i++)
+            {
+                coordinateArray[i] = new Coordinate(wgs84Coordinates[i].Lon, wgs84Coordinates[i].Lat);
+            }
+
+            var geometryFactory = new GeometryFactory();
+            var linearRing = new LinearRing(coordinateArray);
+            return new Polygon(linearRing);
         }
 
         private Geometry ConvertUtmToLatLong(Geometry polygon)
