@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using BIE.Core.API.Controllers;
@@ -40,7 +41,7 @@ public class CsvDatasetHandler : IDatasetHandler
 
         // the list of features from combined datasets.
         var features = new List<Dictionary<string, object>>();
-
+        var culture = new CultureInfo("en-US");
 
         foreach (var row in DbHelper.GetData(query))
         {
@@ -52,8 +53,8 @@ public class CsvDatasetHandler : IDatasetHandler
                 .Replace(")", "")
                 .Split(' ');
             
-            var longitude = coordinates[0];
-            var latitude = coordinates[1];
+            var longitude = float.Parse(coordinates[0],culture);
+            var latitude = float.Parse(coordinates[1],culture);
 
             var feature = new Dictionary<string, object>
             {
@@ -61,9 +62,9 @@ public class CsvDatasetHandler : IDatasetHandler
                 {
                     "geometry", new Dictionary<string, object>
                     {
-                        { "type", $"{row["Type"]}" },
+                        { "type", "Point" },
                         {
-                            "coordinates", $"[{longitude}, {latitude}]"
+                            "coordinates", new List<float>{longitude, latitude}
                         }
                     }
                 },
