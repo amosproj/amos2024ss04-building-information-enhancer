@@ -4,6 +4,35 @@
         <name>BIE.Core.API</name>
     </assembly>
     <members>
+        <member name="M:BIE.Core.API.ApiHelper.GetBoundingBoxFromParameters(BIE.Core.API.Controllers.DatasetController.QueryParameters)">
+            <summary>
+            Get the Bounding Box from the query parameters.
+            </summary>
+            <param name="parameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BIE.Core.API.ApiHelper.GetPolygonFromBoundingBox(BieMetadata.BoundingBox)">
+            <summary>
+            get the WKT (well known text) polygon from a bounding box.
+            </summary>
+            <param name="boundingBox"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BIE.Core.API.ApiHelper.GetPolygonFromQueryParameters(BIE.Core.API.Controllers.DatasetController.QueryParameters)">
+            <summary>
+            Get the polygon of the bounding box given in the queryparameters
+            </summary>
+            <param name="parameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BIE.Core.API.ApiHelper.BoxIntersection(BieMetadata.BoundingBox,BieMetadata.BoundingBox)">
+            <summary>
+            returns true if two boxes are intersecting.
+            </summary>
+            <param name="box1"></param>
+            <param name="box2"></param>
+            <returns></returns>
+        </member>
         <member name="T:BIE.Core.API.Controllers.DatasetController">
             <summary>
             Batch controller
@@ -13,9 +42,7 @@
             <summary>
             Get viewport data. so Data for a specific rectangle returned as featurecollection
             </summary>
-            <param name="parameters">Nice</param>
             <returns></returns>
-            
         </member>
         <member name="M:BIE.Core.API.Controllers.DatasetController.LoadLocationData(BIE.Core.API.Controllers.LocationDataRequest)">
             <summary>
@@ -82,6 +109,14 @@
             Delete
             </summary>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BIE.Core.API.DatasetHandlers.ShapeDatasetHandler.GetDataInsideArea(System.String,BieMetadata.BoundingBox)">
+            <summary>
+            Get the data inside a bounding box
+            </summary>
+            <param name="dataset"></param>
+            <param name="boundingBox"></param>
             <returns></returns>
         </member>
         <member name="T:BIE.Core.API.Global">

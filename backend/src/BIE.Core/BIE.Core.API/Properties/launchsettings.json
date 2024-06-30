@@ -1,9 +1,7 @@
 {
   "profiles": {
-    "BIE.DataPipeline": {
+    "BIE.Core.API": {
       "commandName": "Project",
-      "commandLineArgs": "--behavior=replace common/actual_use_Kreisfreie_Stadt_Nuernberg.yaml",
-      "workingDirectory": "yaml",
       "environmentVariables": {
         "DB_SERVER": "localhost",
         "DB_NAME": "BIEDB",

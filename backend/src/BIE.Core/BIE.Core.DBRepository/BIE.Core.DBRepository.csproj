@@ -11,4 +11,8 @@
     <ProjectReference Include="..\BIE.Data\BIE.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Driver" Version="2.26.0" />
+  </ItemGroup>
+
 </Project>

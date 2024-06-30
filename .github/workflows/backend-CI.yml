@@ -36,6 +36,10 @@ jobs:
         run: dotnet restore
         working-directory: backend\src\BIE.DataPipeline
 
+      - name: Build required Libraries
+        run: dotnet build "./BieMetadata.csproj" -c Release
+        working-directory: backend\lib\BieMetadata
+
       - name: Run unit tests
-        run: dotnet test
-        working-directory: backend\src\BIE.DataPipeline
+        run: dotnet test ".\src\BIE.DataPipeline"
+        working-directory: backend

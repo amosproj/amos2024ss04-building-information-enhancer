@@ -6,19 +6,24 @@ EXPOSE 80
 EXPOSE 443
 
 ### COPY PROJECTS ###
+ENV C_DIR=src/BIE.Core
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-WORKDIR /src
-COPY ["BIE.Core.API/BIE.Core.API.csproj", "BIE.Core.API/"]
-COPY ["BIE.Core.DataObjects/BIE.Core.DataObjects.csproj", "BIE.Core.DataObjects/"]
-COPY ["BIE.Core.Services/BIE.Core.Services.csproj", "BIE.Core.Services/"]
-COPY ["BIE.Core.BaseRepository/BIE.Core.BaseRepository.csproj", "BIE.Core.BaseRepository/"]
-COPY ["BIE.Core.DBRepository/BIE.Core.DBRepository.csproj", "BIE.Core.DBRepository/"]
-COPY ["BIE.Data/BIE.Data.csproj", "BIE.Data/"]
-RUN dotnet restore "BIE.Core.API/BIE.Core.API.csproj"
-COPY . .
+WORKDIR /source
+COPY ["src/BIE.Core/BIE.Core.API/BIE.Core.API.csproj", "src/BIE.Core/BIE.Core.API/"]
+COPY ["src/BIE.Core/BIE.Core.DataObjects/BIE.Core.DataObjects.csproj", "src/BIE.Core/BIE.Core.DataObjects/"]
+COPY ["src/BIE.Core/BIE.Core.Services/BIE.Core.Services.csproj", "src/BIE.Core/BIE.Core.Services/"]
+COPY ["src/BIE.Core/BIE.Core.BaseRepository/BIE.Core.BaseRepository.csproj", "src/BIE.Core/BIE.Core.BaseRepository/"]
+COPY ["src/BIE.Core/BIE.Core.DBRepository/BIE.Core.DBRepository.csproj", "src/BIE.Core/BIE.Core.DBRepository/"]
+COPY ["src/BIE.Core/BIE.Data/BIE.Data.csproj", "src/BIE.Core/BIE.Data/"]
+RUN dotnet restore "src/BIE.Core/BIE.Core.API/BIE.Core.API.csproj"
+COPY "./src/BIE.Core" "./src/BIE.Core"
 
 ### BUILD ###
-WORKDIR "/src/BIE.Core.API"
+# Copy and build metadata library
+COPY ./lib/BieMetadata ./lib/BieMetadata
+RUN dotnet build "./lib/BieMetadata/BieMetadata.csproj" -c Release
+
+WORKDIR "/source/src/BIE.Core/BIE.Core.API"
 RUN dotnet build "BIE.Core.API.csproj" -c Release -o /app/build
 
 ### PUBLISH ###

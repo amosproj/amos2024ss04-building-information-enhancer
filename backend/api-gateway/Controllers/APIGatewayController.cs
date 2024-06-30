@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 using System.Text;
+using BieMetadata;
 
 namespace BIE.Core.API.Controllers
 {
