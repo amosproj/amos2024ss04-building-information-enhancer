@@ -1,9 +1,8 @@
-import React from "react";
+import React, { Fragment } from "react";
 import PopUp from "./PopUp";
 import { TabProps } from "../../contexts/TabsContext";
 import { Divider } from "@mui/material";
 import { Article, MapPin, Hash } from "@phosphor-icons/react";
-
 import "./TabInfoPopUp.css";
 
 interface TabInfoPopUpProps {
@@ -26,51 +25,58 @@ const TabInfoPopUp: React.FC<TabInfoPopUpProps> = ({
     >
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         <Divider />
-        <span
-          className="overline text-header"
-          style={{ paddingBottom: "1rem" }}
-        >
-          <Article size={20} weight="bold" /> <b>Dataset Description</b>
-        </span>
-        <span className="secondary-text" style={{ paddingBottom: "1rem" }}>
-          {currentTab.dataset.metaData?.longDescription}
-        </span>
-        <Divider />
-        <div className="tab-info-additional">
-          <span
-            className="overline text-header"
-            style={{ paddingBottom: "1rem" }}
-          >
-            <MapPin size={20} weight="bold" />
-            <b>Display Type: </b>
+        {currentTab.dataset.metaData ? (
+          <Fragment>
             <span
-              className="secondary-text"
-              style={{ textTransform: "capitalize" }}
+              className="overline text-header"
+              style={{ paddingBottom: "1rem" }}
             >
-              {currentTab.dataset.metaData
-                ? currentTab.dataset.metaData.type
-                : "None"}
+              <Article size={20} weight="bold" /> <b>Dataset Description</b>
             </span>
-          </span>
-          <span
-            className="overline text-header"
-            style={{ paddingBottom: "1rem" }}
-          >
-            <Hash size={20} weight="bold" />
-            <b>Total Data Points: </b>
-            <span
-              className="secondary-text"
-              style={{ textTransform: "capitalize" }}
-            >
-              {currentTab.dataset.metaData
-                ? currentTab.dataset.metaData.tables.reduce(
-                    (sum, table) => sum + table.numberOfLines,
-                    0
-                  )
-                : "0"}
+            <span className="secondary-text" style={{ paddingBottom: "1rem" }}>
+              {currentTab.dataset.metaData?.longDescription}
             </span>
-          </span>
-        </div>
+            <div className="tab-info-additional">
+              <span
+                className="overline text-header"
+                style={{ paddingBottom: "1rem" }}
+              >
+                <MapPin size={20} weight="bold" />
+                <b>Display Type: </b>
+                <span
+                  className="secondary-text"
+                  style={{ textTransform: "capitalize" }}
+                >
+                  {currentTab.dataset.metaData
+                    ? currentTab.dataset.metaData.type
+                    : "None"}
+                </span>
+              </span>
+              <span
+                className="overline text-header"
+                style={{ paddingBottom: "1rem" }}
+              >
+                <Hash size={20} weight="bold" />
+                <b>Total Data Points: </b>
+                <span
+                  className="secondary-text"
+                  style={{ textTransform: "capitalize" }}
+                >
+                  {currentTab.dataset.metaData
+                    ? currentTab.dataset.metaData.tables.reduce(
+                        (sum, table) => sum + table.numberOfLines,
+                        0
+                      )
+                    : "0"}
+                </span>
+              </span>
+            </div>
+          </Fragment>
+        ) : (
+          <div>
+            The metadata could not be fetched. Please check your connection.
+          </div>
+        )}
       </div>
     </PopUp>
   );
