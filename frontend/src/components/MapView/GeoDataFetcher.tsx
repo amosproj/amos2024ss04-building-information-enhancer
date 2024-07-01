@@ -3,8 +3,7 @@ import { LatLngBounds } from "leaflet";
 import { useContext, useEffect, useState } from "react";
 import { TabsContext } from "../../contexts/TabsContext";
 import { AlertContext } from "../../contexts/AlertContext";
-import axios from "axios";
-import { getAPIGatewayURL } from "../../services/metadataService";
+import { fetchViewportDataForDataset } from "../../services/viewportDataService";
 
 /***
  * Function to fetch the data from the backend.
@@ -14,7 +13,6 @@ const GeoDataFetcher = (
   id: string,
   bounds: LatLngBounds,
   zoom: number,
-
   onUpdate: (data: FeatureCollection<Geometry>, bounds: LatLngBounds) => void
 ): FeatureCollection<Geometry> | undefined => {
   const [data, setData] = useState<FeatureCollection<Geometry>>();
@@ -41,38 +39,18 @@ const GeoDataFetcher = (
       return;
     }
     const fetchData = async (bounds: LatLngBounds): Promise<void> => {
-      try {
-        // Define the query parameters
-        const params = {
-          BottomLat: bounds.getSouthWest().lat, // bottomLat,
-          BottomLong: bounds.getSouthWest().lng, //bottomLong,
-          TopLat: bounds.getNorthEast().lat, //topLat,
-          TopLong: bounds.getNorthEast().lng, //topLong,
-          ZoomLevel: zoom,
-          datasetID: id,
-        };
-        const response = await axios.get<FeatureCollection<Geometry>>(
-          getAPIGatewayURL() + "/api/getDatasetViewportData",
-          {
-            params,
-          }
-        );
-        setData(response.data);
-        onUpdate(response.data, bounds);
-      } catch (error) {
+      const viewportData = await fetchViewportDataForDataset(id, bounds, zoom);
+      if (viewportData) {
+        console.log("t");
+        setData(viewportData);
+        onUpdate(viewportData, bounds);
+      } else {
         // Display alert
         setCurrentAlertCache({
           ...currentAlertCache,
           isAlertOpened: true,
           text: "Fetching data failed.",
         });
-        console.error("Fetching data failed.", error);
-        // Console log the error
-        if (axios.isAxiosError(error)) {
-          console.error("Axios error fetching data:", error.message);
-        } else {
-          console.error("Unknown error fetching data:", error);
-        }
       }
     };
 
