@@ -41,7 +41,6 @@ const GeoDataFetcher = (
     const fetchData = async (bounds: LatLngBounds): Promise<void> => {
       const viewportData = await fetchViewportDataForDataset(id, bounds, zoom);
       if (viewportData) {
-        console.log("t");
         setData(viewportData);
         onUpdate(viewportData, bounds);
       } else {
