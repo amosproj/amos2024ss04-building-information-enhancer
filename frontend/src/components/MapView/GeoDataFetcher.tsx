@@ -4,9 +4,13 @@ import { useContext, useEffect, useState } from "react";
 import { TabsContext } from "../../contexts/TabsContext";
 import { AlertContext } from "../../contexts/AlertContext";
 import axios from "axios";
-import { getAPIGatewayURL } from "../../utils";
+import { getAPIGatewayURL } from "../../services/metadataService";
 
-const useGeoData = (
+/***
+ * Function to fetch the data from the backend.
+ * Connects to the API Gateway.
+ */
+const GeoDataFetcher = (
   id: string,
   bounds: LatLngBounds,
   zoom: number,
@@ -22,22 +26,15 @@ const useGeoData = (
     (tab) => tab.dataset.id === id
   );
 
-  // Returns the API Gateway URL of the endpoint for a specific dataset.
-  const getViewportDatasetEndpoint = (): string => {
-    switch (id) {
-      case "empty_map":
-        return "";
-      default:
-        return getAPIGatewayURL() + "/api/getDatasetViewportData";
-    }
-  };
-
+  // Fetch the data
   useEffect(() => {
+    // Check if empty map
     if (id === "empty_map") return;
+    // Check if the same viewport
     if (tabProps && tabProps.dataset.lastDataRequestBounds === bounds) {
-      console.log("SAME AS LAST TIME");
       return;
     }
+    // Check if
     if (tabProps && tabProps.dataset.type === "markers" && zoom <= 10) {
       setData(undefined);
       console.log("too far away");
@@ -54,9 +51,8 @@ const useGeoData = (
           ZoomLevel: zoom,
           datasetID: id,
         };
-        console.log(getViewportDatasetEndpoint());
         const response = await axios.get<FeatureCollection<Geometry>>(
-          getViewportDatasetEndpoint(),
+          getAPIGatewayURL() + "/api/getDatasetViewportData",
           {
             params,
           }
@@ -68,9 +64,9 @@ const useGeoData = (
         setCurrentAlertCache({
           ...currentAlertCache,
           isAlertOpened: true,
-          text: "Fetching data failed, using local GeoJSON data.",
+          text: "Fetching data failed.",
         });
-        console.error("Fetching data failed, using local GeoJSON data.", error);
+        console.error("Fetching data failed.", error);
         // Console log the error
         if (axios.isAxiosError(error)) {
           console.error("Axios error fetching data:", error.message);
@@ -87,4 +83,4 @@ const useGeoData = (
   return data;
 };
 
-export default useGeoData;
+export default GeoDataFetcher;

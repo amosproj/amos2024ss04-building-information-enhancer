@@ -8,28 +8,15 @@ import {
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
-
 import "./DatasetsList.css";
 import { AlertContext } from "../../contexts/AlertContext";
 import { FeatureCollection } from "geojson";
-import L, { LatLngBounds } from "leaflet";
-import { MarkersTypes } from "./MarkersTypes";
+import L from "leaflet";
+import { MarkersTypes } from "../../types/MarkersTypes";
 import axios from "axios";
-import { DatasetBasicData, DatasetMetaData } from "./DatasetTypes";
-import { getAPIGatewayURL } from "../../utils";
+import { Dataset, DatasetBasicData } from "../../types/DatasetTypes";
 import CustomSvgIcon from "./CustomSvgIcon";
-
-// Dataset Type
-export type Dataset = {
-  id: string;
-  displayName: string;
-  shortDescription: string;
-  type: MarkersTypes;
-  datasetIcon: JSX.Element;
-  data: FeatureCollection;
-  lastDataRequestBounds: LatLngBounds;
-  metaData: DatasetMetaData | undefined;
-};
+import { getAPIGatewayURL } from "../../services/metadataService";
 
 // Define an empty FeatureCollection
 const emptyFeatureCollection: FeatureCollection = {

@@ -15,10 +15,10 @@ import MapOptions from "./MapOptions";
 import { WMSTileLayer, ZoomControl } from "react-leaflet";
 import { MapContext } from "../../contexts/MapContext";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
-import { Dataset } from "../DatasetsList/DatasetsList";
 import MapDatasetVisualizer from "./MapDatasetVisualizer";
 import MapEventsHandler from "./MapEventsHandler";
 import ZoomWarningLabel from "./ZoomWarningLabel";
+import { Dataset } from "../../types/DatasetTypes";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -33,14 +33,29 @@ interface MapViewProps {
 }
 
 const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
-  const { currentTabsCache } = useContext(TabsContext);
+  const { currentTabsCache, getCurrentTab, getOrFetchMetadata } =
+    useContext(TabsContext);
   const [map, setMap] = useState<L.Map | null>(null);
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
   const [showSatellite, setShowSatellite] = useState<boolean>(false);
   const toggleShowSatellite = () => {
     setShowSatellite((prevShowSatellite: boolean) => !prevShowSatellite);
   };
+  const currentTab = getCurrentTab();
 
+  /**
+   * Fetches the metadata of the current tab on load.
+   */
+  useEffect(() => {
+    // Fetch the metadata
+    if (currentTab) {
+      getOrFetchMetadata(currentTab.dataset.id);
+    }
+  }, [currentTab, getCurrentTab, getOrFetchMetadata]);
+
+  /**
+   * Sets the current map cache on load
+   */
   useEffect(() => {
     if (map) {
       const initialBounds = map.getBounds();
@@ -61,10 +76,6 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
   const pinnedFeatureCollections = currentTabsCache.openedTabs
     .filter((tab: TabProps) => tab.ifPinned)
     .map((tab: TabProps) => tab.dataset);
-
-  const tabProps = currentTabsCache.openedTabs.find(
-    (tab: TabProps) => tab.dataset.id === datasetId
-  );
 
   // Check if the current geoData is in the pinnedFeatureCollections
   const isCurrentDataPinned = pinnedFeatureCollections.some(
@@ -90,10 +101,9 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
         {pinnedFeatureCollections.map((dataset: Dataset, index: number) => (
           <MapDatasetVisualizer dataset={dataset} key={index} />
         ))}
-        {!isCurrentDataPinned && tabProps && (
-          <MapDatasetVisualizer dataset={tabProps.dataset} />
+        {!isCurrentDataPinned && currentTab && (
+          <MapDatasetVisualizer dataset={currentTab.dataset} />
         )}
-
         <MapEventsHandler />
 
         {showSatellite ? (
@@ -124,7 +134,6 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.de/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              //bounds={L.latLngBounds([47.141, 5.561], [55.054, 15.579])}
             />
           </div>
         )}

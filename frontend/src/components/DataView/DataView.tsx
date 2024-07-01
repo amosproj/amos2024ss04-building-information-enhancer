@@ -7,7 +7,7 @@ import { Funnel, MapPin, MapPinLine } from "@phosphor-icons/react";
 import { MapContext } from "../../contexts/MapContext";
 import LoadDataButton from "./LoadDataButton";
 import axios from "axios";
-import { getAPIGatewayURL } from "../../utils";
+import { getAPIGatewayURL } from "../../services/metadataService";
 
 const loadLocationData = async (): Promise<
   LocationDataResponse | undefined
