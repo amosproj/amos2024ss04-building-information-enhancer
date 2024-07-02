@@ -38,9 +38,11 @@ const ThreeDView: React.FC = () => {
     cssRenderer.domElement.style.pointerEvents = "none"; // Allow mouse events to pass through
     mount.appendChild(cssRenderer.domElement);
 
-    // Initialize Leaflet map
+    // Ensure the map container is displayed and has dimensions before initializing Leaflet
     mapElement.style.display = "block"; // Ensure the element is visible
     mapElement.style.pointerEvents = "none"; // Ensure the element does not consume events
+
+    // Initialize Leaflet map
     const map = L.map(mapElement).setView([51.505, -0.09], 13);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -51,6 +53,11 @@ const ThreeDView: React.FC = () => {
     cssObject.rotation.x = -Math.PI / 2; // Rotate to lie flat
     cssObject.position.set(0, 0, 0); // Position at ground level
     scene.add(cssObject);
+
+    // Force Leaflet map to re-render
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 0);
 
     // Light
     const light = new THREE.DirectionalLight(0xffffff, 1);
@@ -84,6 +91,11 @@ const ThreeDView: React.FC = () => {
       }
       if (keyState["ArrowRight"] || keyState["KeyD"]) {
         camera.position.x += moveSpeed;
+      }
+
+      // Prevent camera from going below the map
+      if (camera.position.y < 1) {
+        camera.position.y = 1;
       }
     };
 
@@ -119,10 +131,10 @@ const ThreeDView: React.FC = () => {
       <div
         ref={mapRef}
         style={{
-          width: "1600px",
-          height: "1600px",
+          width: "400px",
+          height: "400px",
           position: "absolute",
-          display: "none", // Initially hidden
+          zIndex: -999,
         }}
       />
     </>
