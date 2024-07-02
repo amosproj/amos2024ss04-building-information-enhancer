@@ -187,7 +187,7 @@ namespace BIE.DataPipeline.Import
 
 
             [DefaultValue(null)]
-            public LocationToSQLPoint? location_to_SQL_point { get; set; }
+            public LocationToSQLPoint location_to_SQL_point { get; set; }
 
             public override bool Equals(object? obj)
             {

@@ -1,7 +1,6 @@
 using MongoDB.Driver;
 using Microsoft.Extensions.Configuration;
 using APIGateway.Models;
-using BieMetadata;
 
 namespace BIE.Core.API.Services
 {

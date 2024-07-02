@@ -1,11 +1,7 @@
-﻿using System.Globalization;
-using BIE.DataPipeline;
+﻿using BIE.DataPipeline;
 using BIE.DataPipeline.Import;
-using BieMetadata;
+using BIE.DataPipeline.Metadata;
 using Mono.Options;
-
-// set the culture to be always en-US
-CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
 
 // Setup the command line options
 var tableInsertBehaviour = InsertBehaviour.none;
@@ -40,7 +36,6 @@ if (!dbHelper.CheckConnection())
     Console.WriteLine("Could not establish database connection, exiting...");
     return 1;
 }
-
 Console.WriteLine("Established the database connection.");
 
 // End if Dataset can be skipped
@@ -117,21 +112,15 @@ try
             // Optionally, you can decide to break the loop or continue based on the type of error
         }
     }
-
     Console.WriteLine($"Finished inserting {count} lines of data.");
 
     if (dbHelper.CheckIfColumnExists(description))
     {
+
         dbHelper.CreateIndexes(description);
-    }
-
+    }    
     Console.WriteLine("Updating the metadata...");
-    var boundingBox = dbHelper.GetBoundingBox(description.table_name);
-    if (!metadataDbHelper.UpdateMetadata(description.dataset, description.table_name, count, boundingBox))
-    {
-        return 1;
-    }
-
+    metadataDbHelper.UpdateMetadata(description, count);
     Console.WriteLine("The metadata was updated.");
     Console.WriteLine("--------------------------------------------------------------");
 }
@@ -140,6 +129,16 @@ catch (Exception e)
     Console.WriteLine("Error inserting the data into the database:");
     Console.WriteLine(e);
     return 1;
+}
+
+try
+{
+}
+catch (Exception e)
+{
+    Console.WriteLine("Could not insert into Metadata DB");
+    Console.WriteLine(e);
+    throw;
 }
 
 return 0;

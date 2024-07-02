@@ -9,8 +9,4 @@
     <ProjectReference Include="..\BIE.Core.DataObjects\BIE.Core.DataObjects.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="2.26.0" />
-  </ItemGroup>
-
 </Project>

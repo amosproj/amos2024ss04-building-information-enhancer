@@ -1,14 +1,14 @@
-﻿using MongoDB.Driver;
+﻿using BIE.DataPipeline.Import;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
-namespace BieMetadata;
+namespace BIE.DataPipeline.Metadata;
 
 public class MetadataDbHelper
 {
     private string mMetaDataDbUrl;
 
     private IMongoDatabase mDatabase;
-    
-    public bool Connected { get; private set; }
 
     public MetadataDbHelper()
     {
@@ -30,7 +30,6 @@ public class MetadataDbHelper
             var connectionString = $"mongodb://datapipeline:datapipeline@{mMetaDataDbUrl}/bci-metadata";
             var client = new MongoClient(connectionString);
             mDatabase = client.GetDatabase("bci-metadata");
-            Connected = true;
             return true;
         }
         catch (Exception e)
@@ -40,54 +39,38 @@ public class MetadataDbHelper
         }
     }
 
-    /// <summary>
-    /// get the Metadata for a specified dataset. Returns null if dataset is not found.
-    /// </summary>
-    /// <param name="dataset"></param>
-    /// <returns></returns>
-    public MetadataObject? GetMetadata(string dataset)
+    public MetadataObject GetMetadata(DataSourceDescription description)
     {
         // Get the collection
         var collection = mDatabase.GetCollection<MetadataObject>("datasets");
 
         // Find the dataset object with the given ID
         var metadataObject = collection
-            .Find(g => g.basicData.DatasetId == dataset)
+            .Find(g => g.basicData.DatasetId == description.dataset)
             .FirstOrDefault();
 
         return metadataObject;
     }
 
-    public bool UpdateMetadata(string dataset, string tableName, int numberOfLines, BoundingBox boundingBox)
+    public void UpdateMetadata(DataSourceDescription description, int numberOfLines)
     {
         // Load the collection
         var collection = mDatabase.GetCollection<MetadataObject>("datasets");
 
         // Find the dataset object
         var metadataObject = collection
-            .Find(g => g.basicData.DatasetId == dataset)
+            .Find(g => g.basicData.DatasetId == description.dataset)
             .FirstOrDefault();
 
-        if (metadataObject == null)
-        {
-            Console.WriteLine($"Could not find Metadata for dataset {dataset}.");
-            return false;
-        }
-
         // Load the existing table
-        var existingTable = metadataObject.additionalData.Tables.Find(t => t.Name == tableName);
+        var existingTable = metadataObject.additionalData.Tables.Find(t => t.Name == description.table_name);
         if (existingTable == null)
         {
             // Create a new table object if not present
-            var newTable = new MetadataObject.TableData()
-            {
-                Name = tableName,
-                NumberOfLines = numberOfLines,
-                BoundingBox = boundingBox
-            };
+            var newTable = new MetadataObject.TableData() { Name = description.table_name, NumberOfLines = numberOfLines };
             metadataObject.additionalData.Tables.Add(newTable);
-            collection.ReplaceOne(g => g.basicData.DatasetId == dataset, metadataObject);
-            return true;
+            collection.ReplaceOne(g => g.basicData.DatasetId == description.dataset, metadataObject);
+            return;
         }
 
         // Table info already exists, for now just choose the larger number of lines number.
@@ -95,10 +78,6 @@ public class MetadataDbHelper
             ? numberOfLines
             : existingTable.NumberOfLines;
 
-        // always write the current Bounding box
-        existingTable.BoundingBox = boundingBox;
-
-        collection.ReplaceOne(g => g.basicData.DatasetId == dataset, metadataObject);
-        return true;
+        collection.ReplaceOne(g => g.basicData.DatasetId == description.dataset, metadataObject);
     }
 }

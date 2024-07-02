@@ -163,10 +163,8 @@ namespace BIE.DataPipeline.Import
                 // Extract latitude and longitude
                 double latitude = wgs84Point[1];
                 double longitude = wgs84Point[0];
-                // this has probably caused some issues...
-                // Lat = Y , Lon = X
-                coordinate.X = longitude;
-                coordinate.Y = latitude;
+                coordinate.X = latitude;
+                coordinate.Y = longitude;
             }
 
             return polygon;

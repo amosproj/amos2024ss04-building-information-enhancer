@@ -10,10 +10,9 @@ using Accord.MachineLearning;
 using Newtonsoft.Json;
 using System.Data;
 using System.ComponentModel.DataAnnotations;
+
 using System.Globalization;
 using System.Text;
-using BIE.Core.API.DatasetHandlers;
-using BieMetadata;
 using Microsoft.Extensions.Logging;
 
 namespace BIE.Core.API.Controllers
@@ -25,36 +24,11 @@ namespace BIE.Core.API.Controllers
     [ApiController]
     public class DatasetController : Controller
     {
-        // ReSharper disable once InconsistentNaming
         private readonly ILogger<DatasetController> _logger;
-
-        private MetadataDbHelper mMetadataDbHelper;
-
-        private MetadataDbHelper MetadataDbHelper
-        {
-            get
-            {
-                if (mMetadataDbHelper != null)
-                {
-                    return mMetadataDbHelper;
-                }
-
-                mMetadataDbHelper = new MetadataDbHelper();
-                if (mMetadataDbHelper.CreateConnection())
-                {
-                    return mMetadataDbHelper;
-                }
-
-                Console.WriteLine("could not establish Metadata-database Connection");
-                throw new Exception("no metadata DB reachable!");
-            }
-        }
 
         public DatasetController(ILogger<DatasetController> logger)
         {
             _logger = logger;
-
-            Console.WriteLine("setting up Dataset Controller");
         }
 
         /// <summary>
@@ -67,40 +41,24 @@ namespace BIE.Core.API.Controllers
         [ProducesResponseType(500)]
         public ActionResult GetDatasetViewportData([FromQuery] QueryParameters parameters)
         {
-            _logger.LogInformation($"Received request for GetDatasetViewportData with parameters: {parameters}");
-            Console.WriteLine("Get Viewport Data");
+            _logger.LogInformation("Received request for GetDatasetViewportData with parameters: {parameters}", parameters);
 
             if (!ModelState.IsValid)
             {
-                _logger.LogWarning($"Invalid model state: {ModelState}");
+                _logger.LogWarning("Invalid model state: {ModelState}", ModelState);
                 return BadRequest(ModelState);
             }
 
-            // check if the dataset is present in the Metadata
-            var metadata = MetadataDbHelper.GetMetadata(parameters.Id);
-            if (metadata == null)
+            switch (parameters.Id)
             {
-                return StatusCode(400, $"Unsupported dataset: {parameters.Id}");
-            }
-
-            // select the correct Handler
-            IDatasetHandler handler;
-            switch (metadata.additionalData.DataType)
-            {
-                case "SHAPE":
-                    handler = new ShapeDatasetHandler(metadata);
-                    break;
-                case "CSV":
-                    // TODO
-                    handler = new CsvDatasetHandler(metadata);
-                    break;
+                case "house_footprints":
+                    return GetHouseFootprintsData(parameters);
+                case "EV_charging_stations":
+                    return GetChargingStations(parameters);
                 default:
-                    Console.WriteLine($"Datatype {metadata.additionalData.DataType} is not known.");
-                    return StatusCode(400, $"Unsupported dataset type: {metadata.additionalData.DataType}");
+                    _logger.LogWarning("Unsupported dataset ID: {Id}", parameters.Id);
+                    return StatusCode(400, $"Unsupported dataset ID of {parameters.Id}");
             }
-
-            var boundingBox = ApiHelper.GetBoundingBoxFromParameters(parameters);
-            return Ok(handler.GetDataInsideArea(boundingBox));
         }
 
         private ActionResult GetChargingStations(QueryParameters parameters)
@@ -108,9 +66,13 @@ namespace BIE.Core.API.Controllers
             _logger.LogInformation("Fetching charging stations with parameters: {parameters}", parameters);
             try
             {
-                // Create polygon WKT from bounding box
-                var polygonWkt = ApiHelper.GetPolygonFromQueryParameters(parameters);
+                var bottomLat = parameters.BottomLat;
+                var bottomLong = parameters.BottomLong;
+                var topLat = parameters.TopLat;
+                var topLong = parameters.TopLong;
 
+                // Create polygon WKT from bounding box
+                var polygonWkt = $"POLYGON(({bottomLong.ToString(new CultureInfo("en-US"))} {bottomLat.ToString(new CultureInfo("en-US"))}, {topLong.ToString(new CultureInfo("en-US"))} {bottomLat.ToString(new CultureInfo("en-US"))}, {topLong.ToString(new CultureInfo("en-US"))} {topLat.ToString(new CultureInfo("en-US"))}, {bottomLong.ToString(new CultureInfo("en-US"))} {topLat.ToString(new CultureInfo("en-US"))}, {bottomLong.ToString(new CultureInfo("en-US"))} {bottomLat.ToString(new CultureInfo("en-US"))}))";
 
                 // SQL Query to find intersecting points
                 var sqlQuery = $@"
@@ -164,15 +126,21 @@ namespace BIE.Core.API.Controllers
         }
 
 
+
         private ActionResult GetHouseFootprintsData([FromQuery] QueryParameters parameters)
         {
             _logger.LogInformation("Fetching house footprints with parameters: {parameters}", parameters);
             try
             {
+                var bottomLong = parameters.BottomLat;
+                var bottomLat = parameters.BottomLong;
+                var topLong = parameters.TopLat;
+                var topLat = parameters.TopLong;
+
                 DbHelper.CreateDbConnection();
 
                 // Create polygon WKT from bounding box
-                var polygonWkt = ApiHelper.GetPolygonFromQueryParameters(parameters);
+                var polygonWkt = $"POLYGON(({bottomLong.ToString(new CultureInfo("en-US"))} {bottomLat.ToString(new CultureInfo("en-US"))}, {topLong.ToString(new CultureInfo("en-US"))} {bottomLat.ToString(new CultureInfo("en-US"))}, {topLong.ToString(new CultureInfo("en-US"))} {topLat.ToString(new CultureInfo("en-US"))}, {bottomLong.ToString(new CultureInfo("en-US"))} {topLat.ToString(new CultureInfo("en-US"))}, {bottomLong.ToString(new CultureInfo("en-US"))} {bottomLat.ToString(new CultureInfo("en-US"))}))";
 
                 // SQL Query to find intersecting points
                 var sqlQuery = $@"
@@ -397,18 +365,18 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
                     var location = new List<double[]>();
                     try
                     {
-                        location = row["Location"]
-                            .Replace("POLYGON ((", "").Replace("))", "")
-                            .Split(',')
-                            .Select(coord => coord.Trim().Split(' ')
-                                        .Select(double.Parse).ToArray()).ToList();
+                         location = row["Location"]
+                     .Replace("POLYGON ((", "").Replace("))", "")
+                     .Split(',')
+                     .Select(coord => coord.Trim().Split(' ')
+                     .Select(double.Parse).ToArray()).ToList();
+
                     }
                     catch (Exception ex)
                     {
                         _logger.LogWarning(ex, "Error parsing location coordinates.");
                         continue;
                     }
-
                     spatialDataList.Add(new SpatialData
                     {
                         Id = Convert.ToInt32(row["Id"]),
@@ -416,13 +384,11 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
                         Type = row["Type"]
                     });
                 }
-
                 if (spatialDataList.Count == 0)
                 {
                     _logger.LogInformation("No spatial data found.");
                     return Ok("{\"type\":\"FeatureCollection\",\"features\":[]}");
                 }
-
                 var clusters = QueryParameters.ClusterData(spatialDataList, Convert.ToInt32(parameters.ZoomLevel));
                 var geoJson = QueryParameters.ConvertToGeoJson(clusters);
                 _logger.LogInformation("Clustered data fetched successfully.");
@@ -438,9 +404,9 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
         public class SpatialData
         {
             public int Id { get; set; }
-            public List<double[]> Coordinates { get; set; }
+            public List<double[]> Coordinates { get; set; }  
             public string Type { get; set; }
-            public int ClusterId { get; set; }
+            public int ClusterId { get; set; } 
         }
 
 
@@ -473,19 +439,18 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
                 cordinate = cordinate.Replace("POLYGON ((", "");
                 cordinate = cordinate.Replace("))", "");
                 var lstcordinate = cordinate.Split(',');
-                for (int i = 0; i < lstcordinate.Length; i++)
+                for (int i = 0;i<lstcordinate.Length; i++)
                 {
-                    lstcordinate[i] = lstcordinate[i].Trim().Replace(" ", ",");
+                    lstcordinate[i] = lstcordinate[i].Trim().Replace(" ",",");
                     var pairOfCoordinates = lstcordinate[i].Split(',');
                     lstcordinate[i] = pairOfCoordinates[1] + ',' + pairOfCoordinates[0];
                     lstcordinate[i] = lstcordinate[i].Trim().Replace("(", "").Replace(")", "");
                 }
 
                 cordinate = string.Join("],[", lstcordinate);
-                cordinate = "[[" + cordinate + "]]";
+                cordinate ="[["+cordinate+"]]";
                 return cordinate;
             }
-
             public static double[] CalculateCentroid(List<double[]> coordinates)
             {
                 double centroidX = 0, centroidY = 0;
@@ -499,7 +464,6 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
 
                 return new double[] { centroidX / pointCount, centroidY / pointCount };
             }
-
             public static List<List<SpatialData>> ClusterData(List<SpatialData> data, int numberOfClusters)
             {
                 var centroids = data.Select(d => CalculateCentroid(d.Coordinates)).ToArray();
@@ -509,7 +473,7 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
 
                 for (int i = 0; i < labels.Length; i++)
                 {
-                    data[i].ClusterId = labels[i];
+                    data[i].ClusterId = labels[i];  
                 }
 
                 var clusteredData = new List<List<SpatialData>>();
@@ -561,7 +525,9 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
 
                 return featureCollection;
             }
+
         }
+
     }
 
     public class LocationDataRequest
