@@ -62,7 +62,6 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
 
   // Function to fetch metadata for the dataset
   const fetchMetadata = useCallback(async () => {
-    console.log("HEYYYYOOOOOOOO");
     try {
       setMetadataLoading(true); // Set loading state to true
       const params = {
@@ -140,27 +139,27 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
     currentMapCache.zoom,
     updateDatasetData
   );
-  const myCRS = new L.Proj.CRS(
+  /*const myCRS = new L.Proj.CRS(
     "EPSG:25832",
     "+proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
   );
   const coordsToLatLngWithCRS = (coords: number[]) => {
     const latLng = myCRS.unproject(L.point(coords[0], coords[1]));
     return latLng;
-  };
+  };*/
 
   useEffect(() => {
     if (!geoData) return;
 
     if (dataset.id === "house_footprints") {
       console.log("hi from data visualizer");
-
-      if (currentMapCache.zoom < 13) {
+      /*if (currentMapCache.zoom < 17) {
         const markerClusterGroup = L.markerClusterGroup();
         L.geoJson(geoData, {
-          coordsToLatLng: coordsToLatLngWithCRS,
+          //coordsToLatLng: coordsToLatLngWithCRS,
           onEachFeature: function (feature, featureLayer) {
             if (feature.geometry.type === "Polygon") {
+              console.log("inside polygon");
               const bounds = (
                 featureLayer as unknown as { getBounds: () => L.LatLngBounds }
               ).getBounds();
@@ -176,16 +175,19 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
         return () => {
           map.removeLayer(markerClusterGroup);
         };
-      } else {
-        const geojsonLayer = L.geoJson(geoData, {
-          coordsToLatLng: coordsToLatLngWithCRS,
-        });
+      } else {*/
+
+      try {
+        const geojsonLayer = L.geoJson(geoData);
         geojsonLayer.addTo(map);
 
         return () => {
           map.removeLayer(geojsonLayer);
         };
+      } catch (error) {
+        console.error("Error adding GeoJSON layer to the map:", error);
       }
+      //}
     } else {
       const geojsonLayer = L.geoJson(geoData, {
         pointToLayer: function (_feature, latlng) {
@@ -207,7 +209,6 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
         map.removeLayer(markerClusterGroup);
       };
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataset, currentMapCache.zoom, map, geoData]);
 
   return null;

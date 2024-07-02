@@ -21,6 +21,8 @@ namespace BIE.Data
         DbProviderFactory Factory { get; }
         DbCommand CreateSPCommand(string spName, List<DbParameter> parameters = null, DbTransaction trans = null);
         DbCommand CreateCommand(string query, DbTransaction trans = null);
+        DbCommand CreateCommand(string query, int commandTimeout, DbTransaction trans = null);
+
         void AddParameter(DbCommand cmd, string paramName, object value);
         DataSet LoadData(DbCommand cmd);
         object ExecuteScalar(DbCommand command);
@@ -63,6 +65,8 @@ namespace BIE.Data
             SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
             builder.DataSource = dbServer;
             builder.InitialCatalog = dbName;
+            builder.ConnectTimeout = int.Parse("600"); 
+
             if (trustedConnection)
                 builder.IntegratedSecurity = true;
             else
@@ -121,6 +125,22 @@ namespace BIE.Data
 
             return cmd;
         }
+
+        public DbCommand CreateCommand(string query, int commandTimeout, DbTransaction trans = null)
+        {
+            DbCommand cmd = Factory.CreateCommand();
+            cmd.CommandText = query;
+            cmd.CommandTimeout = commandTimeout; // Set the command timeout
+
+            if (trans != null)
+            {
+                cmd.Transaction = trans;
+            }
+
+            return cmd;
+        }
+
+
 
         public void AddParameter(DbCommand cmd, string paramName, object value)
         {

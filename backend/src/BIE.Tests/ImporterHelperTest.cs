@@ -15,7 +15,7 @@ namespace BIE.Tests
         [SetUp]
         public void SetUp()
         {
-            description = YamlImporter.GetSourceDescription(@".\yaml\unitTest.yaml");
+            description = YamlImporter.GetSourceDescription(@".\yaml\common\unitTest.yaml");
         }
 
         [Test]

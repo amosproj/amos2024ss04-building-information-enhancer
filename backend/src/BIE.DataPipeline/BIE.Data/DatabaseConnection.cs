@@ -15,6 +15,8 @@ namespace BIE.Data
                                                 bool trustedConnection);
         DbProviderFactory Factory { get; }
         DbCommand CreateSPCommand(string spName, List<DbParameter> parameters = null, DbTransaction trans = null);
+        (DbDataReader reader, DbConnection connection) ExecuteReader(DbCommand command);
+
         DbCommand CreateCommand(string query, DbTransaction trans = null);
         void AddParameter(DbCommand cmd, string paramName, object value);
         DataSet LoadData(DbCommand cmd);
@@ -102,6 +104,17 @@ namespace BIE.Data
             return con;
         }
 
+        public (DbDataReader reader, DbConnection connection) ExecuteReader(DbCommand command)
+        {
+            DbDataReader r;
+            var con = CreateConnection();
+            con.Open();
+            command.Connection = con;
+            command.CommandTimeout = 600;
+            r = command.ExecuteReader();
+
+            return (r, con);
+        }
         public DbProviderFactory Factory { get; private set; }
 
         public DbCommand CreateSPCommand(string spName, List<DbParameter> parameters = null, DbTransaction trans = null)
@@ -127,7 +140,6 @@ namespace BIE.Data
 
             return cmd;
         }
-
         public DbCommand CreateCommand(string query, DbTransaction trans = null)
         {
             DbCommand cmd = Factory.CreateCommand();
@@ -174,6 +186,7 @@ namespace BIE.Data
             con.Open();
             
             command.Connection = con;
+            command.CommandTimeout = 600;
             command.ExecuteNonQuery();
             
             con.Close();

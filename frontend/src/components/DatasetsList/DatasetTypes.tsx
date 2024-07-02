@@ -1,13 +1,20 @@
 export interface DatasetBasicData {
   datasetId: string;
   name: string;
-  description: string;
+  shortDescription: string;
   icon: string;
 }
 
 export interface DatasetMetaData {
   icon: string;
   type: string;
+  longDescription: string;
   minZoomLevel: number;
   displayProperty: string;
+  tables: Table[];
+}
+
+export interface Table {
+  name: string;
+  numberOfLines: number;
 }

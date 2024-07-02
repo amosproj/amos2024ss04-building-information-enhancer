@@ -14,7 +14,7 @@ public class Tests
     public void TestYamlImporter()
     {
         Console.WriteLine("Test Yaml Importer");
-        DataSourceDescription description = YamlImporter.GetSourceDescription(@".\yaml\test.yaml");
+        DataSourceDescription description = YamlImporter.GetSourceDescription(@".\yaml\common\EV_charging_stations.yaml");
         Assert.IsNotNull(description);
         char result = description.delimiter;
         Assert.That(result, Is.EqualTo(';'), "Delimiter should be ;");
