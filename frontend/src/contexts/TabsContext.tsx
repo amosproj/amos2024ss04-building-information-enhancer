@@ -76,6 +76,7 @@ export const TabsContextProvider: React.FC<TabsContextProviderProps> = ({
     // Try to fetch the metadata
     try {
       const metadata = await fetchMetadataForDataset(datasetID);
+      // Update the state with the fetched metadata
       setCurrentTabsCache((prevTabsCache) => {
         const updatedTabs = prevTabsCache.openedTabs.map((tab) =>
           tab.dataset.id === datasetID
@@ -84,10 +85,8 @@ export const TabsContextProvider: React.FC<TabsContextProviderProps> = ({
         );
         return { ...prevTabsCache, openedTabs: updatedTabs };
       });
-      const updatedTab = currentTabsCache.openedTabs.find(
-        (tab) => tab.dataset.id === datasetID
-      );
-      return updatedTab?.dataset.metaData;
+      // Return the fetched metadata directly
+      return metadata;
     } catch (error) {
       console.error("Failed to fetch metadata:", error);
       return undefined;
@@ -110,7 +109,7 @@ export const TabsContextProvider: React.FC<TabsContextProviderProps> = ({
     if (tab?.dataset.metaData) {
       return tab.dataset.metaData;
     } else {
-      return fetchAndSetMetadata(datasetID);
+      return await fetchAndSetMetadata(datasetID);
     }
   };
 

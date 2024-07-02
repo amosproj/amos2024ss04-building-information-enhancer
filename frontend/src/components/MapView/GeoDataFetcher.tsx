@@ -17,43 +17,67 @@ const GeoDataFetcher = (
 ): FeatureCollection<Geometry> | undefined => {
   const [data, setData] = useState<FeatureCollection<Geometry>>();
   const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
+  const { getOrFetchMetadata, getCurrentTab } = useContext(TabsContext);
 
-  const { currentTabsCache } = useContext(TabsContext);
+  const currentTab = getCurrentTab();
 
-  const tabProps = currentTabsCache.openedTabs.find(
-    (tab) => tab.dataset.id === id
-  );
-
-  // Fetch the data
-  useEffect(() => {
-    // Check if empty map
-    if (id === "empty_map") return;
-    // Check if the same viewport
-    if (tabProps && tabProps.dataset.lastDataRequestBounds === bounds) {
+  /**
+   * Checks if the metadata has been fetched, if not does it.
+   * Next, it fetches the viewport data itself.
+   */
+  const fetchMetadataAndData = async () => {
+    // Check if the currentTab is not defined or if it is an empty map
+    if (!currentTab || id === "empty_map") return;
+    // Skip if the viewport did not change
+    if (currentTab.dataset.lastDataRequestBounds === bounds) {
       return;
     }
-    // Check if
-    if (tabProps && tabProps.dataset.type === "markers" && zoom <= 10) {
+    // Fetch the metadata if not done so already
+    if (!currentTab.dataset.metaData) {
+      const metadata = await getOrFetchMetadata(currentTab.dataset.id);
+      // Update currentTab with the newly fetched metadata
+      currentTab.dataset.metaData = metadata;
+    }
+
+    // Check if the zoom threshold has not been achieved
+    console.log(
+      "Read min Zoom level: " + currentTab.dataset.metaData!.minZoomLevel
+    );
+    if (
+      currentTab &&
+      currentTab.dataset.type === "markers" &&
+      zoom <= currentTab.dataset.metaData!.minZoomLevel
+    ) {
       setData(undefined);
-      console.log("too far away");
       return;
     }
-    const fetchData = async (bounds: LatLngBounds): Promise<void> => {
-      const viewportData = await fetchViewportDataForDataset(id, bounds, zoom);
-      if (viewportData) {
-        setData(viewportData);
-        onUpdate(viewportData, bounds);
-      } else {
-        // Display alert
-        setCurrentAlertCache({
-          ...currentAlertCache,
-          isAlertOpened: true,
-          text: "Fetching data failed.",
-        });
-      }
-    };
-
     fetchData(bounds);
+  };
+
+  /**
+   * Fetches the viewport data for a specific dataset.
+   * @param bounds the bounds of the viewport
+   */
+  const fetchData = async (bounds: LatLngBounds): Promise<void> => {
+    const viewportData = await fetchViewportDataForDataset(id, bounds, zoom);
+    if (viewportData) {
+      setData(viewportData);
+      onUpdate(viewportData, bounds);
+    } else {
+      // Display alert
+      setCurrentAlertCache({
+        ...currentAlertCache,
+        isAlertOpened: true,
+        text: "Fetching data failed.",
+      });
+    }
+  };
+
+  /**
+   * Fetches the data whenever the viewport, zoom or datasetID changes.
+   */
+  useEffect(() => {
+    fetchMetadataAndData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bounds, zoom, id]);
 
