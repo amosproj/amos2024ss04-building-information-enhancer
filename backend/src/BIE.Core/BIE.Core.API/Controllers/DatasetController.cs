@@ -285,7 +285,7 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
                 string command = $@"
                 SELECT TOP 1000
                     {columnsString},
-                    Location.STArea() AS Area,
+                    geography::STGeomFromText(Location.STAsText(),4326).STArea() AS Area,
                     Location.STAsText() AS Location
                 FROM 
                     dbo.{datasetId}
@@ -297,25 +297,6 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
             _logger.LogInformation(command);
 
             return DbHelper.GetData(command);
-        }
-
-        public static List<Dictionary<string, string>> GetHouseFootprints(double latitude, double longitude, int radius)
-        {
-            string command = @"
-        SELECT TOP 5
-            Id,
-            Location.STArea() AS Area,
-            Location.STAsText() AS Location,
-            geometry::Point({0}, {1}, 4326).STDistance(Location) AS Distance
-        FROM 
-            dbo.Hausumringe_mittelfranken_small
-        WHERE
-            geometry::Point({0}, {1}, 4326).STBuffer({2}).STIntersects(Location) = 1
-        ORDER BY 
-            geometry::Point({0}, {1}, 4326).STDistance(Location);";
-
-            string formattedQuery = string.Format(command, latitude, longitude, radius);
-            return DbHelper.GetData(formattedQuery).ToList();
         }
 
         public static List<List<SpatialData>> ClusterData(List<SpatialData> data, int numberOfClusters)

@@ -11,13 +11,12 @@ import { getAPIGatewayURL } from "../../utils";
 
 const loadLocationData = async (
   latitude: number,
-  longitude: number
+  longitude: number,
+  datasetId: string
 ): Promise<LocationDataResponse | undefined> => {
   const requestBody = {
-    datasetId: "example_dataset",
-    location: [
-      { latitude, longitude }, // Example coordinate
-    ],
+    datasetId: datasetId,
+    location: [{ latitude, longitude }],
   };
 
   try {
@@ -82,7 +81,11 @@ function DataView() {
         ...currentMapCache,
         loadedCoordinates: currentMapCache.selectedCoordinates,
       });
-      const responseData = await loadLocationData(lat, lng);
+      const responseData = await loadLocationData(
+        lat,
+        lng,
+        getCurrentTabTitle()
+      );
       setData(responseData);
     }
   };
