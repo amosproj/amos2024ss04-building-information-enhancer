@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using Accord.Math;
 using BIE.Core.API.Controllers;
 using BieMetadata;
 
@@ -7,6 +10,8 @@ namespace BIE.Core.API;
 
 public static class ApiHelper
 {
+    private static CultureInfo sCultureInfo = new CultureInfo("en-US");
+
     /// <summary>
     /// Get the Bounding Box from the query parameters.
     /// </summary>
@@ -95,5 +100,30 @@ public static class ApiHelper
         return $@"
 FROM dbo.{tableName}
 WHERE Location.STIntersects(geometry::STGeomFromText('{polygon}', 4326)) = 1;";
+    }
+
+    /// <summary>
+    /// Gets the float coordinates from the polygon string
+    /// </summary>
+    /// <param name="polygon"></param>
+    /// <returns></returns>
+    public static float[][] GetCoordinatesFromPolygon(string polygon)
+    {
+        // example:
+        // POLYGON ((49.496927347229494 11.060226859896797, ..., 49.496927347229494 11.060226859896797))
+        var substring = polygon.Substring(10, polygon.Length - 12);
+        var coordinatePairs = substring.Replace("(", "").Replace(")", "").Split(",");
+        var floatList = coordinatePairs.Select(pair => pair.Trim().Split(" ").Select(StringToFloat).ToArray());
+        return floatList.ToArray();
+    }
+
+    /// <summary>
+    /// Casts a string to a Float using the en-US culture.
+    /// </summary>
+    /// <param name="s"></param>
+    /// <returns></returns>
+    public static float StringToFloat(string s)
+    {
+        return float.Parse(s, sCultureInfo);
     }
 }

@@ -33,6 +33,28 @@
             <param name="box2"></param>
             <returns></returns>
         </member>
+        <member name="M:BIE.Core.API.ApiHelper.FromTableIntersectsPolygon(System.String,System.String)">
+            <summary>
+            Gets the Query to filter a table via polygon Intersection. Presents the FROM part of a Query.
+            </summary>
+            <param name="tableName">the name of the table to filter</param>
+            <param name="polygon">the polygon string</param>
+            <returns></returns>
+        </member>
+        <member name="M:BIE.Core.API.ApiHelper.GetCoordinatesFromPolygon(System.String)">
+            <summary>
+            Gets the float coordinates from the polygon string
+            </summary>
+            <param name="polygon"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BIE.Core.API.ApiHelper.StringToFloat(System.String)">
+            <summary>
+            Casts a string to a Float using the en-US culture.
+            </summary>
+            <param name="s"></param>
+            <returns></returns>
+        </member>
         <member name="T:BIE.Core.API.Controllers.DatasetController">
             <summary>
             Batch controller
@@ -111,7 +133,24 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:BIE.Core.API.DatasetHandlers.ShapeDatasetHandler.GetDataInsideArea(System.String,BieMetadata.BoundingBox)">
+        <member name="T:BIE.Core.API.DatasetHandlers.CsvDatasetHandler">
+            <summary>
+            Handler for the CSV Datatype. Assumes a single table. Uses a Geometry row named
+            </summary>
+        </member>
+        <member name="M:BIE.Core.API.DatasetHandlers.CsvDatasetHandler.#ctor(BieMetadata.MetadataObject)">
+            <summary>
+            Handler for the CSV Datatype. Assumes a single table. Uses a Geometry row named
+            </summary>
+            <param name="metadata"></param>
+        </member>
+        <member name="M:BIE.Core.API.DatasetHandlers.ShapeDatasetHandler.#ctor(BieMetadata.MetadataObject)">
+            <summary>
+            Handler for the Shape Dataset Type. Scans multiple Tables and combines results.
+            </summary>
+            <param name="metadata"></param>
+        </member>
+        <member name="M:BIE.Core.API.DatasetHandlers.ShapeDatasetHandler.GetDataInsideArea(BieMetadata.BoundingBox)">
             <summary>
             Get the data inside a bounding box
             </summary>

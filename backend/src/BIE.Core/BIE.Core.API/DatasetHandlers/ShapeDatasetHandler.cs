@@ -67,8 +67,7 @@ public class ShapeDatasetHandler : IDatasetHandler
                         {
                             { "type", $"{row["Type"]}" },
                             {
-                                "coordinates",
-                                $"[{DatasetController.QueryParameters.GetPolygonCordinates(row["Location"])}]"
+                                "coordinates", ApiHelper.GetCoordinatesFromPolygon(row["Location"])
                             }
                         }
                     },
