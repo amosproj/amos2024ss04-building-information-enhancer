@@ -107,14 +107,14 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygon}', 4326)) = 1;";
     /// </summary>
     /// <param name="polygon"></param>
     /// <returns></returns>
-    public static float[][] GetCoordinatesFromPolygon(string polygon)
+    public static float[][][] GetCoordinatesFromPolygon(string polygon)
     {
         // example:
         // POLYGON ((49.496927347229494 11.060226859896797, ..., 49.496927347229494 11.060226859896797))
         var substring = polygon.Substring(10, polygon.Length - 12);
         var coordinatePairs = substring.Replace("(", "").Replace(")", "").Split(",");
         var floatList = coordinatePairs.Select(pair => pair.Trim().Split(" ").Select(StringToFloat).ToArray());
-        return floatList.ToArray();
+        return new []{floatList.ToArray()};
     }
 
     /// <summary>
