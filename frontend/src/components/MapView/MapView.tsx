@@ -1,24 +1,25 @@
-import { useContext, useEffect, useState } from "react";
-import { MapContainer } from "react-leaflet/MapContainer";
-
-import { TileLayer } from "react-leaflet/TileLayer";
+import { Fragment, useContext, useEffect, useState } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  WMSTileLayer,
+  ZoomControl,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet.markercluster";
-
 import "./MapView.css";
 import L from "leaflet";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import MapOptions from "./MapOptions";
-import { WMSTileLayer, ZoomControl } from "react-leaflet";
 import { MapContext } from "../../contexts/MapContext";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
 import MapDatasetVisualizer from "./MapDatasetVisualizer";
 import MapEventsHandler from "./MapEventsHandler";
-import ZoomWarningLabel from "./ZoomWarningLabel";
 import { Dataset } from "../../types/DatasetTypes";
+import ZoomWarningLabel from "../ZoomWarningLabel/ZoomWarningLabel";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -38,24 +39,20 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
   const [map, setMap] = useState<L.Map | null>(null);
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
   const [showSatellite, setShowSatellite] = useState<boolean>(false);
+  const [isGrayscale, setIsGrayscale] = useState<boolean>(false);
+
   const toggleShowSatellite = () => {
     setShowSatellite((prevShowSatellite: boolean) => !prevShowSatellite);
   };
+
   const currentTab = getCurrentTab();
 
-  /**
-   * Fetches the metadata of the current tab on load.
-   */
   useEffect(() => {
-    // Fetch the metadata
     if (currentTab) {
       getOrFetchMetadata(currentTab.dataset.id);
     }
-  }, [currentTab, getCurrentTab, getOrFetchMetadata]);
+  }, [currentTab, getOrFetchMetadata]);
 
-  /**
-   * Sets the current map cache on load
-   */
   useEffect(() => {
     if (map) {
       const initialBounds = map.getBounds();
@@ -72,17 +69,31 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
     }
   }, [map, setCurrentMapCache]);
 
-  // Get the feature collections from pinned tabs
+  useEffect(() => {
+    if (currentTab && currentTab.dataset.metaData) {
+      setIsGrayscale(
+        currentMapCache.zoom <= currentTab.dataset.metaData.minZoomLevel
+      );
+    }
+  }, [currentMapCache.zoom, currentTab]);
+
+  useEffect(() => {
+    if (map) {
+      if (isGrayscale) {
+        map.getContainer().classList.add("grayscale-overlay");
+      } else {
+        map.getContainer().classList.remove("grayscale-overlay");
+      }
+    }
+  }, [isGrayscale, map]);
+
   const pinnedFeatureCollections = currentTabsCache.openedTabs
     .filter((tab: TabProps) => tab.ifPinned)
     .map((tab: TabProps) => tab.dataset);
 
-  // Check if the current geoData is in the pinnedFeatureCollections
   const isCurrentDataPinned = pinnedFeatureCollections.some(
     (dataset: Dataset) => dataset.id === datasetId
   );
-  //console.log("current data pinned" + isCurrentDataPinned);
-  const minZoomForLabel = 10;
 
   return (
     <div className="tab-map-container">
@@ -97,15 +108,19 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
         minZoom={6}
       >
         <ZoomControl position="topright" />
-
-        {pinnedFeatureCollections.map((dataset: Dataset, index: number) => (
-          <MapDatasetVisualizer dataset={dataset} key={index} />
-        ))}
-        {!isCurrentDataPinned && currentTab && (
-          <MapDatasetVisualizer dataset={currentTab.dataset} />
+        {isGrayscale ? (
+          <Fragment />
+        ) : (
+          <div>
+            {pinnedFeatureCollections.map((dataset: Dataset, index: number) => (
+              <MapDatasetVisualizer dataset={dataset} key={index} />
+            ))}
+            {!isCurrentDataPinned && currentTab && (
+              <MapDatasetVisualizer dataset={currentTab.dataset} />
+            )}
+          </div>
         )}
         <MapEventsHandler />
-
         {showSatellite ? (
           <div>
             <TileLayer
@@ -137,11 +152,7 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
             />
           </div>
         )}
-
-        <ZoomWarningLabel
-          label="Zoom in to see the markers"
-          minZoom={minZoomForLabel}
-        />
+        <ZoomWarningLabel />
       </MapContainer>
     </div>
   );

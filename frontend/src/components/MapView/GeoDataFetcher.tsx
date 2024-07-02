@@ -38,11 +38,7 @@ const GeoDataFetcher = (
       // Update currentTab with the newly fetched metadata
       currentTab.dataset.metaData = metadata;
     }
-
     // Check if the zoom threshold has not been achieved
-    console.log(
-      "Read min Zoom level: " + currentTab.dataset.metaData!.minZoomLevel
-    );
     if (
       currentTab &&
       currentTab.dataset.type === "markers" &&
