@@ -118,7 +118,13 @@ const SearchBar: React.FC = () => {
 
         if(item.area && item.bounds){
             mapInstance.flyToBounds(item.bounds, { animate: true, duration: 5 });
-            const drawPolygon = L.geoJSON(item.polygon) ;
+            const drawPolygon = L.geoJSON(item.polygon, {
+              style: {
+                color: '#ff0000', 
+                weight: 2,       
+                fillOpacity: 0   
+              }
+            }) ;
             drawPolygon.addTo(mapInstance);
             setCurrentMapCache({
               ...currentMapCache,
@@ -141,6 +147,15 @@ const SearchBar: React.FC = () => {
     return Array.from(uniqueOptions.values());
   };
 
+  const handleSearchIconClick = () => {
+    if (options.length > 0) {
+      onItemSelected(options[0]);
+    } else {
+      console.log("No suggestions available.");
+    }
+  };
+
+
   return (
     <>
     <Autocomplete
@@ -156,8 +171,6 @@ const SearchBar: React.FC = () => {
       autoComplete
       includeInputInList
       filterSelectedOptions
-      value={null}
-      disableClearable={false}
       onChange={(_event, newValue) => {
         if (typeof newValue === "string"){
             return;
@@ -175,6 +188,13 @@ const SearchBar: React.FC = () => {
       }}
 
       onInputChange={(_event, newInputValue) => {
+        if (newInputValue === ""){
+          currentMapCache.polygon?.remove();
+          setCurrentMapCache({
+            ...currentMapCache,
+            polygon: null,
+          });
+        }
         setInputValue(newInputValue);
       }}
       renderInput={(params) => (
@@ -187,7 +207,6 @@ const SearchBar: React.FC = () => {
             </div>
           }
         size="small"
-        //fullWidth 
         sx={{
             width: 150,
             '&:focus-within':{
@@ -195,6 +214,17 @@ const SearchBar: React.FC = () => {
             },
             transition: 'width 0s',
             backgroundColor:'white',
+          }}
+          InputProps={{
+            ...params.InputProps,
+            endAdornment: (
+              <>
+                <IconButton onClick={handleSearchIconClick}>
+                  <MagnifyingGlass size={20} />
+                </IconButton>
+                {params.InputProps.endAdornment}
+              </>
+            ),
           }}
     />
 
