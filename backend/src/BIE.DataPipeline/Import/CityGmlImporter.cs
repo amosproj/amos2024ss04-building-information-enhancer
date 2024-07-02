@@ -105,8 +105,11 @@ namespace BIE.DataPipeline.Import
 
                 Geometry geometry = UtmCoordinatesToGeometry(positionNode.InnerText);
 
+                float groundHeight = GetBuildingGroundHeight(buildingNode);
+
                 nextLine = $"geography::STGeomFromText('{geometry.AsText()}', 4326)";
                 nextLine += string.Format(",'{0}'", buildingNode.InnerXml);
+                nextLine += string.Format(",'{0}'", groundHeight.ToString());//TODO add culture info
 
                 this.buildingIndex++;
                 return true;
@@ -193,6 +196,20 @@ namespace BIE.DataPipeline.Import
             }
 
             return polygon;
+        }
+
+        private float GetBuildingGroundHeight(XmlNode buildingNode)
+        {
+            XmlNode groundHeightNode = buildingNode.SelectSingleNode(".//gen:stringAttribute[@name='DatenquelleBodenhoehe']/gen:value", this.nsmgr);
+
+            float result = 0;
+            if(!float.TryParse(groundHeightNode.InnerText, out result)) //TODO add culture info
+            {
+                Console.WriteLine("Unable to get ground height");
+                return -1;
+            }
+
+            return result;
         }
     }
 }

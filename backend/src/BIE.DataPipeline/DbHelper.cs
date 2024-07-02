@@ -11,7 +11,7 @@ namespace BIE.DataPipeline
         private readonly StringBuilder mStringBuilder;
 
         private int mCount;
-        private const int MaxCount = 900;
+        private const int MaxCount = 1;//900;
 
         public DbHelper()
         {
@@ -171,7 +171,8 @@ BEGIN
     CREATE TABLE {description.table_name} (
         Id INT PRIMARY KEY IDENTITY(1,1),
         Location GEOGRAPHY,
-        XmlData XML
+        XmlData XML,
+        GroundHeight FLOAT,
     );
 END";
             }
