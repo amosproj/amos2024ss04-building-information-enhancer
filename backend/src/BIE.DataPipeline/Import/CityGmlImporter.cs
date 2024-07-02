@@ -108,13 +108,14 @@ namespace BIE.DataPipeline.Import
                 float groundHeight = GetBuildingGroundHeight(buildingNode);
                 string districtKey = GetBuildingDistrictKey(buildingNode);
                 string checkDate = GetBuildingCheckDate(buildingNode);
-                Console.WriteLine(checkDate);
+                float groundArea = GetBuildingGroundArea(buildingNode);
 
                 nextLine = $"geography::STGeomFromText('{geometry.AsText()}', 4326)";
                 nextLine += string.Format(",'{0}'", buildingNode.InnerXml);
                 nextLine += string.Format(",'{0}'", groundHeight.ToString());//TODO add culture info
                 nextLine += string.Format(",'{0}'", districtKey);
                 nextLine += string.Format(",'{0}'", checkDate);
+                nextLine += string.Format(",{0}", groundArea.ToString());//TODO add culture info
 
                 this.buildingIndex++;
                 return true;
@@ -247,6 +248,48 @@ namespace BIE.DataPipeline.Import
             }
 
             return checkDateNode.InnerText;
+        }
+
+        private float GetBuildingGroundArea(XmlNode buildingNode)
+        {
+            XmlNodeList groundSurfaceNodes = buildingNode.SelectNodes(".//bldg:GroundSurface", this.nsmgr);
+
+            if (groundSurfaceNodes == null)
+            {
+                Console.WriteLine("No nodes");
+                return -1;
+            }
+
+            if(groundSurfaceNodes.Count > 1)
+            {
+                Console.WriteLine("multi nodes " + groundSurfaceNodes.Count);
+            }
+
+            float res = 0;
+            foreach(XmlNode groundSurface in groundSurfaceNodes)
+            {
+                res += ParseArea(groundSurface);
+            }
+            return res;
+        }
+
+        private float ParseArea(XmlNode node)
+        {
+            XmlNode areaNode = node.SelectSingleNode(".//gen:stringAttribute[@name='Flaeche']/gen:value", this.nsmgr);
+            if(areaNode == null)
+            {
+                Console.WriteLine("No area found");
+                return 0;
+            }
+
+            float result = 0;
+            if (!float.TryParse(areaNode.InnerText, out result)) //TODO add culture info
+            {
+                Console.WriteLine("Unable to get area");
+                return 0;
+            }
+
+            return result;
         }
     }
 }

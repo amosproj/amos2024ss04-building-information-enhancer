@@ -174,7 +174,8 @@ BEGIN
         XmlData XML,
         GroundHeight FLOAT,
         DistrictKey VARCHAR(255),
-        checkDate DATE
+        CheckDate DATE,
+        GroundArea FLOAT,
     );
 END";
             }
