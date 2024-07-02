@@ -38,11 +38,15 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
     useContext(TabsContext);
   const [map, setMap] = useState<L.Map | null>(null);
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
-  const [showSatellite, setShowSatellite] = useState<boolean>(false);
   const [isGrayscale, setIsGrayscale] = useState<boolean>(false);
+  const [mapType, setMapType] = useState<
+    "normal" | "satellite" | "parzellar" | "aerial"
+  >("normal");
 
-  const toggleShowSatellite = () => {
-    setShowSatellite((prevShowSatellite: boolean) => !prevShowSatellite);
+  const handleMapTypeChange = (
+    type: "normal" | "satellite" | "parzellar" | "aerial"
+  ) => {
+    setMapType(type);
   };
 
   const currentTab = getCurrentTab();
@@ -97,7 +101,7 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
 
   return (
     <div className="tab-map-container">
-      <MapOptions toggleShowSatellite={toggleShowSatellite} />
+      <MapOptions onMapTypeChange={handleMapTypeChange} />
       <MapContainer
         center={currentMapCache.mapCenter}
         zoom={currentMapCache.zoom}
@@ -121,7 +125,8 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
           </div>
         )}
         <MapEventsHandler />
-        {showSatellite ? (
+
+        {mapType === "satellite" && (
           <div>
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.de/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
@@ -135,6 +140,14 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
               attribution='&copy; Bundesamt für Kartographie und Geodäsie (BKG), Bayerische Vermessungverwaltung,  <a href="http://sg.geodatenzentrum.de/web_public/gdz/datenquellen/Datenquellen_TopPlusOpen.pdf">Sources</a>'
               bounds={L.latLngBounds([47.141, 5.561], [55.054, 15.579])}
             />
+          </div>
+        )}
+        {mapType === "aerial" && (
+          <div>
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.de/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+              url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+            />
             <WMSTileLayer
               url="https://geoservices.bayern.de/od/wms/dop/v1/dop40?"
               layers="by_dop40c"
@@ -144,11 +157,28 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
               bounds={L.latLngBounds([47.141, 5.561], [55.054, 15.579])}
             />
           </div>
-        ) : (
+        )}
+        {mapType === "normal" && (
           <div>
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.de/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+          </div>
+        )}
+        {mapType === "parzellar" && (
+          <div>
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.de/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+              url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+            />
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.de/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+              url="https://wmtsod1.bayernwolke.de/wmts/by_webkarte/{s}/{z}/{x}/{y}"
+            />
+            <WMSTileLayer
+              url="https://geoservices.bayern.de/wms/v1/ogc_alkis_parzellarkarte.cgi?"
+              layers="by_alkis_parzellarkarte_farbe"
             />
           </div>
         )}

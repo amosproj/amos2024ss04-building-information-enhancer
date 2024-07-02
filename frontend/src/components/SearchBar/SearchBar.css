@@ -1,0 +1,7 @@
+.search-icon {
+  padding: 0 !important;
+}
+
+.MuiAutocomplete-clearIndicator {
+  visibility: visible !important;
+}
