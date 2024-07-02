@@ -5,16 +5,21 @@ import {
   CSS3DRenderer,
 } from "three/examples/jsm/renderers/CSS3DRenderer.js";
 import { MapControls } from "three/examples/jsm/controls/MapControls.js";
-import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import LeafletMap from "../MapView/LeafletMap";
 
-const ThreeDView: React.FC = () => {
+interface ThreeDViewProps {
+  datasetId: string;
+  mapType: string;
+}
+
+const ThreeDView: React.FC<ThreeDViewProps> = ({ datasetId, mapType }) => {
   const mountRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<HTMLDivElement>(null);
+  const threedMapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const mount = mountRef.current!;
-    const mapElement = mapRef.current!;
+    const mapElement = threedMapRef.current!;
 
     // Scene setup
     const scene = new THREE.Scene();
@@ -25,8 +30,8 @@ const ThreeDView: React.FC = () => {
       0.1,
       1000
     );
-    camera.position.set(0, 300, 10);
-    camera.rotateX(-0.7);
+    camera.position.set(0, 400, 10);
+    camera.rotateX(-1);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(mount.clientWidth, mount.clientHeight);
@@ -43,22 +48,10 @@ const ThreeDView: React.FC = () => {
     mapElement.style.display = "block"; // Ensure the element is visible
     mapElement.style.pointerEvents = "auto"; // Ensure the element can consume events
 
-    // Initialize Leaflet map
-    const map = L.map(mapElement).setView([51.505, -0.09], 13);
-
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "© OpenStreetMap contributors",
-    }).addTo(map);
-
     const cssObject = new CSS3DObject(mapElement);
     cssObject.rotation.x = -Math.PI / 2; // Rotate to lie flat
     cssObject.position.set(0, 0, 0); // Position at ground level
     scene.add(cssObject);
-
-    // Force Leaflet map to re-render
-    setTimeout(() => {
-      map.invalidateSize();
-    }, 0);
 
     // Light
     const light = new THREE.DirectionalLight(0xffffff, 1);
@@ -66,7 +59,7 @@ const ThreeDView: React.FC = () => {
     scene.add(light);
 
     // Set up MapControls
-    const controls = new MapControls(camera, renderer.domElement);
+    const controls = new MapControls(camera, cssRenderer.domElement);
     controls.enableDamping = true; // Enable damping (inertia)
     controls.dampingFactor = 0.05; // Damping factor
     controls.screenSpacePanning = false; // Prevent camera from moving vertically in screen space
@@ -83,12 +76,22 @@ const ThreeDView: React.FC = () => {
     controls.enableZoom = false;
 
     // Function to forward events to Leaflet map
-    const forwardEventToMap = (event: MouseEvent | WheelEvent) => {
+    const forwardEventToMap = (event: Event) => {
       if (event instanceof WheelEvent) {
         if (event.deltaY < 0) {
-          map.zoomIn();
+          // Simulate zoom in
+          const simulatedEvent = new WheelEvent(event.type, {
+            ...event,
+            deltaY: -1,
+          });
+          mapElement.dispatchEvent(simulatedEvent);
         } else {
-          map.zoomOut();
+          // Simulate zoom out
+          const simulatedEvent = new WheelEvent(event.type, {
+            ...event,
+            deltaY: 1,
+          });
+          mapElement.dispatchEvent(simulatedEvent);
         }
       } else if (event instanceof MouseEvent && event.button !== 2) {
         // Prevent right-click events from being forwarded
@@ -101,10 +104,14 @@ const ThreeDView: React.FC = () => {
         mapElement.dispatchEvent(simulatedEvent);
       }
     };
+
     // Add event listeners to forward events
-    const events = ["mousedown", "wheel"];
+    const events: (keyof HTMLElementEventMap)[] = ["mousedown", "wheel"];
     events.forEach((eventName) => {
-      renderer.domElement.addEventListener(eventName, forwardEventToMap);
+      renderer.domElement.addEventListener(
+        eventName,
+        forwardEventToMap as EventListener
+      );
     });
 
     // Animate
@@ -120,7 +127,6 @@ const ThreeDView: React.FC = () => {
     return () => {
       mount.removeChild(renderer.domElement);
       mount.removeChild(cssRenderer.domElement);
-      map.remove();
     };
   }, []);
 
@@ -131,14 +137,16 @@ const ThreeDView: React.FC = () => {
         style={{ width: "100%", height: "100vh", position: "relative" }}
       />
       <div
-        ref={mapRef}
+        ref={threedMapRef}
         style={{
           width: "2000px",
           height: "2000px",
           position: "absolute",
-          zIndex: -999,
+          zIndex: -1, // Adjusted zIndex
         }}
-      />
+      >
+        <LeafletMap datasetId={datasetId} mapType={mapType} />
+      </div>
     </>
   );
 };
