@@ -13,6 +13,7 @@ import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import { MapPin } from "@phosphor-icons/react";
 import { Dataset } from "../../types/DatasetTypes";
+import { MarkersTypes } from "../../types/MarkersTypes";
 
 interface MapDatasetVisualizerProps {
   dataset: Dataset;
@@ -89,19 +90,52 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
   );
 
   useEffect(() => {
-    if (!geoData) return;
+    // Check if data has been fetched
+    if (!geoData || !dataset.metaData) return;
+    // Check if dataset type is none
+    if (dataset.metaData.type === MarkersTypes.None) {
+      return;
+    }
+    // For Areas type datasets
+    else if (dataset.metaData.type === MarkersTypes.Areas) {
+      // Check if the zoom level is above the markers threshold
+      // If yes, display markers instead of polygons
+      if (currentMapCache.zoom > dataset.metaData.markersThreshold) {
+        console.log("pol");
+        // Add the polygons to the map
+        try {
+          const geojsonLayer = L.geoJson(geoData);
+          geojsonLayer.addTo(map);
+          return () => {
+            map.removeLayer(geojsonLayer);
+          };
+        } catch (error) {
+          console.error("Error adding GeoJSON layer to the map:", error);
+        }
+      } else {
+        console.log("mark");
+        // Add the markers to the map instead
+        const geojsonLayer = L.geoJson(geoData, {
+          pointToLayer: function (_feature, latlng) {
+            return L.marker(latlng, {
+              icon: dataset.metaData
+                ? createDivIcon(dataset.metaData.icon)
+                : divIcondefault,
+            });
+          },
 
-    if (dataset.id === "house_footprints") {
-      try {
-        const geojsonLayer = L.geoJson(geoData);
-        geojsonLayer.addTo(map);
+          style: { fillOpacity: 0.1 },
+        });
+        const markerClusterGroup = L.markerClusterGroup();
+
+        markerClusterGroup.addLayer(geojsonLayer);
+        map.addLayer(markerClusterGroup);
 
         return () => {
-          map.removeLayer(geojsonLayer);
+          map.removeLayer(markerClusterGroup);
         };
-      } catch (error) {
-        console.error("Error adding GeoJSON layer to the map:", error);
       }
+      // For Markers type datasets
     } else {
       const geojsonLayer = L.geoJson(geoData, {
         pointToLayer: function (_feature, latlng) {

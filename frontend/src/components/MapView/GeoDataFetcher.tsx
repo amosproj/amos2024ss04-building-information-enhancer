@@ -41,7 +41,8 @@ const GeoDataFetcher = (
     // Check if the zoom threshold has not been achieved
     if (
       currentTab &&
-      currentTab.dataset.type === "markers" &&
+      currentTab.dataset.metaData &&
+      currentTab.dataset.metaData.type === "markers" &&
       zoom <= currentTab.dataset.metaData!.minZoomLevel
     ) {
       setData(undefined);

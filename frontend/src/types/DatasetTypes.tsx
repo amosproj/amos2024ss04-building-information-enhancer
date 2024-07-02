@@ -25,6 +25,7 @@ export interface DatasetMetaData {
   type: MarkersTypes;
   longDescription: string;
   minZoomLevel: number;
+  markersThreshold: number;
   displayProperty: string;
   tables: Table[];
 }
