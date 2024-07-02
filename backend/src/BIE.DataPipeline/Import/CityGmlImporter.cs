@@ -10,6 +10,7 @@ using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
 using ProjNet.IO.CoordinateSystems;
 using NetTopologySuite.Algorithm;
+using System.Globalization;
 
 namespace BIE.DataPipeline.Import
 {
@@ -19,6 +20,7 @@ namespace BIE.DataPipeline.Import
         private int buildingIndex = 0;
         private XmlNodeList buildingNodes;
         private XmlNamespaceManager nsmgr;
+        private CultureInfo culture = new CultureInfo("en-US");
 
         private readonly ICoordinateTransformation? mTransformation;
 
@@ -112,10 +114,10 @@ namespace BIE.DataPipeline.Import
 
                 nextLine = $"geography::STGeomFromText('{geometry.AsText()}', 4326)";
                 nextLine += string.Format(",'{0}'", buildingNode.InnerXml);
-                nextLine += string.Format(",'{0}'", groundHeight.ToString());//TODO add culture info
+                nextLine += string.Format(",'{0}'", groundHeight.ToString(culture));
                 nextLine += string.Format(",'{0}'", districtKey);
                 nextLine += string.Format(",'{0}'", checkDate);
-                nextLine += string.Format(",{0}", groundArea.ToString());//TODO add culture info
+                nextLine += string.Format(",{0}", groundArea.ToString(culture));
 
                 this.buildingIndex++;
                 return true;
@@ -215,7 +217,7 @@ namespace BIE.DataPipeline.Import
             }
 
             float result = 0;
-            if(!float.TryParse(groundHeightNode.InnerText, out result)) //TODO add culture info
+            if(!float.TryParse(groundHeightNode.InnerText, NumberStyles.Any, culture, out result))
             {
                 Console.WriteLine("Unable to get ground height");
                 return -1;
@@ -283,7 +285,7 @@ namespace BIE.DataPipeline.Import
             }
 
             float result = 0;
-            if (!float.TryParse(areaNode.InnerText, out result)) //TODO add culture info
+            if (!float.TryParse(areaNode.InnerText, NumberStyles.Any, culture, out result))
             {
                 Console.WriteLine("Unable to get area");
                 return 0;
