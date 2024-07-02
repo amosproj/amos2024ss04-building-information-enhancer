@@ -1,12 +1,20 @@
 import React, { useRef, useEffect } from "react";
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/Addons.js";
+import {
+  CSS3DObject,
+  CSS3DRenderer,
+  OrbitControls,
+} from "three/examples/jsm/Addons.js";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 const ThreeDView: React.FC = () => {
   const mountRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const mount = mountRef.current!;
+    const mapElement = mapRef.current!;
 
     // Scene setup
     const scene = new THREE.Scene();
@@ -23,12 +31,26 @@ const ThreeDView: React.FC = () => {
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     mount.appendChild(renderer.domElement);
 
-    // Plane
-    const planeGeometry = new THREE.PlaneGeometry(100, 100);
-    const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x808080 });
-    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.rotation.x = -Math.PI / 2;
-    scene.add(plane);
+    const cssRenderer = new CSS3DRenderer();
+    cssRenderer.setSize(mount.clientWidth, mount.clientHeight);
+    cssRenderer.domElement.style.position = "absolute";
+    cssRenderer.domElement.style.top = "0";
+    cssRenderer.domElement.style.pointerEvents = "none"; // Allow mouse events to pass through
+    mount.appendChild(cssRenderer.domElement);
+
+    // Initialize Leaflet map
+    mapElement.style.display = "block"; // Ensure the element is visible
+    mapElement.style.pointerEvents = "none"; // Ensure the element does not consume events
+    const map = L.map(mapElement).setView([51.505, -0.09], 13);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap contributors",
+    }).addTo(map);
+
+    const cssObject = new CSS3DObject(mapElement);
+    cssObject.rotation.x = -Math.PI / 2; // Rotate to lie flat
+    cssObject.position.set(0, 0, 0); // Position at ground level
+    scene.add(cssObject);
 
     // Light
     const light = new THREE.DirectionalLight(0xffffff, 1);
@@ -74,18 +96,37 @@ const ThreeDView: React.FC = () => {
       updateCameraPosition();
       controls.update();
       renderer.render(scene, camera);
+      cssRenderer.render(scene, camera);
     };
     animate();
 
     // Cleanup on component unmount
     return () => {
       mount.removeChild(renderer.domElement);
+      mount.removeChild(cssRenderer.domElement);
+      map.remove();
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
     };
   }, []);
 
-  return <div ref={mountRef} style={{ width: "100%", height: "100vh" }} />;
+  return (
+    <>
+      <div
+        ref={mountRef}
+        style={{ width: "100%", height: "100vh", position: "relative" }}
+      />
+      <div
+        ref={mapRef}
+        style={{
+          width: "1600px",
+          height: "1600px",
+          position: "absolute",
+          display: "none", // Initially hidden
+        }}
+      />
+    </>
+  );
 };
 
 export default ThreeDView;
