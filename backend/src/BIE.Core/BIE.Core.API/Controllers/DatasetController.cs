@@ -195,7 +195,6 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
         [ProducesResponseType(500)]
         public IActionResult LoadLocationData([FromBody, Required] LocationDataRequest request)
         {
-
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -214,8 +213,28 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
                 var radius = 10000000; // Define the radius as needed
                 var buffer = 1000; // Define the buffer as needed
 
-                var houseFootprints = QueryParameters.GetHouseFootprints(latitude, longitude, radius);
-                var evChargingStations = QueryParameters.GetEVChargingStations(latitude, longitude, buffer);
+                var houseFootprintsData = QueryParameters.GetHouseFootprints(latitude, longitude, radius);
+                var evChargingStationsData = QueryParameters.GetEVChargingStations(latitude, longitude, buffer);
+
+                var houseFootprints = houseFootprintsData.SelectMany(h =>
+                    h.Select(kv => new DatasetItem
+                    {
+                        Id = h.ContainsKey("Id") ? h["Id"] : null,
+                        Key = kv.Key,
+                        Value = kv.Value,
+                        MapId = h.ContainsKey("MapId") ? h["MapId"] : null // Optional
+                    })
+                ).ToList();
+
+                var evChargingStations = evChargingStationsData.SelectMany(e =>
+                    e.Select(kv => new DatasetItem
+                    {
+                        Id = e.ContainsKey("Id") ? e["Id"] : null,
+                        Key = kv.Key,
+                        Value = kv.Value,
+                        MapId = e.ContainsKey("MapId") ? e["MapId"] : null // Optional
+                    })
+                ).ToList();
 
                 var response = new
                 {
