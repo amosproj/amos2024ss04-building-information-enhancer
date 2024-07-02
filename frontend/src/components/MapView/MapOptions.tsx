@@ -118,6 +118,7 @@ const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
                     handleClose();
                   }}
                 />
+                
                 <Typography variant="body2" sx={{ marginTop: 0.5 }}>
                   Aerial
                 </Typography>
