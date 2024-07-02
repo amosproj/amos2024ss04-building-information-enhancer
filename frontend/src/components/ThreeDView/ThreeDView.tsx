@@ -25,7 +25,7 @@ const ThreeDView: React.FC = () => {
       0.1,
       1000
     );
-    camera.position.set(0, 20, 10);
+    camera.position.set(0, 300, 10);
     camera.rotateX(-0.7);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -74,16 +74,23 @@ const ThreeDView: React.FC = () => {
     controls.maxDistance = 500; // Maximum zoom distance
     controls.maxPolarAngle = Math.PI / 2; // Limit angle from the top
 
-    // Configure controls to respond only to right-click and zoom
+    // Configure controls to respond only to right-click
     controls.mouseButtons = {
-      LEFT: null, // Disable left-click
-      MIDDLE: THREE.MOUSE.DOLLY, // Enable middle-click for zoom (if desired)
-      RIGHT: THREE.MOUSE.ROTATE, // Enable right-click for rotation
+      LEFT: null,
+      MIDDLE: null,
+      RIGHT: THREE.MOUSE.ROTATE,
     };
+    controls.enableZoom = false;
 
     // Function to forward events to Leaflet map
-    const forwardEventToMap = (event: MouseEvent) => {
-      if (event.button !== 2) {
+    const forwardEventToMap = (event: MouseEvent | WheelEvent) => {
+      if (event instanceof WheelEvent) {
+        if (event.deltaY < 0) {
+          map.zoomIn();
+        } else {
+          map.zoomOut();
+        }
+      } else if (event instanceof MouseEvent && event.button !== 2) {
         // Prevent right-click events from being forwarded
         const simulatedEvent = new MouseEvent(event.type, {
           bubbles: true,
@@ -94,9 +101,8 @@ const ThreeDView: React.FC = () => {
         mapElement.dispatchEvent(simulatedEvent);
       }
     };
-
     // Add event listeners to forward events
-    const events = ["mousedown", "scroll"];
+    const events = ["mousedown", "wheel"];
     events.forEach((eventName) => {
       renderer.domElement.addEventListener(eventName, forwardEventToMap);
     });
@@ -127,8 +133,8 @@ const ThreeDView: React.FC = () => {
       <div
         ref={mapRef}
         style={{
-          width: "400px",
-          height: "400px",
+          width: "2000px",
+          height: "2000px",
           position: "absolute",
           zIndex: -999,
         }}
