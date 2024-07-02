@@ -106,10 +106,12 @@ namespace BIE.DataPipeline.Import
                 Geometry geometry = UtmCoordinatesToGeometry(positionNode.InnerText);
 
                 float groundHeight = GetBuildingGroundHeight(buildingNode);
+                string districtKey = GetBuildingDistrictKey(buildingNode);
 
                 nextLine = $"geography::STGeomFromText('{geometry.AsText()}', 4326)";
                 nextLine += string.Format(",'{0}'", buildingNode.InnerXml);
                 nextLine += string.Format(",'{0}'", groundHeight.ToString());//TODO add culture info
+                nextLine += string.Format(",'{0}'", districtKey);
 
                 this.buildingIndex++;
                 return true;
@@ -202,6 +204,12 @@ namespace BIE.DataPipeline.Import
         {
             XmlNode groundHeightNode = buildingNode.SelectSingleNode(".//gen:stringAttribute[@name='DatenquelleBodenhoehe']/gen:value", this.nsmgr);
 
+            if(groundHeightNode == null)
+            {
+                Console.WriteLine("No ground height node");
+                return -1;
+            }
+
             float result = 0;
             if(!float.TryParse(groundHeightNode.InnerText, out result)) //TODO add culture info
             {
@@ -210,6 +218,19 @@ namespace BIE.DataPipeline.Import
             }
 
             return result;
+        }
+
+        private string GetBuildingDistrictKey(XmlNode buildingNode)
+        {
+            XmlNode distrcitKeyNode = buildingNode.SelectSingleNode(".//gen:stringAttribute[@name='Gemeindeschluessel']/gen:value", this.nsmgr);
+
+            if (distrcitKeyNode == null)
+            {
+                Console.WriteLine("No ground height node");
+                return "";
+            }
+
+            return distrcitKeyNode.InnerText;
         }
     }
 }

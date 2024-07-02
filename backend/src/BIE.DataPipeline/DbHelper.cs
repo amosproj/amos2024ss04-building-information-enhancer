@@ -173,6 +173,7 @@ BEGIN
         Location GEOGRAPHY,
         XmlData XML,
         GroundHeight FLOAT,
+        DistrictKey VARCHAR(255) 
     );
 END";
             }
