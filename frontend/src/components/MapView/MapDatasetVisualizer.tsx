@@ -1,12 +1,6 @@
 import { useMap } from "react-leaflet";
 import { useCallback, useContext, useEffect } from "react";
-import {
-  Feature,
-  FeatureCollection,
-  GeoJsonProperties,
-  Point,
-  Position,
-} from "geojson";
+import { FeatureCollection } from "geojson";
 import { MapContext } from "../../contexts/MapContext";
 import { TabsContext } from "../../contexts/TabsContext";
 import GeoDataFetcher from "./GeoDataFetcher";
@@ -20,6 +14,7 @@ import { MapPin } from "@phosphor-icons/react";
 import { Dataset } from "../../types/DatasetTypes";
 import { MarkersTypes } from "../../types/MarkersTypes";
 import { createDivIcon } from "../../utils/mergeIcons";
+import { convertPolygonsToMarkers } from "../../utils/polgonsToMarkers";
 
 interface MapDatasetVisualizerProps {
   dataset: Dataset;
@@ -41,32 +36,6 @@ const divIcondefault: DivIcon = L.divIcon({
   iconSize: [34, 34],
   iconAnchor: [17, 17], // Adjust the anchor point as needed
 });
-
-// Function to convert polygon GeoJSON to marker GeoJSON
-const convertPolygonsToMarkers = (
-  geoData: FeatureCollection
-): FeatureCollection<Point, GeoJsonProperties> => {
-  const markerFeatures: Feature<Point, GeoJsonProperties>[] =
-    geoData.features.map((feature) => {
-      if (feature.geometry.type === "Polygon") {
-        const firstCoord = feature.geometry.coordinates[0][0];
-        return {
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: firstCoord as Position,
-          },
-          properties: feature.properties,
-        } as Feature<Point, GeoJsonProperties>;
-      }
-      return feature as Feature<Point, GeoJsonProperties>;
-    });
-
-  return {
-    type: "FeatureCollection",
-    features: markerFeatures,
-  };
-};
 
 const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
   dataset,
