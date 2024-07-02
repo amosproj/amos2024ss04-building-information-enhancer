@@ -212,9 +212,10 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
                 var longitude = coordinate.Longitude;
                 var radius = 10000000; // Define the radius as needed
 
-                var houseFootprintsData = getNclosestObjects("EV_charging_stations", longitude, latitude, radius, 5);
+                var columns = new HashSet<string> { "operator", "Id" };
+                var chargingStations = getNclosestObjects("EV_charging_stations", longitude, latitude, radius, 5, columns);
 
-                var houseFootprints = houseFootprintsData.Select(h => new DatasetItem
+                var chargingStationsData = chargingStations.Select(h => new DatasetItem
                 {
                     Id = h.ContainsKey("Id") ? h["Id"] : null,
                     Key = "Charging station: " + (h.ContainsKey("operator") ? h["operator"] : "No operator defined"),
@@ -222,10 +223,21 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
                     MapId = "EV_charging_stations",
                 }).ToList();
 
+                columns = new HashSet<string> { "Id" };
+                var houseFootprintsInArea = getMatchingObjects("Hausumringe_mittelfranken_small", longitude, latitude, columns);
+
+                var houseFootprintsInAreaData = houseFootprintsInArea.Select(h => new DatasetItem
+                {
+                    Id = h.ContainsKey("Id") ? h["Id"] : null,
+                    Key = "Building footprint: ",
+                    Value = h.ContainsKey("Area") ? h["Area"] : "-1",
+                    MapId = "house_footprints",
+                }).ToList();
+
                 LocationDataResponse response = new LocationDataResponse
                 {
-                    CurrentDatasetData = houseFootprints,
-                    GeneralData = new List<DatasetItem>() // Initialize GeneralData with an empty list
+                    CurrentDatasetData = chargingStationsData,
+                    GeneralData = houseFootprintsInAreaData
                 };
 
                 return Ok(response);
@@ -236,26 +248,55 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
             }
         }
 
-        private IEnumerable<Dictionary<string, string>> getNclosestObjects(string datasetId, double longitude, double lattitude, double radius, int n)
+        private IEnumerable<Dictionary<string, string>> getNclosestObjects(string datasetId, double longitude, double latitude, double radius, int n, IEnumerable<string> columns)
         {
             // number of closest objects with input of dataset name to be queried and maybe column for name
-            string command = @"
-        SELECT TOP {4}
-            operator, Id,
-            Location.STArea() AS Area,
-            Location.STAsText() AS Location,
-            geometry::Point({0}, {1}, 4326).STDistance(Location) AS Distance
-        FROM 
-            dbo.{3}
-        WHERE
-            geometry::Point({0}, {1}, 4326).STBuffer({2}).STIntersects(Location) = 1
-        ORDER BY 
-            geometry::Point({0}, {1}, 4326).STDistance(Location);";
+            string columnsString = string.Join(", ", columns);
 
-            string formattedQuery = string.Format(command, lattitude, longitude, radius, datasetId, n);
-            _logger.LogInformation(formattedQuery);
+            // Define the SQL command with the columns string
+            string command = $@"
+            SELECT TOP {n}
+                {columnsString},
+                Location.STArea() AS Area,
+                Location.STAsText() AS Location,
+                geometry::Point({latitude}, {longitude}, 4326).STDistance(Location) AS Distance
+            FROM 
+                dbo.{datasetId}
+            WHERE
+                geometry::Point({latitude}, {longitude}, 4326).STBuffer({radius}).STIntersects(Location) = 1
+            ORDER BY 
+                geometry::Point({latitude}, {longitude}, 4326).STDistance(Location);";
 
-            return DbHelper.GetData(formattedQuery);
+            _logger.LogInformation(command);
+
+            return DbHelper.GetData(command);
+        }
+
+        private IEnumerable<Dictionary<string, string>> getMatchingObjects(
+        string datasetId,
+        double longitude,
+        double latitude,
+        IEnumerable<string> columns)
+            {
+                // Convert the columns set to a comma-separated string
+                string columnsString = string.Join(", ", columns);
+
+                // Define the SQL command with the columns string
+                string command = $@"
+                SELECT TOP 1000
+                    {columnsString},
+                    Location.STArea() AS Area,
+                    Location.STAsText() AS Location
+                FROM 
+                    dbo.{datasetId}
+                WHERE
+                    Location.STIntersects(geometry::Point({latitude}, {longitude}, 4326)) = 1
+                ORDER BY 
+                    geometry::Point({latitude}, {longitude}, 4326).STDistance(Location);";
+
+            _logger.LogInformation(command);
+
+            return DbHelper.GetData(command);
         }
 
         public static List<Dictionary<string, string>> GetHouseFootprints(double latitude, double longitude, int radius)
