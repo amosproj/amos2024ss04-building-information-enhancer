@@ -1,17 +1,13 @@
 import React, { useState } from "react";
-import {
-  Paper,
-  Popover,
-  Grid,
-  Typography,
-  Box,
-} from "@mui/material";
-import SearchBar from "../PopUp/SearchBar";
+import { Paper, Popover, Grid, Typography, Box } from "@mui/material";
 import "./MapOptions.css";
 import { StackSimple } from "@phosphor-icons/react";
+import SearchBar from "../SearchBar/SearchBar";
 
 interface MapOptionsProps {
-  onMapTypeChange: (type: "normal" | "satellite" | "parzellar" | "aerial") => void;
+  onMapTypeChange: (
+    type: "normal" | "satellite" | "parzellar" | "aerial"
+  ) => void;
 }
 
 const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
@@ -25,7 +21,9 @@ const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
     setAnchorEl(null);
   };
 
-  const handleMapTypeChange = (type: "normal" | "satellite" | "parzellar" | "aerial") => {
+  const handleMapTypeChange = (
+    type: "normal" | "satellite" | "parzellar" | "aerial"
+  ) => {
     onMapTypeChange(type);
     handleClose();
   };
@@ -33,16 +31,16 @@ const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
   const open = Boolean(anchorEl);
   const id = open ? "simple-popover" : undefined;
 
-
   return (
     <div className="map-options-container">
       <div className="search-bar">
         <SearchBar />
       </div>
-      <div onClick={handleClick} className="layers-map-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom">
-      <StackSimple aria-describedby={id} >
-        
-      </StackSimple>
+      <div
+        onClick={handleClick}
+        className="layers-map-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom"
+      >
+        <StackSimple aria-describedby={id}></StackSimple>
       </div>
       <Popover
         id={id}
@@ -68,7 +66,12 @@ const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
             height: "100px",
           }}
         >
-          <Grid container spacing={2} justifyContent="center" alignItems="center">
+          <Grid
+            container
+            spacing={2}
+            justifyContent="center"
+            alignItems="center"
+          >
             <Grid item>
               <Box textAlign="center" sx={{ marginLeft: 2 }}>
                 <img
@@ -118,7 +121,7 @@ const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
                     handleClose();
                   }}
                 />
-                
+
                 <Typography variant="body2" sx={{ marginTop: 0.5 }}>
                   Aerial
                 </Typography>
