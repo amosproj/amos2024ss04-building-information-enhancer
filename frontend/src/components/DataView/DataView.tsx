@@ -9,13 +9,14 @@ import LoadDataButton from "./LoadDataButton";
 import axios from "axios";
 import { getAPIGatewayURL } from "../../utils";
 
-const loadLocationData = async (): Promise<
-  LocationDataResponse | undefined
-> => {
+const loadLocationData = async (
+  latitude: number,
+  longitude: number
+): Promise<LocationDataResponse | undefined> => {
   const requestBody = {
     datasetId: "example_dataset",
     location: [
-      { latitude: 51.509865, longitude: -0.118092 }, // Example coordinate
+      { latitude, longitude }, // Example coordinate
     ],
   };
 
@@ -74,13 +75,16 @@ function DataView() {
   }, [currentMapCache, ifNeedsReloading]);
 
   const reloadData = async () => {
-    setIfNeedsReloading(false);
-    setCurrentMapCache({
-      ...currentMapCache,
-      loadedCoordinates: currentMapCache.selectedCoordinates,
-    });
-    const responseData = await loadLocationData();
-    setData(responseData);
+    if (currentMapCache.selectedCoordinates) {
+      const { lat, lng } = currentMapCache.selectedCoordinates;
+      setIfNeedsReloading(false);
+      setCurrentMapCache({
+        ...currentMapCache,
+        loadedCoordinates: currentMapCache.selectedCoordinates,
+      });
+      const responseData = await loadLocationData(lat, lng);
+      setData(responseData);
+    }
   };
 
   return (
