@@ -12,11 +12,9 @@ import "./DatasetsList.css";
 import { AlertContext } from "../../contexts/AlertContext";
 import { FeatureCollection } from "geojson";
 import L from "leaflet";
-import { MarkersTypes } from "../../types/MarkersTypes";
-import axios from "axios";
 import { Dataset, DatasetBasicData } from "../../types/DatasetTypes";
 import CustomSvgIcon from "./CustomSvgIcon";
-import { getAPIGatewayURL } from "../../services/metadataService";
+import { fetchDatasets } from "../../services/datasetsService";
 
 // Define an empty FeatureCollection
 const emptyFeatureCollection: FeatureCollection = {
@@ -37,39 +35,35 @@ const DatasetsList: React.FC<DatasetsListProps> = ({ closeDialog }) => {
   const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
 
   useEffect(() => {
-    const fetchDatasets = async () => {
-      try {
-        // Make the API call with the expected response type
-        const response = await axios.get<DatasetBasicData[]>(
-          getAPIGatewayURL() + "/api/getDatasetList"
+    const fetchDatasetsData = async () => {
+      const datasetsData = await fetchDatasets();
+      if (datasetsData) {
+        const datasetsTransformed = datasetsData.map(
+          (dataset: DatasetBasicData) => {
+            const data: Dataset = {
+              id: dataset.datasetId,
+              displayName: dataset.name,
+              shortDescription: dataset.shortDescription,
+              datasetIcon: dataset.icon ? (
+                <CustomSvgIcon svgString={dataset.icon} size={24} />
+              ) : (
+                <CustomSvgIcon svgString={svgIconDefault} size={24} />
+              ),
+              metaData: undefined,
+              data: emptyFeatureCollection,
+              lastDataRequestBounds: L.latLngBounds(
+                L.latLng(0, 0),
+                L.latLng(0, 0)
+              ),
+            };
+            return data;
+          }
         );
-        const datasetsData = response.data.map((dataset: DatasetBasicData) => {
-          const data: Dataset = {
-            id: dataset.datasetId,
-            displayName: dataset.name,
-            shortDescription: dataset.shortDescription,
-            type: MarkersTypes.None,
-            datasetIcon: dataset.icon ? (
-              <CustomSvgIcon svgString={dataset.icon} size={24} />
-            ) : (
-              <CustomSvgIcon svgString={svgIconDefault} size={24} />
-            ),
-            metaData: undefined,
-            data: emptyFeatureCollection,
-            lastDataRequestBounds: L.latLngBounds(
-              L.latLng(0, 0),
-              L.latLng(0, 0)
-            ),
-          };
-          return data;
-        });
-        setDatasets(datasetsData);
-      } catch (error) {
-        console.error("Error fetching datasets:", error);
+        setDatasets(datasetsTransformed);
       }
     };
 
-    fetchDatasets();
+    fetchDatasetsData();
   }, []);
 
   // Opens a new tab

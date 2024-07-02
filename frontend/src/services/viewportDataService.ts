@@ -1,7 +1,7 @@
 import axios from "axios";
 import { FeatureCollection, Geometry } from "geojson";
 import { LatLngBounds } from "leaflet";
-import { getAPIGatewayURL } from "./metadataService";
+import { getAPIGatewayURL } from "../utils/apiGatewayURL";
 
 /**
  * Fetches the viewport data for a specific dataset from the backend.
@@ -33,14 +33,29 @@ export const fetchViewportDataForDataset = async (
         params,
       }
     );
-    // Return the viewport data
-    return response.data;
+    // Check the response status
+    if (response.status === 200) {
+      // Return the viewport data
+      return response.data;
+    } else {
+      // Log the error message and status code
+      console.error(
+        `Error fetching viewport data, status code: ${response.status}, message: ${response.statusText}`
+      );
+      return undefined;
+    }
   } catch (error) {
     // Console log the error
-    if (axios.isAxiosError(error)) {
+    if (axios.isAxiosError(error) && error.response) {
+      console.error(
+        `Axios error fetching data, status code: ${error.response.status}, message: ${error.response.statusText}`,
+        error.response.data
+      );
+    } else if (axios.isAxiosError(error)) {
       console.error("Axios error fetching data:", error.message);
     } else {
       console.error("Unknown error fetching data:", error);
     }
+    return undefined;
   }
 };

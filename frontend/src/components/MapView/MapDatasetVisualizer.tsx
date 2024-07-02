@@ -8,7 +8,7 @@ import L, { DivIcon } from "leaflet";
 import { LatLngBounds } from "leaflet";
 import "proj4leaflet";
 import "proj4";
-import { mergeIcons } from "../../utils";
+import { mergeIcons } from "../../utils/mergeIcons";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import { MapPin } from "@phosphor-icons/react";

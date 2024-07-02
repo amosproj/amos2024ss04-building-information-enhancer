@@ -7,7 +7,6 @@ export type Dataset = {
   id: string;
   displayName: string;
   shortDescription: string;
-  type: MarkersTypes;
   datasetIcon: JSX.Element;
   data: FeatureCollection;
   lastDataRequestBounds: LatLngBounds;
@@ -23,7 +22,7 @@ export interface DatasetBasicData {
 
 export interface DatasetMetaData {
   icon: string;
-  type: string;
+  type: MarkersTypes;
   longDescription: string;
   minZoomLevel: number;
   displayProperty: string;

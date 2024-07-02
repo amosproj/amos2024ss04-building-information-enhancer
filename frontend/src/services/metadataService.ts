@@ -1,26 +1,6 @@
 import axios from "axios";
 import { DatasetMetaData } from "../types/DatasetTypes";
-
-/**
- * These values will be replaced after build with the .sh script when spinning up docker container.
- */
-const currentEnvironment = {
-  apiGatewayHost: "API_GATEWAY_HOST",
-  apiGatewayPort: "API_GATEWAY_PORT",
-};
-
-/**
- * Returns the API Gateway URL for a specific deployment environment.
- * The .join() function ensures that this strings will not be replace by the .sh script.
- */
-export const getAPIGatewayURL = (): string => {
-  return (
-    "http://" +
-    (import.meta.env.DEV ? "localhost" : currentEnvironment.apiGatewayHost) +
-    ":" +
-    (import.meta.env.DEV ? "8081" : currentEnvironment.apiGatewayPort)
-  );
-};
+import { getAPIGatewayURL } from "../utils/apiGatewayURL";
 
 /**
  * Fetches the metadata for a specific dataset from the metadata database.
@@ -29,18 +9,43 @@ export const getAPIGatewayURL = (): string => {
  */
 export const fetchMetadataForDataset = async (
   datasetID: string
-): Promise<DatasetMetaData> => {
+): Promise<DatasetMetaData | undefined> => {
   // Prepare the parameters
   const params = {
     datasetID: datasetID,
   };
-  // Make the API call
-  const response = await axios.get<DatasetMetaData>(
-    getAPIGatewayURL() + "/api/getDatasetMetadata/",
-    {
-      params,
+
+  try {
+    // Make the API call
+    const response = await axios.get<DatasetMetaData>(
+      getAPIGatewayURL() + "/api/getDatasetMetadata/",
+      {
+        params,
+      }
+    );
+    // Check the response status
+    if (response.status === 200) {
+      // Return the metadata
+      return response.data;
+    } else {
+      // Log the error message and status code
+      console.error(
+        `Error fetching metadata, status code: ${response.status}, message: ${response.statusText}`
+      );
+      return undefined;
     }
-  );
-  // Return the metadata
-  return response.data;
+  } catch (error) {
+    // Console log the error
+    if (axios.isAxiosError(error) && error.response) {
+      console.error(
+        `Error fetching metadata, status code: ${error.response.status}, message: ${error.response.statusText}`,
+        error.response.data
+      );
+    } else if (axios.isAxiosError(error)) {
+      console.error("Axios error fetching metadata:", error.message);
+    } else {
+      console.error("Unknown error fetching metadata", error);
+    }
+    return undefined;
+  }
 };
