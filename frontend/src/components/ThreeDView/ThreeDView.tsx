@@ -3,8 +3,8 @@ import * as THREE from "three";
 import {
   CSS3DObject,
   CSS3DRenderer,
-  OrbitControls,
-} from "three/examples/jsm/Addons.js";
+} from "three/examples/jsm/renderers/CSS3DRenderer.js";
+import { MapControls } from "three/examples/jsm/controls/MapControls.js";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -25,7 +25,8 @@ const ThreeDView: React.FC = () => {
       0.1,
       1000
     );
-    camera.position.set(0, 5, 10);
+    camera.position.set(0, 20, 10);
+    camera.rotateX(-0.7);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(mount.clientWidth, mount.clientHeight);
@@ -40,7 +41,7 @@ const ThreeDView: React.FC = () => {
 
     // Ensure the map container is displayed and has dimensions before initializing Leaflet
     mapElement.style.display = "block"; // Ensure the element is visible
-    mapElement.style.pointerEvents = "none"; // Ensure the element does not consume events
+    mapElement.style.pointerEvents = "auto"; // Ensure the element can consume events
 
     // Initialize Leaflet map
     const map = L.map(mapElement).setView([51.505, -0.09], 13);
@@ -64,49 +65,46 @@ const ThreeDView: React.FC = () => {
     light.position.set(10, 10, 10).normalize();
     scene.add(light);
 
-    // Controls
-    const controls = new OrbitControls(camera, renderer.domElement);
+    // Set up MapControls
+    const controls = new MapControls(camera, renderer.domElement);
+    controls.enableDamping = true; // Enable damping (inertia)
+    controls.dampingFactor = 0.05; // Damping factor
+    controls.screenSpacePanning = false; // Prevent camera from moving vertically in screen space
+    controls.minDistance = 10; // Minimum zoom distance
+    controls.maxDistance = 500; // Maximum zoom distance
+    controls.maxPolarAngle = Math.PI / 2; // Limit angle from the top
 
-    // Keyboard controls
-    const moveSpeed = 0.5;
-    const keyState: { [key: string]: boolean } = {};
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      keyState[event.code] = true;
+    // Configure controls to respond only to right-click and zoom
+    controls.mouseButtons = {
+      LEFT: null, // Disable left-click
+      MIDDLE: THREE.MOUSE.DOLLY, // Enable middle-click for zoom (if desired)
+      RIGHT: THREE.MOUSE.ROTATE, // Enable right-click for rotation
     };
 
-    const onKeyUp = (event: KeyboardEvent) => {
-      keyState[event.code] = false;
-    };
-
-    const updateCameraPosition = () => {
-      if (keyState["ArrowUp"] || keyState["KeyW"]) {
-        camera.position.z -= moveSpeed;
-      }
-      if (keyState["ArrowDown"] || keyState["KeyS"]) {
-        camera.position.z += moveSpeed;
-      }
-      if (keyState["ArrowLeft"] || keyState["KeyA"]) {
-        camera.position.x -= moveSpeed;
-      }
-      if (keyState["ArrowRight"] || keyState["KeyD"]) {
-        camera.position.x += moveSpeed;
-      }
-
-      // Prevent camera from going below the map
-      if (camera.position.y < 1) {
-        camera.position.y = 1;
+    // Function to forward events to Leaflet map
+    const forwardEventToMap = (event: MouseEvent) => {
+      if (event.button !== 2) {
+        // Prevent right-click events from being forwarded
+        const simulatedEvent = new MouseEvent(event.type, {
+          bubbles: true,
+          cancelable: true,
+          clientX: event.clientX - 1,
+          clientY: event.clientY - 1,
+        });
+        mapElement.dispatchEvent(simulatedEvent);
       }
     };
 
-    window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("keyup", onKeyUp);
+    // Add event listeners to forward events
+    const events = ["mousedown", "scroll"];
+    events.forEach((eventName) => {
+      renderer.domElement.addEventListener(eventName, forwardEventToMap);
+    });
 
     // Animate
     const animate = () => {
       requestAnimationFrame(animate);
-      updateCameraPosition();
-      controls.update();
+      controls.update(); // Update controls
       renderer.render(scene, camera);
       cssRenderer.render(scene, camera);
     };
@@ -117,8 +115,6 @@ const ThreeDView: React.FC = () => {
       mount.removeChild(renderer.domElement);
       mount.removeChild(cssRenderer.domElement);
       map.remove();
-      window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("keyup", onKeyUp);
     };
   }, []);
 
