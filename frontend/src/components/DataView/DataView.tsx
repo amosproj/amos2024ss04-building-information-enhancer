@@ -6,42 +6,8 @@ import { Box, TextField } from "@mui/material";
 import { Funnel, MapPin, MapPinLine } from "@phosphor-icons/react";
 import { MapContext } from "../../contexts/MapContext";
 import LoadDataButton from "./LoadDataButton";
-import axios from "axios";
-import { getAPIGatewayURL } from "../../utils";
-
-const loadLocationData = async (
-  latitude: number,
-  longitude: number,
-  datasetId: string
-): Promise<LocationDataResponse | undefined> => {
-  const requestBody = {
-    datasetId: datasetId,
-    location: [{ latitude, longitude }],
-  };
-
-  try {
-    const response = await axios.put<LocationDataResponse>(
-      getAPIGatewayURL() + "/api/loadLocationData",
-      requestBody
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error loading location data", error);
-    return undefined;
-  }
-};
-
-interface LocationDataResponse {
-  currentDatasetData: DatasetItem[];
-  generalData: DatasetItem[];
-  extraRows: DatasetItem[];
-}
-
-interface DatasetItem {
-  key: string;
-  value: string;
-  mapId: string;
-}
+import { LocationDataResponse } from "../../types/LocationDataTypes";
+import { fetchLocationData } from "../../services/locationDataService";
 
 function DataView() {
   const { currentTabsCache } = useContext(TabsContext);
@@ -73,19 +39,17 @@ function DataView() {
     }
   }, [currentMapCache, ifNeedsReloading]);
 
+  /**
+   * Reloads the location data.
+   */
   const reloadData = async () => {
-    if (currentMapCache.selectedCoordinates) {
-      const { lat, lng } = currentMapCache.selectedCoordinates;
-      setIfNeedsReloading(false);
-      setCurrentMapCache({
-        ...currentMapCache,
-        loadedCoordinates: currentMapCache.selectedCoordinates,
-      });
-      const responseData = await loadLocationData(
-        lat,
-        lng,
-        getCurrentTabTitle()
-      );
+    setIfNeedsReloading(false);
+    setCurrentMapCache({
+      ...currentMapCache,
+      loadedCoordinates: currentMapCache.selectedCoordinates,
+    });
+    const responseData = await fetchLocationData();
+    if (responseData) {
       setData(responseData);
     }
   };
