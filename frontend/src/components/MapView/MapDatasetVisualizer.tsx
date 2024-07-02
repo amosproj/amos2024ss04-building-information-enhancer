@@ -119,7 +119,6 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
       // Check if the zoom level is above the markers threshold
       // If yes, display markers instead of polygons
       if (currentMapCache.zoom > dataset.metaData.markersThreshold) {
-        console.log("pol");
         // Add the polygons to the map
         try {
           const geojsonLayer = L.geoJson(geoData);
@@ -131,7 +130,6 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
           console.error("Error adding GeoJSON layer to the map:", error);
         }
       } else {
-        console.log("mark");
         // Convert polygons to markers
         const markerData = convertPolygonsToMarkers(geoData);
         // Add the markers to the map instead
