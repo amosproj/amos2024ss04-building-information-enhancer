@@ -192,9 +192,17 @@ namespace BIE.Core.API.Controllers
             try
             {
                 var response = await _httpClient.GetAsync(targetUrl);
-                response.EnsureSuccessStatusCode(); // Throw if not a success code.
                 var content = await response.Content.ReadAsStringAsync();
-                return Ok(content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return Ok(content);
+                }
+                else
+                {
+                    _logger.LogError($"Error fetching data from the target service. Status code: {response.StatusCode}");
+                    return StatusCode((int)response.StatusCode, content);
+                }
             }
             catch (HttpRequestException ex)
             {

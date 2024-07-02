@@ -1,38 +1,35 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { useMap } from "react-leaflet";
 import { Box, Typography } from "@mui/material";
+import { TabsContext } from "../../contexts/TabsContext";
+import "./ZoomWarningLabel.css";
+import { Warning } from "@phosphor-icons/react";
 
-interface CenterLabelProps {
-  label: string;
-  minZoom: number;
-}
-
-const ZoomWarningLabel: React.FC<CenterLabelProps> = ({ label, minZoom }) => {
+const ZoomWarningLabel: React.FC = () => {
   const map = useMap();
+  const { getCurrentTab } = useContext(TabsContext);
+
+  const currentTab = getCurrentTab();
 
   useEffect(() => {
     const onZoomEnd = () => {
       const currentZoom = map.getZoom();
       const labelElement = document.getElementById("center-label");
-
-      if (labelElement) {
-        if (currentZoom <= minZoom) {
+      if (currentTab && currentTab.dataset.metaData && labelElement) {
+        if (currentZoom <= currentTab.dataset.metaData.minZoomLevel) {
           labelElement.style.display = "block";
         } else {
           labelElement.style.display = "none";
         }
       }
     };
-
     map.on("zoomend", onZoomEnd);
-
     // Initial check
     onZoomEnd();
-
     return () => {
       map.off("zoomend", onZoomEnd);
     };
-  }, [map, minZoom]);
+  }, [currentTab, map]);
 
   return (
     <Box
@@ -48,10 +45,13 @@ const ZoomWarningLabel: React.FC<CenterLabelProps> = ({ label, minZoom }) => {
         boxShadow: "0px 2px 4px rgba(0,0,0,0.1)",
         zIndex: 1000, // Ensure it is above the map
         pointerEvents: "none", // Make sure it doesn't interfere with map interactions
+        display: "none",
       }}
     >
       <Typography variant="h6" color="textPrimary">
-        {label}
+        <div className="warning-label">
+          <Warning size={40} /> Zoom in to see the markers
+        </div>
       </Typography>
     </Box>
   );
