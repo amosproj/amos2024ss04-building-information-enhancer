@@ -1,16 +1,20 @@
 import React, { useState } from "react";
-import { Paper, Popover, Grid, Typography, Box } from "@mui/material";
+import { Paper, Popover, Grid, Typography, Box, Tooltip } from "@mui/material";
 import "./MapOptions.css";
-import { StackSimple } from "@phosphor-icons/react";
+import { StackSimple, ThreeD } from "@phosphor-icons/react";
 import SearchBar from "../SearchBar/SearchBar";
 
 interface MapOptionsProps {
   onMapTypeChange: (
     type: "normal" | "satellite" | "parzellar" | "aerial"
   ) => void;
+  toggle3D: () => void;
 }
 
-const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
+const MapOptions: React.FC<MapOptionsProps> = ({
+  onMapTypeChange,
+  toggle3D,
+}) => {
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -36,12 +40,25 @@ const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
       <div className="search-bar">
         <SearchBar />
       </div>
-      <div
-        onClick={handleClick}
-        className="layers-map-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom"
-      >
-        <StackSimple aria-describedby={id}></StackSimple>
-      </div>
+      <Tooltip title="Change map layers" arrow placement="right">
+        <div
+          onClick={handleClick}
+          className="layers-map-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom"
+        >
+          <StackSimple
+            aria-describedby={id}
+            className="options-icons"
+          ></StackSimple>
+        </div>
+      </Tooltip>
+      <Tooltip title="Toggle 3D view" arrow placement="right">
+        <div
+          onClick={toggle3D}
+          className="threed-map-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom"
+        >
+          <ThreeD className="options-icons"></ThreeD>
+        </div>
+      </Tooltip>
       <Popover
         id={id}
         open={open}
@@ -121,30 +138,11 @@ const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
                     handleClose();
                   }}
                 />
-
                 <Typography variant="body2" sx={{ marginTop: 0.5 }}>
                   Aerial
                 </Typography>
               </Box>
             </Grid>
-            {/* <Grid item>
-              <Box textAlign="center" sx={{ marginLeft: 2 }}>
-                <img
-                  className="image-hover-effect"
-                  src="/satellite_view.png"
-                  alt="Satellite"
-                  width="50"
-                  height="50"
-                  onClick={() => {
-                    handleMapTypeChange("parzellar");
-                    handleClose();
-                  }}
-                />
-                <Typography variant="body2" sx={{ marginTop: 0.5 }}>
-                  Parzellar
-                </Typography>
-              </Box>
-            </Grid> */}
           </Grid>
         </Paper>
       </Popover>
