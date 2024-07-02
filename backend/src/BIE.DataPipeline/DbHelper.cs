@@ -173,7 +173,8 @@ BEGIN
         Location GEOGRAPHY,
         XmlData XML,
         GroundHeight FLOAT,
-        DistrictKey VARCHAR(255) 
+        DistrictKey VARCHAR(255),
+        checkDate DATE
     );
 END";
             }

@@ -107,11 +107,14 @@ namespace BIE.DataPipeline.Import
 
                 float groundHeight = GetBuildingGroundHeight(buildingNode);
                 string districtKey = GetBuildingDistrictKey(buildingNode);
+                string checkDate = GetBuildingCheckDate(buildingNode);
+                Console.WriteLine(checkDate);
 
                 nextLine = $"geography::STGeomFromText('{geometry.AsText()}', 4326)";
                 nextLine += string.Format(",'{0}'", buildingNode.InnerXml);
                 nextLine += string.Format(",'{0}'", groundHeight.ToString());//TODO add culture info
                 nextLine += string.Format(",'{0}'", districtKey);
+                nextLine += string.Format(",'{0}'", checkDate);
 
                 this.buildingIndex++;
                 return true;
@@ -226,11 +229,24 @@ namespace BIE.DataPipeline.Import
 
             if (distrcitKeyNode == null)
             {
-                Console.WriteLine("No ground height node");
+                Console.WriteLine("No district key node");
                 return "";
             }
 
             return distrcitKeyNode.InnerText;
+        }
+
+        private string GetBuildingCheckDate(XmlNode buildingNode)
+        {
+            XmlNode checkDateNode = buildingNode.SelectSingleNode(".//gen:stringAttribute[@name='Grundrissaktualitaet']/gen:value", this.nsmgr);
+
+            if (checkDateNode == null)
+            {
+                Console.WriteLine("No change date node");
+                return "";
+            }
+
+            return checkDateNode.InnerText;
         }
     }
 }
