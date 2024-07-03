@@ -1,6 +1,6 @@
 import React from "react";
 import { SvgIcon, SvgIconProps } from "@mui/material";
-import { modifySvg } from "../../utils";
+import { modifySvg } from "../../utils/mergeIcons";
 
 interface CustomSvgIconProps extends SvgIconProps {
   svgString: string;

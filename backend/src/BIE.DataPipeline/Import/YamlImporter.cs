@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text;
 using YamlDotNet.Serialization;
 
 // ReSharper disable InconsistentNaming
 
+[assembly: InternalsVisibleTo("BIE.Tests")]
 namespace BIE.DataPipeline.Import
 {
     public static class YamlImporter
@@ -55,6 +57,11 @@ namespace BIE.DataPipeline.Import
         /// The name of the database table associated with the data source.
         /// </summary>
         public string table_name { get; set; }
+        
+        /// <summary>
+        /// The name of the associated dataset this source belongs to
+        /// </summary>
+        public string dataset { get; set; }
 
 
         private char mDelimiter = ';';
@@ -73,6 +80,40 @@ namespace BIE.DataPipeline.Import
         /// </summary>
         public List<DataSourceColumn> table_cols { get; set; }
 
+        public override bool Equals(object? obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            DataSourceDescription des = obj as DataSourceDescription;
+
+            if (!source.Equals(des.source))
+            {
+                return false;
+            }
+
+            if (!options.Equals(des.options))
+            {
+                return false;
+            }
+
+            if (!table_name.Equals(des.table_name))
+            {
+                return false;
+            }
+
+            for (int i = 0; i < table_cols.Count; i++)
+            {
+                if (!table_cols[i].Equals(des.table_cols[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public class DataSourceLocation
         {
             /// <summary>
@@ -89,6 +130,33 @@ namespace BIE.DataPipeline.Import
             /// the format of the data
             /// </summary>
             public string data_format { get; set; }
+
+            public override bool Equals(object? obj)
+            {
+                if (obj == null)
+                {
+                    return false;
+                }
+
+                DataSourceLocation des = obj as DataSourceLocation;
+
+                if (type != des.type)
+                {
+                    return false;
+                }
+
+                if (location != des.location)
+                {
+                    return false;
+                }
+
+                if (data_format != des.data_format)
+                {
+                    return false;
+                }
+
+                return true;
+            }
         }
 
         public class DataSourceOptions
@@ -116,6 +184,38 @@ namespace BIE.DataPipeline.Import
                 get => mIf_table_exists;
                 set => mIf_table_exists = value;
             }
+
+
+            [DefaultValue(null)]
+            public LocationToSQLPoint location_to_SQL_point { get; set; }
+
+            public override bool Equals(object? obj)
+            {
+                if (obj == null)
+                {
+                    return false;
+                }
+
+                DataSourceOptions des = obj as DataSourceOptions;
+
+                if (skip_lines != des.skip_lines)
+                {
+                    return false;
+                }
+
+                if (discard_null_rows != des.discard_null_rows)
+                {
+                    return false;
+                }
+
+                if (if_table_exists != des.if_table_exists)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
         }
 
         public class DataSourceColumn
@@ -145,6 +245,57 @@ namespace BIE.DataPipeline.Import
             /// </summary>
             [DefaultValue(false)]
             public bool is_not_nullable { get; set; }
+
+
+            public override bool Equals(object? obj)
+            {
+                if (obj == null)
+                {
+                    return false;
+                }
+
+                DataSourceColumn des = obj as DataSourceColumn;
+
+                if (name != des.name)
+                {
+                    return false;
+                }
+
+                if (name_in_table != des.name_in_table)
+                {
+                    return false;
+                }
+
+                if (type != des.type)
+                {
+                    return false;
+                }
+
+                if (is_not_nullable != des.is_not_nullable)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+        public class LocationToSQLPoint
+        {
+            /// <summary>
+            /// The name of the column in the database table.
+            /// </summary>
+            public string name_in_table { get; set; }
+
+            /// <summary>
+            /// The index of the lonitude column in the file .
+            /// </summary>
+            public int index_lon { get; set; }
+
+            /// <summary>
+            /// The index of the latitude column in the file .
+            /// </summary>
+            public int index_lat { get; set; }
         }
     }
 

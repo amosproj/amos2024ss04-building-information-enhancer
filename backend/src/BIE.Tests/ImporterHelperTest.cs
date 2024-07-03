@@ -15,7 +15,7 @@ namespace BIE.Tests
         [SetUp]
         public void SetUp()
         {
-            description = YamlImporter.GetSourceDescription(@".\yaml\unitTest.yaml");
+            description = YamlImporter.GetSourceDescription(@".\yaml\common\unitTest.yaml");
         }
 
         [Test]
@@ -65,8 +65,8 @@ namespace BIE.Tests
         public void TestReadYamlHeader()
         {
             string[] expected = {
-            "testDefault",
-            "testVarChar",
+            "header1",
+            "header2",
             "testBool",
             "testBoolean",
             "testInt",

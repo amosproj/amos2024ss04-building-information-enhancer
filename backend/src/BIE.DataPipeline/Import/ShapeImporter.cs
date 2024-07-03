@@ -7,7 +7,6 @@ using ProjNet.IO.CoordinateSystems;
 using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
 
-
 namespace BIE.DataPipeline.Import
 {
     internal class ShapeImporter : IImporter
@@ -19,7 +18,7 @@ namespace BIE.DataPipeline.Import
 
         public ShapeImporter(DataSourceDescription? dataSourceDescription)
         {
-            //YAML Arguments:
+            // YAML Arguments:
             this.mDataSourceDescription = dataSourceDescription;
 
             new StringBuilder();
@@ -46,17 +45,47 @@ namespace BIE.DataPipeline.Import
 
         private void SetupParser()
         {
-            // handle Zip file:
+            MemoryStream shpStream = new MemoryStream();
+            MemoryStream dbfStream = new MemoryStream();
 
-            Console.WriteLine($"Grabbing Webfile {mDataSourceDescription.source.location}");
-            var client = new HttpClient();
-            var zipStream = client.GetStreamAsync(mDataSourceDescription.source.location).Result;
+            if (mDataSourceDescription.source.type.Equals("filepath"))
+            {
+                // handle local Zip file:
+                Console.WriteLine($"Opening local Zip file {mDataSourceDescription.source.location}");
+                using (var zipStream = new FileStream(mDataSourceDescription.source.location, FileMode.Open))
+                {
+                    var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Read);
+                    ExtractShapeFilesFromZip(zipArchive, shpStream, dbfStream);
+                }
+            }
+            else
+            {
+                // handle Zip file from URL:
+                Console.WriteLine($"Grabbing Webfile {mDataSourceDescription.source.location}");
+                var client = new HttpClient();
+                var zipStream = client.GetStreamAsync(mDataSourceDescription.source.location).Result;
 
-            Console.WriteLine("opening Zip file");
-            var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Read);
+                Console.WriteLine("Opening the Zip file...");
+                var zipArchive = new ZipArchive(zipStream, ZipArchiveMode.Read);
+                ExtractShapeFilesFromZip(zipArchive, shpStream, dbfStream);
+            }
 
-            var shpStream = new MemoryStream();
-            var dbfStream = new MemoryStream();
+            shpStream.Position = 0;
+            dbfStream.Position = 0;
+
+            mParser = Shapefile.CreateDataReader(
+                new ShapefileStreamProviderRegistry(
+                    new ByteStreamProvider(StreamTypes.Shape, shpStream),
+                    new ByteStreamProvider(StreamTypes.Data, dbfStream),
+                    true,
+                    true),
+                GeometryFactory.Default);
+
+            mHeader = mParser.DbaseHeader;
+        }
+
+        private void ExtractShapeFilesFromZip(ZipArchive zipArchive, MemoryStream shpStream, MemoryStream dbfStream)
+        {
             foreach (var zipArchiveEntry in zipArchive.Entries)
             {
                 if (zipArchiveEntry.Name.EndsWith(".shp"))
@@ -73,33 +102,11 @@ namespace BIE.DataPipeline.Import
                 }
             }
 
-            if (shpStream == null || dbfStream == null)
+            if (shpStream.Length == 0 || dbfStream.Length == 0)
             {
-                throw new FileNotFoundException("the required .shp and .bdf files could not be found.");
+                throw new FileNotFoundException("The required .shp and .dbf files could not be found.");
             }
-
-            shpStream.Position = 0;
-            dbfStream.Position = 0;
-            Console.WriteLine("File loaded.");
-
-            mParser =
-                Shapefile.CreateDataReader(
-                                           new ShapefileStreamProviderRegistry(
-                                                                               new ByteStreamProvider(
-                                                                                                      StreamTypes.Shape,
-                                                                                                      shpStream),
-                                                                               new ByteStreamProvider(
-                                                                                                      StreamTypes.Data,
-                                                                                                      dbfStream),
-                                                                               true,
-                                                                               true),
-                                           GeometryFactory.Default);
-
-            // parser = new ShapefileDataReader(@"D:\datasets\093_Oberpfalz_Hausumringe\hausumringe",
-            //                                  NetTopologySuite.Geometries.GeometryFactory.Default);
-            mHeader = mParser.DbaseHeader;
         }
-
 
         /// <summary>
         /// reads the next line from the Shapefile and returns it as WKT (Well known text)
@@ -111,7 +118,7 @@ namespace BIE.DataPipeline.Import
             nextLine = "";
             if (!mParser.Read())
             {
-                Console.WriteLine("EOF");
+                Console.WriteLine("Reached EOF, finishing.");
                 return false;
             }
 
@@ -119,7 +126,7 @@ namespace BIE.DataPipeline.Import
             var geometry = mParser.Geometry;
             geometry = ConvertUtmToLatLong(geometry);
 
-            nextLine = $"geography::STGeomFromText('{geometry.AsText()}', 4326)";
+            nextLine = $"GEOMETRY::STGeomFromText('{geometry.AsText()}', 4326)";
 
             return true;
         }

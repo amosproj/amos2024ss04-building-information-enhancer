@@ -8,3 +8,7 @@
   height: 100%;
   z-index: 1;
 }
+
+.grayscale-overlay {
+  filter: grayscale(80%);
+}

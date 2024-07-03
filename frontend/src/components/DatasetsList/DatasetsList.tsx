@@ -8,28 +8,13 @@ import {
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
-
 import "./DatasetsList.css";
 import { AlertContext } from "../../contexts/AlertContext";
 import { FeatureCollection } from "geojson";
-import L, { LatLngBounds } from "leaflet";
-import { MarkersTypes } from "./MarkersTypes";
-import axios from "axios";
-import { DatasetBasicData, DatasetMetaData } from "./DatasetTypes";
-import { getAPIGatewayURL } from "../../utils";
+import L from "leaflet";
+import { Dataset, DatasetBasicData } from "../../types/DatasetTypes";
 import CustomSvgIcon from "./CustomSvgIcon";
-
-// Dataset Type
-export type Dataset = {
-  id: string;
-  displayName: string;
-  description: string;
-  type: MarkersTypes;
-  datasetIcon: JSX.Element;
-  data: FeatureCollection;
-  lastDataRequestBounds: LatLngBounds;
-  metaData: DatasetMetaData | undefined;
-};
+import { fetchDatasets } from "../../services/datasetsService";
 
 // Define an empty FeatureCollection
 const emptyFeatureCollection: FeatureCollection = {
@@ -50,39 +35,35 @@ const DatasetsList: React.FC<DatasetsListProps> = ({ closeDialog }) => {
   const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
 
   useEffect(() => {
-    const fetchDatasets = async () => {
-      try {
-        // Make the API call with the expected response type
-        const response = await axios.get<DatasetBasicData[]>(
-          getAPIGatewayURL() + "/api/getDatasetList"
+    const fetchDatasetsData = async () => {
+      const datasetsData = await fetchDatasets();
+      if (datasetsData) {
+        const datasetsTransformed = datasetsData.map(
+          (dataset: DatasetBasicData) => {
+            const data: Dataset = {
+              id: dataset.datasetId,
+              displayName: dataset.name,
+              shortDescription: dataset.shortDescription,
+              datasetIcon: dataset.icon ? (
+                <CustomSvgIcon svgString={dataset.icon} size={24} />
+              ) : (
+                <CustomSvgIcon svgString={svgIconDefault} size={24} />
+              ),
+              metaData: undefined,
+              data: emptyFeatureCollection,
+              lastDataRequestBounds: L.latLngBounds(
+                L.latLng(0, 0),
+                L.latLng(0, 0)
+              ),
+            };
+            return data;
+          }
         );
-        const datasetsData = response.data.map((dataset: DatasetBasicData) => {
-          const data: Dataset = {
-            id: dataset.datasetId,
-            displayName: dataset.name,
-            description: dataset.description,
-            type: MarkersTypes.None,
-            datasetIcon: dataset.icon ? (
-              <CustomSvgIcon svgString={dataset.icon} size={24} />
-            ) : (
-              <CustomSvgIcon svgString={svgIconDefault} size={24} />
-            ),
-            metaData: undefined,
-            data: emptyFeatureCollection,
-            lastDataRequestBounds: L.latLngBounds(
-              L.latLng(0, 0),
-              L.latLng(0, 0)
-            ),
-          };
-          return data;
-        });
-        setDatasets(datasetsData);
-      } catch (error) {
-        console.error("Error fetching datasets:", error);
+        setDatasets(datasetsTransformed);
       }
     };
 
-    fetchDatasets();
+    fetchDatasetsData();
   }, []);
 
   // Opens a new tab
@@ -127,7 +108,7 @@ const DatasetsList: React.FC<DatasetsListProps> = ({ closeDialog }) => {
                 <ListItemAvatar>{dataset.datasetIcon}</ListItemAvatar>
                 <ListItemText
                   primary={dataset.displayName}
-                  secondary={dataset.description}
+                  secondary={dataset.shortDescription}
                 />
               </ListItemButton>
               <Divider />

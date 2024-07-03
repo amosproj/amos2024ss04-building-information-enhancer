@@ -1,9 +1,8 @@
 import { Menu, MenuItem } from "@mui/material";
-import { Fragment, useContext, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { AlertContext } from "../../contexts/AlertContext";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
 import { Info, PushPin, PushPinSlash, X } from "@phosphor-icons/react";
-
 import "./TabOptions.css";
 import TabInfoPopUp from "../PopUp/TabInfoPopup";
 
@@ -21,15 +20,24 @@ const TabOptions: React.FC<TabOptionsProps> = ({
   // Tab Info Popup
   // Stores the state of if the search popup is open
   const [ifOpenedDialog, setIfOpenedDialog] = useState(false);
+  const { getOrFetchMetadata } = useContext(TabsContext);
+
+  /**
+   * Fetch the metadata of the tab
+   */
+  useEffect(() => {
+    if (currentTab) {
+      getOrFetchMetadata(currentTab.dataset.id);
+    }
+  }, [currentTab, getOrFetchMetadata]);
 
   const toggleIfOpenedDialog = () => {
     if (ifOpenedDialog === true) {
       // Handle the closing of the menu
       handleClose();
-   }
+    }
     setIfOpenedDialog(!ifOpenedDialog);
   };
-
 
   // Access the tabs context
   const { currentTabsCache, setCurrentTabsCache } = useContext(TabsContext);
@@ -112,8 +120,7 @@ const TabOptions: React.FC<TabOptionsProps> = ({
               className="tab-options-item-container"
               onClick={() => {
                 toggleIfOpenedDialog();
-              }
-              }
+              }}
             >
               <Info size={18} />
               Info

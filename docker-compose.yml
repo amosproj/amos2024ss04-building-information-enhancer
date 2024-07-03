@@ -49,7 +49,8 @@ services:
     networks:
       - bie-network
     depends_on:
-      - sql-database
+      sql-database:
+        condition: service_healthy
 
   ## Data Pipeline for ingesting the datasets
   datapipeline:
@@ -64,11 +65,15 @@ services:
       - DB_USERNAME=${SQL_DB_USERNAME}
       - DB_TYPE=${SQL_DB_TYPE}
       - TRUSTED=${SQL_TRUSTED}
+      - METADATA_DB_URL=metadata-database:${METADATA_DATABASE_PORT}
     container_name: datapipeline
     networks:
       - bie-network
     depends_on:
-      - sql-database
+      sql-database:
+        condition: service_healthy
+      metadata-database:
+        condition: service_healthy
 
   ## Main SQL DB for storing the datasets
   sql-database:
@@ -81,6 +86,18 @@ services:
       - bie-network
     volumes:
       - bie-mssqldata:/var/opt/mssql
+    ports:
+      - "1433:1433"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools/bin/sqlcmd -S localhost -U ${SQL_DB_USERNAME} -P ${SQL_DB_PASSWORD} -Q 'SELECT 1' || exit 1",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 10s
 
   ## The database for storing datasets metadata, accessible by multiple services
   metadata-database:
@@ -96,6 +113,12 @@ services:
       - ${METADATA_DATABASE_PORT}:27017
     networks:
       - bie-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
 volumes:
   bie-mssqldata:
