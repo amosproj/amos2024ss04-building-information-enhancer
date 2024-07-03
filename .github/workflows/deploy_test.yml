@@ -1,17 +1,14 @@
-name: Publish and deploy - Test Env.
+name: Publish and deploy - Production Env.
 
 on:
   push:
     tags:
-      - sprint-**-release-candidate
-    branches:
-      - CI-CD
-      - sprint-release
+      - sprint-**-release
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: amosproj/amos2024ss04-building-information-enhancer
-  STAGE: test
+  STAGE: production
 
 jobs:
   build-and-publish:
@@ -23,16 +20,22 @@ jobs:
         service:
           - name: frontend
             context: ./frontend
+            docker_dir: 
           - name: api-gateway
-            context: ./backend/api-gateway
+            context: ./backend
+            docker_dir: /api-gateway
           - name: api-composer
-            context: ./backend/src/BIE.Core
+            context: ./backend
+            docker_dir: /src/BIE.Core
           - name: datapipeline
-            context: ./backend/src/BIE.DataPipeline
+            context: ./backend
+            docker_dir: /src/BIE.DataPipeline
           - name: sql-database
-            context: ./backend/sql-database
+            context: ./backend
+            docker_dir: /sql-database
           - name: metadata-database
-            context: ./backend/metadata-database
+            context: ./backend
+            docker_dir: /metadata-database
 
     steps:
       - name: Checkout repository
@@ -54,14 +57,18 @@ jobs:
             type=ref,event=tag
             type=sha
             type=raw,value=${{ env.STAGE }}
+            latest
           labels: |
             stage=${{ env.STAGE }}
+
+      - name: Print debug tree
+        run: tree -nh ./backend
 
       - name: Build and Publish Docker Image - ${{ matrix.service.name }}
         uses: docker/build-push-action@v5
         with:
           context: ${{ matrix.service.context }}
-          file: ${{ matrix.service.context }}/Dockerfile
+          file: ${{ matrix.service.context }}${{ matrix.service.docker_dir }}/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -70,26 +77,24 @@ jobs:
 
   deploy-test-env:
     needs: build-and-publish
-    name: Deploy - Test Environment
+    name: Deploy - Production Environment
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
+        with:
+          ref: ${{github.ref_name}}
       - name: Install SSH key
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "${{ secrets.TEST_ENV_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.TEST_ENV_SSH_HOST }} > ~/.ssh/known_hosts
-
+          echo "${{secrets.PROD_ENV_SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{secrets.PROD_ENV_SSH_HOST}} > ~/.ssh/known_hosts
       - name: Copy necessary files
         run: |
-          scp ./docker-compose.yml ${{ secrets.TEST_ENV_SSH_USER }}@${{ secrets.TEST_ENV_SSH_HOST }}:/var/lib/bie
-          scp ./.env.test ${{ secrets.TEST_ENV_SSH_USER }}@${{ secrets.TEST_ENV_SSH_HOST }}:/var/lib/bie/.env
-
+          scp ./docker-compose.yml ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}}:/var/lib/bie
+          scp ./.env.production ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}}:/var/lib/bie/.env
       - name: Connect and Pull
-        run: ssh ${{ secrets.TEST_ENV_SSH_USER }}@${{ secrets.TEST_ENV_SSH_HOST }} "cd /var/lib/bie && docker compose pull && docker compose up -d --remove-orphans --force-recreate && exit"
-
+        run: ssh ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}} "cd /var/lib/bie && docker compose pull && docker compose up -d --remove-orphans --force-recreate && exit"
       - name: Cleanup
         run: rm -rf ~/.ssh
