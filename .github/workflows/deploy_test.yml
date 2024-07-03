@@ -26,20 +26,19 @@ jobs:
             docker_dir: 
           - name: api-gateway
             context: ./backend
-            docker_dir: api-gateway
+            docker_dir: /api-gateway
           - name: api-composer
             context: ./backend
-            docker_dir: src/BIE.Core
+            docker_dir: /src/BIE.Core
           - name: datapipeline
             context: ./backend
-            docker_dir: src/BIE.DataPipeline
+            docker_dir: /src/BIE.DataPipeline
           - name: sql-database
-            context: ./backend
-            docker_dir: sql-database
+            context: ./backend/sql-database
+            docker_dir: 
           - name: metadata-database
-            context: ./backend
-            docker_dir: metadata-database
-
+            context: ./backend/metadata-database
+            docker_dir: 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -68,7 +67,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ${{ matrix.service.context }}
-          file: ${{ matrix.service.context }}/${{ matrix.service.docker_dir }}/Dockerfile
+          file: ${{ matrix.service.context }}${{ matrix.service.docker_dir }}/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
