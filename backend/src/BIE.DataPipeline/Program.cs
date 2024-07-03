@@ -48,10 +48,20 @@ if (!dbHelper.CheckConnection())
 Console.WriteLine("Established the database connection.");
 
 // End if Dataset can be skipped
-if (dbHelper.CanSkip(description))
+if (DbHelper.CanSkip(description))
 {
     return 1;
 }
+
+// Establish Connection to Metadata DB
+var metadataDbHelper = new MetadataDbHelper();
+if (!metadataDbHelper.CreateConnection())
+{
+    // maybe make optional?
+    Console.WriteLine("metadataDatabase could not found");
+    return 1;
+}
+
 Console.WriteLine("Starting Importer");
 
 IImporter importer;
