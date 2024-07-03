@@ -5,14 +5,20 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
 # Copy the .csproj file and restore any dependencies
-COPY *.csproj ./
-RUN dotnet restore
+# This is done separately from the rest of the source to (potentially) 
+# speed up later builds.
+COPY ./api-gateway/APIGateway.csproj ./api-gateway/
+RUN dotnet restore ./api-gateway/APIGateway.csproj
 
 # Copy the remaining source code
-COPY . ./
+COPY ./api-gateway ./api-gateway
+# Copy the Metadata Library
+# Copy and build metadata library
+COPY ./lib/BieMetadata ./lib/BieMetadata
+RUN dotnet build "./lib/BieMetadata/BieMetadata.csproj" -c Release
 
 # Build the application
-RUN dotnet publish -c Release -o out
+RUN dotnet publish ./api-gateway/APIGateway.csproj -c Release -o out
 
 # Use the official Microsoft .NET runtime image to run the app
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
