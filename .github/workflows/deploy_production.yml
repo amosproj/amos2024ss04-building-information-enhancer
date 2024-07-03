@@ -61,6 +61,8 @@ jobs:
           labels: |
             stage=${{ env.STAGE }}
 
+      - run: tree -nh ./backend
+
       - name: Build and Publish Docker Image - ${{ matrix.service.name }}
         uses: docker/build-push-action@v5
         with:
