@@ -276,7 +276,24 @@ BEGIN
 END";
             }
 
-            var query = $@"
+            if (description.source.data_format == "CITYGML")
+            {
+                return $@"
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{description.table_name}')
+BEGIN
+    CREATE TABLE {description.table_name} (
+        Id INT PRIMARY KEY IDENTITY(1,1),
+        Location GEOGRAPHY,
+        XmlData XML,
+        GroundHeight FLOAT,
+        DistrictKey VARCHAR(255),
+        CheckDate DATE,
+        GroundArea FLOAT,
+    );
+END";
+            }
+
+                var query = $@"
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{description.table_name}')
 BEGIN CREATE TABLE {description.table_name} (";
 

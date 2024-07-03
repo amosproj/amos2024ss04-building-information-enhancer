@@ -2,8 +2,8 @@
 using BIE.DataPipeline.Import;
 using BIE.DataPipeline.Metadata;
 using Mono.Options;
-
-// Setup the command line options
+using System.Xml;
+// setup command line options.
 var tableInsertBehaviour = InsertBehaviour.none;
 var filename = HandleCliArguments();
 
@@ -69,6 +69,10 @@ try
         case "SHAPE":
             importer = new ShapeImporter(description);
             dbHelper.SetInfo(description.table_name, "Location");
+            break;
+        case "CITYGML":
+            importer = new CityGmlImporter(description);
+            dbHelper.SetInfo(description.table_name, "Location, XmlData, GroundHeight, DistrictKey, CheckDate, GroundArea");
             break;
 
         default:
