@@ -1,4 +1,4 @@
-name: Publish and deploy - Production Env.
+name: Publish and deploy - Test Env.
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: amosproj/amos2024ss04-building-information-enhancer
-  STAGE: production
+  STAGE: test
 
 jobs:
   build-and-publish:
