@@ -13,7 +13,7 @@ import SatelliteMap from "./BackgroundMaps/SatelliteMap";
 import AerialMap from "./BackgroundMaps/AerialMap";
 import NormalMap from "./BackgroundMaps/NormalMap";
 import ParcelMap from "./BackgroundMaps/ParcelMap";
-import { Console } from "console";
+import "./LeafletMap.css";
 
 interface LeafletMapProps {
   datasetId: string;
