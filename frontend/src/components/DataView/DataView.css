@@ -86,3 +86,8 @@
   width: 1rem;
   height: 1rem;
 }
+
+.sub-text {
+  color: gray;
+  font-size: 0.6rem;
+}

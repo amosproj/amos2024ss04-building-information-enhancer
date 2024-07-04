@@ -33,32 +33,6 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
   const currentTab = getCurrentTab();
 
   /**
-   * Add the draw polygon layer
-   */
-  useEffect(() => {
-    if (map) {
-      // Allow for drawing polygons
-      const drawnItems = new L.FeatureGroup();
-      setDrawnItems(drawnItems);
-      map.addLayer(drawnItems);
-      setPolygonDrawer(new L.Draw.Polygon(map as L.DrawMap));
-      // Bind for polygon created
-      map.on(L.Draw.Event.CREATED, (event: LeafletEvent) => {
-        const drawnObject = (event as L.DrawEvents.Created).layer;
-        if (drawnObject instanceof L.Polygon) {
-          drawnItems.addLayer(drawnObject);
-          setCurrentMapCache({
-            ...currentMapCache,
-            selectedCoordinates: drawnObject,
-            isDrawing: false,
-          });
-        }
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map]);
-
-  /**
    * Toggle polygon drawer
    */
   useEffect(() => {
@@ -106,7 +80,6 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
       const initialBounds = map.getBounds();
       const initialCenter = map.getCenter();
       const initialZoom = map.getZoom();
-
       setCurrentMapCache((prevCache) => ({
         ...prevCache,
         mapInstance: map,
@@ -114,8 +87,27 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
         mapBounds: initialBounds,
         zoom: initialZoom,
       }));
+      // Allow for drawing polygons
+      const drawnItems = new L.FeatureGroup();
+      setDrawnItems(drawnItems);
+      map.addLayer(drawnItems);
+      setPolygonDrawer(new L.Draw.Polygon(map as L.DrawMap));
+      // Bind for polygon created
+      map.on(L.Draw.Event.CREATED, (event: LeafletEvent) => {
+        const drawnObject = (event as L.DrawEvents.Created).layer;
+        if (drawnObject instanceof L.Polygon) {
+          if (drawnItems) {
+            drawnItems.addLayer(drawnObject);
+            setCurrentMapCache({
+              ...currentMapCache,
+              selectedCoordinates: drawnObject,
+              isDrawing: false,
+            });
+          }
+        }
+      });
     }
-  }, [currentMapCache, map, setCurrentMapCache]);
+  }, [map]);
 
   /**
    * Check for the zoom level threshold to apply the zoom warning and its effects

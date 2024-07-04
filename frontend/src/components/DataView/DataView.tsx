@@ -9,6 +9,7 @@ import LoadDataButton from "./LoadDataButton";
 import { LocationDataResponse } from "../../types/LocationDataTypes";
 import { fetchLocationData } from "../../services/locationDataService";
 import { LatLng } from "leaflet";
+import L from "leaflet";
 
 function DataView() {
   const { currentTabsCache } = useContext(TabsContext);
@@ -77,14 +78,9 @@ function DataView() {
         // If a single coordinates are selected
         coords = [currentCoords];
         console.log("single");
-      } else if (
+      } else if (currentCoords instanceof L.Polygon) {
         // If an area (array of coordinates) is selected
-        Array.isArray(currentCoords) &&
-        currentCoords.every((obj) => {
-          obj instanceof LatLng;
-        })
-      ) {
-        coords = currentCoords;
+        coords = currentCoords.getLatLngs() as LatLng[];
         console.log("area");
       }
       const responseData = await fetchLocationData(currentID, coords);
@@ -103,13 +99,17 @@ function DataView() {
           <div className="dataview-header-container">
             <b className="dataview-header-title">
               <MapPin size={20} />
-              {currentMapCache.loadedCoordinates instanceof LatLng ? (
+              {currentMapCache.loadedCoordinates instanceof LatLng && (
                 <div>
-                  {currentMapCache.loadedCoordinates.lat.toFixed(6)},{" "}
-                  {currentMapCache.loadedCoordinates.lng.toFixed(6)}
+                  Custom Marker{" "}
+                  <span className="sub-text">
+                    ({currentMapCache.loadedCoordinates.lat.toFixed(6)},{" "}
+                    {currentMapCache.loadedCoordinates.lng.toFixed(6)})
+                  </span>
                 </div>
-              ) : (
-                <div></div>
+              )}
+              {currentMapCache.loadedCoordinates instanceof L.Polygon && (
+                <div>Custom Polygon </div>
               )}
             </b>
             <Box id="filter-panel" style={{ maxWidth: "18rem", width: "100%" }}>
