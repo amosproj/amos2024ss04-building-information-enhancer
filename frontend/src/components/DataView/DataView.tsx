@@ -8,6 +8,7 @@ import { MapContext } from "../../contexts/MapContext";
 import LoadDataButton from "./LoadDataButton";
 import { LocationDataResponse } from "../../types/LocationDataTypes";
 import { fetchLocationData } from "../../services/locationDataService";
+import { LatLng } from "leaflet";
 
 function DataView() {
   const { currentTabsCache } = useContext(TabsContext);
@@ -59,15 +60,39 @@ function DataView() {
    * Reloads the location data.
    */
   const reloadData = async () => {
+    // Get all parameters
     setIfNeedsReloading(false);
+    const currentID = currentTabsCache.currentTabID;
+    const currentCoords = currentMapCache.selectedCoordinates;
+    // Set the current map cache
     setCurrentMapCache({
       ...currentMapCache,
-      loadedCoordinates: currentMapCache.selectedCoordinates,
-      currentTabID: currentTabsCache.currentTabID,
+      loadedCoordinates: currentCoords,
+      currentTabID: currentID,
     });
-    const responseData = await fetchLocationData();
-    if (responseData) {
-      setData(responseData);
+    // Prepare the location data
+    if (currentCoords) {
+      let coords: LatLng[] = [];
+      if (currentCoords instanceof LatLng) {
+        // If a single coordinates are selected
+        coords = [currentCoords];
+        console.log("single");
+      } else if (
+        // If an area (array of coordinates) is selected
+        Array.isArray(currentCoords) &&
+        currentCoords.every((obj) => {
+          obj instanceof LatLng;
+        })
+      ) {
+        coords = currentCoords;
+        console.log("area");
+      }
+      const responseData = await fetchLocationData(currentID, coords);
+      if (responseData) {
+        setData(responseData);
+      }
+    } else {
+      console.log("Currently selected coordinates are null.");
     }
   };
 
@@ -78,8 +103,14 @@ function DataView() {
           <div className="dataview-header-container">
             <b className="dataview-header-title">
               <MapPin size={20} />
-              {currentMapCache.loadedCoordinates.lat.toFixed(6)},{" "}
-              {currentMapCache.loadedCoordinates.lng.toFixed(6)}
+              {currentMapCache.loadedCoordinates instanceof LatLng ? (
+                <div>
+                  {currentMapCache.loadedCoordinates.lat.toFixed(6)},{" "}
+                  {currentMapCache.loadedCoordinates.lng.toFixed(6)}
+                </div>
+              ) : (
+                <div></div>
+              )}
             </b>
             <Box id="filter-panel" style={{ maxWidth: "18rem", width: "100%" }}>
               <TextField

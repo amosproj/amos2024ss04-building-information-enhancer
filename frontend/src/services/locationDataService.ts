@@ -1,17 +1,23 @@
 import axios from "axios";
 import { LocationDataResponse } from "../types/LocationDataTypes";
 import { getAPIGatewayURL } from "../utils/apiGatewayURL";
+import { LatLng } from "leaflet";
 
-export const fetchLocationData = async (): Promise<
-  LocationDataResponse | undefined
-> => {
+/**
+ * Fetches the data from a specific location
+ * @param datasetId the dataset ID of the current map
+ * @param location an array of coordinates
+ * @returns
+ */
+export const fetchLocationData = async (
+  datasetId: string,
+  location: LatLng[]
+): Promise<LocationDataResponse | undefined> => {
+  // Build the request body
   const requestBody = {
-    datasetId: "example_dataset",
-    location: [
-      { latitude: 51.509865, longitude: -0.118092 }, // Example coordinate
-    ],
+    datasetId: datasetId,
+    location: location,
   };
-
   try {
     const response = await axios.put<LocationDataResponse>(
       getAPIGatewayURL() + "/api/loadLocationData",

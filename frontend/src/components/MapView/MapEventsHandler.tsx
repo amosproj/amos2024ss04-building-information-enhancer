@@ -2,7 +2,7 @@ import { Fragment, useContext } from "react";
 import { Marker } from "react-leaflet/Marker";
 import { useMapEvents } from "react-leaflet/hooks";
 import { MapContext } from "../../contexts/MapContext";
-import L, { DivIcon } from "leaflet";
+import L, { DivIcon, LatLng } from "leaflet";
 import { MapPin } from "@phosphor-icons/react";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
@@ -47,7 +47,8 @@ const MapEventsHandler = () => {
     },
   });
 
-  return currentMapCache.selectedCoordinates !== null ? (
+  return currentMapCache.selectedCoordinates !== null &&
+    currentMapCache.selectedCoordinates instanceof LatLng ? (
     <Marker
       position={currentMapCache.selectedCoordinates}
       icon={divIconMarker}

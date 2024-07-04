@@ -6,8 +6,8 @@ import React, { createContext, useState, ReactNode } from "react";
 // Map Cache Type
 export type MapCacheProps = {
   mapInstance: L.Map | null;
-  selectedCoordinates: LatLng | null;
-  loadedCoordinates: LatLng | null;
+  selectedCoordinates: LatLng | LatLng[] | null;
+  loadedCoordinates: LatLng | LatLng[] | null;
   currentTabID: string | null;
   mapCenter: LatLng;
   mapBounds: LatLngBounds;
