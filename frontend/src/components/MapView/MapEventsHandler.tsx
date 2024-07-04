@@ -1,7 +1,6 @@
 import { Fragment, useContext } from "react";
 import { Marker } from "react-leaflet/Marker";
-import { Popup } from "react-leaflet/Popup";
-import { useMap, useMapEvents } from "react-leaflet/hooks";
+import { useMapEvents } from "react-leaflet/hooks";
 import { MapContext } from "../../contexts/MapContext";
 import L, { DivIcon } from "leaflet";
 import { MapPin } from "@phosphor-icons/react";
@@ -28,11 +27,6 @@ const divIconMarker: DivIcon = L.divIcon({
 const MapEventsHandler = () => {
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
 
-  const setPosition = (latlng: L.LatLng) => {
-    setCurrentMapCache({ ...currentMapCache, selectedCoordinates: latlng });
-  };
-
-  const map = useMap();
   // Add events
   useMapEvents({
     click: (event) => {
@@ -54,33 +48,10 @@ const MapEventsHandler = () => {
   });
 
   return currentMapCache.selectedCoordinates !== null ? (
-    <Marker position={currentMapCache.selectedCoordinates} icon={divIconMarker}>
-      <Popup>
-        <span
-          // Get the current location of the user
-          onClick={() => {
-            map
-              .locate({ setView: true })
-              .on("locationfound", function (event) {
-                //currentMapCache.polygon?.remove();
-                setPosition(event.latlng);
-                map.flyTo(event.latlng, map.getZoom(), {
-                  animate: true,
-                  duration: 50,
-                });
-              })
-              // If access to the location was denied
-              .on("locationerror", function (event) {
-                console.log(event);
-                alert("Location access denied.");
-              });
-          }}
-        >
-          {currentMapCache.selectedCoordinates.lat.toFixed(4)},{" "}
-          {currentMapCache.selectedCoordinates.lng.toFixed(4)}
-        </span>
-      </Popup>
-    </Marker>
+    <Marker
+      position={currentMapCache.selectedCoordinates}
+      icon={divIconMarker}
+    />
   ) : (
     <Fragment />
   );
