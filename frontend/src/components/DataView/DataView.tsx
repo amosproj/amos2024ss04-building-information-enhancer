@@ -20,6 +20,10 @@ function DataView() {
     setFilterValue(event.target.value);
   };
 
+  /**
+   * Returns the title of the currently selected tab
+   * @returns current tab title
+   */
   const getCurrentTabTitle = (): string => {
     const currentTabID = currentTabsCache.currentTabID.toString();
     const currentTab = currentTabsCache.openedTabs.find(
@@ -29,15 +33,27 @@ function DataView() {
     return currentTab ? currentTab.dataset.displayName : "No map loaded";
   };
 
+  /**
+   * Check if the "Reload data" button should be visible.
+   * Should be run on selecting different coordinates or changing the current map ID.
+   */
   useEffect(() => {
+    // Check if different coordinates were selected
     if (
       !ifNeedsReloading &&
       currentMapCache.selectedCoordinates !== null &&
       currentMapCache.loadedCoordinates !== currentMapCache.selectedCoordinates
     ) {
       setIfNeedsReloading(true);
+      // Check if tab was switched
+    } else if (
+      !ifNeedsReloading &&
+      currentMapCache.selectedCoordinates !== null &&
+      currentMapCache.currentTabID !== currentTabsCache.currentTabID
+    ) {
+      setIfNeedsReloading(true);
     }
-  }, [currentMapCache, ifNeedsReloading]);
+  }, [currentMapCache, ifNeedsReloading, currentTabsCache.currentTabID]);
 
   /**
    * Reloads the location data.
@@ -47,6 +63,7 @@ function DataView() {
     setCurrentMapCache({
       ...currentMapCache,
       loadedCoordinates: currentMapCache.selectedCoordinates,
+      currentTabID: currentTabsCache.currentTabID,
     });
     const responseData = await fetchLocationData();
     if (responseData) {
