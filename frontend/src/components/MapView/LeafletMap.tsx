@@ -13,6 +13,7 @@ import SatelliteMap from "./BackgroundMaps/SatelliteMap";
 import AerialMap from "./BackgroundMaps/AerialMap";
 import NormalMap from "./BackgroundMaps/NormalMap";
 import ParcelMap from "./BackgroundMaps/ParcelMap";
+import { Console } from "console";
 
 interface LeafletMapProps {
   datasetId: string;
@@ -28,6 +29,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
   const [polygonDrawer, setPolygonDrawer] = useState<L.Draw.Polygon | null>(
     null
   );
+  const [drawnItems, setDrawnItems] = useState<L.FeatureGroup | null>(null);
   const currentTab = getCurrentTab();
 
   /**
@@ -37,6 +39,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
     if (map) {
       // Allow for drawing polygons
       const drawnItems = new L.FeatureGroup();
+      setDrawnItems(drawnItems);
       map.addLayer(drawnItems);
       setPolygonDrawer(new L.Draw.Polygon(map as L.DrawMap));
       // Bind for polygon created
@@ -61,12 +64,15 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
   useEffect(() => {
     if (polygonDrawer) {
       if (currentMapCache.isDrawing) {
+        if (drawnItems) {
+          drawnItems.clearLayers();
+        }
         polygonDrawer.enable();
       } else {
         polygonDrawer.disable();
       }
     }
-  }, [currentMapCache.isDrawing, polygonDrawer]);
+  }, [currentMapCache.isDrawing, drawnItems, polygonDrawer]);
 
   /**
    * Fetches the metadata of the current tab
