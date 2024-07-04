@@ -1,13 +1,12 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Paper, Popover, Grid, Typography, Box, Tooltip } from "@mui/material";
 import "./MapOptions.css";
-import { StackSimple, ThreeD } from "@phosphor-icons/react";
+import { Polygon, StackSimple, ThreeD } from "@phosphor-icons/react";
 import SearchBar from "../SearchBar/SearchBar";
+import { MapContext } from "../../contexts/MapContext";
 
 interface MapOptionsProps {
-  onMapTypeChange: (
-    type: "normal" | "satellite" | "parzellar" | "aerial"
-  ) => void;
+  onMapTypeChange: (type: "normal" | "satellite" | "parcel" | "aerial") => void;
   toggle3D: () => void;
 }
 
@@ -16,6 +15,7 @@ const MapOptions: React.FC<MapOptionsProps> = ({
   toggle3D,
 }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
+  const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     setAnchorEl(event.currentTarget);
@@ -26,7 +26,7 @@ const MapOptions: React.FC<MapOptionsProps> = ({
   };
 
   const handleMapTypeChange = (
-    type: "normal" | "satellite" | "parzellar" | "aerial"
+    type: "normal" | "satellite" | "parcel" | "aerial"
   ) => {
     onMapTypeChange(type);
     handleClose();
@@ -45,10 +45,7 @@ const MapOptions: React.FC<MapOptionsProps> = ({
           onClick={handleClick}
           className="layers-map-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom"
         >
-          <StackSimple
-            aria-describedby={id}
-            className="options-icons"
-          ></StackSimple>
+          <StackSimple aria-describedby={id} className="options-icons" />
         </div>
       </Tooltip>
       <Tooltip title="Toggle 3D view" arrow placement="right">
@@ -56,7 +53,20 @@ const MapOptions: React.FC<MapOptionsProps> = ({
           onClick={toggle3D}
           className="threed-map-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom"
         >
-          <ThreeD className="options-icons"></ThreeD>
+          <ThreeD className="options-icons" />
+        </div>
+      </Tooltip>
+      <Tooltip title="Select a polygon" arrow placement="right">
+        <div
+          onClick={() => {
+            setCurrentMapCache({
+              ...currentMapCache,
+              isDrawing: !currentMapCache.isDrawing,
+            });
+          }}
+          className="draw-polygon-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom"
+        >
+          <Polygon className="options-icons" />
         </div>
       </Tooltip>
       <Popover

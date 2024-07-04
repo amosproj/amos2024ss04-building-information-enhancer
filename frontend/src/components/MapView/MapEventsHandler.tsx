@@ -1,5 +1,5 @@
-import { Fragment, useContext } from "react";
-import { Marker } from "react-leaflet/Marker";
+import React, { Fragment, useContext } from "react";
+import { Marker } from "react-leaflet";
 import { useMapEvents } from "react-leaflet/hooks";
 import { MapContext } from "../../contexts/MapContext";
 import L, { DivIcon, LatLng } from "leaflet";
@@ -24,18 +24,20 @@ const divIconMarker: DivIcon = L.divIcon({
   iconAnchor: [18, 36], // Adjust the anchor point as needed
 });
 
-const MapEventsHandler = () => {
+const MapEventsHandler: React.FC = () => {
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
 
   // Add events
   useMapEvents({
     click: (event) => {
-      currentMapCache.polygon?.remove();
-      setCurrentMapCache({
-        ...currentMapCache,
-        selectedCoordinates: event.latlng,
-        polygon: null,
-      });
+      if (!currentMapCache.isDrawing) {
+        currentMapCache.polygon?.remove();
+        setCurrentMapCache({
+          ...currentMapCache,
+          selectedCoordinates: event.latlng,
+          polygon: null,
+        });
+      }
     },
     moveend: (event) => {
       setCurrentMapCache({

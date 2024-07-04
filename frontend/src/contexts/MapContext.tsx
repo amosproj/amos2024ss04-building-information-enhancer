@@ -6,13 +6,14 @@ import React, { createContext, useState, ReactNode } from "react";
 // Map Cache Type
 export type MapCacheProps = {
   mapInstance: L.Map | null;
-  selectedCoordinates: LatLng | LatLng[] | null;
-  loadedCoordinates: LatLng | LatLng[] | null;
+  selectedCoordinates: LatLng | L.Polygon | null;
+  loadedCoordinates: LatLng | L.Polygon | null;
   currentTabID: string | null;
   mapCenter: LatLng;
   mapBounds: LatLngBounds;
   zoom: number;
   polygon: L.GeoJSON | null;
+  isDrawing: boolean;
 };
 
 // Map Context Type
@@ -38,6 +39,7 @@ const defaultMapCache: MapCacheProps = {
   mapBounds: L.latLngBounds([49.5732, 11.0288], [49.5732, 11.0288]),
   zoom: 13,
   polygon: null,
+  isDrawing: false,
 };
 
 // Actual value of the context

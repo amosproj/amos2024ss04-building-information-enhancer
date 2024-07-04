@@ -18,6 +18,7 @@ export const fetchLocationData = async (
     datasetId: datasetId,
     location: location,
   };
+  console.log(requestBody);
   try {
     const response = await axios.put<LocationDataResponse>(
       getAPIGatewayURL() + "/api/loadLocationData",

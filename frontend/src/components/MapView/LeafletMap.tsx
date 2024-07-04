@@ -1,17 +1,18 @@
-import { Fragment, useContext, useEffect, useState } from "react";
-import {
-  MapContainer,
-  TileLayer,
-  WMSTileLayer,
-  ZoomControl,
-} from "react-leaflet";
+import React, { Fragment, useContext, useEffect, useState } from "react";
+import { MapContainer, ZoomControl } from "react-leaflet";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
 import { MapContext } from "../../contexts/MapContext";
 import MapDatasetVisualizer from "./MapDatasetVisualizer";
 import { Dataset } from "../../types/DatasetTypes";
 import MapEventsHandler from "./MapEventsHandler";
 import ZoomWarningLabel from "../ZoomWarningLabel/ZoomWarningLabel";
-import L from "leaflet";
+import L, { LeafletEvent } from "leaflet";
+import "leaflet-draw/dist/leaflet.draw.css";
+import "leaflet-draw";
+import SatelliteMap from "./BackgroundMaps/SatelliteMap";
+import AerialMap from "./BackgroundMaps/AerialMap";
+import NormalMap from "./BackgroundMaps/NormalMap";
+import ParcelMap from "./BackgroundMaps/ParcelMap";
 
 interface LeafletMapProps {
   datasetId: string;
@@ -24,8 +25,47 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
   const [map, setMap] = useState<L.Map | null>(null);
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
   const [isGrayscale, setIsGrayscale] = useState<boolean>(false);
-
+  const [polygonDrawer, setPolygonDrawer] = useState<L.Draw.Polygon | null>(
+    null
+  );
   const currentTab = getCurrentTab();
+
+  /**
+   * Add the draw polygon layer
+   */
+  useEffect(() => {
+    if (map) {
+      // Allow for drawing polygons
+      const drawnItems = new L.FeatureGroup();
+      map.addLayer(drawnItems);
+      setPolygonDrawer(new L.Draw.Polygon(map as L.DrawMap));
+      // Bind for polygon created
+      map.on(L.Draw.Event.CREATED, (event: LeafletEvent) => {
+        const drawnObject = (event as L.DrawEvents.Created).layer;
+        if (drawnObject instanceof L.Polygon) {
+          drawnItems.addLayer(drawnObject);
+          setCurrentMapCache({
+            ...currentMapCache,
+            selectedCoordinates: drawnObject,
+          });
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map]);
+
+  /**
+   * Toggle polygon drawer
+   */
+  useEffect(() => {
+    if (polygonDrawer) {
+      if (currentMapCache.isDrawing) {
+        polygonDrawer.enable();
+      } else {
+        polygonDrawer.disable();
+      }
+    }
+  }, [currentMapCache.isDrawing, polygonDrawer]);
 
   /**
    * Fetches the metadata of the current tab
@@ -50,8 +90,11 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
         zoom: initialZoom,
       }));
     }
-  }, [map, setCurrentMapCache]);
+  }, [currentMapCache, map, setCurrentMapCache]);
 
+  /**
+   * Check for the zoom level threshold to apply the zoom warning and its effects
+   */
   useEffect(() => {
     if (currentTab && currentTab.dataset.metaData) {
       setIsGrayscale(
@@ -60,6 +103,9 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
     }
   }, [currentMapCache.zoom, currentTab]);
 
+  /**
+   * Adds or removes the grayscale css value
+   */
   useEffect(() => {
     if (map) {
       if (isGrayscale) {
@@ -103,63 +149,10 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
           </div>
         )}
         <MapEventsHandler />
-
-        {mapType === "satellite" && (
-          <div>
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.de/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-              url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-            />
-            <WMSTileLayer
-              url="https://sg.geodatenzentrum.de/wms_sentinel2_de"
-              layers="rgb_2020"
-              format="image/png"
-              transparent={true}
-              attribution='&copy; Bundesamt für Kartographie und Geodäsie (BKG), Bayerische Vermessungverwaltung,  <a href="http://sg.geodatenzentrum.de/web_public/gdz/datenquellen/Datenquellen_TopPlusOpen.pdf">Sources</a>'
-              bounds={L.latLngBounds([47.141, 5.561], [55.054, 15.579])}
-            />
-          </div>
-        )}
-        {mapType === "aerial" && (
-          <div>
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.de/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-              url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-            />
-            <WMSTileLayer
-              url="https://geoservices.bayern.de/od/wms/dop/v1/dop40?"
-              layers="by_dop40c"
-              format="image/png"
-              transparent={true}
-              attribution="&copy; © Europäische Union, enthält Copernicus Sentinel-2 Daten 2020, verarbeitet durch das Bundesamt für Kartographie und Geodäsie (BKG)"
-              bounds={L.latLngBounds([47.141, 5.561], [55.054, 15.579])}
-            />
-          </div>
-        )}
-        {mapType === "normal" && (
-          <div>
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.de/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-          </div>
-        )}
-        {mapType === "parzellar" && (
-          <div>
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.de/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-              url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-            />
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.de/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-              url="https://wmtsod1.bayernwolke.de/wmts/by_webkarte/{s}/{z}/{x}/{y}"
-            />
-            <WMSTileLayer
-              url="https://geoservices.bayern.de/wms/v1/ogc_alkis_parzellarkarte.cgi?"
-              layers="by_alkis_parzellarkarte_farbe"
-            />
-          </div>
-        )}
+        {mapType === "satellite" && <SatelliteMap />}
+        {mapType === "aerial" && <AerialMap />}
+        {mapType === "normal" && <NormalMap />}
+        {mapType === "parcel" && <ParcelMap />}
         <ZoomWarningLabel />
       </MapContainer>
     </div>

@@ -26,7 +26,7 @@ interface MapViewProps {
 const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
   const [if3D, setIf3D] = useState<boolean>(false);
   const [mapType, setMapType] = useState<
-    "normal" | "satellite" | "parzellar" | "aerial"
+    "normal" | "satellite" | "parcel" | "aerial"
   >("normal");
 
   /**
@@ -34,7 +34,7 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
    * @param type type of the layer
    */
   const handleMapTypeChange = (
-    type: "normal" | "satellite" | "parzellar" | "aerial"
+    type: "normal" | "satellite" | "parcel" | "aerial"
   ) => {
     setMapType(type);
   };
