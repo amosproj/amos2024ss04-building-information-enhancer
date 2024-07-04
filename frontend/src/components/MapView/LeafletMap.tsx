@@ -6,7 +6,7 @@ import MapDatasetVisualizer from "./MapDatasetVisualizer";
 import { Dataset } from "../../types/DatasetTypes";
 import MapEventsHandler from "./MapEventsHandler";
 import ZoomWarningLabel from "../ZoomWarningLabel/ZoomWarningLabel";
-import L, { LeafletEvent } from "leaflet";
+import L, { LatLng, LeafletEvent } from "leaflet";
 import "leaflet-draw/dist/leaflet.draw.css";
 import "leaflet-draw";
 import SatelliteMap from "./BackgroundMaps/SatelliteMap";
@@ -67,12 +67,27 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
         if (drawnItems) {
           drawnItems.clearLayers();
         }
+        setCurrentMapCache({ ...currentMapCache, selectedCoordinates: null });
         polygonDrawer.enable();
       } else {
         polygonDrawer.disable();
       }
     }
-  }, [currentMapCache.isDrawing, drawnItems, polygonDrawer]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentMapCache.isDrawing]);
+
+  /**
+   * Delete the selection if other coordinate was selected
+   */
+  useEffect(() => {
+    if (currentMapCache.selectedCoordinates instanceof (LatLng || null)) {
+      polygonDrawer?.disable();
+      if (drawnItems) {
+        drawnItems.clearLayers();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentMapCache.selectedCoordinates]);
 
   /**
    * Fetches the metadata of the current tab
@@ -83,6 +98,9 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
     }
   }, [currentTab, getOrFetchMetadata]);
 
+  /**
+   * Refresh the map bounds on map change
+   */
   useEffect(() => {
     if (map) {
       const initialBounds = map.getBounds();
