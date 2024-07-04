@@ -47,6 +47,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
           setCurrentMapCache({
             ...currentMapCache,
             selectedCoordinates: drawnObject,
+            isDrawing: false,
           });
         }
       });
