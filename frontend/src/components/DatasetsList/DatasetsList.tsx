@@ -86,6 +86,7 @@ const DatasetsList: React.FC<DatasetsListProps> = ({ closeDialog }) => {
     };
     setCurrentTabsCache({
       ...currentTabsCache,
+      currentTabID: newTab.id,
       openedTabs: [...currentTabsCache.openedTabs, newTab],
     });
     // Close the dialog if necessary
