@@ -289,6 +289,7 @@ BEGIN
         DistrictKey VARCHAR(255),
         CheckDate DATE,
         GroundArea FLOAT,
+        BuildingWallHeight FLOAT,
     );
 END";
             }

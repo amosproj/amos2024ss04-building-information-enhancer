@@ -111,6 +111,7 @@ namespace BIE.DataPipeline.Import
                 string districtKey = GetBuildingDistrictKey(buildingNode);
                 string checkDate = GetBuildingCheckDate(buildingNode);
                 float groundArea = GetBuildingGroundArea(buildingNode);
+                float buildingWallHeight = GetBuildingWallHeight(buildingNode);
 
                 nextLine = $"geography::STGeomFromText('{geometry.AsText()}', 4326)";
                 nextLine += string.Format(",'{0}'", buildingNode.InnerXml);
@@ -118,6 +119,7 @@ namespace BIE.DataPipeline.Import
                 nextLine += string.Format(",'{0}'", districtKey);
                 nextLine += string.Format(",'{0}'", checkDate);
                 nextLine += string.Format(",{0}", groundArea.ToString(culture));
+                nextLine += string.Format(",{0}", buildingWallHeight.ToString(culture));
 
                 this.buildingIndex++;
                 return true;
@@ -273,6 +275,40 @@ namespace BIE.DataPipeline.Import
                 res += ParseArea(groundSurface);
             }
             return res;
+        }
+
+        private float GetBuildingWallHeight(XmlNode buildingNode)
+        {
+            float hoeheGrund = GetStringAttributeValue(buildingNode, "HoeheGrund");
+            float niedrigsteTraufeDesGebaeudes = GetStringAttributeValue(buildingNode, "NiedrigsteTraufeDesGebaeudes");
+            if(hoeheGrund == -1 || niedrigsteTraufeDesGebaeudes == -1)
+            {
+                return -1;
+            }
+            else
+            {
+                return niedrigsteTraufeDesGebaeudes - hoeheGrund;
+            }
+        }
+
+        private float GetStringAttributeValue(XmlNode buildingNode, string name, float defaultValue = -1)
+        {
+            XmlNode groundHeightNode = buildingNode.SelectSingleNode(".//gen:stringAttribute[@name='" + name + "']/gen:value", this.nsmgr);
+
+            if (groundHeightNode == null)
+            {
+                Console.WriteLine("No " + name + " value");
+                return defaultValue;
+            }
+
+            float result = 0;
+            if (!float.TryParse(groundHeightNode.InnerText, NumberStyles.Any, culture, out result))
+            {
+                Console.WriteLine("Unable to parse " + name);
+                return defaultValue;
+            }
+
+            return result;
         }
 
         private float ParseArea(XmlNode node)
