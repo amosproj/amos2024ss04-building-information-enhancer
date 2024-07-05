@@ -80,4 +80,4 @@ for name, url in file_info:
     i = i + 1
     print(i)
     #print(f"File Name: {name}\nFirst URL: {url}\n")
-    #create_yaml_file(target_folder_path, remove_file_extension(name), url)
+    create_yaml_file(target_folder_path, remove_file_extension(name), url)
