@@ -112,6 +112,7 @@ namespace BIE.DataPipeline.Import
                 string checkDate = GetBuildingCheckDate(buildingNode);
                 float groundArea = GetBuildingGroundArea(buildingNode);
                 float buildingWallHeight = GetBuildingWallHeight(buildingNode);
+                float livingArea = GetLivingArea(buildingNode, groundArea, buildingWallHeight);
 
                 nextLine = $"geography::STGeomFromText('{geometry.AsText()}', 4326)";
                 nextLine += string.Format(",'{0}'", buildingNode.InnerXml);
@@ -120,6 +121,7 @@ namespace BIE.DataPipeline.Import
                 nextLine += string.Format(",'{0}'", checkDate);
                 nextLine += string.Format(",{0}", groundArea.ToString(culture));
                 nextLine += string.Format(",{0}", buildingWallHeight.ToString(culture));
+                nextLine += string.Format(",{0}", livingArea.ToString(culture));
 
                 this.buildingIndex++;
                 return true;
@@ -289,6 +291,17 @@ namespace BIE.DataPipeline.Import
             {
                 return niedrigsteTraufeDesGebaeudes - hoeheGrund;
             }
+        }
+
+        private float GetLivingArea(XmlNode buildingNode, float groundArea, float buildingWallHeight)
+        {
+            if(groundArea == -1 || buildingWallHeight == -1)
+            {
+                return -1;
+            }
+
+            const float averageFloorHeight = 2.4f;
+            return groundArea * (float)Math.Ceiling(buildingWallHeight / averageFloorHeight);
         }
 
         private float GetStringAttributeValue(XmlNode buildingNode, string name, float defaultValue = -1)

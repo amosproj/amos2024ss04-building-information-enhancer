@@ -290,6 +290,7 @@ BEGIN
         CheckDate DATE,
         GroundArea FLOAT,
         BuildingWallHeight FLOAT,
+        LivingArea FLOAT,
     );
 END";
             }
