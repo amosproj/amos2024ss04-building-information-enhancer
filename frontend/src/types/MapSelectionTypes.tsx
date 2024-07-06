@@ -1,5 +1,5 @@
 import { LatLng } from "leaflet";
-import { GeoJSON } from "geojson";
+import { Feature, Polygon } from "geojson";
 
 // An interface for the map selection
 
@@ -7,11 +7,15 @@ export type MapSelection = PolygonSelection | MarkerSelection | null;
 
 // Define PolygonSelection class
 export class PolygonSelection {
-  polygon: GeoJSON;
+  polygon: Feature<Polygon>;
   displayName: string;
   ifHandDrawn: boolean;
 
-  constructor(polygon: GeoJSON, displayName: string, ifHandDrawn: boolean) {
+  constructor(
+    polygon: Feature<Polygon>,
+    displayName: string,
+    ifHandDrawn: boolean
+  ) {
     this.polygon = polygon;
     this.displayName = displayName;
     this.ifHandDrawn = ifHandDrawn;

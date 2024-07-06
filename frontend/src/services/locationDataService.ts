@@ -1,7 +1,7 @@
 import axios from "axios";
 import { LocationDataResponse } from "../types/LocationDataTypes";
 import { getAPIGatewayURL } from "../utils/apiGatewayURL";
-import { LatLng } from "leaflet";
+import { Position } from "geojson";
 
 /**
  * Fetches the data from a specific location
@@ -11,7 +11,7 @@ import { LatLng } from "leaflet";
  */
 export const fetchLocationData = async (
   datasetId: string,
-  location: LatLng[]
+  location: Position[]
 ): Promise<LocationDataResponse | undefined> => {
   // Build the request body
   const requestBody = {

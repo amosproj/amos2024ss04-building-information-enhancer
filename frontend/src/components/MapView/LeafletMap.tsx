@@ -24,6 +24,7 @@ import {
   MarkerSelection,
   PolygonSelection,
 } from "../../types/MapSelectionTypes";
+import { Feature, GeoJsonProperties, Polygon } from "geojson";
 
 interface LeafletMapProps {
   datasetId: string;
@@ -114,14 +115,15 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
         if (drawnObject instanceof L.Polygon) {
           if (drawnItems) {
             drawnItems.addLayer(drawnObject);
-            const latLongs = drawnObject.toGeoJSON();
+            const latLongs = drawnObject.toGeoJSON() as Feature<
+              Polygon,
+              GeoJsonProperties
+            >;
             const polygonSelection = new PolygonSelection(
               latLongs,
               "Custom Polygon",
               true
             );
-            console.log(polygonSelection);
-            console.log(currentMapCacheRef.current);
             setCurrentMapCache({
               ...currentMapCacheRef.current,
               selectedCoordinates: polygonSelection,

@@ -8,15 +8,14 @@ import { MapContext } from "../../contexts/MapContext";
 import LoadDataButton from "./LoadDataButton";
 import { LocationDataResponse } from "../../types/LocationDataTypes";
 import { fetchLocationData } from "../../services/locationDataService";
-import { LatLng } from "leaflet";
-import L from "leaflet";
 import {
   MarkerSelection,
   PolygonSelection,
 } from "../../types/MapSelectionTypes";
+import { Position } from "geojson";
 
 function DataView() {
-  const { currentTabsCache } = useContext(TabsContext);
+  const { currentTabsCache, getCurrentTab } = useContext(TabsContext);
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
   const [filterValue, setFilterValue] = useState("");
   const [ifNeedsReloading, setIfNeedsReloading] = useState(false);
@@ -77,19 +76,26 @@ function DataView() {
     });
     // Prepare the location data
     if (currentCoords) {
-      let coords: LatLng[] = [];
-      if (currentCoords instanceof LatLng) {
-        // If a single coordinates are selected
-        coords = [currentCoords];
-        console.log("single");
-      } else if (currentCoords instanceof L.Polygon) {
-        // If an area (array of coordinates) is selected
-        coords = currentCoords.getLatLngs() as LatLng[];
-        console.log("area");
+      let coords: Position[] = [];
+      if (currentCoords instanceof MarkerSelection) {
+        const singlePosition: Position = [
+          currentCoords.marker.lng,
+          currentCoords.marker.lat,
+        ];
+        coords = [singlePosition];
+      } else if (currentCoords instanceof PolygonSelection) {
+        coords = currentCoords.polygon.geometry.coordinates[0];
       }
-      const responseData = await fetchLocationData(currentID, coords);
-      if (responseData) {
-        setData(responseData);
+      // Send the location request
+      const currentTab = getCurrentTab();
+      if (currentTab) {
+        const responseData = await fetchLocationData(
+          currentTab.dataset.id,
+          coords
+        );
+        if (responseData) {
+          setData(responseData);
+        }
       }
     } else {
       console.log("Currently selected coordinates are null.");
