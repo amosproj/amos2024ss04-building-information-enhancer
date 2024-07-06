@@ -10,6 +10,10 @@ import { LocationDataResponse } from "../../types/LocationDataTypes";
 import { fetchLocationData } from "../../services/locationDataService";
 import { LatLng } from "leaflet";
 import L from "leaflet";
+import {
+  MarkerSelection,
+  PolygonSelection,
+} from "../../types/MapSelectionTypes";
 
 function DataView() {
   const { currentTabsCache } = useContext(TabsContext);
@@ -99,18 +103,17 @@ function DataView() {
           <div className="dataview-header-container">
             <b className="dataview-header-title">
               <MapPin size={20} />
-              {currentMapCache.loadedCoordinates instanceof LatLng && (
+              {currentMapCache.loadedCoordinates instanceof MarkerSelection && (
                 <div>
                   Custom Marker{" "}
                   <span className="sub-text">
-                    ({currentMapCache.loadedCoordinates.lat.toFixed(6)},{" "}
-                    {currentMapCache.loadedCoordinates.lng.toFixed(6)})
+                    ({currentMapCache.loadedCoordinates.marker.lat.toFixed(6)},{" "}
+                    {currentMapCache.loadedCoordinates.marker.lng.toFixed(6)})
                   </span>
                 </div>
               )}
-              {currentMapCache.loadedCoordinates instanceof L.Polygon && (
-                <div>Custom Polygon </div>
-              )}
+              {currentMapCache.loadedCoordinates instanceof
+                PolygonSelection && <div>Custom Polygon </div>}
             </b>
             <Box id="filter-panel" style={{ maxWidth: "18rem", width: "100%" }}>
               <TextField

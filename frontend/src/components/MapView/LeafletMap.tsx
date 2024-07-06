@@ -6,7 +6,7 @@ import MapDatasetVisualizer from "./MapDatasetVisualizer";
 import { Dataset } from "../../types/DatasetTypes";
 import MapEventsHandler from "./MapEventsHandler";
 import ZoomWarningLabel from "../ZoomWarningLabel/ZoomWarningLabel";
-import L, { LatLng, LeafletEvent } from "leaflet";
+import L, { LeafletEvent } from "leaflet";
 import "leaflet-draw/dist/leaflet.draw.css";
 import "leaflet-draw";
 import SatelliteMap from "./BackgroundMaps/SatelliteMap";
@@ -14,6 +14,10 @@ import AerialMap from "./BackgroundMaps/AerialMap";
 import NormalMap from "./BackgroundMaps/NormalMap";
 import ParcelMap from "./BackgroundMaps/ParcelMap";
 import "./LeafletMap.css";
+import {
+  MarkerSelection,
+  PolygonSelection,
+} from "../../types/MapSelectionTypes";
 
 interface LeafletMapProps {
   datasetId: string;
@@ -54,7 +58,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
    * Delete the selection if other coordinate was selected
    */
   useEffect(() => {
-    if (currentMapCache.selectedCoordinates instanceof (LatLng || null)) {
+    if (currentMapCache.selectedCoordinates instanceof MarkerSelection) {
       polygonDrawer?.disable();
       if (drawnItems) {
         drawnItems.clearLayers();
@@ -98,15 +102,24 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
         if (drawnObject instanceof L.Polygon) {
           if (drawnItems) {
             drawnItems.addLayer(drawnObject);
+            const latLongs = drawnObject.toGeoJSON();
+            const polygonSelection = new PolygonSelection(
+              latLongs,
+              "Custom Polygon",
+              true
+            );
+            console.log(polygonSelection);
+            console.log(currentMapCache);
             setCurrentMapCache({
               ...currentMapCache,
-              selectedCoordinates: drawnObject,
+              selectedCoordinates: polygonSelection,
               isDrawing: false,
             });
           }
         }
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map]);
 
   /**

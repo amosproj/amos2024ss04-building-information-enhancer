@@ -1,18 +1,18 @@
 import L, { LatLng, LatLngBounds } from "leaflet";
 import React, { createContext, useState, ReactNode } from "react";
+import { MapSelection } from "../types/MapSelectionTypes";
 
 //// TYPES ////
 
 // Map Cache Type
 export type MapCacheProps = {
   mapInstance: L.Map | null;
-  selectedCoordinates: LatLng | L.Polygon | null;
-  loadedCoordinates: LatLng | L.Polygon | null;
-  currentTabID: string | null;
+  selectedCoordinates: MapSelection;
+  loadedCoordinates: MapSelection;
+  currentTabID: null | string;
   mapCenter: LatLng;
   mapBounds: LatLngBounds;
   zoom: number;
-  polygon: L.GeoJSON | null;
   isDrawing: boolean;
 };
 
@@ -38,7 +38,6 @@ const defaultMapCache: MapCacheProps = {
   mapCenter: L.latLng([49.5732, 11.0288]),
   mapBounds: L.latLngBounds([49.5732, 11.0288], [49.5732, 11.0288]),
   zoom: 13,
-  polygon: null,
   isDrawing: false,
 };
 

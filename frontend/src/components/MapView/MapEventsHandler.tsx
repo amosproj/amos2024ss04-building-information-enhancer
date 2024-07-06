@@ -2,10 +2,11 @@ import React, { Fragment, useContext } from "react";
 import { Marker } from "react-leaflet";
 import { useMapEvents } from "react-leaflet/hooks";
 import { MapContext } from "../../contexts/MapContext";
-import L, { DivIcon, LatLng } from "leaflet";
+import L, { DivIcon } from "leaflet";
 import { MapPin } from "@phosphor-icons/react";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
+import { MarkerSelection } from "../../types/MapSelectionTypes";
 
 // Utility function to render a React component to HTML string
 const renderToHtml = (Component: React.FC) => {
@@ -31,11 +32,10 @@ const MapEventsHandler: React.FC = () => {
   useMapEvents({
     click: (event) => {
       if (!currentMapCache.isDrawing) {
-        currentMapCache.polygon?.remove();
+        const markerSelection = new MarkerSelection(event.latlng);
         setCurrentMapCache({
           ...currentMapCache,
-          selectedCoordinates: event.latlng,
-          polygon: null,
+          selectedCoordinates: markerSelection,
         });
       }
     },
@@ -49,10 +49,9 @@ const MapEventsHandler: React.FC = () => {
     },
   });
 
-  return currentMapCache.selectedCoordinates !== null &&
-    currentMapCache.selectedCoordinates instanceof LatLng ? (
+  return currentMapCache.selectedCoordinates instanceof MarkerSelection ? (
     <Marker
-      position={currentMapCache.selectedCoordinates}
+      position={currentMapCache.selectedCoordinates.marker}
       icon={divIconMarker}
     />
   ) : (
