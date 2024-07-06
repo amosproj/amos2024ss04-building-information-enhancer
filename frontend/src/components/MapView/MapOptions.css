@@ -68,32 +68,11 @@
   border-color: blue;
 }
 
-.threed-map-icon-container {
-  width: 2.1rem;
-  height: 2.1rem;
-  position: absolute;
-  top: 7.5rem;
-  right: 0.6rem;
-  cursor: pointer;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  background-color: white;
-  justify-content: center;
-  align-items: center;
-  border: 2px solid rgba(0, 0, 0, 0.27);
-  box-shadow: none;
-}
-.threed-map-icon-container:hover {
-  background-color: #f4f4f4;
-  color: #535bf2;
-}
-
 .draw-polygon-icon-container {
   width: 2.1rem;
   height: 2.1rem;
   position: absolute;
-  top: 10rem;
+  top: 7.5rem;
   right: 0.6rem;
   cursor: pointer;
   z-index: 2;

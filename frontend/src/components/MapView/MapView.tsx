@@ -8,7 +8,6 @@ import L from "leaflet";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import MapOptions from "./MapOptions";
-import ThreeDView from "../ThreeDView/ThreeDView";
 import LeafletMap from "./LeafletMap";
 
 const DefaultIcon = L.icon({
@@ -24,7 +23,6 @@ interface MapViewProps {
 }
 
 const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
-  const [if3D, setIf3D] = useState<boolean>(false);
   const [mapType, setMapType] = useState<
     "normal" | "satellite" | "parcel" | "aerial"
   >("normal");
@@ -39,22 +37,10 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
     setMapType(type);
   };
 
-  /**
-   * Toggles the 3D View
-   */
-  const toggle3D = () => {
-    console.log("3D");
-    setIf3D(!if3D);
-  };
-
   return (
     <div className="tab-map-container">
-      {if3D ? (
-        <ThreeDView datasetId={datasetId} mapType={mapType} />
-      ) : (
-        <LeafletMap datasetId={datasetId} mapType={mapType} />
-      )}
-      <MapOptions onMapTypeChange={handleMapTypeChange} toggle3D={toggle3D} />
+      <LeafletMap datasetId={datasetId} mapType={mapType} />
+      <MapOptions onMapTypeChange={handleMapTypeChange} />
     </div>
   );
 };

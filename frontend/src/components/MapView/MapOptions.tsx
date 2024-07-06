@@ -1,19 +1,15 @@
 import React, { useContext, useState } from "react";
 import { Paper, Popover, Grid, Typography, Box, Tooltip } from "@mui/material";
 import "./MapOptions.css";
-import { Polygon, StackSimple, ThreeD } from "@phosphor-icons/react";
+import { Polygon, StackSimple } from "@phosphor-icons/react";
 import SearchBar from "../SearchBar/SearchBar";
 import { MapContext } from "../../contexts/MapContext";
 
 interface MapOptionsProps {
   onMapTypeChange: (type: "normal" | "satellite" | "parcel" | "aerial") => void;
-  toggle3D: () => void;
 }
 
-const MapOptions: React.FC<MapOptionsProps> = ({
-  onMapTypeChange,
-  toggle3D,
-}) => {
+const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
 
@@ -46,14 +42,6 @@ const MapOptions: React.FC<MapOptionsProps> = ({
           className="layers-map-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom"
         >
           <StackSimple aria-describedby={id} className="options-icons" />
-        </div>
-      </Tooltip>
-      <Tooltip title="Toggle 3D view" arrow placement="right">
-        <div
-          onClick={toggle3D}
-          className="threed-map-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom"
-        >
-          <ThreeD className="options-icons" />
         </div>
       </Tooltip>
       <Tooltip title="Select a polygon" arrow placement="right">
