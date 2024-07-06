@@ -5,24 +5,28 @@ import { Feature, MultiPolygon } from "geojson";
 export class PolygonSelection {
   polygon: Feature<MultiPolygon>;
   displayName: string;
-  ifHandDrawn: boolean;
+  ifHandSelected: boolean;
 
   constructor(
     polygon: Feature<MultiPolygon>,
     displayName: string,
-    ifHandDrawn: boolean
+    ifHandSelected: boolean
   ) {
     this.polygon = polygon;
     this.displayName = displayName;
-    this.ifHandDrawn = ifHandDrawn;
+    this.ifHandSelected = ifHandSelected;
   }
 }
 
 // An interface for a single marker selection
 export class MarkerSelection {
   marker: LatLng;
+  displayName: string;
+  ifHandSelected: boolean;
 
-  constructor(marker: LatLng) {
+  constructor(marker: LatLng, displayName: string, ifHandSelected: boolean) {
     this.marker = marker;
+    this.displayName = displayName;
+    this.ifHandSelected = ifHandSelected;
   }
 }

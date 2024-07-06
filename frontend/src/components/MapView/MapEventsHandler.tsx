@@ -32,7 +32,11 @@ const MapEventsHandler: React.FC = () => {
   useMapEvents({
     click: (event) => {
       if (!currentMapCache.isDrawing) {
-        const markerSelection = new MarkerSelection(event.latlng);
+        const markerSelection = new MarkerSelection(
+          event.latlng,
+          "Custom Marker",
+          true
+        );
         setCurrentMapCache({
           ...currentMapCache,
           selectedCoordinates: markerSelection,

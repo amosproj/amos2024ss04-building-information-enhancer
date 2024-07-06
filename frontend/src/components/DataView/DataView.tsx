@@ -2,7 +2,7 @@ import DataPanel from "./DataPanel";
 import "./DataView.css";
 import { Fragment, useContext, useEffect, useState } from "react";
 import { TabsContext } from "../../contexts/TabsContext";
-import { Box, TextField } from "@mui/material";
+import { Box, TextField, Tooltip } from "@mui/material";
 import { Funnel, MapPin, MapPinLine } from "@phosphor-icons/react";
 import { MapContext } from "../../contexts/MapContext";
 import LoadDataButton from "./LoadDataButton";
@@ -111,11 +111,21 @@ function DataView() {
               <MapPin size={20} />
               {currentMapCache.loadedCoordinates instanceof MarkerSelection && (
                 <div>
-                  Custom Marker{" "}
-                  <span className="sub-text">
+                  <Tooltip
+                    title={currentMapCache.loadedCoordinates.displayName}
+                    arrow
+                  >
+                    <span>
+                      {currentMapCache.loadedCoordinates.displayName.substring(
+                        0,
+                        40
+                      ) + "... "}
+                    </span>
+                  </Tooltip>
+                  <div className="sub-text">
                     ({currentMapCache.loadedCoordinates.marker.lat.toFixed(6)},{" "}
                     {currentMapCache.loadedCoordinates.marker.lng.toFixed(6)})
-                  </span>
+                  </div>
                 </div>
               )}
               {currentMapCache.loadedCoordinates instanceof

@@ -8,7 +8,6 @@ import { MapSelection, SearchContext } from "../../contexts/SearchContext";
 import { OpenStreetMapProvider } from "leaflet-geosearch";
 import { LatLng } from "leaflet";
 import { MapContext } from "../../contexts/MapContext";
-import L from "leaflet";
 import "./SearchBar.css";
 import { Feature, GeoJSON, MultiPolygon } from "geojson";
 import {
@@ -115,14 +114,14 @@ const SearchBar: React.FC = () => {
     if (mapInstance) {
       if (item.area && item.bounds) {
         mapInstance.flyToBounds(item.bounds, { animate: true, duration: 5 });
-        const drawPolygon = L.geoJSON(item.polygon, {
-          style: {
-            color: "#ff0000",
-            weight: 2,
-            fillOpacity: 0,
-          },
-        });
-        drawPolygon.addTo(mapInstance);
+        // const drawPolygon = L.geoJSON(item.polygon, {
+        //   style: {
+        //     color: "#ff0000",
+        //     weight: 2,
+        //     fillOpacity: 0,
+        //   },
+        // });
+        // drawPolygon.addTo(mapInstance);
         if (item.polygon) {
           const polygonSelection = new PolygonSelection(
             item.polygon as Feature<MultiPolygon>,
@@ -136,7 +135,11 @@ const SearchBar: React.FC = () => {
         }
       } else {
         // Select a marker on the map
-        const markerSelection = new MarkerSelection(targetPosition);
+        const markerSelection = new MarkerSelection(
+          targetPosition,
+          item.displayName,
+          false
+        );
         currentMapCache.selectedCoordinates = markerSelection;
         mapInstance.flyTo(targetPosition, 13, { animate: true, duration: 5 });
       }
