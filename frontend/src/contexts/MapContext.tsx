@@ -1,14 +1,14 @@
 import L, { LatLng, LatLngBounds } from "leaflet";
 import React, { createContext, useState, ReactNode } from "react";
-import { MapSelection } from "../types/MapSelectionTypes";
+import { MarkerSelection, PolygonSelection } from "../types/MapSelectionTypes";
 
 //// TYPES ////
 
 // Map Cache Type
 export type MapCacheProps = {
   mapInstance: L.Map | null;
-  selectedCoordinates: MapSelection;
-  loadedCoordinates: MapSelection;
+  selectedCoordinates: PolygonSelection | MarkerSelection | null;
+  loadedCoordinates: PolygonSelection | MarkerSelection | null;
   currentTabID: null | string;
   mapCenter: LatLng;
   mapBounds: LatLngBounds;

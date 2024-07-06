@@ -1,18 +1,14 @@
 import { LatLng } from "leaflet";
-import { Feature, Polygon } from "geojson";
-
-// An interface for the map selection
-
-export type MapSelection = PolygonSelection | MarkerSelection | null;
+import { Feature, MultiPolygon } from "geojson";
 
 // Define PolygonSelection class
 export class PolygonSelection {
-  polygon: Feature<Polygon>;
+  polygon: Feature<MultiPolygon>;
   displayName: string;
   ifHandDrawn: boolean;
 
   constructor(
-    polygon: Feature<Polygon>,
+    polygon: Feature<MultiPolygon>,
     displayName: string,
     ifHandDrawn: boolean
   ) {

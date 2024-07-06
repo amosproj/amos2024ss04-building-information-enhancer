@@ -10,7 +10,11 @@ import { LatLng } from "leaflet";
 import { MapContext } from "../../contexts/MapContext";
 import L from "leaflet";
 import "./SearchBar.css";
-import { GeoJSON } from "geojson";
+import { Feature, GeoJSON, MultiPolygon } from "geojson";
+import {
+  MarkerSelection,
+  PolygonSelection,
+} from "../../types/MapSelectionTypes";
 
 declare module "leaflet-geosearch/dist/providers/openStreetMapProvider.js" {
   interface RawResult {
@@ -119,16 +123,24 @@ const SearchBar: React.FC = () => {
           },
         });
         drawPolygon.addTo(mapInstance);
-        setCurrentMapCache({
-          ...currentMapCache,
-          polygon: drawPolygon,
-          selectedCoordinates: null,
-        });
+        if (item.polygon) {
+          const polygonSelection = new PolygonSelection(
+            item.polygon as Feature<MultiPolygon>,
+            item.displayName,
+            false
+          );
+          setCurrentMapCache({
+            ...currentMapCache,
+            selectedCoordinates: polygonSelection,
+          });
+        }
       } else {
-        currentMapCache.selectedCoordinates = targetPosition;
+        // Select a marker on the map
+        const markerSelection = new MarkerSelection(targetPosition);
+        currentMapCache.selectedCoordinates = markerSelection;
         mapInstance.flyTo(targetPosition, 13, { animate: true, duration: 5 });
       }
-    } else console.log("no map instance");
+    } else console.log("No map instance");
   };
 
   const getUniqueOptions = (options: MapSelection[]) => {
@@ -156,7 +168,7 @@ const SearchBar: React.FC = () => {
         getOptionLabel={(option) =>
           typeof option === "string" ? option : option.displayName
         }
-        freeSolo={inputValue?.length ? false : true}
+        freeSolo={true}
         loading={loading}
         forcePopupIcon={false}
         filterOptions={(x) => x}
@@ -184,10 +196,9 @@ const SearchBar: React.FC = () => {
         }}
         onInputChange={(_event, newInputValue) => {
           if (newInputValue === "") {
-            currentMapCache.polygon?.remove();
             setCurrentMapCache({
               ...currentMapCache,
-              polygon: null,
+              selectedCoordinates: null,
             });
           }
           setInputValue(newInputValue);
@@ -237,7 +248,7 @@ const SearchBar: React.FC = () => {
           );
 
           return (
-            <li {...props}>
+            <li {...props} key={option.displayName}>
               <Grid
                 container
                 alignItems="center"

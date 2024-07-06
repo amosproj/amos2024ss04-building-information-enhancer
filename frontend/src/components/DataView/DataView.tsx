@@ -76,15 +76,15 @@ function DataView() {
     });
     // Prepare the location data
     if (currentCoords) {
-      let coords: Position[] = [];
+      let coords: Position[][][] = [];
       if (currentCoords instanceof MarkerSelection) {
         const singlePosition: Position = [
           currentCoords.marker.lng,
           currentCoords.marker.lat,
         ];
-        coords = [singlePosition];
+        coords = [[[singlePosition]]];
       } else if (currentCoords instanceof PolygonSelection) {
-        coords = currentCoords.polygon.geometry.coordinates[0];
+        coords = currentCoords.polygon.geometry.coordinates;
       }
       // Send the location request
       const currentTab = getCurrentTab();
@@ -119,7 +119,9 @@ function DataView() {
                 </div>
               )}
               {currentMapCache.loadedCoordinates instanceof
-                PolygonSelection && <div>Custom Polygon </div>}
+                PolygonSelection && (
+                <div>{currentMapCache.loadedCoordinates.displayName}</div>
+              )}
             </b>
             <Box id="filter-panel" style={{ maxWidth: "18rem", width: "100%" }}>
               <TextField

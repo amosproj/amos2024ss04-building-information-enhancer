@@ -11,7 +11,7 @@ import { Position } from "geojson";
  */
 export const fetchLocationData = async (
   datasetId: string,
-  location: Position[]
+  location: Position[][][]
 ): Promise<LocationDataResponse | undefined> => {
   // Build the request body
   const requestBody = {
