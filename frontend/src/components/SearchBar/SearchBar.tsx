@@ -14,6 +14,7 @@ import {
   MarkerSelection,
   PolygonSelection,
 } from "../../types/MapSelectionTypes";
+import L from "leaflet";
 
 declare module "leaflet-geosearch/dist/providers/openStreetMapProvider.js" {
   interface RawResult {
@@ -114,15 +115,18 @@ const SearchBar: React.FC = () => {
     if (mapInstance) {
       if (item.area && item.bounds) {
         mapInstance.flyToBounds(item.bounds, { animate: true, duration: 5 });
-        // const drawPolygon = L.geoJSON(item.polygon, {
-        //   style: {
-        //     color: "#ff0000",
-        //     weight: 2,
-        //     fillOpacity: 0,
-        //   },
-        // });
-        // drawPolygon.addTo(mapInstance);
+        if (currentMapCache.drawnItems) {
+          currentMapCache.drawnItems.clearLayers();
+        }
         if (item.polygon) {
+          const drawPolygon = L.geoJSON(item.polygon, {
+            style: {
+              color: "#ff0000",
+              weight: 2,
+              fillOpacity: 0,
+            },
+          });
+          drawPolygon.addTo(currentMapCache.drawnItems!);
           const polygonSelection = new PolygonSelection(
             item.polygon as Feature<MultiPolygon>,
             item.displayName,

@@ -41,7 +41,6 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
   const [polygonDrawer, setPolygonDrawer] = useState<L.Draw.Polygon | null>(
     null
   );
-  const [drawnItems, setDrawnItems] = useState<L.FeatureGroup | null>(null);
   const currentTab = getCurrentTab();
 
   // Update ref value whenever currentMapCache changes
@@ -55,8 +54,8 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
   useEffect(() => {
     if (polygonDrawer) {
       if (currentMapCache.isDrawing) {
-        if (drawnItems) {
-          drawnItems.clearLayers();
+        if (currentMapCache.drawnItems) {
+          currentMapCache.drawnItems.clearLayers();
         }
         setCurrentMapCache({ ...currentMapCache, selectedCoordinates: null });
         polygonDrawer.enable();
@@ -73,8 +72,8 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
   useEffect(() => {
     if (currentMapCache.selectedCoordinates instanceof MarkerSelection) {
       polygonDrawer?.disable();
-      if (drawnItems) {
-        drawnItems.clearLayers();
+      if (currentMapCache.drawnItems) {
+        currentMapCache.drawnItems.clearLayers();
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -97,16 +96,17 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
       const initialBounds = map.getBounds();
       const initialCenter = map.getCenter();
       const initialZoom = map.getZoom();
+      const drawnItems = new L.FeatureGroup();
+
       setCurrentMapCache((prevCache) => ({
         ...prevCache,
         mapInstance: map,
         mapCenter: initialCenter,
         mapBounds: initialBounds,
         zoom: initialZoom,
+        drawnItems: drawnItems,
       }));
       // Allow for drawing polygons
-      const drawnItems = new L.FeatureGroup();
-      setDrawnItems(drawnItems);
       map.addLayer(drawnItems);
       setPolygonDrawer(new L.Draw.Polygon(map as L.DrawMap));
       // Bind for polygon created

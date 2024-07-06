@@ -109,29 +109,29 @@ function DataView() {
           <div className="dataview-header-container">
             <b className="dataview-header-title">
               <MapPin size={20} />
-              {currentMapCache.loadedCoordinates instanceof MarkerSelection && (
-                <div>
-                  <Tooltip
-                    title={currentMapCache.loadedCoordinates.displayName}
-                    arrow
-                  >
-                    <span>
-                      {currentMapCache.loadedCoordinates.displayName.substring(
-                        0,
-                        40
-                      ) + "... "}
-                    </span>
-                  </Tooltip>
+              <div>
+                <Tooltip
+                  title={currentMapCache.loadedCoordinates.displayName}
+                  arrow
+                >
+                  <span>
+                    {currentMapCache.loadedCoordinates.displayName.substring(
+                      0,
+                      40
+                    ) +
+                      (currentMapCache.loadedCoordinates.displayName.length > 40
+                        ? "... "
+                        : "")}
+                  </span>
+                </Tooltip>
+                {currentMapCache.loadedCoordinates instanceof
+                  MarkerSelection && (
                   <div className="sub-text">
                     ({currentMapCache.loadedCoordinates.marker.lat.toFixed(6)},{" "}
                     {currentMapCache.loadedCoordinates.marker.lng.toFixed(6)})
                   </div>
-                </div>
-              )}
-              {currentMapCache.loadedCoordinates instanceof
-                PolygonSelection && (
-                <div>{currentMapCache.loadedCoordinates.displayName}</div>
-              )}
+                )}
+              </div>
             </b>
             <Box id="filter-panel" style={{ maxWidth: "18rem", width: "100%" }}>
               <TextField

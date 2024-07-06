@@ -14,6 +14,7 @@ export type MapCacheProps = {
   mapBounds: LatLngBounds;
   zoom: number;
   isDrawing: boolean;
+  drawnItems: L.FeatureGroup | null;
 };
 
 // Map Context Type
@@ -39,6 +40,7 @@ const defaultMapCache: MapCacheProps = {
   mapBounds: L.latLngBounds([49.5732, 11.0288], [49.5732, 11.0288]),
   zoom: 13,
   isDrawing: false,
+  drawnItems: null,
 };
 
 // Actual value of the context
