@@ -23,7 +23,7 @@ jobs:
         service:
           - name: frontend
             context: ./frontend
-            docker_dir: 
+            docker_dir:
           - name: api-gateway
             context: ./backend
             docker_dir: /api-gateway
@@ -35,10 +35,11 @@ jobs:
             docker_dir: /src/BIE.DataPipeline
           - name: sql-database
             context: ./backend/sql-database
-            docker_dir: 
+            docker_dir:
           - name: metadata-database
             context: ./backend/metadata-database
-            docker_dir: 
+            docker_dir:
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -82,20 +83,22 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{github.ref_name}}
 
       - name: Install SSH key
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
-          echo "${{ secrets.TEST_ENV_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.TEST_ENV_SSH_HOST }} > ~/.ssh/known_hosts
+          echo "${{secrets.TEST_ENV_SSH_PRIVATE_KEY}}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{secrets.TEST_ENV_SSH_HOST}} > ~/.ssh/known_hosts
 
       - name: Copy necessary files
         run: |
-          scp ./docker-compose.yml ${{ secrets.TEST_ENV_SSH_USER }}@${{ secrets.TEST_ENV_SSH_HOST }}:/var/lib/bie
-          scp ./.env.test ${{ secrets.TEST_ENV_SSH_USER }}@${{ secrets.TEST_ENV_SSH_HOST }}:/var/lib/bie/.env
+          scp ./docker-compose.yml ${{secrets.TEST_ENV_SSH_USER}}@${{secrets.TEST_ENV_SSH_HOST}}:/var/lib/bie
+          scp ./.env.test ${{secrets.TEST_ENV_SSH_USER }}@${{secrets.TEST_ENV_SSH_HOST}}:/var/lib/bie/.env
 
       - name: Connect and Pull
-        run: ssh ${{ secrets.TEST_ENV_SSH_USER }}@${{ secrets.TEST_ENV_SSH_HOST }} "cd /var/lib/bie && docker compose down -v && docker compose pull && docker compose up -d --remove-orphans --force-recreate && exit"
+        run: ssh ${{secrets.TEST_ENV_SSH_USER}}@${{secrets.TEST_ENV_SSH_HOST}} "cd /var/lib/bie && docker compose down -v && docker compose pull && docker compose up -d --remove-orphans --force-recreate && exit"
 
       - name: Cleanup
         run: rm -rf ~/.ssh

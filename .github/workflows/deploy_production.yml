@@ -20,7 +20,7 @@ jobs:
         service:
           - name: frontend
             context: ./frontend
-            docker_dir: 
+            docker_dir:
           - name: api-gateway
             context: ./backend
             docker_dir: /api-gateway
@@ -31,11 +31,11 @@ jobs:
             context: ./backend
             docker_dir: /src/BIE.DataPipeline
           - name: sql-database
-            context: ./backend
-            docker_dir: /sql-database
+            context: ./backend/sql-database
+            docker_dir:
           - name: metadata-database
-            context: ./backend
-            docker_dir: /metadata-database
+            context: ./backend/metadata-database
+            docker_dir:
 
     steps:
       - name: Checkout repository
