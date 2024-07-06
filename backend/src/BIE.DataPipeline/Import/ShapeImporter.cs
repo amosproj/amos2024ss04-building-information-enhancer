@@ -126,7 +126,7 @@ namespace BIE.DataPipeline.Import
             var geometry = mParser.Geometry;
             geometry = ConvertUtmToLatLong(geometry);
 
-            nextLine = $"geography::STGeomFromText('{geometry.AsText()}', 4326)";
+            nextLine = $"GEOMETRY::STGeomFromText('{geometry.AsText()}', 4326)";
 
             return true;
         }
@@ -163,8 +163,10 @@ namespace BIE.DataPipeline.Import
                 // Extract latitude and longitude
                 double latitude = wgs84Point[1];
                 double longitude = wgs84Point[0];
-                coordinate.X = latitude;
-                coordinate.Y = longitude;
+                // this has probably caused some issues...
+                // Lat = Y , Lon = X
+                coordinate.X = longitude;
+                coordinate.Y = latitude;
             }
 
             return polygon;

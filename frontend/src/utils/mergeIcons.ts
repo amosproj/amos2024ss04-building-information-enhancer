@@ -1,31 +1,6 @@
-// These values will be replaced after build with the .sh script when spinning up docker container.
-const currentEnvironment = {
-  apiGatewayHost: "API_GATEWAY_HOST",
-  apiGatewayPort: "API_GATEWAY_PORT",
-};
+import L from "leaflet";
 
-// Returns the API Gateway URL for a specific deployment environment
-// The .join() function ensures that this strings will not be replace by the .sh script.
-export const getAPIGatewayURL = (): string => {
-  console.log(
-    `Read APIGateway URL: http://${currentEnvironment.apiGatewayHost}:${currentEnvironment.apiGatewayPort}`
-  );
-  console.log(
-    "Final APIGateway URL: " +
-      "http://" +
-      (import.meta.env.DEV ? "localhost" : currentEnvironment.apiGatewayHost) +
-      ":" +
-      (import.meta.env.DEV ? "8081" : currentEnvironment.apiGatewayPort)
-  );
-  return (
-    "http://" +
-    (import.meta.env.DEV ? "localhost" : currentEnvironment.apiGatewayHost) +
-    ":" +
-    (import.meta.env.DEV ? "8081" : currentEnvironment.apiGatewayPort)
-  );
-};
-
-export function modifySvg(svgString: string, size: number = 30) {
+export const modifySvg = (svgString: string, size: number = 30) => {
   const svgElement = new DOMParser()
     .parseFromString(svgString, "image/svg+xml")
     .querySelector("svg");
@@ -41,16 +16,16 @@ export function modifySvg(svgString: string, size: number = 30) {
     }
   }
   return svgElement?.outerHTML || "";
-}
+};
 
-export function mergeIcons(
+export const mergeIcons = (
   bigIcon: string,
   smallIcon: string,
   sizeBig: number = 32,
   sizeSmall: number = 10,
   smallIconTranslationX: number = 16,
   smallIconTranslationY: number = 16
-) {
+) => {
   const bigIconSvg = modifySvg(bigIcon, sizeBig);
   const smallIconSvg = modifySvg(smallIcon, sizeSmall);
 
@@ -65,6 +40,19 @@ export function mergeIcons(
       </div>
     </div>
   `;
-
   return combinedHtml;
-}
+};
+
+export const pinSvg =
+  '<svg width="32" height="32" fill="#000000" viewBox="0 0 256 256" version="1.1" id="svg1" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">  <defs id="defs1" />  <path d="m 128,16 a 88.1,88.1 0 0 0 -88,88 c 0,75.3 80,132.17 83.41,134.55 a 8,8 0 0 0 9.18,0 C 136,236.17 216,179.3 216,104 A 88.1,88.1 0 0 0 128,16 Z m 0,56 a 32,32 0 1 1 -32,32 32,32 0 0 1 32,-32 z" id="path1" />  <ellipse style="fill:#ffffff;stroke:#000000;stroke-width:0;stroke-dasharray:none;stroke-opacity:1" id="path12" cx="128.39645" cy="104.18782" rx="81.751793" ry="81.967773" /></svg>';
+
+export const createDivIcon = (iconSvgString: string) => {
+  const combinedSvg = mergeIcons(pinSvg, iconSvgString, 40, 16, 12, 6);
+
+  return L.divIcon({
+    html: combinedSvg,
+    className: "", // Optional: add a custom class name
+    iconSize: [40, 40],
+    iconAnchor: [20, 20], // Adjust the anchor point as needed
+  });
+};

@@ -58,3 +58,12 @@
   top: 0.6rem;
   left: 0.6rem;
 }
+
+.image-hover-effect {
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.image-hover-effect:hover {
+  border-color: blue; 
+}

@@ -1,0 +1,16 @@
+{
+  "profiles": {
+    "BIE.Core.API": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DB_SERVER": "localhost",
+        "DB_NAME": "BIEDB",
+        "DB_PASSWORD": "MyPass@1234",
+        "DB_USERNAME": "db_user1",
+        "DB_TYPE": "SQL",
+        "TRUSTED": "True",
+        "METADATA_DB_URL": "localhost:27017"
+      }
+    }
+  }
+}

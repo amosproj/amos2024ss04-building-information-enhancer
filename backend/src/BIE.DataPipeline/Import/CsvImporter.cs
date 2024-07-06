@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using BIE.DataPipeline;
 using Microsoft.VisualBasic.FileIO;
 using NetTopologySuite.Geometries;
+// ReSharper disable InconsistentNaming
 
 [assembly: InternalsVisibleTo("BIE.Tests")]
 
@@ -19,7 +20,7 @@ namespace BIE.DataPipeline.Import
     internal class CsvImporter : IImporter
     {
         private TextFieldParser parser;
-        private DataSourceDescription? dataSourceDescription;
+        private DataSourceDescription dataSourceDescription;
         private Type[] columnTypes;
         private string[] fileHeader;
         private string[] yamlHeader;
@@ -29,7 +30,7 @@ namespace BIE.DataPipeline.Import
 
         private StringBuilder builder;
 
-        public CsvImporter(DataSourceDescription? dataSourceDescription)
+        public CsvImporter(DataSourceDescription dataSourceDescription)
         {
             // CultureInfo
             cultureInfo = new CultureInfo("en-US");
@@ -211,7 +212,7 @@ namespace BIE.DataPipeline.Import
 
         private string LocationToPoint(double longitude, double latitude)
         {
-            return "GEOGRAPHY::Point(" + latitude.ToString(cultureInfo) + "," + longitude.ToString(cultureInfo) + ", 4326)";
+            return "GEOMETRY::Point(" + latitude.ToString(cultureInfo) + "," + longitude.ToString(cultureInfo) + ", 4326)";
         }
 
         private void SetupParser()
@@ -228,11 +229,32 @@ namespace BIE.DataPipeline.Import
                 // Http path
                 Console.WriteLine($"Grabbing Web file {dataSourceDescription.source.location}");
                 var client = new HttpClient();
-                var stream = client.GetStreamAsync(dataSourceDescription.source.location).Result;
+                Stream stream = null;
 
-                parser = new TextFieldParser(stream);
+                // Retry logic
+                for (int i = 0; i < 3; i++)
+                {
+                    try
+                    {
+                        var response = client.GetAsync(dataSourceDescription.source.location).Result;
+                        response.EnsureSuccessStatusCode();
+                        stream = response.Content.ReadAsStreamAsync().Result;
+                        break; // Exit the loop if successful
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Attempt {i + 1} failed: {ex.Message}");
+                        if (i == 2) throw; // Rethrow exception if all attempts fail
+                    }
+                }
 
-                Console.WriteLine("File loaded.");
+                if (stream != null)
+                {
+                    parser = new TextFieldParser(stream);
+                    Console.WriteLine("File loaded.");
+                }
+                else
+                    Console.WriteLine("Failed file loading.");
             }
 
             parser.TextFieldType = FieldType.Delimited;

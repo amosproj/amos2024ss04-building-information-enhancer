@@ -1,7 +1,9 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using BIE.Data;
 using BIE.DataPipeline.Import;
+using BieMetadata;
 
 namespace BIE.DataPipeline
 {
@@ -106,6 +108,36 @@ namespace BIE.DataPipeline
         }
 
         /// <summary>
+        /// Check if location column exists
+        /// </summary>
+        /// <param name="description"></param>
+        public bool CheckIfColumnExists(DataSourceDescription description)
+        {
+            string query = @"
+            SELECT t.name AS table_name, c.name AS column_name, ty.name AS data_type
+            FROM sys.columns c
+            JOIN sys.tables t ON c.object_id = t.object_id
+            JOIN sys.types ty ON c.user_type_id = ty.user_type_id
+            WHERE t.name = '" + description.table_name + "' AND c.name = 'Location' AND ty.name = 'geometry';";
+            var db = Database.Instance;
+
+            using (var command = db.CreateCommand(query))
+            {
+                var (reader, connection) = db.ExecuteReader(command);
+
+                try
+                {
+                    return reader.HasRows;
+                }
+                finally
+                {
+                    reader.Close();
+                    connection.Close();
+                }
+            }
+        }
+
+        /// <summary>
         /// Create indexes for shape dataset on location column
         /// </summary>
         /// <param name="description"></param>
@@ -116,26 +148,75 @@ namespace BIE.DataPipeline
                 Console.WriteLine("Creating Index...");
                 var db = Database.Instance;
 
+                // Step 1: Check if the ID column exists, and add it if it doesn't, create it.
+                var addIdCollumnQuery = @"
+    USE BIEDB;
+    IF NOT EXISTS (
+        SELECT * 
+        FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE TABLE_NAME = '" + description.table_name + @"' 
+        AND COLUMN_NAME = 'ID'
+    )
+    BEGIN
+        ALTER TABLE dbo." + description.table_name + @" 
+        ADD ID INT IDENTITY(1,1);
+    END;
+";
 
-                var query = "USE BIEDB;" +
-                    " \r\n " +
-                    " SET QUOTED_IDENTIFIER ON; " +
-                    "\r\n " +
-                    " IF NOT EXISTS (" +
-                    " SELECT *" +
-                    "  FROM sys.indexes " +
-                    "  WHERE name = 'SI_"+description.table_name+"_Location' " +
-                    "   AND object_id = OBJECT_ID('dbo."+description.table_name+"')" +
-                    " ) " +
-                    " BEGIN" +
-                    "   CREATE SPATIAL INDEX SI_"+description.table_name+"_Location " +
-                    " ON dbo."+description.table_name+"(Location); " +
-                    " END " +
-                    " \r\n"+
-                    " UPDATE STATISTICS dbo." +description.table_name+"; " +
-                    " \r\n";
+                var addIdCollumnCommand = db.CreateCommand(addIdCollumnQuery);
+                db.Execute(addIdCollumnCommand);
 
-                var cmd = db.CreateCommand(query);
+                // Step 2: Ensure the ID column is the primary key
+                var primaryKeyQuery = $@"
+    USE BIEDB;
+    IF NOT EXISTS (
+        SELECT * 
+        FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS 
+        WHERE TABLE_NAME = '{description.table_name}' 
+        AND CONSTRAINT_TYPE = 'PRIMARY KEY'
+    )
+    BEGIN
+        ALTER TABLE dbo.{description.table_name} 
+        ADD CONSTRAINT PK_{description.table_name}_ID PRIMARY KEY CLUSTERED (ID);
+    END;
+";
+
+                var primaryKeyCommand = db.CreateCommand(primaryKeyQuery);
+                db.Execute(primaryKeyCommand);
+
+                var boundingBox = GetBoundingBox(description.table_name);
+
+                Console.WriteLine($"BBox: MinX = {boundingBox.minX}," +
+                                  $" MinY = {boundingBox.minY}," +
+                                  $" MaxX = {boundingBox.maxX}," +
+                                  $" MaxY = {boundingBox.maxY}");
+                // Step 4: Create the spatial index
+                var indexQuery = $@"
+    USE BIEDB;
+    SET QUOTED_IDENTIFIER ON;
+    IF NOT EXISTS (
+        SELECT *
+        FROM sys.indexes
+        WHERE name = 'SI_{description.table_name}_Location'
+        AND object_id = OBJECT_ID('dbo.{description.table_name}')
+    )
+    BEGIN
+        CREATE SPATIAL INDEX SI_{description.table_name}_Location
+        ON dbo.{description.table_name}(Location)
+        USING GEOMETRY_AUTO_GRID
+        WITH (
+            BOUNDING_BOX = (
+                XMIN = {boundingBox.minX},
+                YMIN = {boundingBox.minY},
+                XMAX = {boundingBox.maxX},
+                YMAX = {boundingBox.maxY}
+            )
+        );
+    END;
+    UPDATE STATISTICS dbo.{description.table_name};
+";
+
+                var cmd = db.CreateCommand(indexQuery);
                 db.Execute(cmd);
 
                 Console.WriteLine("Index created.");
@@ -150,7 +231,52 @@ namespace BIE.DataPipeline
             }
         }
 
-        private string GetCreationQuery(DataSourceDescription? description)
+        public BoundingBox GetBoundingBox(string tableName)
+        {
+            var db = Database.Instance;
+
+            // Step 3: Calculate the bounding box
+            string bboxQuery = $@"
+    USE BIEDB;
+    DECLARE @MinX FLOAT, @MinY FLOAT, @MaxX FLOAT, @MaxY FLOAT;
+
+    WITH ConvertedGeography AS (
+        SELECT Location.STAsText() AS WKT
+        FROM dbo.{tableName}
+    )
+    SELECT
+        @MinX = geometry::EnvelopeAggregate(geometry::STGeomFromText(WKT, 4326)).STPointN(1).STX,
+        @MinY = geometry::EnvelopeAggregate(geometry::STGeomFromText(WKT, 4326)).STPointN(1).STY,
+        @MaxX = geometry::EnvelopeAggregate(geometry::STGeomFromText(WKT, 4326)).STPointN(3).STX,
+        @MaxY = geometry::EnvelopeAggregate(geometry::STGeomFromText(WKT, 4326)).STPointN(3).STY
+    FROM ConvertedGeography;
+    
+    SELECT @MinX AS MinX, @MinY AS MinY, @MaxX AS MaxX, @MaxY AS MaxY;
+";
+
+            var bboxCmd = db.CreateCommand(bboxQuery);
+            var (bboxReader, bboxConnection) = db.ExecuteReader(bboxCmd);
+
+            float minX = 0 , minY = 0, maxX = 0, maxY = 0;
+
+            if (bboxReader.Read())
+            {
+                var culture = new CultureInfo("en-US");
+                minX = float.Parse(bboxReader["MinX"].ToString()!, culture);
+                minY = float.Parse(bboxReader["MinY"].ToString()!, culture);
+                maxX = float.Parse(bboxReader["MaxX"].ToString()!, culture);
+                maxY = float.Parse(bboxReader["MaxY"].ToString()!, culture);
+            }
+
+
+            bboxReader.Close();
+            bboxConnection.Close();
+
+            return new BoundingBox() { minX = minX, minY = minY, maxX = maxX, maxY = maxY };
+        }
+
+
+        private string GetCreationQuery(DataSourceDescription description)
         {
             if (description.source.data_format == "SHAPE")
             {
@@ -159,12 +285,29 @@ IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{desc
 BEGIN
     CREATE TABLE {description.table_name} (
         Id INT PRIMARY KEY IDENTITY(1,1),
-        Location GEOGRAPHY
+        Location GEOMETRY
     );
 END";
             }
 
-            var query = $@"
+            if (description.source.data_format == "CITYGML")
+            {
+                return $@"
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{description.table_name}')
+BEGIN
+    CREATE TABLE {description.table_name} (
+        Id INT PRIMARY KEY IDENTITY(1,1),
+        Location GEOGRAPHY,
+        XmlData XML,
+        GroundHeight FLOAT,
+        DistrictKey VARCHAR(255),
+        CheckDate DATE,
+        GroundArea FLOAT,
+    );
+END";
+            }
+
+                var query = $@"
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{description.table_name}')
 BEGIN CREATE TABLE {description.table_name} (";
 
@@ -173,9 +316,9 @@ BEGIN CREATE TABLE {description.table_name} (";
                 query += $" {column.name_in_table} {column.type}, ";
             }
 
-            if(description.options.location_to_SQL_point != null)
+            if (description.options.location_to_SQL_point != null)
             {
-                query += $" {description.options.location_to_SQL_point.name_in_table} GEOGRAPHY,";
+                query += $" {description.options.location_to_SQL_point.name_in_table} GEOMETRY,";
             }
 
             query += "); END";
@@ -243,7 +386,7 @@ BEGIN CREATE TABLE {description.table_name} (";
                                                   Environment.GetEnvironmentVariable("DB_TYPE") ??
                                                   throw new Exception("Could not get EnvironmentVariable DB_TYPE"));
 
-            
+
             if (dbServer == null || dbName == null || dbUser == null || dbPassword == null)
             {
                 throw new ExternalException("Could not get Environment Variables.");
