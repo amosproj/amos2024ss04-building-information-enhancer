@@ -12,13 +12,6 @@
   height: 8px !important;
 }
 
-.leaflet-interactive {
-  fill: none;
-  stroke: #ff0000;
-  stroke-width: 2px;
-  stroke-opacity: 1;
-}
-
 .leaflet-draw-guide-dash {
   background-color: #ff0000 !important;
   border-radius: 1rem;

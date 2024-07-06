@@ -108,7 +108,15 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
       }));
       // Allow for drawing polygons
       map.addLayer(drawnItems);
-      setPolygonDrawer(new L.Draw.Polygon(map as L.DrawMap));
+      // Define the options for the polygon drawer
+      const polygonOptions = {
+        shapeOptions: {
+          color: "#ff0000",
+          weight: 3,
+          fillOpacity: 0,
+        },
+      };
+      setPolygonDrawer(new L.Draw.Polygon(map as L.DrawMap, polygonOptions));
       // Bind for polygon created
       map.on(L.Draw.Event.CREATED, (event: LeafletEvent) => {
         const drawnObject = (event as L.DrawEvents.Created).layer;
