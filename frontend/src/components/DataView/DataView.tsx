@@ -86,15 +86,6 @@ function DataView() {
       } else if (currentCoords instanceof PolygonSelection) {
         console.log(currentCoords.polygon);
         coords = currentCoords.polygon.coordinates;
-        // Iterate over the coordinate pairs and reverse each one
-        // for (let i = 0; i < coords.length; i++) {
-        //   for (let j = 0; j < coords[i].length; j++) {
-        //     const lat = coords[i][j][1];
-        //     const long = coords[i][j][0];
-        //     coords[i][j][0] = lat;
-        //     coords[i][j][1] = long;
-        //   }
-        // }
       }
       console.log(coords);
       // Send the location request
