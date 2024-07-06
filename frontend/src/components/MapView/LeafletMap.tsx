@@ -1,4 +1,10 @@
-import React, { Fragment, useContext, useEffect, useState } from "react";
+import React, {
+  Fragment,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { MapContainer, ZoomControl } from "react-leaflet";
 import { TabProps, TabsContext } from "../../contexts/TabsContext";
 import { MapContext } from "../../contexts/MapContext";
@@ -29,12 +35,18 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
     useContext(TabsContext);
   const [map, setMap] = useState<L.Map | null>(null);
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
+  const currentMapCacheRef = useRef(currentMapCache);
   const [isGrayscale, setIsGrayscale] = useState<boolean>(false);
   const [polygonDrawer, setPolygonDrawer] = useState<L.Draw.Polygon | null>(
     null
   );
   const [drawnItems, setDrawnItems] = useState<L.FeatureGroup | null>(null);
   const currentTab = getCurrentTab();
+
+  // Update ref value whenever currentMapCache changes
+  useEffect(() => {
+    currentMapCacheRef.current = currentMapCache;
+  }, [currentMapCache]);
 
   /**
    * Toggle polygon drawer
@@ -109,9 +121,9 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
               true
             );
             console.log(polygonSelection);
-            console.log(currentMapCache);
+            console.log(currentMapCacheRef.current);
             setCurrentMapCache({
-              ...currentMapCache,
+              ...currentMapCacheRef.current,
               selectedCoordinates: polygonSelection,
               isDrawing: false,
             });
