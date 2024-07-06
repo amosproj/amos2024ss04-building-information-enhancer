@@ -84,7 +84,6 @@ function DataView() {
         ];
         coords = [[singlePosition]];
       } else if (currentCoords instanceof PolygonSelection) {
-        console.log(currentCoords.polygon);
         coords = currentCoords.polygon.coordinates;
       }
       console.log(coords);

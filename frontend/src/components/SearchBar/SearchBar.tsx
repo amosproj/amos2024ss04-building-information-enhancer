@@ -123,7 +123,7 @@ const SearchBar: React.FC = () => {
             style: {
               color: "#ff0000",
               weight: 2,
-              fillOpacity: 0,
+              fillOpacity: 0.06,
             },
           });
           drawPolygon.addTo(currentMapCache.drawnItems!);
@@ -145,7 +145,10 @@ const SearchBar: React.FC = () => {
           false
         );
         currentMapCache.selectedCoordinates = markerSelection;
-        mapInstance.flyTo(targetPosition, 13, { animate: true, duration: 5 });
+        mapInstance.flyTo(targetPosition, currentMapCache.zoom, {
+          animate: true,
+          duration: 5,
+        });
       }
     } else console.log("No map instance");
   };
@@ -202,18 +205,12 @@ const SearchBar: React.FC = () => {
           }
         }}
         onInputChange={(_event, newInputValue) => {
-          if (newInputValue === "") {
-            setCurrentMapCache({
-              ...currentMapCache,
-              selectedCoordinates: null,
-            });
-          }
           setInputValue(newInputValue);
         }}
         renderInput={(params) => (
           <TextField
             {...params}
-            label={<div className="search-box-label">Search…</div>}
+            placeholder="Search..."
             size="small"
             sx={{
               width: inputValue.length > 0 ? "100%" : 150,

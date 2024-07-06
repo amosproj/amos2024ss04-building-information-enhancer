@@ -113,7 +113,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
         shapeOptions: {
           color: "#ff0000",
           weight: 3,
-          fillOpacity: 0,
+          fillOpacity: 0.06,
         },
       };
       setPolygonDrawer(new L.Draw.Polygon(map as L.DrawMap, polygonOptions));
