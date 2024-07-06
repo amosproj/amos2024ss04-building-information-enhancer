@@ -79,6 +79,13 @@ const GeoDataFetcher = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bounds, zoom, id]);
 
+  /**
+   * Fetches the data at first load.
+   */
+  useEffect(() => {
+    fetchMetadataAndData();
+  });
+
   return data;
 };
 
