@@ -76,16 +76,27 @@ function DataView() {
     });
     // Prepare the location data
     if (currentCoords) {
-      let coords: Position[][][] = [];
+      let coords: Position[][] | Position[][][] = [];
       if (currentCoords instanceof MarkerSelection) {
         const singlePosition: Position = [
           currentCoords.marker.lng,
           currentCoords.marker.lat,
         ];
-        coords = [[[singlePosition]]];
+        coords = [[singlePosition]];
       } else if (currentCoords instanceof PolygonSelection) {
-        coords = currentCoords.polygon.geometry.coordinates;
+        console.log(currentCoords.polygon);
+        coords = currentCoords.polygon.coordinates;
+        // Iterate over the coordinate pairs and reverse each one
+        // for (let i = 0; i < coords.length; i++) {
+        //   for (let j = 0; j < coords[i].length; j++) {
+        //     const lat = coords[i][j][1];
+        //     const long = coords[i][j][0];
+        //     coords[i][j][0] = lat;
+        //     coords[i][j][1] = long;
+        //   }
+        // }
       }
+      console.log(coords);
       // Send the location request
       const currentTab = getCurrentTab();
       if (currentTab) {

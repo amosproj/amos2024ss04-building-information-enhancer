@@ -21,4 +21,5 @@
 
 .leaflet-draw-guide-dash {
   background-color: #ff0000 !important;
+  border-radius: 1rem;
 }

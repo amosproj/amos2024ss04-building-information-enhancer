@@ -120,7 +120,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
               GeoJsonProperties
             >;
             const polygonSelection = new PolygonSelection(
-              latLongs,
+              latLongs.geometry,
               "Custom Polygon",
               true
             );

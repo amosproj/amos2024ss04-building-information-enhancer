@@ -1,14 +1,14 @@
 import { LatLng } from "leaflet";
-import { Feature, MultiPolygon } from "geojson";
+import { MultiPolygon } from "geojson";
 
 // Define PolygonSelection class
 export class PolygonSelection {
-  polygon: Feature<MultiPolygon>;
+  polygon: MultiPolygon;
   displayName: string;
   ifHandSelected: boolean;
 
   constructor(
-    polygon: Feature<MultiPolygon>,
+    polygon: MultiPolygon,
     displayName: string,
     ifHandSelected: boolean
   ) {

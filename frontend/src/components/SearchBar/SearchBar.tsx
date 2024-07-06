@@ -9,7 +9,7 @@ import { OpenStreetMapProvider } from "leaflet-geosearch";
 import { LatLng } from "leaflet";
 import { MapContext } from "../../contexts/MapContext";
 import "./SearchBar.css";
-import { Feature, GeoJSON, MultiPolygon } from "geojson";
+import { GeoJSON, MultiPolygon } from "geojson";
 import {
   MarkerSelection,
   PolygonSelection,
@@ -128,7 +128,7 @@ const SearchBar: React.FC = () => {
           });
           drawPolygon.addTo(currentMapCache.drawnItems!);
           const polygonSelection = new PolygonSelection(
-            item.polygon as Feature<MultiPolygon>,
+            item.polygon as MultiPolygon,
             item.displayName,
             false
           );

@@ -11,14 +11,13 @@ import { Position } from "geojson";
  */
 export const fetchLocationData = async (
   datasetId: string,
-  location: Position[][][]
+  location: Position[][][] | Position[][]
 ): Promise<LocationDataResponse | undefined> => {
   // Build the request body
   const requestBody = {
     datasetId: datasetId,
     location: location,
   };
-  console.log(requestBody);
   try {
     const response = await axios.put<LocationDataResponse>(
       getAPIGatewayURL() + "/api/loadLocationData",
