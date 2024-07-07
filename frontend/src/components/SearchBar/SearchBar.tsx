@@ -111,13 +111,7 @@ const SearchBar: React.FC = () => {
     if (mapInstance) {
       if (item.area && item.bounds) {
         mapInstance.flyToBounds(item.bounds, { animate: true, duration: 5 });
-        const drawPolygon = L.geoJSON(item.polygon, {
-          style: {
-            color: "#ff0000",
-            weight: 2,
-            fillOpacity: 0,
-          },
-        });
+        const drawPolygon = L.geoJSON(item.polygon);
         drawPolygon.addTo(mapInstance);
         setCurrentMapCache({
           ...currentMapCache,
