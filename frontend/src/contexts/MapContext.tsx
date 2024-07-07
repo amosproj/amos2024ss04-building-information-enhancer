@@ -1,17 +1,20 @@
 import L, { LatLng, LatLngBounds } from "leaflet";
 import React, { createContext, useState, ReactNode } from "react";
+import { MarkerSelection, PolygonSelection } from "../types/MapSelectionTypes";
 
 //// TYPES ////
 
 // Map Cache Type
 export type MapCacheProps = {
   mapInstance: L.Map | null;
-  selectedCoordinates: LatLng | null;
-  loadedCoordinates: LatLng | null;
+  selectedCoordinates: PolygonSelection | MarkerSelection | null;
+  loadedCoordinates: PolygonSelection | MarkerSelection | null;
+  currentTabID: null | string;
   mapCenter: LatLng;
   mapBounds: LatLngBounds;
   zoom: number;
-  polygon: L.GeoJSON | null;
+  isDrawing: boolean;
+  drawnItems: L.FeatureGroup | null;
 };
 
 // Map Context Type
@@ -32,10 +35,12 @@ const defaultMapCache: MapCacheProps = {
   mapInstance: null,
   selectedCoordinates: null, // The coordinates selected by the use on the map
   loadedCoordinates: null, // The last coordinates loaded in the dataview panel
+  currentTabID: null, // The currently loaded tab ID
   mapCenter: L.latLng([49.5732, 11.0288]),
   mapBounds: L.latLngBounds([49.5732, 11.0288], [49.5732, 11.0288]),
   zoom: 13,
-  polygon: null,
+  isDrawing: false,
+  drawnItems: null,
 };
 
 // Actual value of the context
