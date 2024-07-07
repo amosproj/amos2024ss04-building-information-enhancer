@@ -20,16 +20,22 @@ jobs:
         service:
           - name: frontend
             context: ./frontend
+            docker_dir:
           - name: api-gateway
-            context: ./backend/api-gateway
+            context: ./backend
+            docker_dir: /api-gateway
           - name: api-composer
-            context: ./backend/src/BIE.Core
+            context: ./backend
+            docker_dir: /src/BIE.Core
           - name: datapipeline
-            context: ./backend/src/BIE.DataPipeline
+            context: ./backend
+            docker_dir: /src/BIE.DataPipeline
           - name: sql-database
             context: ./backend/sql-database
+            docker_dir:
           - name: metadata-database
             context: ./backend/metadata-database
+            docker_dir:
 
     steps:
       - name: Checkout repository
@@ -59,7 +65,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ${{ matrix.service.context }}
-          file: ${{ matrix.service.context }}/Dockerfile
+          file: ${{ matrix.service.context }}${{ matrix.service.docker_dir }}/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -86,6 +92,6 @@ jobs:
           scp ./docker-compose.yml ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}}:/var/lib/bie
           scp ./.env.production ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}}:/var/lib/bie/.env
       - name: Connect and Pull
-        run: ssh ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}} "cd /var/lib/bie && docker compose pull && docker compose up -d --remove-orphans --force-recreate && exit"
+        run: ssh ${{secrets.PROD_ENV_SSH_USER}}@${{secrets.PROD_ENV_SSH_HOST}} "cd /var/lib/bie && docker compose down -v && docker compose pull && docker compose up -d --remove-orphans --force-recreate && exit"
       - name: Cleanup
         run: rm -rf ~/.ssh

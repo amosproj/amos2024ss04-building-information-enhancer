@@ -3,13 +3,17 @@ using BIE.DataPipeline;
 using BIE.DataPipeline.Import;
 using BieMetadata;
 using Mono.Options;
+using System.Xml;
 
 // set the culture to be always en-US
 CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
 
-// Setup the command line options
+// Setup command line options.
 var tableInsertBehaviour = InsertBehaviour.none;
+
 var filename = HandleCliArguments();
+
+Console.WriteLine("Starting datapipeline");
 
 var description = GetDataSourceDescription(filename);
 if (description == null)
@@ -17,27 +21,27 @@ if (description == null)
     return 1;
 }
 
-Console.WriteLine($@"Starting the Data Pipeline for {filename}:
+Console.WriteLine($@"Running with {filename}:
 type:       {description.source.type}
 format:     {description.source.data_format}
 location:   {description.source.location}
 table name: {description.table_name}
+
 ");
 
-// Check if the table insert behaviour is overwritten
 if (tableInsertBehaviour != InsertBehaviour.none)
 {
     description.options.if_table_exists = tableInsertBehaviour;
-    Console.WriteLine($"Overwriting description: Using {tableInsertBehaviour} Behaviour for insertion.");
+    Console.WriteLine($"Overwriting Description: Using {tableInsertBehaviour} Behaviour for insertion.");
 }
 
-// Create the connection to the database
+// create connection to database;
 var dbHelper = new DbHelper();
 
-// Exit when the connection is not possible
+// End if Connection not possible.
 if (!dbHelper.CheckConnection())
 {
-    Console.WriteLine("Could not establish database connection, exiting...");
+    Console.WriteLine("Could not establish Database Connection, exiting...");
     return 1;
 }
 
@@ -54,12 +58,12 @@ var metadataDbHelper = new MetadataDbHelper();
 if (!metadataDbHelper.CreateConnection())
 {
     // maybe make optional?
+    Console.WriteLine("metadataDatabase could not found");
     return 1;
 }
 
-Console.WriteLine("Starting the importer...");
+Console.WriteLine("Starting Importer");
 
-// Import the data based on the specified data type
 IImporter importer;
 try
 {
@@ -75,6 +79,10 @@ try
             importer = new ShapeImporter(description);
             dbHelper.SetInfo(description.table_name, "Location");
             break;
+        case "CITYGML":
+            importer = new CityGmlImporter(description);
+            dbHelper.SetInfo(description.table_name, "Location, XmlData, GroundHeight, DistrictKey, CheckDate, GroundArea");
+            break;
 
         default:
             Console.WriteLine($"Unknown or missing data format: {description.source.data_format}");
@@ -83,7 +91,7 @@ try
 }
 catch (Exception e)
 {
-    Console.WriteLine("Error while setting up the importer.");
+    Console.WriteLine("Error While setting up Importer.");
     Console.WriteLine(e);
     return 1;
 }
@@ -97,9 +105,9 @@ try
 {
     var line = "";
     var notEof = importer.ReadLine(out line);
-    Console.WriteLine("Inserting the data into the database...");
 
-    // Read all lines
+    Console.WriteLine("Inserting into Database");
+
     var count = 0;
     while (notEof)
     {
@@ -137,16 +145,12 @@ try
 }
 catch (Exception e)
 {
-    Console.WriteLine("Error inserting the data into the database:");
+    Console.WriteLine("Error inserting into Database:");
     Console.WriteLine(e);
     return 1;
 }
 
 return 0;
-
-// -------------------------------------------------------
-// FUNCTIONS
-// -------------------------------------------------------
 
 string HandleCliArguments()
 {

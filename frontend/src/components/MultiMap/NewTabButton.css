@@ -1,0 +1,27 @@
+.add-tab-button {
+  background-color: white;
+  border-color: gray;
+  color: gray;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.4rem;
+  min-width: 2rem;
+  min-height: 2rem;
+  width: 2rem;
+  height: 2rem;
+  margin-right: 2rem;
+}
+
+.add-tab-button:hover {
+  background-color: rgb(245, 245, 245);
+  border-color: black;
+  color: black;
+}
+
+.add-tab-button:focus {
+  color: none;
+  border-color: none;
+  outline: none;
+}

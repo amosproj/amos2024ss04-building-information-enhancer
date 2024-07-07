@@ -5,43 +5,15 @@ import { CaretDown, MapTrifold } from "@phosphor-icons/react";
 import "./DataPanel.css";
 import { Tooltip } from "@mui/material";
 import { GridToolbar, GridToolbarProps } from "@mui/x-data-grid";
-import { useState } from "react";
-
-// Returns a button if the "button" value is set to 1
-const renderDetailsButton = (params: GridRenderCellParams) => {
-  const value = params.value;
-  if (value === 1) {
-    return (
-      <strong>
-        <Tooltip arrow title="Open as a map">
-          <IconButton aria-label="open as map" size="small">
-            <MapTrifold />
-          </IconButton>
-        </Tooltip>
-      </strong>
-    );
-  } else {
-    return null;
-  }
-};
-
-// Defines the columns of the Datagrid
-const columns: GridColDef[] = [
-  {
-    field: "button",
-    headerName: "button",
-    width: 60,
-    renderCell: renderDetailsButton,
-  },
-  { field: "key", headerName: "key", width: 250 },
-  {
-    field: "value",
-    headerName: "value",
-    type: "number",
-    width: 250,
-    getApplyQuickFilterFn: undefined,
-  },
-];
+import { useContext, useState } from "react";
+import { DatasetItem } from "../../types/LocationDataTypes";
+import { TabsContext } from "../../contexts/TabsContext";
+import { fetchDatasets } from "../../services/datasetsService";
+import { AlertContext } from "../../contexts/AlertContext";
+import { Dataset } from "../../types/DatasetTypes";
+import L from "leaflet";
+import CustomSvgIcon from "../DatasetsList/CustomSvgIcon";
+import { svgIconDefault } from "../DatasetsList/DatasetsList";
 
 function MyCustomToolbar(props: GridToolbarProps) {
   return <GridToolbar {...props} />;
@@ -50,9 +22,9 @@ function MyCustomToolbar(props: GridToolbarProps) {
 interface DataPanelProps {
   listTitle: string;
   filterValue: string;
-  mapRows: object[];
-  genericRows: object[];
-  extraRows: object[];
+  mapRows: DatasetItem[];
+  genericRows: DatasetItem[];
+  extraRows: DatasetItem[];
 }
 
 /*
@@ -72,6 +44,88 @@ const DataPanel: React.FC<DataPanelProps> = ({
     useState<boolean>(false);
   const [ifExtraDataTabHidden, toggleExtraDataHidden] =
     useState<boolean>(false);
+  const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
+
+  const { openNewTab } = useContext(TabsContext);
+
+  const openDatasetFromMapIcon = async (mapId: string) => {
+    const datasetsData = await fetchDatasets();
+    if (datasetsData) {
+      const datasetToOpen = datasetsData.find(
+        (dataset) => dataset.datasetId === mapId
+      );
+      if (datasetToOpen) {
+        const datasetToOpenTransformed: Dataset = {
+          id: datasetToOpen.datasetId,
+          displayName: datasetToOpen.name,
+          shortDescription: datasetToOpen.shortDescription,
+          datasetIcon: datasetToOpen.icon ? (
+            <CustomSvgIcon svgString={datasetToOpen.icon} size={24} />
+          ) : (
+            <CustomSvgIcon svgString={svgIconDefault} size={24} />
+          ),
+          metaData: undefined,
+          data: {
+            type: "FeatureCollection",
+            features: [],
+          },
+          lastDataRequestBounds: L.latLngBounds(L.latLng(0, 0), L.latLng(0, 0)),
+        };
+
+        openNewTab(datasetToOpenTransformed);
+      } else {
+        // Display alert
+        setCurrentAlertCache({
+          ...currentAlertCache,
+          isAlertOpened: true,
+          text: "Dataset with provided ID does not exist.",
+        });
+        console.error("Dataset with provided ID does not exist.");
+      }
+    }
+  };
+
+  // Returns a button if the "button" value is set to 1
+  const renderDetailsButton = (params: GridRenderCellParams) => {
+    const dataObject = params.row as DatasetItem;
+    if (dataObject.mapId !== "") {
+      return (
+        <strong>
+          <Tooltip arrow title="Open a map ">
+            <IconButton
+              aria-label="open as map"
+              size="small"
+              onClick={() => {
+                openDatasetFromMapIcon(dataObject.mapId);
+              }}
+            >
+              <MapTrifold />
+            </IconButton>
+          </Tooltip>
+        </strong>
+      );
+    } else {
+      return null;
+    }
+  };
+
+  // Defines the columns of the Datagrid
+  const columns: GridColDef[] = [
+    {
+      field: "button",
+      headerName: "button",
+      width: 60,
+      renderCell: renderDetailsButton,
+    },
+    { field: "key", headerName: "key", width: 250 },
+    {
+      field: "value",
+      headerName: "value",
+      type: "number",
+      width: 250,
+      getApplyQuickFilterFn: undefined,
+    },
+  ];
 
   return (
     <div className="datapanels-container">
@@ -99,6 +153,9 @@ const DataPanel: React.FC<DataPanelProps> = ({
           }`}
         >
           <DataGrid
+            getRowId={(row: DatasetItem) => {
+              return row.key + row.value;
+            }}
             hideFooter={true}
             disableColumnMenu
             columnHeaderHeight={0}
@@ -161,6 +218,9 @@ const DataPanel: React.FC<DataPanelProps> = ({
           }`}
         >
           <DataGrid
+            getRowId={(row: DatasetItem) => {
+              return row.key + row.value;
+            }}
             hideFooter={true}
             disableColumnMenu
             columnHeaderHeight={0}
@@ -223,6 +283,9 @@ const DataPanel: React.FC<DataPanelProps> = ({
           }`}
         >
           <DataGrid
+            getRowId={(row: DatasetItem) => {
+              return row.key + row.value;
+            }}
             hideFooter={true}
             disableColumnMenu
             columnHeaderHeight={0}
