@@ -24,7 +24,13 @@ import {
   MarkerSelection,
   PolygonSelection,
 } from "../../types/MapSelectionTypes";
-import { Feature, GeoJsonProperties, MultiPolygon } from "geojson";
+import {
+  Feature,
+  GeoJsonProperties,
+  Geometry,
+  MultiPolygon,
+  Position,
+} from "geojson";
 
 interface LeafletMapProps {
   datasetId: string;
@@ -123,15 +129,31 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
         if (drawnObject instanceof L.Polygon) {
           if (drawnItems) {
             drawnItems.addLayer(drawnObject);
-            const latLongs = drawnObject.toGeoJSON() as Feature<
-              MultiPolygon,
+            const geoJsonObject = drawnObject.toGeoJSON() as Feature<
+              Geometry,
               GeoJsonProperties
             >;
+            let multiPolygon: MultiPolygon;
+
+            // we will probably always encounter only polygons but in a istant future it may be interesting to have multi polygon selection
+            if (geoJsonObject.geometry.type === "Polygon") {
+              const polygon = geoJsonObject.geometry
+                .coordinates as Position[][];
+              multiPolygon = {
+                type: "MultiPolygon",
+                coordinates: [polygon],
+              };
+            } else if (geoJsonObject.geometry.type === "MultiPolygon") {
+              multiPolygon = geoJsonObject.geometry as MultiPolygon;
+            } else {
+              throw new Error("Unsupported geometry type");
+            }
             const polygonSelection = new PolygonSelection(
-              latLongs.geometry,
+              multiPolygon,
               "Custom Polygon",
               true
             );
+
             setCurrentMapCache({
               ...currentMapCacheRef.current,
               selectedCoordinates: polygonSelection,

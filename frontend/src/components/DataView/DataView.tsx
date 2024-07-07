@@ -12,7 +12,13 @@ import {
   MarkerSelection,
   PolygonSelection,
 } from "../../types/MapSelectionTypes";
-import { Position } from "geojson";
+import { MultiPolygon, Position } from "geojson";
+
+// Function to filter and return an array of outer polygons
+function getOuterPolygons(multiPolygon: MultiPolygon): Position[][] {
+  // Filter out the inner polygons (holes) and keep only the outer ones
+  return multiPolygon.coordinates.map((polygon) => polygon[0]);
+}
 
 function DataView() {
   const { currentTabsCache, getCurrentTab } = useContext(TabsContext);
@@ -76,7 +82,8 @@ function DataView() {
     });
     // Prepare the location data
     if (currentCoords) {
-      let coords: Position[][] | Position[][][] = [];
+      let coords: Position[][] = [];
+
       if (currentCoords instanceof MarkerSelection) {
         const singlePosition: Position = [
           currentCoords.marker.lng,
@@ -84,9 +91,12 @@ function DataView() {
         ];
         coords = [[singlePosition]];
       } else if (currentCoords instanceof PolygonSelection) {
-        coords = currentCoords.polygon.coordinates;
+        // we have multipolygons which can have quite complicated inner structures.
+        // we simplfiy fot the current api in a way that we ignore all inner "holes" or other parts and only take
+        // the outer parts. so the independent general polygons.
+        coords = getOuterPolygons(currentCoords.polygon);
       }
-      console.log(coords);
+
       // Send the location request
       const currentTab = getCurrentTab();
       if (currentTab) {
