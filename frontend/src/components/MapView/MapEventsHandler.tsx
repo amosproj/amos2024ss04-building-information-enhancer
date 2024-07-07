@@ -1,12 +1,12 @@
-import { Fragment, useContext } from "react";
-import { Marker } from "react-leaflet/Marker";
-import { Popup } from "react-leaflet/Popup";
-import { useMap, useMapEvents } from "react-leaflet/hooks";
+import React, { Fragment, useContext } from "react";
+import { Marker } from "react-leaflet";
+import { useMapEvents } from "react-leaflet/hooks";
 import { MapContext } from "../../contexts/MapContext";
 import L, { DivIcon } from "leaflet";
 import { MapPin } from "@phosphor-icons/react";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
+import { MarkerSelection } from "../../types/MapSelectionTypes";
 
 // Utility function to render a React component to HTML string
 const renderToHtml = (Component: React.FC) => {
@@ -25,23 +25,23 @@ const divIconMarker: DivIcon = L.divIcon({
   iconAnchor: [18, 36], // Adjust the anchor point as needed
 });
 
-const MapEventsHandler = () => {
+const MapEventsHandler: React.FC = () => {
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
 
-  const setPosition = (latlng: L.LatLng) => {
-    setCurrentMapCache({ ...currentMapCache, selectedCoordinates: latlng });
-  };
-
-  const map = useMap();
   // Add events
   useMapEvents({
     click: (event) => {
-      currentMapCache.polygon?.remove();
-      setCurrentMapCache({
-        ...currentMapCache,
-        selectedCoordinates: event.latlng,
-        polygon: null,
-      });
+      if (!currentMapCache.isDrawing) {
+        const markerSelection = new MarkerSelection(
+          event.latlng,
+          "Custom Marker",
+          true
+        );
+        setCurrentMapCache({
+          ...currentMapCache,
+          selectedCoordinates: markerSelection,
+        });
+      }
     },
     moveend: (event) => {
       setCurrentMapCache({
@@ -53,34 +53,11 @@ const MapEventsHandler = () => {
     },
   });
 
-  return currentMapCache.selectedCoordinates !== null ? (
-    <Marker position={currentMapCache.selectedCoordinates} icon={divIconMarker}>
-      <Popup>
-        <span
-          // Get the current location of the user
-          onClick={() => {
-            map
-              .locate({ setView: true })
-              .on("locationfound", function (event) {
-                //currentMapCache.polygon?.remove();
-                setPosition(event.latlng);
-                map.flyTo(event.latlng, map.getZoom(), {
-                  animate: true,
-                  duration: 50,
-                });
-              })
-              // If access to the location was denied
-              .on("locationerror", function (event) {
-                console.log(event);
-                alert("Location access denied.");
-              });
-          }}
-        >
-          {currentMapCache.selectedCoordinates.lat.toFixed(4)},{" "}
-          {currentMapCache.selectedCoordinates.lng.toFixed(4)}
-        </span>
-      </Popup>
-    </Marker>
+  return currentMapCache.selectedCoordinates instanceof MarkerSelection ? (
+    <Marker
+      position={currentMapCache.selectedCoordinates.marker}
+      icon={divIconMarker}
+    />
   ) : (
     <Fragment />
   );

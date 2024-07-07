@@ -1,0 +1,18 @@
+.leaflet-draw-tooltip {
+  display: none;
+}
+
+.leaflet-editing-icon {
+  background-color: #ff0000;
+  border-color: black;
+  margin-top: -3px !important;
+  margin-left: -3px !important;
+  border-radius: 1rem;
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.leaflet-draw-guide-dash {
+  background-color: #ff0000 !important;
+  border-radius: 1rem;
+}
