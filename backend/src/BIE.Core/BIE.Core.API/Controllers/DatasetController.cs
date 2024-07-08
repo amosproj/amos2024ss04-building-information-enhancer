@@ -15,6 +15,11 @@ using System.Text;
 using BIE.Core.API.DatasetHandlers;
 using BieMetadata;
 using Microsoft.Extensions.Logging;
+using System.Text.Json.Serialization;
+using NetTopologySuite.IO;
+using NetTopologySuite.Geometries;
+using Microsoft.AspNetCore.Http;
+using NetTopologySuite;
 
 namespace BIE.Core.API.Controllers
 {
@@ -29,6 +34,7 @@ namespace BIE.Core.API.Controllers
         private readonly ILogger<DatasetController> _logger;
 
         private MetadataDbHelper mMetadataDbHelper;
+        private static readonly WKTReader GeoReader = new(new NtsGeometryServices(new PrecisionModel(), 4326));
 
         private MetadataDbHelper MetadataDbHelper
         {
@@ -103,117 +109,7 @@ namespace BIE.Core.API.Controllers
             return Ok(handler.GetDataInsideArea(boundingBox));
         }
 
-        private ActionResult GetChargingStations(QueryParameters parameters)
-        {
-            _logger.LogInformation("Fetching charging stations with parameters: {parameters}", parameters);
-            try
-            {
-                // Create polygon WKT from bounding box
-                var polygonWkt = ApiHelper.GetPolygonFromQueryParameters(parameters);
 
-
-                // SQL Query to find intersecting points
-                var sqlQuery = $@"
-        SELECT top 1000  operator, Location.AsTextZM() AS Location
-        FROM dbo.EV_charging_stations
-        WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
-        ";
-
-                Console.WriteLine(sqlQuery);
-                // Get data from database
-                var data = DbHelper.GetData(sqlQuery);
-
-                // Construct GeoJSON response
-                var response = new StringBuilder();
-                response.Append("{\"type\": \"FeatureCollection\",\n\"features\": [");
-
-                foreach (var row in data)
-                {
-                    var location = row["Location"].ToString();
-                    // Extract the coordinates from the POINT string
-                    var coordinates = location.Replace("POINT (", "").Replace(")", "").Split(' ');
-                    var longitude = coordinates[0];
-                    var latitude = coordinates[1];
-
-                    response.Append($@"
-            {{
-                ""type"": ""Feature"",
-                ""geometry"": {{
-                    ""type"": ""Point"",
-                    ""coordinates"": [{longitude}, {latitude}]
-                }},
-                ""properties"": {{
-                    ""name"": ""{row["operator"]}""
-                }}
-            }},");
-                }
-
-                if (response[response.Length - 1] == ',')
-                {
-                    response.Length--; // Remove the trailing comma
-                }
-
-                response.Append("]}");
-
-                return Ok(response.ToString());
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-
-        private ActionResult GetHouseFootprintsData([FromQuery] QueryParameters parameters)
-        {
-            _logger.LogInformation("Fetching house footprints with parameters: {parameters}", parameters);
-            try
-            {
-                DbHelper.CreateDbConnection();
-
-                // Create polygon WKT from bounding box
-                var polygonWkt = ApiHelper.GetPolygonFromQueryParameters(parameters);
-
-                // SQL Query to find intersecting points
-                var sqlQuery = $@"
-SELECT top 1000  Location.AsTextZM() AS Location, Location.STGeometryType() AS Type
-FROM dbo.Hausumringe_mittelfranken_small
-WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
-";
-                Console.WriteLine(sqlQuery);
-                // Console.WriteLine(command);
-                var response = "{\"type\": \"FeatureCollection\",\n\"features\": [";
-                foreach (var row in DbHelper.GetData(sqlQuery))
-                {
-                    response += $@"
-{{
-  ""type"": ""Feature"",
-  ""geometry"": {{
-    ""type"": ""{row["Type"]}"",
-    ""coordinates"": [{QueryParameters.GetPolygonCordinates(row["Location"])}]
-  }},
-  ""properties"": {{
-    ""text"": ""{row["Type"]}""
-}}
-}},";
-                }
-
-                if (response.Last() == ',')
-                {
-                    response = response[..^1];
-                }
-
-                response += "]}";
-
-                _logger.LogInformation("House footprints data fetched successfully.");
-                return Ok(response);
-            }
-            catch (ServiceException se)
-            {
-                _logger.LogError(se, "ServiceException occurred while fetching house footprints data.");
-                return BadRequest(se.Message);
-            }
-        }
 
         /// <summary>
         /// Loads the location data for the given point or polygon.
@@ -234,45 +130,84 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
 
             try
             {
-                var coordinate = request.Location.FirstOrDefault();
-                if (coordinate == null)
+
+                // 2 parts: general data summarized for areas, indiviualized data for single parts
+                // in case of point we have a single entry inside the first polygon
+                if (request.Location.Count <= 0)
                 {
-                    return BadRequest("Location coordinates are required.");
+                    return BadRequest("at least a single point has to be given");
                 }
-
-                var latitude = coordinate.Latitude;
-                var longitude = coordinate.Longitude;
-                var radius = 10000000; // Define the radius as needed
-
-                var columns = new HashSet<string> { "operator", "Id" };
-                var chargingStations = getNclosestObjects("EV_charging_stations", longitude, latitude, radius, 5, columns);
-
-                var chargingStationsData = chargingStations.Select(h => new DatasetItem
+                else if (request.Location.Count == 1)
                 {
-                    Id = h.ContainsKey("Id") ? h["Id"] : null,
-                    Key = "Charging station: " + (h.ContainsKey("operator") ? h["operator"] : "No operator defined"),
-                    Value = h.ContainsKey("Distance") ? h["Distance"] : "-1",
-                    MapId = "EV_charging_stations",
-                }).ToList();
+                    var coordinate = request.Location.FirstOrDefault().FirstOrDefault();
+                    if (coordinate == null)
+                    {
+                        return BadRequest("Location coordinates are required.");
+                    }
 
-                columns = new HashSet<string> { "Id" };
-                var houseFootprintsInArea = getMatchingObjects("Hausumringe_mittelfranken_small", longitude, latitude, columns);
+                    var latitude = coordinate.ElementAt(0);
+                    var longitude = coordinate.ElementAt(1);
 
-                var houseFootprintsInAreaData = houseFootprintsInArea.Select(h => new DatasetItem
-                {
-                    Id = h.ContainsKey("Id") ? h["Id"] : null,
-                    Key = "Building footprint: ",
-                    Value = h.ContainsKey("Area") ? h["Area"] : "-1",
-                    MapId = "house_footprints",
-                }).ToList();
+                    ////// all entries are saved to the result dataitem list.
+                    var results = new List<DatasetItem>();
 
-                LocationDataResponse response = new LocationDataResponse
-                {
-                    CurrentDatasetData = chargingStationsData,
-                    GeneralData = houseFootprintsInAreaData
-                };
+                    var reader = new WKTReader();
+                    var geoFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
-                return Ok(response);
+                    //////////// load charging stations data
+                    var radius = 10000000; // Define the radius as needed
+                    var columns = new HashSet<string> { "operator", "Id" };
+                    var metadata = MetadataDbHelper.GetMetadata("EV_charging_stations");
+                    if (metadata != null)
+                    {
+                        var tables = metadata.additionalData.Tables;
+                        if (tables.Count == 1)
+                        {
+
+                            var chargingStations = getNclosestObjects(tables[0].Name, longitude, latitude, radius, 3, columns);
+
+                            var chargingStationsData = chargingStations.Select(h => new DatasetItem
+                            {
+                                Id = h.ContainsKey("Id") ? h["Id"] : null,
+                                Key = "Charging station: " + (h.ContainsKey("operator") ? h["operator"] : "No operator defined"),
+                                Value = h.ContainsKey("Distance") ? h["Distance"] : "-1",
+                                MapId = "EV_charging_stations",
+                            }).ToList();
+
+                            results.AddRange(chargingStationsData);
+                        }
+                    }
+
+
+                    //////////// house footprints charging stations data
+                    columns = new HashSet<string> { "Id" };
+                    metadata = MetadataDbHelper.GetMetadata("house_footprints");
+                    if (metadata != null)
+                    {
+                        var tables = metadata.additionalData.Tables;
+                        foreach (var table in tables)
+                        {
+                            var houseFootprintsInArea = getMatchingObjects(table.Name, longitude, latitude, columns);
+
+                            var currentData = houseFootprintsInArea.Select(h => new DatasetItem
+                            {
+                                Id = h.ContainsKey("Id") ? h["Id"] : null,
+                                Key = "Building footprint: ",
+                                Value = h.ContainsKey("Area") ? h["Area"] : "-1",
+                                MapId = "house_footprints",
+                            }).ToList();
+                            results.AddRange(currentData);
+                        }
+                    }
+
+                    LocationDataResponse locationDataResponse = new()
+                    {
+                        CurrentDatasetData = results
+                    };
+
+                    return Ok(locationDataResponse);
+                }
+                return StatusCode(500, $"Currently unsupported operatin");
             }
             catch (Exception ex)
             {
@@ -288,10 +223,8 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
             // Define the SQL command with the columns string
             string command = $@"
             SELECT TOP {n}
-                {columnsString},
-                Location.STArea() AS Area,
-                Location.STAsText() AS Location,
-                geometry::Point({latitude}, {longitude}, 4326).STDistance(Location) AS Distance
+                {columnsString}
+                Location.STAsText() AS Location
             FROM 
                 dbo.{datasetId}
             WHERE
@@ -301,23 +234,52 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
 
             _logger.LogInformation(command);
 
-            return DbHelper.GetData(command);
+            // Get data from the database
+            var results = DbHelper.GetData(command);
+
+            var geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+            var point1 = geometryFactory.CreatePoint(new Coordinate(longitude, latitude));
+
+            foreach (var result in results)
+            {
+                if (result.ContainsKey("Location"))
+                {
+                    var wkt = result["Location"];
+                    var point2 = GeoReader.Read(wkt) as Point;
+                    if (point2 != null)
+                    {
+                        var distance = point1.Distance(point2);
+                        result["Distance"] = distance.ToString();
+                    }
+                    else
+                    {
+                        result["Distance"] = "-1";
+                    }
+                }
+                else
+                {
+                    result["Distance"] = "-1";
+                }
+            }
+
+            return results;
         }
+
+        //private long getObjectCount(string datasetId, )
 
         private IEnumerable<Dictionary<string, string>> getMatchingObjects(
         string datasetId,
         double longitude,
         double latitude,
         IEnumerable<string> columns)
-            {
-                // Convert the columns set to a comma-separated string
-                string columnsString = string.Join(", ", columns);
+        {
+            // Convert the columns set to a comma-separated string
+            string columnsString = string.Join(", ", columns);
 
-                // Define the SQL command with the columns string
-                string command = $@"
+            // Define the SQL command with the columns string
+            string command = $@"
                 SELECT TOP 1000
                     {columnsString},
-                    geography::STGeomFromText(Location.STAsText(),4326).STArea() AS Area,
                     Location.STAsText() AS Location
                 FROM 
                     dbo.{datasetId}
@@ -328,8 +290,36 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
 
             _logger.LogInformation(command);
 
-            return DbHelper.GetData(command);
+            // Get data from the database
+            var results = DbHelper.GetData(command);
+
+            var geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+            var point1 = geometryFactory.CreatePoint(new Coordinate(longitude, latitude));
+
+            foreach (var result in results)
+            {
+                if (result.ContainsKey("Location"))
+                {
+                    var wkt = result["Location"];
+                    var polygon = GeoReader.Read(wkt) as Polygon;
+                    if (polygon != null)
+                    {
+                        result["Area"] = polygon.Area.ToString();
+                    }
+                    else
+                    {
+                        result["Area"] = "-1";
+                    }
+                }
+                else
+                {
+                    result["Area"] = "-1";
+                }
+            }
+
+            return results;
         }
+    
 
         public static List<List<SpatialData>> ClusterData(List<SpatialData> data, int numberOfClusters)
         {
@@ -564,6 +554,43 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
                 return new double[] { centroidX / pointCount, centroidY / pointCount };
             }
 
+            public static List<Dictionary<string, string>> GetEVChargingStations(double latitude, double longitude, int buffer)
+            {
+                string command = @"
+        SELECT TOP 5
+            Id,
+            Location.STAsText() AS Location,
+            geometry::Point({0}, {1}, 4326).STDistance(Location) AS Distance
+        FROM 
+            dbo.EV_charging_stations
+        WHERE
+            geometry::Point({0}, {1}, 4326).STBuffer({2}).STIntersects(Location) = 1
+        ORDER BY 
+            geometry::Point({0}, {1}, 4326).STDistance(Location);";
+
+                string formattedQuery = string.Format(command, latitude, longitude, buffer);
+                return DbHelper.GetData(formattedQuery).ToList();
+            }
+
+            public static List<Dictionary<string, string>> GetHouseFootprints(double latitude, double longitude, int radius)
+            {
+                string command = @"
+        SELECT TOP 5
+            Id,
+            Location.STArea() AS Area,
+            Location.STAsText() AS Location,
+            geometry::Point({0}, {1}, 4326).STDistance(Location) AS Distance
+        FROM 
+            dbo.Hausumringe_mittelfranken_small
+        WHERE
+            geometry::Point({0}, {1}, 4326).STBuffer({2}).STIntersects(Location) = 1
+        ORDER BY 
+            geometry::Point({0}, {1}, 4326).STDistance(Location);";
+
+                string formattedQuery = string.Format(command, latitude, longitude, radius);
+                return DbHelper.GetData(formattedQuery).ToList();
+            }
+
             public static List<List<SpatialData>> ClusterData(List<SpatialData> data, int numberOfClusters)
             {
                 var centroids = data.Select(d => CalculateCentroid(d.Coordinates)).ToArray();
@@ -630,14 +657,10 @@ WHERE Location.STIntersects(geometry::STGeomFromText('{polygonWkt}', 4326)) = 1;
 
     public class LocationDataRequest
     {
+        [JsonPropertyName("datasetId")]
         public string DatasetId { get; set; }
-        public List<Coordinate> Location { get; set; }
-    }
-
-    public class Coordinate
-    {
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
+        [JsonPropertyName("location")]
+        public List<List<List<float>>> Location { get; set; }
     }
 
     public class LocationDataResponse
