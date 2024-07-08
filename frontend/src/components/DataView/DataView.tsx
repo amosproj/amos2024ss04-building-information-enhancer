@@ -13,6 +13,7 @@ import {
   PolygonSelection,
 } from "../../types/MapSelectionTypes";
 import { MultiPolygon, Position } from "geojson";
+import { CircularProgress } from "@mui/material";
 
 // Function to filter and return an array of outer polygons
 function getOuterPolygons(multiPolygon: MultiPolygon): Position[][] {
@@ -21,6 +22,7 @@ function getOuterPolygons(multiPolygon: MultiPolygon): Position[][] {
 }
 
 function DataView() {
+  const [isLoading, setIsLoading] = useState(false);
   const { currentTabsCache, getCurrentTab } = useContext(TabsContext);
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
   const [filterValue, setFilterValue] = useState("");
@@ -70,7 +72,7 @@ function DataView() {
    * Reloads the location data.
    */
   const reloadData = async () => {
-    // Get all parameters
+    setIsLoading(true); // Set loading to true before starting the fetch request
     setIfNeedsReloading(false);
     const currentID = currentTabsCache.currentTabID;
     const currentCoords = currentMapCache.selectedCoordinates;
@@ -111,6 +113,8 @@ function DataView() {
     } else {
       console.log("Currently selected coordinates are null.");
     }
+
+    setIsLoading(false); // Set loading to false after the fetch request completes
   };
 
   return (
@@ -159,13 +163,19 @@ function DataView() {
               />
             </Box>
           </div>
-          <DataPanel
-            listTitle={getCurrentTabTitle()}
-            filterValue={filterValue}
-            mapRows={data?.currentDatasetData ?? []}
-            genericRows={data?.generalData ?? []}
-            extraRows={data?.extraRows ?? []}
-          />
+          {isLoading ? (
+            <div className="spinner-container">
+              <CircularProgress />
+            </div>
+          ) : (
+            <DataPanel
+              listTitle={getCurrentTabTitle()}
+              filterValue={filterValue}
+              mapRows={data?.currentDatasetData ?? []}
+              genericRows={data?.generalData ?? []}
+              extraRows={data?.extraRows ?? []}
+            />
+          )}
           {ifNeedsReloading ? (
             <div className="load-data-container">
               <div className="load-data-button" onClick={reloadData}>
