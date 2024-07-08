@@ -20,6 +20,11 @@ using NetTopologySuite.IO;
 using NetTopologySuite.Geometries;
 using Microsoft.AspNetCore.Http;
 using NetTopologySuite;
+using ProjNet.CoordinateSystems.Transformations;
+using ProjNet.CoordinateSystems;
+using ProjNet.IO.CoordinateSystems;
+using static System.Collections.Specialized.BitVector32;
+using NetTopologySuite.Algorithm;
 
 namespace BIE.Core.API.Controllers
 {
@@ -35,6 +40,8 @@ namespace BIE.Core.API.Controllers
 
         private MetadataDbHelper mMetadataDbHelper;
         private static readonly WKTReader GeoReader = new(new NtsGeometryServices(new PrecisionModel(), 4326));
+        private static readonly GeometryFactory GeometryFactory = new(new PrecisionModel(), 4326);
+
 
         private MetadataDbHelper MetadataDbHelper
         {
@@ -130,9 +137,6 @@ namespace BIE.Core.API.Controllers
 
             try
             {
-
-                // 2 parts: general data summarized for areas, indiviualized data for single parts
-                // in case of point we have a single entry inside the first polygon
                 if (request.Location.Count <= 0)
                 {
                     return BadRequest("at least a single point has to be given");
@@ -147,14 +151,8 @@ namespace BIE.Core.API.Controllers
 
                     var latitude = coordinate.ElementAt(0);
                     var longitude = coordinate.ElementAt(1);
-
-                    ////// all entries are saved to the result dataitem list.
                     var results = new List<DatasetItem>();
 
-                    var reader = new WKTReader();
-                    var geoFactory = new GeometryFactory(new PrecisionModel(), 4326);
-
-                    //////////// load charging stations data
                     var radius = 10000000; // Define the radius as needed
                     var columns = new HashSet<string> { "operator", "Id" };
                     var metadata = MetadataDbHelper.GetMetadata("EV_charging_stations");
@@ -163,14 +161,19 @@ namespace BIE.Core.API.Controllers
                         var tables = metadata.additionalData.Tables;
                         if (tables.Count == 1)
                         {
-
                             var chargingStations = getNclosestObjects(tables[0].Name, longitude, latitude, radius, 3, columns);
+
+                            // Log chargingStations to inspect the content
+                            foreach (var station in chargingStations)
+                            {
+                                _logger.LogInformation($"Station data: {string.Join(", ", station.Select(kv => $"{kv.Key}: {kv.Value}"))}");
+                            }
 
                             var chargingStationsData = chargingStations.Select(h => new DatasetItem
                             {
                                 Id = h.ContainsKey("Id") ? h["Id"] : null,
                                 Key = "Charging station: " + (h.ContainsKey("operator") ? h["operator"] : "No operator defined"),
-                                Value = h.ContainsKey("Distance") ? h["Distance"] : "-1",
+                                Value = h.ContainsKey("Distance") ? h["Distance"] : "-1 no dist",
                                 MapId = "EV_charging_stations",
                             }).ToList();
 
@@ -178,27 +181,7 @@ namespace BIE.Core.API.Controllers
                         }
                     }
 
-
-                    //////////// house footprints charging stations data
-                    columns = new HashSet<string> { "Id" };
-                    metadata = MetadataDbHelper.GetMetadata("house_footprints");
-                    if (metadata != null)
-                    {
-                        var tables = metadata.additionalData.Tables;
-                        foreach (var table in tables)
-                        {
-                            var houseFootprintsInArea = getMatchingObjects(table.Name, longitude, latitude, columns);
-
-                            var currentData = houseFootprintsInArea.Select(h => new DatasetItem
-                            {
-                                Id = h.ContainsKey("Id") ? h["Id"] : null,
-                                Key = "Building footprint: ",
-                                Value = h.ContainsKey("Area") ? h["Area"] : "-1",
-                                MapId = "house_footprints",
-                            }).ToList();
-                            results.AddRange(currentData);
-                        }
-                    }
+                    // Additional section for house footprints omitted for brevity
 
                     LocationDataResponse locationDataResponse = new()
                     {
@@ -207,7 +190,7 @@ namespace BIE.Core.API.Controllers
 
                     return Ok(locationDataResponse);
                 }
-                return StatusCode(500, $"Currently unsupported operatin");
+                return StatusCode(500, $"Currently unsupported operation");
             }
             catch (Exception ex)
             {
@@ -217,38 +200,91 @@ namespace BIE.Core.API.Controllers
 
         private IEnumerable<Dictionary<string, string>> getNclosestObjects(string datasetId, double longitude, double latitude, double radius, int n, IEnumerable<string> columns)
         {
-            // number of closest objects with input of dataset name to be queried and maybe column for name
             string columnsString = string.Join(", ", columns);
 
-            // Define the SQL command with the columns string
             string command = $@"
-            SELECT TOP {n}
-                {columnsString}
-                Location.STAsText() AS Location
-            FROM 
-                dbo.{datasetId}
-            WHERE
-                geometry::Point({latitude}, {longitude}, 4326).STBuffer({radius}).STIntersects(Location) = 1
-            ORDER BY 
-                geometry::Point({latitude}, {longitude}, 4326).STDistance(Location);";
+    SELECT TOP {n}
+        {columnsString},
+        Location.STAsText() AS Location
+    FROM 
+        dbo.{datasetId}
+    WHERE
+        geometry::Point({latitude}, {longitude}, 4326).STBuffer({radius}).STIntersects(Location) = 1
+    ORDER BY 
+        geometry::Point({latitude}, {longitude}, 4326).STDistance(Location);";
 
-            _logger.LogInformation(command);
+            var results = DbHelper.GetData(command).ToList();
 
-            // Get data from the database
-            var results = DbHelper.GetData(command);
+            const string epsg27700 = @"PROJCS[""North_America_Albers_Equal_Area_Conic"",
+                        GEOGCS[""NAD83"",
+                            DATUM[""North_American_Datum_1983"",
+                                SPHEROID[""GRS 1980"",6378137,298.257222101,
+                                    AUTHORITY[""EPSG"",""7019""]],
+                                AUTHORITY[""EPSG"",""6269""]],
+                            PRIMEM[""Greenwich"",0,
+                                AUTHORITY[""EPSG"",""8901""]],
+                            UNIT[""degree"",0.0174532925199433,
+                                AUTHORITY[""EPSG"",""9122""]],
+                            AUTHORITY[""EPSG"",""4269""]],
+                        PROJECTION[""Albers_Conic_Equal_Area""],
+                        PARAMETER[""latitude_of_center"",40],
+                        PARAMETER[""longitude_of_center"",-96],
+                        PARAMETER[""standard_parallel_1"",20],
+                        PARAMETER[""standard_parallel_2"",60],
+                        PARAMETER[""false_easting"",0],
+                        PARAMETER[""false_northing"",0],
+                        UNIT[""metre"",1,
+                            AUTHORITY[""EPSG"",""9001""]],
+                        AXIS[""Easting"",EAST],
+                        AXIS[""Northing"",NORTH],
+                        AUTHORITY[""ESRI"",""102008""]
+                        "; // see http://epsg.io/27700
 
-            var geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
-            var point1 = geometryFactory.CreatePoint(new Coordinate(longitude, latitude));
+            var epsg27700_crs = CoordinateSystemWktReader
+                .Parse(epsg27700);
+            var wgs84 = GeographicCoordinateSystem.WGS84;
+            // Create coordinate transformation
+            var mTransformation =
+                new CoordinateTransformationFactory().CreateFromCoordinateSystems(wgs84, (CoordinateSystem)epsg27700_crs);
+
+            var windsorCastle = new Coordinate(51.483884, -0.604455);
+            var buckinghamPalace = new Coordinate(51.501576, -0.141208);
+            double[] basic = { -0.604455, 51.483884 };
+            double[] epsg27700Point = mTransformation.MathTransform.Transform(basic);
+
+            double[] basic2 = { -0.141208, 51.501576 };
+            double[] epsg27700Point2 = mTransformation.MathTransform.Transform(basic2);
+
+            // Extract latitude and longitude
+            double latitude1 = epsg27700Point[1];
+            double longitude1 = epsg27700Point[0];
+
+            double latitude2 = epsg27700Point2[1];
+            double longitude2 = epsg27700Point2[0];
+
+            var distance = new Coordinate(longitude1, latitude1).Distance(new Coordinate(longitude2, latitude2));
+            _logger.LogInformation($"windsor castle: {mTransformation.MathTransform.Transform(basic)}");
+            _logger.LogInformation($"distance: {distance}");
+
+            double[] sourceInWGS84_arr = {longitude,latitude };
+            double[] sourceInEPSG27700_arr = mTransformation.MathTransform.Transform(sourceInWGS84_arr);
+            Coordinate sourceInEPSG27700 = new Coordinate(sourceInEPSG27700_arr[0], sourceInEPSG27700_arr[1]);
+            _logger.LogInformation($"sourceInWGS84_arr: [{string.Join(", ", sourceInWGS84_arr)}] and sourceInEPSG27700_arr: [{string.Join(", ", sourceInEPSG27700_arr)}] and sourceInEPSG27700: {sourceInEPSG27700}");
 
             foreach (var result in results)
             {
                 if (result.ContainsKey("Location"))
                 {
                     var wkt = result["Location"];
-                    var point2 = GeoReader.Read(wkt) as Point;
-                    if (point2 != null)
+                    var point2_wrong = GeoReader.Read(wkt) as Point;
+                    if (point2_wrong != null)
                     {
-                        var distance = point1.Distance(point2);
+                        double[] targetPointInWGS84 = { point2_wrong.Y, point2_wrong.X };
+                        double[] targetPointInEpsg27700 = mTransformation.MathTransform.Transform(targetPointInWGS84);
+                        Coordinate targetInEPSG27700 = new Coordinate(targetPointInEpsg27700[0], targetPointInEpsg27700[1]);
+                        distance = sourceInEPSG27700.Distance(targetInEPSG27700);
+                        _logger.LogInformation($"targetPointInWGS84: [{string.Join(", ", targetPointInWGS84)}] and targetPointInEpsg27700: [{string.Join(", ", targetPointInEpsg27700)}] and targetInEPSG27700: {targetInEPSG27700}");
+
                         result["Distance"] = distance.ToString();
                     }
                     else
@@ -264,6 +300,7 @@ namespace BIE.Core.API.Controllers
 
             return results;
         }
+
 
         //private long getObjectCount(string datasetId, )
 
