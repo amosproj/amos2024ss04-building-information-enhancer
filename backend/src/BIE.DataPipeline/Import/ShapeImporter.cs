@@ -126,10 +126,51 @@ namespace BIE.DataPipeline.Import
             var geometry = mParser.Geometry;
             geometry = ConvertUtmToLatLong(geometry);
 
-            nextLine = $"GEOMETRY::STGeomFromText('{geometry.AsText()}', 4326)";
+            var area = CalculateAreaInSquareMeters(geometry);
+
+            nextLine = $"GEOMETRY::STGeomFromText('{geometry.AsText()}', 4326),"+area;
 
             return true;
         }
+        /// <summary>
+        /// Calculates Area of Polygon
+        /// </summary>
+        /// <param name="geometry"></param>
+        /// <returns></returns>
+        private double CalculateAreaInSquareMeters(Geometry geometry)
+        {
+            // Define the coordinate systems
+            var wgs84 = GeographicCoordinateSystem.WGS84;
+            var utm32 = ProjectedCoordinateSystem.WGS84_UTM(32, true); // UTM zone 32 for the given coordinates
+
+            var ctfac = new CoordinateTransformationFactory();
+            var transform = ctfac.CreateFromCoordinateSystems(wgs84, utm32);
+
+            // Transform the coordinates
+            var coordinates = geometry.Coordinates;
+            var transformedCoordinates = new Coordinate[coordinates.Length];
+
+            for (int i = 0; i < coordinates.Length; i++)
+            {
+                double[] transformed = transform.MathTransform.Transform(new double[] { coordinates[i].X, coordinates[i].Y });
+                transformedCoordinates[i] = new Coordinate(transformed[0], transformed[1]);
+            }
+
+            // Ensure the polygon is closed
+            if (!transformedCoordinates[0].Equals2D(transformedCoordinates[transformedCoordinates.Length - 1]))
+            {
+                Array.Resize(ref transformedCoordinates, transformedCoordinates.Length + 1);
+                transformedCoordinates[transformedCoordinates.Length - 1] = transformedCoordinates[0];
+            }
+
+            // Create a polygon with transformed coordinates
+            var geometryFactory = new GeometryFactory();
+            var transformedPolygon = geometryFactory.CreatePolygon(transformedCoordinates);
+
+            // Calculate and return the area
+            return transformedPolygon.Area;
+        }
+
 
         private string[] ReadFileHeader()
         {
