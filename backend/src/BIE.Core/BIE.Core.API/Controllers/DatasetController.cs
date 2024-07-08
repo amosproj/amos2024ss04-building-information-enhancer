@@ -173,15 +173,34 @@ namespace BIE.Core.API.Controllers
                             {
                                 Id = h.ContainsKey("Id") ? h["Id"] : null,
                                 Key = "Charging station: " + (h.ContainsKey("operator") ? h["operator"] : "No operator defined"),
-                                Value = h.ContainsKey("Distance") ? h["Distance"] : "-1 no dist",
+                                Value = h.ContainsKey("Distance") ? h["Distance"] + "m" : "-1",
                                 MapId = "EV_charging_stations",
-                            }).ToList();
+                            });
 
                             results.AddRange(chargingStationsData);
                         }
                     }
 
-                    // Additional section for house footprints omitted for brevity
+                    // Additional section for house footprints 
+                    columns = new HashSet<string> { "Id" };
+                    metadata = MetadataDbHelper.GetMetadata("house_footprints");
+                    if (metadata != null)
+                    {
+                        foreach(var table in metadata.additionalData.Tables)
+                        {
+                            var housefootprints = getMatchingObjects(table.Name, longitude, latitude, columns);
+                            var housefootprintsData = housefootprints.Select(h => new DatasetItem
+                            {
+                                Id = h.ContainsKey("Id") ? h["Id"] : null,
+                                Key = "House footprints" ,
+                                Value = h.ContainsKey("Area") ? h["Area"] + "m²" : "-1",
+                                MapId = table.Name,
+                            });
+                            results.AddRange(housefootprintsData);
+
+                        }
+                    }
+
 
                     LocationDataResponse locationDataResponse = new()
                     {
@@ -215,62 +234,7 @@ namespace BIE.Core.API.Controllers
 
             var results = DbHelper.GetData(command).ToList();
 
-            const string epsg27700 = @"PROJCS[""North_America_Albers_Equal_Area_Conic"",
-                        GEOGCS[""NAD83"",
-                            DATUM[""North_American_Datum_1983"",
-                                SPHEROID[""GRS 1980"",6378137,298.257222101,
-                                    AUTHORITY[""EPSG"",""7019""]],
-                                AUTHORITY[""EPSG"",""6269""]],
-                            PRIMEM[""Greenwich"",0,
-                                AUTHORITY[""EPSG"",""8901""]],
-                            UNIT[""degree"",0.0174532925199433,
-                                AUTHORITY[""EPSG"",""9122""]],
-                            AUTHORITY[""EPSG"",""4269""]],
-                        PROJECTION[""Albers_Conic_Equal_Area""],
-                        PARAMETER[""latitude_of_center"",40],
-                        PARAMETER[""longitude_of_center"",-96],
-                        PARAMETER[""standard_parallel_1"",20],
-                        PARAMETER[""standard_parallel_2"",60],
-                        PARAMETER[""false_easting"",0],
-                        PARAMETER[""false_northing"",0],
-                        UNIT[""metre"",1,
-                            AUTHORITY[""EPSG"",""9001""]],
-                        AXIS[""Easting"",EAST],
-                        AXIS[""Northing"",NORTH],
-                        AUTHORITY[""ESRI"",""102008""]
-                        "; // see http://epsg.io/27700
-
-            var epsg27700_crs = CoordinateSystemWktReader
-                .Parse(epsg27700);
-            var wgs84 = GeographicCoordinateSystem.WGS84;
-            // Create coordinate transformation
-            var mTransformation =
-                new CoordinateTransformationFactory().CreateFromCoordinateSystems(wgs84, (CoordinateSystem)epsg27700_crs);
-
-            var windsorCastle = new Coordinate(51.483884, -0.604455);
-            var buckinghamPalace = new Coordinate(51.501576, -0.141208);
-            double[] basic = { -0.604455, 51.483884 };
-            double[] epsg27700Point = mTransformation.MathTransform.Transform(basic);
-
-            double[] basic2 = { -0.141208, 51.501576 };
-            double[] epsg27700Point2 = mTransformation.MathTransform.Transform(basic2);
-
-            // Extract latitude and longitude
-            double latitude1 = epsg27700Point[1];
-            double longitude1 = epsg27700Point[0];
-
-            double latitude2 = epsg27700Point2[1];
-            double longitude2 = epsg27700Point2[0];
-
-            var distance = new Coordinate(longitude1, latitude1).Distance(new Coordinate(longitude2, latitude2));
-            _logger.LogInformation($"windsor castle: {mTransformation.MathTransform.Transform(basic)}");
-            _logger.LogInformation($"distance: {distance}");
-
-            double[] sourceInWGS84_arr = {longitude,latitude };
-            double[] sourceInEPSG27700_arr = mTransformation.MathTransform.Transform(sourceInWGS84_arr);
-            Coordinate sourceInEPSG27700 = new Coordinate(sourceInEPSG27700_arr[0], sourceInEPSG27700_arr[1]);
-            _logger.LogInformation($"sourceInWGS84_arr: [{string.Join(", ", sourceInWGS84_arr)}] and sourceInEPSG27700_arr: [{string.Join(", ", sourceInEPSG27700_arr)}] and sourceInEPSG27700: {sourceInEPSG27700}");
-
+            
             foreach (var result in results)
             {
                 if (result.ContainsKey("Location"))
@@ -279,13 +243,9 @@ namespace BIE.Core.API.Controllers
                     var point2_wrong = GeoReader.Read(wkt) as Point;
                     if (point2_wrong != null)
                     {
-                        double[] targetPointInWGS84 = { point2_wrong.Y, point2_wrong.X };
-                        double[] targetPointInEpsg27700 = mTransformation.MathTransform.Transform(targetPointInWGS84);
-                        Coordinate targetInEPSG27700 = new Coordinate(targetPointInEpsg27700[0], targetPointInEpsg27700[1]);
-                        distance = sourceInEPSG27700.Distance(targetInEPSG27700);
-                        _logger.LogInformation($"targetPointInWGS84: [{string.Join(", ", targetPointInWGS84)}] and targetPointInEpsg27700: [{string.Join(", ", targetPointInEpsg27700)}] and targetInEPSG27700: {targetInEPSG27700}");
 
-                        result["Distance"] = distance.ToString();
+                        var distance = ApiHelper.getDistance(longitude, latitude, point2_wrong);
+                        result["Distance"] = distance.ToString("0.##");
                     }
                     else
                     {
@@ -328,10 +288,7 @@ namespace BIE.Core.API.Controllers
             _logger.LogInformation(command);
 
             // Get data from the database
-            var results = DbHelper.GetData(command);
-
-            var geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
-            var point1 = geometryFactory.CreatePoint(new Coordinate(longitude, latitude));
+            var results = DbHelper.GetData(command).ToList();
 
             foreach (var result in results)
             {
@@ -341,17 +298,15 @@ namespace BIE.Core.API.Controllers
                     var polygon = GeoReader.Read(wkt) as Polygon;
                     if (polygon != null)
                     {
-                        result["Area"] = polygon.Area.ToString();
+                        result["Area"] = ApiHelper.getArea(polygon).ToString("0.##");
                     }
                     else
-                    {
                         result["Area"] = "-1";
-                    }
+                    
                 }
                 else
-                {
-                    result["Area"] = "-1";
-                }
+                    result["Area"] = "-1 no location";
+                
             }
 
             return results;
