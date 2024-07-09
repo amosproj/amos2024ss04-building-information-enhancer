@@ -113,6 +113,7 @@ namespace BIE.DataPipeline.Import
                 float groundArea = GetBuildingGroundArea(buildingNode);
                 float buildingWallHeight = GetBuildingWallHeight(buildingNode);
                 float livingArea = GetLivingArea(buildingNode, groundArea, buildingWallHeight);
+                float roofArea = GetRoofArea(buildingNode);
 
                 nextLine = $"geography::STGeomFromText('{geometry.AsText()}', 4326)";
                 nextLine += string.Format(",'{0}'", buildingNode.InnerXml);
@@ -122,6 +123,7 @@ namespace BIE.DataPipeline.Import
                 nextLine += string.Format(",{0}", groundArea.ToString(culture));
                 nextLine += string.Format(",{0}", buildingWallHeight.ToString(culture));
                 nextLine += string.Format(",{0}", livingArea.ToString(culture));
+                nextLine += string.Format(",{0}", roofArea.ToString(culture));
 
                 this.buildingIndex++;
                 return true;
@@ -302,6 +304,22 @@ namespace BIE.DataPipeline.Import
 
             const float averageFloorHeight = 2.4f;
             return groundArea * (float)Math.Ceiling(buildingWallHeight / averageFloorHeight);
+        }
+
+        private float GetRoofArea(XmlNode buildingNode)
+        {
+            XmlNodeList roofNodes = buildingNode.SelectNodes(".//bldg:RoofSurface", this.nsmgr);
+            float roofArea = 0;
+            foreach(XmlNode roofNode in roofNodes)
+            {
+                float roofTileArea = GetStringAttributeValue(roofNode, "Flaeche");
+                if(roofTileArea != -1)
+                {
+                    roofArea += roofTileArea;
+                }
+            }
+
+            return roofArea;
         }
 
         private float GetStringAttributeValue(XmlNode buildingNode, string name, float defaultValue = -1)

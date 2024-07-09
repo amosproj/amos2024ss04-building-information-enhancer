@@ -291,6 +291,7 @@ BEGIN
         GroundArea FLOAT,
         BuildingWallHeight FLOAT,
         LivingArea FLOAT,
+        RoofArea FLOAT,
     );
 END";
             }
