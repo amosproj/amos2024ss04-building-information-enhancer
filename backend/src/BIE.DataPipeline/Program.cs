@@ -71,7 +71,7 @@ try
             dbHelper.SetInfo(description.table_name, "Location");
             break;
         case "CITYGML":
-            importer = new CityGmlImporter(description);
+            importer = new CityGmlImporter(description, dbHelper);
             dbHelper.SetInfo(description.table_name, "Location, XmlData, GroundHeight, DistrictKey, CheckDate, GroundArea, BuildingWallHeight, LivingArea, RoofArea");
             break;
 

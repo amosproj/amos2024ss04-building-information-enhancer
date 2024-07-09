@@ -21,10 +21,12 @@ namespace BIE.DataPipeline.Import
         private XmlNodeList buildingNodes;
         private XmlNamespaceManager nsmgr;
         private CultureInfo culture = new CultureInfo("en-US");
+        private DbHelper db;
+        private bool firstRead = true;
 
         private readonly ICoordinateTransformation? mTransformation;
 
-        public CityGmlImporter(DataSourceDescription description)
+        public CityGmlImporter(DataSourceDescription description, DbHelper db)
         {
             // Define the source and target coordinate systems
             var utmZone32 = CoordinateSystemWktReader
@@ -41,6 +43,7 @@ namespace BIE.DataPipeline.Import
             mTransformation =
                 new CoordinateTransformationFactory().CreateFromCoordinateSystems((CoordinateSystem)utmZone32, wgs84);
             this.description = description;
+            this.db = db;
             this.buildingNodes = ReadBuildings();
         }
 
@@ -85,6 +88,14 @@ namespace BIE.DataPipeline.Import
         /// <returns>SQL Polygon, xml data</returns>
         public bool ReadLine(out string nextLine)
         {
+            if (firstRead)
+            {
+                //create roof table during the first read process.
+                //Cant be done in the constructor because the main table does not exist jet.
+                db.CreatCityGMLRoofTable(description.table_name);
+                firstRead = false;
+            }
+
             if(this.buildingIndex < buildingNodes.Count)
             {
                 XmlNode buildingNode = buildingNodes[this.buildingIndex];
@@ -313,6 +324,9 @@ namespace BIE.DataPipeline.Import
             foreach(XmlNode roofNode in roofNodes)
             {
                 float roofTileArea = GetStringAttributeValue(roofNode, "Flaeche");
+                float roofTileAngle = GetStringAttributeValue(roofNode, "Dachneigung");
+                float roofTileOrientation = GetStringAttributeValue(roofNode, "Dachorientierung");
+                db.InsertRoofData((this.buildingIndex + 1).ToString(culture), roofTileArea.ToString(culture), roofTileOrientation.ToString(culture), roofTileAngle.ToString(culture));
                 if(roofTileArea != -1)
                 {
                     roofArea += roofTileArea;
