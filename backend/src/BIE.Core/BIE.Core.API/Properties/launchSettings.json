@@ -9,7 +9,8 @@
         "DB_PASSWORD": "MyPass@1234",
         "DB_TYPE": "SQL",
         "TRUSTED": "False",
-        "DB_USERNAME": "db_user1"
+        "DB_USERNAME": "db_user1",
+        "METADATA_DB_URL": "localhost:27017"
       },
       "applicationUrl": "https://localhost:63103;http://localhost:63104"
     }
