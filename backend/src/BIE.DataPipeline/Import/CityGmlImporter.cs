@@ -313,7 +313,7 @@ namespace BIE.DataPipeline.Import
                 return -1;
             }
 
-            const float averageFloorHeight = 2.4f;
+            const float averageFloorHeight = 2.85f;
             return groundArea * (float)Math.Ceiling(buildingWallHeight / averageFloorHeight);
         }
 
