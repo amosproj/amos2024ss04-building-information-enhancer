@@ -1,7 +1,12 @@
+"""
+This scripts generates all yaml files in a given meta4 file and saves them in a folder named building_models_yaml_file.
+The path to the meta4 file has to be set in this script.
+"""
 import xml.etree.ElementTree as ET
 #pip install pyyaml
 import yaml
 import os
+file_path = 'This should be the full path the the meta4 file eg: C:\\folder\\test.meta4'
 
 def extract_file_info(xml_data):
     # Parse the XML data
@@ -43,7 +48,8 @@ def create_yaml_file(file_path, name, url):
             "if_table_exists": "skip"
         },
         "table_name": table_name,
-        "table_cols": []
+        "table_cols": [],
+        "dataset": "building_models"
     }
     
     target_file = file_path + "\\" + table_name + ".yaml"
@@ -67,7 +73,7 @@ def remove_file_extension(file_name):
 # Get the location of the current script
 script_path, script_dir = get_script_location()
 
-file_path = 'C:\\Users\\nicol\\Downloads\\09.meta4'
+
 target_folder_path = script_dir + "\\building_models_yaml_file"
 with open(file_path, 'r', encoding='utf-8') as file:
         xml_data = file.read()
