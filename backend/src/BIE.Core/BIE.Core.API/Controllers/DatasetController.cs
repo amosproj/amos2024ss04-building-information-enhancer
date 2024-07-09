@@ -25,6 +25,11 @@ using ProjNet.CoordinateSystems;
 using ProjNet.IO.CoordinateSystems;
 using static System.Collections.Specialized.BitVector32;
 using NetTopologySuite.Algorithm;
+using MySqlX.XDevAPI.Relational;
+using Org.BouncyCastle.Asn1.Cms;
+using MySqlX.XDevAPI.Common;
+using static MongoDB.Bson.Serialization.Serializers.SerializerHelper;
+using Accord.Math;
 
 namespace BIE.Core.API.Controllers
 {
@@ -137,79 +142,177 @@ namespace BIE.Core.API.Controllers
 
             try
             {
+                var generalData = new List<DatasetItem>();
+                var individualData = new List<DatasetItem>();
+
+                // can still be called even if we have a single point
+                var polygons = ApiHelper.ConvertToWktPolygons(request.Location);
+
+
                 if (request.Location.Count <= 0)
                 {
                     return BadRequest("at least a single point has to be given");
                 }
-                else if (request.Location.Count == 1)
+
+                bool onlySinglePoint = request.Location.Count == 1 && request.Location.ElementAt(0).Count == 1;
+
+                Point pointForCalculations = new Point(new Coordinate());
+                if (onlySinglePoint)
                 {
-                    var coordinate = request.Location.FirstOrDefault().FirstOrDefault();
-                    if (coordinate == null)
-                    {
-                        return BadRequest("Location coordinates are required.");
-                    }
+                    var p = request.Location.First().First();
+                    pointForCalculations = new Point(p.ElementAt(0), p.ElementAt(1));
+                }
+                else
+                {
+                    // Create a WKTReader instance
+                    WKTReader reader = new WKTReader();
+                    Geometry geometry = reader.Read(polygons.First());
+                    if (geometry is Polygon polygon)
+                        pointForCalculations = polygon.Centroid;
 
-                    var latitude = coordinate.ElementAt(0);
-                    var longitude = coordinate.ElementAt(1);
-                    var results = new List<DatasetItem>();
+                }
 
-                    var radius = 10000000; // Define the radius as needed
-                    var columns = new HashSet<string> { "operator", "Id" };
-                    var metadata = MetadataDbHelper.GetMetadata("EV_charging_stations");
-                    if (metadata != null)
+                // closest charging stations and number of charging stations
+                var radius = 10000000; // Define the radius as needed
+                var columns = new HashSet<string> { "operator", "Id", "rated_power_kw" };
+                var metadata = MetadataDbHelper.GetMetadata("EV_charging_stations");
+                if (metadata != null)
+                {
+                    var tables = metadata.additionalData.Tables;
+                    if (tables.Count == 1)
                     {
-                        var tables = metadata.additionalData.Tables;
-                        if (tables.Count == 1)
+                        var chargingStations = getNclosestObjects(tables[0].Name, pointForCalculations.Y, pointForCalculations.X, radius, 3, columns);
+
+                        // Log chargingStations to inspect the content
+                        foreach (var station in chargingStations)
                         {
-                            var chargingStations = getNclosestObjects(tables[0].Name, longitude, latitude, radius, 3, columns);
-
-                            // Log chargingStations to inspect the content
-                            foreach (var station in chargingStations)
-                            {
-                                _logger.LogInformation($"Station data: {string.Join(", ", station.Select(kv => $"{kv.Key}: {kv.Value}"))}");
-                            }
-
-                            var chargingStationsData = chargingStations.Select(h => new DatasetItem
-                            {
-                                Id = h.ContainsKey("Id") ? h["Id"] : null,
-                                Key = "Charging station: " + (h.ContainsKey("operator") ? h["operator"] : "No operator defined"),
-                                Value = h.ContainsKey("Distance") ? h["Distance"] + "m" : "-1",
-                                MapId = "EV_charging_stations",
-                            });
-
-                            results.AddRange(chargingStationsData);
+                            _logger.LogInformation($"Station data: {string.Join(", ", station.Select(kv => $"{kv.Key}: {kv.Value}"))}");
                         }
-                    }
 
+                        var chargingStationsData = chargingStations.Select(h => new DatasetItem
+                        {
+                            Id = h.ContainsKey("Id") ? h["Id"] : null,
+                            Key = "Charging station: " + (h.ContainsKey("operator") ? h["operator"] : "No operator defined"),
+                            Value = (h.ContainsKey("Distance") ? h["Distance"] + "m" : "-1") + " | " + (h.ContainsKey("rated_power_kw") ? h["rated_power_kw"] + "kw" : "-1"),
+                            MapId = "EV_charging_stations",
+                        });
+
+                        individualData.AddRange(chargingStationsData);
+                    }
+                }
+
+
+                var housefootprints = new List<Dictionary<String, String>>();
+                if(onlySinglePoint)
+                {
                     // Additional section for house footprints 
                     columns = new HashSet<string> { "Id" };
                     metadata = MetadataDbHelper.GetMetadata("house_footprints");
                     if (metadata != null)
                     {
-                        foreach(var table in metadata.additionalData.Tables)
-                        {
-                            var housefootprints = getMatchingObjects(table.Name, longitude, latitude, columns);
-                            var housefootprintsData = housefootprints.Select(h => new DatasetItem
-                            {
-                                Id = h.ContainsKey("Id") ? h["Id"] : null,
-                                Key = "House footprints" ,
-                                Value = h.ContainsKey("Area") ? h["Area"] + "m²" : "-1",
-                                MapId = table.Name,
-                            });
-                            results.AddRange(housefootprintsData);
-
-                        }
+                        var p = request.Location.First().First();
+                        foreach (var table in metadata.additionalData.Tables)
+                            housefootprints.AddRange(getMatchingObjects(table.Name, p.ElementAt(1), p.ElementAt(0), columns));
+                        
                     }
-
-
-                    LocationDataResponse locationDataResponse = new()
-                    {
-                        CurrentDatasetData = results
-                    };
-
-                    return Ok(locationDataResponse);
                 }
-                return StatusCode(500, $"Currently unsupported operation");
+                else
+                {
+                    _logger.LogInformation("Do housefootprints for area");
+
+                    foreach (var polygonWkt in polygons)
+                    {
+                        // then go through house footprints
+                        metadata = MetadataDbHelper.GetMetadata("house_footprints");
+                        if (metadata != null)
+                        {
+                            _logger.LogInformation("metadata from housefootprints retrieved");
+                            foreach (var table in metadata.additionalData.Tables)
+                            {
+                                var sqlQuery = $"SELECT Id, Location.STAsText() AS Location" +
+                                    ApiHelper.FromTableIntersectsPolygon(table.Name, polygonWkt);
+                                _logger.LogInformation(sqlQuery);
+
+                                housefootprints.AddRange(DbHelper.GetData(sqlQuery));
+                            }
+                        }
+
+                    }                    
+                }
+                double totalBuildingArea = 0.0;
+                if (housefootprints.Any())
+                {
+                    var housefootprintsData = housefootprints.Select(h => new DatasetItem
+                    {
+                        Id = h.ContainsKey("Id") ? h["Id"] : null,
+                        Key = "House footprints",
+                        Value = h.ContainsKey("Location") ? ApiHelper.getArea(GeoReader.Read(h["Location"]) as Polygon).ToString("0.##") + "m²" : "-1",
+                        MapId = "House footprints",
+                    });
+                    individualData.AddRange(housefootprintsData);
+                    
+                    long totalCountHouseFootprints = housefootprints.Count();
+                    long totalCountChargingStations = 0l;
+                    foreach (var hdata in housefootprints)
+                    {
+                        
+                            totalBuildingArea += hdata.ContainsKey("Location") ? ApiHelper.getArea(GeoReader.Read(hdata["Location"]) as Polygon) : 0;
+                        
+                    }
+                    if (!onlySinglePoint)
+                    {
+                        generalData.Add(new DatasetItem
+                        {
+                            Id = "Total number of buildings in area",
+                            Key = "Total number of buildings in area",
+                            Value = totalCountHouseFootprints.ToString(),
+                            MapId = ""
+                        });
+                    }
+                    generalData.Add(new DatasetItem
+                    {
+                        Id = "Total building",
+                        Key = "Total building area",
+                        Value = totalBuildingArea.ToString("0.##") + "m²",
+                        MapId = ""
+                    });
+                }
+
+
+                //////////////
+                if (!onlySinglePoint)
+                {
+                    WKTReader reader = new WKTReader();
+                    double totalAreaSearchPolygon = 0.0;
+                    foreach(var polygonWkt in polygons)
+                    {
+                        Geometry geometry = reader.Read(polygonWkt);
+                        if (geometry is Polygon polygon)
+                            totalAreaSearchPolygon += ApiHelper.getArea(polygon);
+                    }
+                    generalData.Insert(0, new DatasetItem
+                    {
+                        Id = "Searched area",
+                        Key = "Searched area",
+                        Value = totalAreaSearchPolygon.ToString("0.##") + "m²",
+                        MapId = ""
+                    });
+                    generalData.Add(new DatasetItem
+                    {
+                        Id = "Potential Area for geothermal use",
+                        Key = "Potential Area for geothermal use",
+                        Value = Math.Max(totalAreaSearchPolygon - totalBuildingArea, 0).ToString("0.##") + "m²",
+                        MapId = ""
+                    });
+                }
+
+                LocationDataResponse locationDataResponse = new()
+                {
+                    IndividualData = individualData,
+                    GeneralData = generalData
+                };
+
+                return Ok(locationDataResponse);
             }
             catch (Exception ex)
             {
@@ -263,6 +366,14 @@ namespace BIE.Core.API.Controllers
 
 
         //private long getObjectCount(string datasetId, )
+        private IEnumerable<Dictionary<string, string>> getMatchingObjects(
+        string datasetId,
+        double[] longitude,
+        double[] latitude,
+        IEnumerable<string> columns)
+        {
+            return new List<Dictionary<string, string>>();
+        }
 
         private IEnumerable<Dictionary<string, string>> getMatchingObjects(
         string datasetId,
@@ -652,12 +763,12 @@ namespace BIE.Core.API.Controllers
         [JsonPropertyName("datasetId")]
         public string DatasetId { get; set; }
         [JsonPropertyName("location")]
-        public List<List<List<float>>> Location { get; set; }
+        public List<List<List<double>>> Location { get; set; }
     }
 
     public class LocationDataResponse
     {
-        public List<DatasetItem> CurrentDatasetData { get; set; }
+        public List<DatasetItem> IndividualData { get; set; }
         public List<DatasetItem> GeneralData { get; set; }
     }
 

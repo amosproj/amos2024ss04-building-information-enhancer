@@ -124,6 +124,38 @@ public static class ApiHelper
             $" {bottomLong} {bottomLat}))";
     }
 
+    public static List<string> ConvertToWktPolygons(List<List<List<double>>> locations)
+    {
+        var culture = new CultureInfo("en-US");
+        var wktPolygons = new List<string>();
+
+        foreach (var polygon in locations)
+        {
+            var wktString = "POLYGON((";
+            foreach (var point in polygon)
+            {
+                if (point.Count != 2)
+                {
+                    throw new ArgumentException("Each point should have exactly two coordinates.");
+                }
+
+                var longitude = point[0].ToString(culture);
+                var latitude = point[1].ToString(culture);
+                wktString += $"{longitude} {latitude}, ";
+            }
+
+            // Close the polygon by repeating the first point
+            var firstPoint = polygon[0];
+            var firstLongitude = firstPoint[0].ToString(culture);
+            var firstLatitude = firstPoint[1].ToString(culture);
+            wktString += $"{firstLongitude} {firstLatitude}))";
+
+            wktPolygons.Add(wktString);
+        }
+
+        return wktPolygons;
+    }
+
     /// <summary>
     /// Get the polygon of the bounding box given in the queryparameters
     /// </summary>
@@ -155,7 +187,7 @@ public static class ApiHelper
         var right2 = box2.maxX;
         var top2 = box2.maxY;
 
-        Console.WriteLine($"left1: {left1}, left2: {left2}");
+        //Console.WriteLine($"left1: {left1}, left2: {left2}");
 
         return !(right1 < left2 || right2 < left1 || top1 < bottom2 || top2 < bottom1);
     }

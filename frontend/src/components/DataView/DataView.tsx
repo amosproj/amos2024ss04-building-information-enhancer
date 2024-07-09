@@ -34,19 +34,6 @@ function DataView() {
   };
 
   /**
-   * Returns the title of the currently selected tab
-   * @returns current tab title
-   */
-  const getCurrentTabTitle = (): string => {
-    const currentTabID = currentTabsCache.currentTabID.toString();
-    const currentTab = currentTabsCache.openedTabs.find(
-      (tab) => tab.id === currentTabID
-    );
-
-    return currentTab ? currentTab.dataset.displayName : "No map loaded";
-  };
-
-  /**
    * Check if the "Reload data" button should be visible.
    * Should be run on selecting different coordinates or changing the current map ID.
    */
@@ -169,11 +156,10 @@ function DataView() {
             </div>
           ) : (
             <DataPanel
-              listTitle={getCurrentTabTitle()}
+              listTitle={"General data"}
               filterValue={filterValue}
-              mapRows={data?.currentDatasetData ?? []}
-              genericRows={data?.generalData ?? []}
-              extraRows={data?.extraRows ?? []}
+              mapRows={data?.generalData ?? []}
+              genericRows={data?.individualData ?? []}
             />
           )}
           {ifNeedsReloading ? (

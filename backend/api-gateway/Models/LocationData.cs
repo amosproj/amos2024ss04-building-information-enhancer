@@ -7,7 +7,7 @@ namespace APIGateway.Models
         [JsonPropertyName("datasetId")]
         public string DatasetId { get; set; }
         [JsonPropertyName("location")]
-        public List<List<List<float>>> Location { get; set; }
+        public List<List<List<double>>> Location { get; set; }
     }
 
     public class Coordinate
@@ -18,7 +18,7 @@ namespace APIGateway.Models
 
     public class LocationDataResponse
     {
-        public List<DatasetItem> CurrentDatasetData { get; set; } = new List<DatasetItem>();
+        public List<DatasetItem> IndividualData { get; set; } = new List<DatasetItem>();
         public List<DatasetItem> GeneralData { get; set; } = new List<DatasetItem>();
     }
 

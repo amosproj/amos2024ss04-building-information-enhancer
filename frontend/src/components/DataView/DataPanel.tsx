@@ -24,7 +24,6 @@ interface DataPanelProps {
   filterValue: string;
   mapRows: DatasetItem[];
   genericRows: DatasetItem[];
-  extraRows: DatasetItem[];
 }
 
 /*
@@ -36,14 +35,12 @@ const DataPanel: React.FC<DataPanelProps> = ({
   filterValue,
   mapRows,
   genericRows,
-  extraRows,
 }) => {
   // Keep track of if tabs are hidden
   const [ifMapDataTabHidden, toggleMapDataHidden] = useState<boolean>(false);
   const [ifGeneralDataTabHidden, toggleGeneralDataHidden] =
     useState<boolean>(false);
-  const [ifExtraDataTabHidden, toggleExtraDataHidden] =
-    useState<boolean>(false);
+  useState<boolean>(false);
   const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
 
   const { openNewTab } = useContext(TabsContext);
@@ -206,7 +203,7 @@ const DataPanel: React.FC<DataPanelProps> = ({
               ifGeneralDataTabHidden ? "data-panel-toggle-icon-hidden" : ""
             }`}
           />
-          General Data
+          Individual Data
         </div>
         <Grid
           item
@@ -225,71 +222,6 @@ const DataPanel: React.FC<DataPanelProps> = ({
             disableColumnMenu
             columnHeaderHeight={0}
             rows={genericRows}
-            columns={columns}
-            slots={{
-              toolbar: MyCustomToolbar,
-            }}
-            slotProps={{
-              toolbar: {
-                printOptions: { disableToolbarButton: true },
-                csvOptions: { disableToolbarButton: true },
-              },
-            }}
-            disableDensitySelector
-            disableColumnFilter
-            disableColumnSelector
-            disableColumnSorting
-            initialState={{
-              filter: {
-                filterModel: {
-                  items: [],
-                  quickFilterValues: [filterValue],
-                  quickFilterExcludeHiddenColumns: true,
-                },
-              },
-            }}
-            filterModel={{
-              items: [
-                { field: "key", operator: "contains", value: filterValue },
-              ],
-            }}
-            density="compact"
-            disableRowSelectionOnClick
-            autoHeight
-          />
-        </Grid>
-      </div>
-      <div className="data-panel-container">
-        <div
-          className="data-panel-title"
-          onClick={() => {
-            toggleExtraDataHidden(!ifExtraDataTabHidden);
-          }}
-        >
-          <CaretDown
-            className={`data-panel-toggle-icon ${
-              ifExtraDataTabHidden ? "data-panel-toggle-icon-hidden" : ""
-            }`}
-          />
-          Extra Capabilities
-        </div>
-        <Grid
-          item
-          style={{ width: "100%" }}
-          container
-          spacing={2}
-          className={`data-panel-grid ${
-            ifExtraDataTabHidden ? "data-panel-grid-hidden" : ""
-          }`}
-        >
-          <DataGrid
-            getRowId={(row: DatasetItem) => {
-              return row.key + row.value;
-            }}
-            hideFooter={true}
-            disableColumnMenu
-            columnHeaderHeight={0}
-            rows={extraRows}
             columns={columns}
             slots={{
               toolbar: MyCustomToolbar,
