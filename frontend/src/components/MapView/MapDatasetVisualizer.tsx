@@ -17,8 +17,7 @@ import { createDivIcon } from "../../utils/mergeIcons";
 import { convertPolygonsToMarkers } from "../../utils/polgonsToMarkers";
 import { Popup } from "react-leaflet/Popup";
 import {
-  MarkerSelection,
-  PolygonSelection,
+  MarkerSelection
 } from "../../types/MapSelectionTypes";
 
 
