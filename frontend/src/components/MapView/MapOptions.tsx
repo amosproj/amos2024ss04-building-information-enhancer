@@ -1,17 +1,17 @@
-import React, { useState } from "react";
-import { Paper, Popover, Grid, Typography, Box } from "@mui/material";
+import React, { useContext, useState } from "react";
+import { Paper, Popover, Grid, Typography, Box, Tooltip } from "@mui/material";
 import "./MapOptions.css";
-import { StackSimple } from "@phosphor-icons/react";
+import { Polygon, StackSimple } from "@phosphor-icons/react";
 import SearchBar from "../SearchBar/SearchBar";
+import { MapContext } from "../../contexts/MapContext";
 
 interface MapOptionsProps {
-  onMapTypeChange: (
-    type: "normal" | "satellite" | "parzellar" | "aerial"
-  ) => void;
+  onMapTypeChange: (type: "normal" | "satellite" | "parcel" | "aerial") => void;
 }
 
 const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
+  const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
     setAnchorEl(event.currentTarget);
@@ -22,7 +22,7 @@ const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
   };
 
   const handleMapTypeChange = (
-    type: "normal" | "satellite" | "parzellar" | "aerial"
+    type: "normal" | "satellite" | "parcel" | "aerial"
   ) => {
     onMapTypeChange(type);
     handleClose();
@@ -36,12 +36,27 @@ const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
       <div className="search-bar">
         <SearchBar />
       </div>
-      <div
-        onClick={handleClick}
-        className="layers-map-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom"
-      >
-        <StackSimple aria-describedby={id}></StackSimple>
-      </div>
+      <Tooltip title="Change map layers" arrow placement="right">
+        <div
+          onClick={handleClick}
+          className="layers-map-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom"
+        >
+          <StackSimple aria-describedby={id} className="options-icons" />
+        </div>
+      </Tooltip>
+      <Tooltip title="Select a polygon" arrow placement="right">
+        <div
+          onClick={() => {
+            setCurrentMapCache({
+              ...currentMapCache,
+              isDrawing: !currentMapCache.isDrawing,
+            });
+          }}
+          className="draw-polygon-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom"
+        >
+          <Polygon className="options-icons" />
+        </div>
+      </Tooltip>
       <Popover
         id={id}
         open={open}
@@ -121,30 +136,11 @@ const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
                     handleClose();
                   }}
                 />
-
                 <Typography variant="body2" sx={{ marginTop: 0.5 }}>
                   Aerial
                 </Typography>
               </Box>
             </Grid>
-            {/* <Grid item>
-              <Box textAlign="center" sx={{ marginLeft: 2 }}>
-                <img
-                  className="image-hover-effect"
-                  src="/satellite_view.png"
-                  alt="Satellite"
-                  width="50"
-                  height="50"
-                  onClick={() => {
-                    handleMapTypeChange("parzellar");
-                    handleClose();
-                  }}
-                />
-                <Typography variant="body2" sx={{ marginTop: 0.5 }}>
-                  Parzellar
-                </Typography>
-              </Box>
-            </Grid> */}
           </Grid>
         </Paper>
       </Popover>

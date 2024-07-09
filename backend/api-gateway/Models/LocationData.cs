@@ -1,9 +1,13 @@
-﻿namespace APIGateway.Models
+﻿using System.Text.Json.Serialization;
+
+namespace APIGateway.Models
 {
     public class LocationDataRequest
     {
-        public string DatasetId { get; set; } = string.Empty;
-        public List<Coordinate> Location { get; set; } = new List<Coordinate>();
+        [JsonPropertyName("datasetId")]
+        public string DatasetId { get; set; }
+        [JsonPropertyName("location")]
+        public List<List<List<double>>> Location { get; set; }
     }
 
     public class Coordinate
@@ -14,7 +18,7 @@
 
     public class LocationDataResponse
     {
-        public List<DatasetItem> CurrentDatasetData { get; set; } = new List<DatasetItem>();
+        public List<DatasetItem> IndividualData { get; set; } = new List<DatasetItem>();
         public List<DatasetItem> GeneralData { get; set; } = new List<DatasetItem>();
     }
 

@@ -18,8 +18,8 @@ services:
   # API Gateway for listening for the FE requests
   api-gateway:
     build:
-      context: ./backend/api-gateway
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: ./api-gateway/Dockerfile
     container_name: api-gateway
     image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-api-gateway:${DOCKER_COMPOSE_IMAGES_TAG}
     environment:
@@ -32,8 +32,8 @@ services:
   # API Composer for composing the FE requests
   api-composer:
     build:
-      context: ./backend/src/BIE.Core
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: ./src/BIE.Core/Dockerfile
     container_name: api-composer
     image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-api-composer:${DOCKER_COMPOSE_IMAGES_TAG}
     environment:
@@ -44,6 +44,7 @@ services:
       - DB_USERNAME=${SQL_DB_USERNAME}
       - DB_TYPE=${SQL_DB_TYPE}
       - TRUSTED=${SQL_TRUSTED}
+      - METADATA_DB_URL=metadata-database:${METADATA_DATABASE_PORT}
     ports:
       - ${API_COMPOSER_PORT}:80
     networks:
@@ -55,8 +56,8 @@ services:
   ## Data Pipeline for ingesting the datasets
   datapipeline:
     build:
-      context: ./backend/src/BIE.DataPipeline
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: ./src/BIE.DataPipeline/Dockerfile
     image: ghcr.io/amosproj/amos2024ss04-building-information-enhancer-datapipeline:${DOCKER_COMPOSE_IMAGES_TAG}
     environment:
       - DB_NAME=${SQL_DB_NAME}
@@ -66,6 +67,7 @@ services:
       - DB_TYPE=${SQL_DB_TYPE}
       - TRUSTED=${SQL_TRUSTED}
       - METADATA_DB_URL=metadata-database:${METADATA_DATABASE_PORT}
+      - ENVIRONMENT_STAGE=${ENVIRONMENT_STAGE}
     container_name: datapipeline
     networks:
       - bie-network

@@ -1,0 +1,176 @@
+Title	URL	Assignees	Priority	Estimate Size	Labels	Milestone	Actual Size	Sprint
+Create mid-project release plan	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/90	dancingsushii, op-hub	P0		devops, organizational			Sprint 5
+Upload imp-squared board sprint 1	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/4	Battlemech	P0		organizational			Sprint 1
+Documentation - BE technology	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/22	Ahsankkhan, nicolasbandel, Superschnizel	P1	1	backend, feature	Data lake	1	Sprint 3
+Agree on product vision and mission	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/88	dancingsushii, op-hub	P0		organizational			Sprint 5
+Watch a video provided by AMOS team about  well-run team meeting	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/83	dancingsushii, op-hub	P2	1	organizational			Sprint 5
+Agree on project-specific definition of done for feature, sprint, and project release	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/89	op-hub	P0		organizational			Sprint 5
+Design Team Logo	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/7	Superschnizel	P0		organizational			Sprint 1
+Watch getting started with amos Videos	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/6	dancingsushii, op-hub	P1		organizational			Sprint 1
+Ask Chris to provide prioritised list of sources and papers	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/41	dancingsushii	P0		feature, organizational			Sprint 2
+Set up Team Contract	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/13	dancingsushii, op-hub	P0		organizational			Sprint 1
+Define division and team distribution	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/11	dancingsushii, op-hub	P0		organizational			Sprint 1
+Upload planning document Sprint 2	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/64	dancingsushii	P0		organizational			Sprint 2
+Upload Imp-Squared board Sprint 2	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/65	Battlemech	P0		organizational			Sprint 2
+Upload Snapshot Feature Board Sprint 2	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/63	dancingsushii	P0		organizational			Sprint 2
+Upload Snapshot feature board sprint 1	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/2	dancingsushii, op-hub	P0		organizational			Sprint 1
+Upload Planning document pdf sprint 1	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/3	dancingsushii, op-hub	P0		organizational			Sprint 1
+Research on how should data pipeline work	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/40	Ahsankkhan, nicolasbandel, Superschnizel	P0	1	backend, feature	Data lake		Sprint 2
+Team Logo and Tshirt	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/5	Superschnizel	P1		organizational			Sprint 1
+Allow Default Values in Datadescription Yaml	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/129	Superschnizel		2	backend, feature	Data lake	1	Sprint 5
+Change default marker	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/192	Lucas-Nan		1	feature, frontend	UI	1	
+Frontend WMS service research and implementation	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/190	Lucas-Nan		2	feature, frontend	UI	3	
+Overlay pinned map visualizations	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/191	Lucas-Nan		2	feature, frontend	UI	2	
+Integrate phosphor markers	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/188	Lucas-Nan		1	feature, frontend	UI	1	
+Add support for satellite image in map	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/119	Lucas-Nan	P1	2	feature, frontend	UI	2	Sprint 5
+Switch between satellite view and normal view	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/189	Lucas-Nan		1	feature, frontend	UI	1	
+Update GitHub README.md	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/85	dancingsushii	P1		organizational	Data lake		Sprint 9
+Research additional datasets	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/166	op-hub	P1		feature, organizational			Sprint 7
+Implement clustering mechanism and define endpoint for clustered data	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/240	Ahsankkhan	P0	5	backend, feature, frontend	Data lake	5	Sprint 7
+Code documentation	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/219		P3	2	organizational			Sprint 7
+Code cleanup	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/220		P3	2	organizational			Sprint 7
+Create 3d view component	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/78	CelineMP	P2	5	feature, frontend	UI		Sprint 8
+Research clustering with focus on end number of clusters (not distance)	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/272				backend, feature, frontend	UI		
+FE djust layer selection	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/273				feature, frontend	UI		
+Clean up data pipeline	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/237	Superschnizel	P0	2	backend, feature	Data lake	2	Sprint 7
+Ingest Hausumringe Bavaria	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/145		P0		Epic	Automated energy assessment		Sprint 8
+API Composer: merge the clustered data endpoint to be utilized with the viewportData endpoint	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/281		P0		backend, feature	Data lake		Sprint 8
+Execute data pipeline on test environment via SSH	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/209		P1	0	backend, feature	Data lake		Sprint 8
+Polishing Frontend	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/173	CelineMP, Corgam, Lucas-Nan		5	Epic, frontend	UI		Sprint 8
+Queryable max zoom level for individual datasets	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/271	Lucas-Nan		1	backend, bug, feature	UI		Sprint 8
+Create indexes for location column in SQL server	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/302	Ahsankkhan			backend, feature	Data lake		Sprint 8
+Improve map location relevance	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/193	CelineMP, Lucas-Nan	P0		Epic	UI		Sprint 8
+Ingest ALKIS-Tatsächliche Nutzung	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/156		P0		Epic	Automated energy assessment		Sprint 8
+Implement an ability to hover on the map icon to get info about a specific marker	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/279		P0	2	feature, frontend	UI		Sprint 8
+Search bar improvements	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/244	CelineMP	P0	2	feature, frontend	UI		Sprint 8
+Extend layer select control	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/242	CelineMP	P0	2	feature, frontend	UI		Sprint 8
+FE boundary for Germany	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/194	CelineMP	P0	2	feature, frontend	UI		Sprint 8
+Implement the getLocationData endpoint on the FE	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/278		P0		feature, frontend	UI		Sprint 8
+Create missing descriptions for the Hausumringe dataset	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/274		P0	0	backend, feature	Automated energy assessment		Sprint 8
+Selecting custom Polygons	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/197		P4		Epic	UI		
+Implement MongoDB metadata DB	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/259	Corgam	P0		backend	Data lake		Sprint 8
+Adopt sustainability data for user view	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/102		P4		backend, feature, frontend	Automated energy assessment		Sprint 4
+Search bar: Cache and bookmarking	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/62		P1		feature, frontend	UI		Sprint 4
+Solar potential assessment tool	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/104		P4		backend, feature, frontend			Sprint 4
+Automated district energy assessment tool	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/103		P4		backend, feature, frontend			Sprint 4
+Implement basic BE CI	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/52	Corgam	P2	2	backend, devops, feature	CI/CD	2	Sprint 2
+Additional map controls	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/116		P2		backend, feature, frontend	UI		Sprint 5
+Implement shapefile data importer for database integration	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/146	Ahsankkhan, nicolasbandel		5	backend, feature	Data lake	5	Sprint 5
+Extend the APIs	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/258	Lucas-Nan	P0	2	backend	Data lake	2	Sprint 8
+Data loading by location	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/184	Lucas-Nan	P1	2	feature, frontend	UI	1	Sprint 7
+Fetch Hausumringe API	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/241	Lucas-Nan	P0	2	feature, frontend	UI	2	Sprint 7
+Extend the BE docker architecture and CI/CD pipeline	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/257	Corgam	P0	5	backend, devops	Data lake	3	Sprint 8
+Storing additional docker images for local deployment	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/243	Corgam	P0	2	devops	CI/CD	0	Sprint 7
+Display Hausumringe in FE	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/147	Lucas-Nan		3	feature, frontend	Automated energy assessment	2	Sprint 7
+Extend API Endpoints for Tatsächliche Nutzung (actual use)	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/159	Ahsankkhan	P0	3	backend, feature	Automated energy assessment		Sprint 8
+Create script to run datapipeline for each dataset upon deployment	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/236	nicolasbandel	P0	1	backend, feature	Data lake	2	Sprint 7
+Persistent suggestions in search field	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/177	CelineMP	P1	3	bug, frontend	UI		Sprint 5
+Ingest ALKIS-Parzellarkarte	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/155		P2		feature, frontend	Sustainability certification 		
+Create GeoPackage importer	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/157		P3		backend, feature			Sprint 7
+Ingest bavarian LoD2 data	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/160		P2	0	Epic	Solar potential		
+Create CityGML importer	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/161		P2		backend, feature	Automated energy assessment		
+Display LoD2 data in FE	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/162		P2		feature, frontend	Automated energy assessment		
+Extend API endpoints for LoD2 data	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/163		P2		backend, feature, frontend	Automated energy assessment		
+Open as map functionality	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/185		P0		feature, frontend	UI		Sprint 8
+Check and update architecture documentation	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/285	Ahsankkhan, CelineMP, Corgam, Lucas-Nan, nicolasbandel, Superschnizel	P1	1	backend, devops, frontend, organizational	Data lake		Sprint 8
+Test environment connection bugs from mid-project review	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/251	Corgam	P0	3	backend, bug, frontend	CI/CD		Sprint 8
+Ingest all Hausumringe datasets for whole of bavaria	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/283	Superschnizel	P0	1	backend, feature	Automated energy assessment		Sprint 8
+Utilize metadata DB to store metadata	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/277	Corgam	P0	2	backend, feature	Data lake		Sprint 8
+Integrate charging stations as geospatial data	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/284	nicolasbandel		3	backend, feature			Sprint 8
+Create missing descriptions for the actual use dataset	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/275	Superschnizel	P0	1	backend, feature	Automated energy assessment		Sprint 8
+Different icons in dataset selection dialog	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/270	Lucas-Nan		2	backend, bug, feature			Sprint 8
+Decide on a storage strategy for split datasets	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/276		P0	2	backend, feature	Data lake		Sprint 8
+Discussion about: API Composer: merge the viewportData endpoints into a single endpoint, using the datasetID field	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/280	Lucas-Nan	P0	2	backend, feature	Data lake		Sprint 8
+Comprehensive map marker enhancements	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/245	CelineMP, Lucas-Nan	P0	3	backend, Epic, feature, frontend	UI		Sprint 8
+Clarify open source scope of the project with Prof. Riele	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/31	dancingsushii	P1		organizational			Sprint 6
+Extend data pipeline to handle zip files	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/207	Superschnizel	P0	3	backend, feature	Data lake	5	Sprint 6
+Add option to drop existing table in data pipeline	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/217	Superschnizel		2	backend, feature	Data lake	2	Sprint 6
+Extend YAML handling to shapefiles	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/206	Superschnizel	P0	3	backend, feature	Data lake	2	Sprint 6
+Change map controll button visibility	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/210	Corgam	P1	1	bug, frontend	UI	1	Sprint 6
+Improve Satellite view perfomance and visualization	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/200	Lucas-Nan		2	feature, frontend	UI		Sprint 6
+FE centering map on Germany	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/201	Lucas-Nan	P0	1	feature, frontend	UI		Sprint 6
+Improve display of markers for zoomed out maps	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/199	Lucas-Nan		3	feature, frontend	UI		Sprint 6
+Rework the datasets tab, add metadata for datasets and main menu	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/215	Corgam	P1	2	feature, frontend	Data lake	2	Sprint 5
+Fix connection between FE and BE	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/213	Corgam	P0	5	bug, devops	UI	5	Sprint 5
+Display Tatsächliche Nutzung (actual use) in FE	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/158				feature, frontend	Automated energy assessment		Sprint 7
+Create API endpoint for single location	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/234	Ahsankkhan, Lucas-Nan	P0	3	backend, feature	Data lake		Sprint 8
+BE problems when retrieving Hausumringe from database	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/282	Ahsankkhan, Lucas-Nan	P0	3	backend, bug	Automated energy assessment		Sprint 8
+Implementation of a unified search interface	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/181	CelineMP	P1	2	feature, frontend	UI	3	Sprint 5
+Irrelevant search results for query "1" in DataView	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/182	CelineMP	P1	2	bug, frontend	UI	1	Sprint 5
+Create build process video and upload to Deliverables folder	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/84	Corgam	P0	2	devops, organizational		2	Sprint 5
+Make padding displaying correctly	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/168	CelineMP	P1	1	bug, frontend	UI	1	Sprint 5
+Reset input fields when switching search modes	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/178	CelineMP	P1	1	bug, frontend	UI	1	Sprint 5
+Persistent input in search popup	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/179	CelineMP	P1	1	bug, frontend	UI	1	Sprint 5
+Enhance search suggestion relevancy	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/180	CelineMP		2	feature, frontend	UI	1	Sprint 5
+Improve searching by adding suggestions	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/115	CelineMP	P2	3	backend, feature, frontend	UI		
+Automate workflow with GitHub Actions	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/28	Corgam	P0	3	devops, feature	CI/CD	3	Sprint 3
+Create video recording and documentation about build process	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/81	Corgam	P0	2	devops, organizational		1	Sprint 3
+Research Github Actions constraints	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/29	Corgam	P0	2	devops, feature	CI/CD	2	Sprint 3
+Simplify .env file	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/69	Corgam	P1	1	devops, feature	CI/CD	0	Sprint 3
+Tag sprint candidate	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/68	Corgam	P0	2	devops, feature	CI/CD	2	Sprint 3
+Setup deployment pipeline/branches	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/30	Corgam	P0	3	devops, feature	CI/CD	2	Sprint 3
+Create basic layout for main UI interface	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/73	Corgam	P0	2	feature, frontend	UI	1	Sprint 3
+Create multimap view component	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/60	Corgam	P0	3	feature, frontend	UI	3	Sprint 3
+Technology Research (Map APIs)	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/15	CelineMP	P0	3	feature, frontend	Data lake	1	Sprint 3
+Create basic data view component	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/61	CelineMP	P0	3	feature, frontend	UI	3	Sprint 3
+Discuss Labels and Milestones	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/19	dancingsushii, op-hub	P1		organizational			Sprint 4
+Allow building of Backend Projects with command line	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/128	Superschnizel		2	backend, devops, feature	Data lake	3	Sprint 4
+Create endpoint to request datapoints for an area	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/131	Superschnizel		5	backend, feature	Data lake	8	Sprint 4
+Integrate dockerfiles in docker compose	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/132	Ahsankkhan		3	devops, feature	Data lake	3	
+Implement search by coordinate	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/101	CelineMP	P0	3	backend, feature, frontend	UI	3	Sprint 4
+FE filtering changes data entries	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/117	CelineMP	P2	1	bug, frontend	UI	1	Sprint 4
+Create architecture / system design for fe components	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/135	Lucas-Nan		3	feature, frontend	UI	3	
+Marker for points (as map features)	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/165	Lucas-Nan		3	frontend	UI	3	
+Compose and finish the UI of the FE	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/113	CelineMP, Corgam, Lucas-Nan	P0	3	feature, frontend	UI	5	Sprint 4
+Fix pinning of the tabs going crazy after deleting some tabs	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/112	Corgam	P0	1	bug, frontend	UI	1	Sprint 4
+Develop YAML Parser	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/56	Superschnizel	P0	5	backend, feature	Data lake	2	Sprint 3
+Develop CSV parser	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/57	nicolasbandel	P0	5	backend, feature	Data lake	5	Sprint 3
+Dockefile for data pipeline	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/71	Ahsankkhan	P0	3	backend, feature	Data lake	3	Sprint 3
+Configure database connection	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/58	Ahsankkhan	P0	3	backend, feature	Data lake	3	Sprint 3
+Compose the FE 2 - Context and states	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/138	Corgam		3	feature, frontend	UI	3	
+Dockerfile for database	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/70	Ahsankkhan	P2	3	backend, feature	Data lake	5	Sprint 3
+Decide on API endpoints - to have one hour meeting	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/17	Corgam, dancingsushii, Lucas-Nan, op-hub	P2	5	backend, feature, frontend	Data lake	5	Sprint 4
+Clarify preferred storage for meeting notes with Prof. Riehle	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/59	op-hub	P2	1	organizational			Sprint 4
+Upload deliverables Sprint 3	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/75	op-hub	P0		organizational			Sprint 3
+Create map component from OSM	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/77	Lucas-Nan	P0	3	feature, frontend	UI	3	Sprint 3
+Create pop-up with favourites	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/80	Lucas-Nan	P0	2	feature, frontend	UI	2	Sprint 3
+Create generic pop-up container	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/79	Lucas-Nan	P0	1	feature, frontend	UI	1	Sprint 3
+Research and prototype on Geospatial Database	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/170	Ahsankkhan	P0	5	backend, feature	Data lake	5	Sprint 5
+Datapipeline crashes while used in docker container	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/172	Superschnizel	P0	5	backend, bug	Data lake	5	Sprint 5
+Add discard_if_empty attribute to yaml.	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/130	nicolasbandel		2	backend	Data lake	2	Sprint 4
+Crash on special character	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/124	nicolasbandel		1	backend, bug	UI	1	Sprint 4
+Compose the FE 1- Composition and Style	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/137	Corgam		3	feature, frontend	UI	3	
+Row mapping/filtering	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/74	nicolasbandel	P0	3	backend, feature	UI	3	Sprint 4
+Update the CI-CD for the new BE	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/139	Corgam		2	devops, feature	CI/CD		Sprint 7
+Refactor FE for new API endpoints	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/269	Lucas-Nan		2	feature, frontend		2	Sprint 7
+Add argument to data pipeline to overwrite if_table_exists option	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/235	Superschnizel	P0	1	backend, feature	Data lake	2	Sprint 7
+Fix the error while building data pipeline	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/253	Superschnizel		3	backend, bug	CI/CD	1	Sprint 7
+Extend API Endpoints for Hausumringe	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/151	Ahsankkhan	P1	3	backend, feature, frontend	Automated energy assessment	3	Sprint 6
+FE Searching: Only Germany	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/196	CelineMP	P0	1	feature, frontend	UI		
+Trigger Data view only on button press	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/66	Corgam, Lucas-Nan	P2	1	feature, frontend	UI	1	Sprint 6
+Clean Up data view	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/214	Corgam	P1	3	Epic	UI	5	Sprint 6
+Map interaction from search	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/183	CelineMP, Lucas-Nan	P1	2	feature, frontend	UI	2	Sprint 6
+Ensure pin doesn't switch tabs	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/212	CelineMP	P1	1	bug	UI	2	Sprint 7
+FE search and display polygon for specific region	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/195	CelineMP	P1	3	feature, frontend	UI	2	Sprint 7
+Functionality to hide data view panel	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/247	CelineMP	P0	2	feature, frontend	UI	3	Sprint 7
+The titles in the data view sections should be bold text	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/248	CelineMP	P0	1	feature, frontend	UI	1	Sprint 7
+Update data sources documentation	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/167	dancingsushii	P0	3	organizational		0	Sprint 8
+Transfer all meeting notes and other relevant documentation to GitHub	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/25	dancingsushii	P0	2	organizational			Sprint 6
+Add linting and testing to backend	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/208	nicolasbandel	P0	5	backend, feature	Data lake	5	Sprint 6
+Review notes from IP meeting and develop PO's concept	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/82	dancingsushii	P0	2	organizational			Sprint 3
+Documentation - FE technology	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/21	Lucas-Nan	P0	1	feature, frontend		1	Sprint 2
+Research on FE RestAPI requirements	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/16	Lucas-Nan	P1	3	feature, frontend		2	Sprint 2
+Setup basic React + NodeJS frontend	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/14	CelineMP	P0	2	feature, frontend	UI	1	Sprint 2
+Create FE Concept	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/18	CelineMP, dancingsushii, Lucas-Nan, op-hub	P0	3	feature, frontend		5	Sprint 2
+Create boilerplate API project	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/38	Ahsankkhan	P0	5	backend, feature	Data lake	3	Sprint 2
+Ingest Data [2]	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/35	Ahsankkhan, Superschnizel	P0	3	backend, feature		3	Sprint 2
+Request Deutsche Bahn dataset	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/37	Superschnizel	P0	1	backend, bug, feature		1	Sprint 2
+API project docker file	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/54	Ahsankkhan	P0	3	backend, devops, feature	Data lake	3	Sprint 2
+Ingest data [3]	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/36	nicolasbandel	P0	3	backend, feature		3	Sprint 2
+Ingest Data [1]	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/34	Superschnizel	P0	3	backend, feature		2	Sprint 2
+Get Backend container running	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/27	Corgam	P0	2	backend, devops, feature	Data lake	2	Sprint 2
+Documentation -  CI/CD technology	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/23	Corgam	P1	1	devops, feature		1	Sprint 2
+Get FE container running	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/26	Corgam	P0	2	devops, feature, frontend		2	Sprint 2
+Initialize Github Wiki	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/20	Corgam	P0	1	feature		1	Sprint 2
+Show search result on map	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/239	CelineMP	P1	3	feature, frontend	UI	3	Sprint 6
+Remodelling the search bar	https://github.com/amosproj/amos2024ss04-building-information-enhancer/issues/238	CelineMP	P1	3	feature, frontend	UI	3	Sprint 6
