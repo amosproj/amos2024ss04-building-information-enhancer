@@ -8,9 +8,13 @@ import { MapSelection, SearchContext } from "../../contexts/SearchContext";
 import { OpenStreetMapProvider } from "leaflet-geosearch";
 import { LatLng } from "leaflet";
 import { MapContext } from "../../contexts/MapContext";
-import L from "leaflet";
 import "./SearchBar.css";
-import { GeoJSON } from "geojson";
+import { GeoJSON, MultiPolygon } from "geojson";
+import {
+  MarkerSelection,
+  PolygonSelection,
+} from "../../types/MapSelectionTypes";
+import L from "leaflet";
 
 declare module "leaflet-geosearch/dist/providers/openStreetMapProvider.js" {
   interface RawResult {
@@ -111,24 +115,42 @@ const SearchBar: React.FC = () => {
     if (mapInstance) {
       if (item.area && item.bounds) {
         mapInstance.flyToBounds(item.bounds, { animate: true, duration: 5 });
-        const drawPolygon = L.geoJSON(item.polygon, {
-          style: {
-            color: "#ff0000",
-            weight: 2,
-            fillOpacity: 0,
-          },
-        });
-        drawPolygon.addTo(mapInstance);
-        setCurrentMapCache({
-          ...currentMapCache,
-          polygon: drawPolygon,
-          selectedCoordinates: null,
-        });
+        if (currentMapCache.drawnItems) {
+          currentMapCache.drawnItems.clearLayers();
+        }
+        if (item.polygon) {
+          const drawPolygon = L.geoJSON(item.polygon, {
+            style: {
+              color: "#ff0000",
+              weight: 2,
+              fillOpacity: 0.06,
+            },
+          });
+          drawPolygon.addTo(currentMapCache.drawnItems!);
+          const polygonSelection = new PolygonSelection(
+            item.polygon as MultiPolygon,
+            item.displayName,
+            false
+          );
+          setCurrentMapCache({
+            ...currentMapCache,
+            selectedCoordinates: polygonSelection,
+          });
+        }
       } else {
-        currentMapCache.selectedCoordinates = targetPosition;
-        mapInstance.flyTo(targetPosition, 13, { animate: true, duration: 5 });
+        // Select a marker on the map
+        const markerSelection = new MarkerSelection(
+          targetPosition,
+          item.displayName,
+          false
+        );
+        currentMapCache.selectedCoordinates = markerSelection;
+        mapInstance.flyTo(targetPosition, currentMapCache.zoom, {
+          animate: true,
+          duration: 5,
+        });
       }
-    } else console.log("no map instance");
+    } else console.log("No map instance");
   };
 
   const getUniqueOptions = (options: MapSelection[]) => {
@@ -156,7 +178,7 @@ const SearchBar: React.FC = () => {
         getOptionLabel={(option) =>
           typeof option === "string" ? option : option.displayName
         }
-        freeSolo={inputValue?.length ? false : true}
+        freeSolo={true}
         loading={loading}
         forcePopupIcon={false}
         filterOptions={(x) => x}
@@ -183,19 +205,12 @@ const SearchBar: React.FC = () => {
           }
         }}
         onInputChange={(_event, newInputValue) => {
-          if (newInputValue === "") {
-            currentMapCache.polygon?.remove();
-            setCurrentMapCache({
-              ...currentMapCache,
-              polygon: null,
-            });
-          }
           setInputValue(newInputValue);
         }}
         renderInput={(params) => (
           <TextField
             {...params}
-            label={<div className="search-box-label">Search…</div>}
+            placeholder="Search..."
             size="small"
             sx={{
               width: inputValue.length > 0 ? "100%" : 150,
@@ -237,7 +252,7 @@ const SearchBar: React.FC = () => {
           );
 
           return (
-            <li {...props}>
+            <li {...props} key={option.displayName}>
               <Grid
                 container
                 alignItems="center"

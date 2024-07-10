@@ -1,6 +1,7 @@
-import React, { createContext, useState, ReactNode } from "react";
+import React, { createContext, useState, ReactNode, useContext } from "react";
 import { fetchMetadataForDataset } from "../services/metadataService";
 import { Dataset, DatasetMetaData } from "../types/DatasetTypes";
+import { AlertContext } from "./AlertContext";
 
 //// TYPES ////
 
@@ -25,6 +26,7 @@ type TabsContextValue = {
   getOrFetchMetadata: (
     datasetID: string
   ) => Promise<DatasetMetaData | undefined>;
+  openNewTab: (datasetID: Dataset) => boolean;
 };
 
 // Provider component props type
@@ -46,6 +48,7 @@ export const TabsContext = createContext<TabsContextValue>({
   setCurrentTabsCache: () => null,
   getCurrentTab: () => undefined,
   getOrFetchMetadata: async () => undefined,
+  openNewTab: () => false,
 });
 
 // Provider component
@@ -54,6 +57,7 @@ export const TabsContextProvider: React.FC<TabsContextProviderProps> = ({
 }) => {
   const [currentTabsCache, setCurrentTabsCache] =
     useState<TabsCacheProps>(defaultTabsCache);
+  const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
 
   /**
    * Returns the currently opened tab
@@ -113,11 +117,43 @@ export const TabsContextProvider: React.FC<TabsContextProviderProps> = ({
     }
   };
 
+  /**
+   * Opens a new tab
+   * @param dataset a dataset id to open
+   */
+  const openNewTab = (dataset: Dataset) => {
+    if (
+      currentTabsCache.openedTabs.some((tab) => tab.dataset.id === dataset.id)
+    ) {
+      setCurrentAlertCache({
+        ...currentAlertCache,
+        isAlertOpened: true,
+        text: "This dataset was already added.",
+      });
+      return false;
+    }
+
+    const newTabID = currentTabsCache.openedTabs.length + 1;
+    const newTab: TabProps = {
+      id: newTabID.toString(),
+      dataset: dataset,
+      ifPinned: false,
+    };
+
+    setCurrentTabsCache({
+      ...currentTabsCache,
+      currentTabID: newTab.id,
+      openedTabs: [...currentTabsCache.openedTabs, newTab],
+    });
+    return true;
+  };
+
   const value = {
     currentTabsCache,
     setCurrentTabsCache,
     getCurrentTab,
     getOrFetchMetadata,
+    openNewTab,
   };
 
   return <TabsContext.Provider value={value}>{children}</TabsContext.Provider>;

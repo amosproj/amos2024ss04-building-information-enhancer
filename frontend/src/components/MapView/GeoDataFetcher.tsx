@@ -67,6 +67,7 @@ const GeoDataFetcher = (
         isAlertOpened: true,
         text: "Fetching data failed.",
       });
+      console.error("Error fetching data.");
     }
   };
 
@@ -77,6 +78,13 @@ const GeoDataFetcher = (
     fetchMetadataAndData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bounds, zoom, id]);
+
+  /**
+   * Fetches the data at first load.
+   */
+  useEffect(() => {
+    fetchMetadataAndData();
+  });
 
   return data;
 };

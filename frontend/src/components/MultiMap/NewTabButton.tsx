@@ -2,6 +2,7 @@ import { Tooltip } from "@mui/material";
 import { Plus } from "@phosphor-icons/react";
 import { useState } from "react";
 import DatasetsPopUp from "../PopUp/DatasetsPopUp";
+import "./NewTabButton.css";
 
 const NewTabButton = () => {
   // Stores the state of if the datasets popup is open
