@@ -35,9 +35,14 @@ import {
 interface LeafletMapProps {
   datasetId: string;
   mapType: string;
+  if3D: boolean;
 }
 
-const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
+const LeafletMap: React.FC<LeafletMapProps> = ({
+  datasetId,
+  mapType,
+  if3D,
+}) => {
   const { currentTabsCache, getCurrentTab, getOrFetchMetadata } =
     useContext(TabsContext);
   const [map, setMap] = useState<L.Map | null>(null);
@@ -209,7 +214,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
         maxBounds={L.latLngBounds([47.1512, 5.6259], [54.967, 15.4446])}
         minZoom={6}
       >
-        <ZoomControl position="topright" />
+        {!if3D && <ZoomControl position="topright" />}
         {isGrayscale ? (
           <Fragment />
         ) : (

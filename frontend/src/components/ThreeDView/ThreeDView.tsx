@@ -35,6 +35,7 @@ const ThreeDView: React.FC<ThreeDViewProps> = ({ datasetId, mapType }) => {
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(mount.clientWidth, mount.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
     mount.appendChild(renderer.domElement);
 
     const cssRenderer = new CSS3DRenderer();
@@ -114,6 +115,18 @@ const ThreeDView: React.FC<ThreeDViewProps> = ({ datasetId, mapType }) => {
       );
     });
 
+    // Resize handler
+    const handleResize = () => {
+      camera.aspect = mount.clientWidth / mount.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(mount.clientWidth, mount.clientHeight);
+      cssRenderer.setSize(mount.clientWidth, mount.clientHeight);
+    };
+
+    // Use ResizeObserver to handle parent element resize
+    const resizeObserver = new ResizeObserver(handleResize);
+    resizeObserver.observe(mount);
+
     // Animate
     const animate = () => {
       requestAnimationFrame(animate);
@@ -125,23 +138,29 @@ const ThreeDView: React.FC<ThreeDViewProps> = ({ datasetId, mapType }) => {
 
     // Cleanup on component unmount
     return () => {
+      resizeObserver.unobserve(mount);
+      window.removeEventListener("resize", handleResize);
       mount.removeChild(renderer.domElement);
       mount.removeChild(cssRenderer.domElement);
     };
   }, []);
 
   return (
-    <div ref={mountRef} className="tab-map-container">
+    <div
+      ref={mountRef}
+      className="tab-map-container"
+      style={{ position: "relative", width: "100%", height: "100%" }}
+    >
       <div
         ref={threedMapRef}
         style={{
-          width: "500px",
-          height: "500px",
+          width: "100%",
+          height: "100%",
           position: "absolute",
           zIndex: -1,
         }}
       >
-        <LeafletMap datasetId={datasetId} mapType={mapType} />
+        <LeafletMap datasetId={datasetId} mapType={mapType} if3D={true} />
       </div>
     </div>
   );

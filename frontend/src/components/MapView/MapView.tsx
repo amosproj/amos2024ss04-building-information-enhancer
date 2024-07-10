@@ -52,7 +52,7 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
       {if3D ? (
         <ThreeDView datasetId={datasetId} mapType={mapType} />
       ) : (
-        <LeafletMap datasetId={datasetId} mapType={mapType} />
+        <LeafletMap datasetId={datasetId} mapType={mapType} if3D={false} />
       )}
       <MapOptions
         onMapTypeChange={handleMapTypeChange}
