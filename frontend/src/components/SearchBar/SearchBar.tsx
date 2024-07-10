@@ -174,7 +174,7 @@ const SearchBar: React.FC = () => {
       <Autocomplete
         id="search-popup"
         noOptionsText="No locations"
-        sx={{ width: 400 }}
+        sx={{ width: inputValue.length > 0 ? 400 : 150 }}
         getOptionLabel={(option) =>
           typeof option === "string" ? option : option.displayName
         }
