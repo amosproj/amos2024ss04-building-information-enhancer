@@ -100,8 +100,8 @@ function DataView() {
     } else {
       console.log("Currently selected coordinates are null.");
     }
-
-    setIsLoading(false); // Set loading to false after the fetch request completes
+    // Set loading to false after the fetch request completes
+    setIsLoading(false);
   };
 
   return (
@@ -156,9 +156,9 @@ function DataView() {
             </div>
           ) : (
             <DataPanel
-              listTitle={"General data"}
+              listTitle={"Selection data"}
               filterValue={filterValue}
-              mapRows={data?.generalData ?? []}
+              mapRows={data?.selectionData ?? []}
               genericRows={data?.individualData ?? []}
             />
           )}

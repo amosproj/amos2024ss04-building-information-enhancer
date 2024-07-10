@@ -37,8 +37,9 @@ const DataPanel: React.FC<DataPanelProps> = ({
   genericRows,
 }) => {
   // Keep track of if tabs are hidden
-  const [ifMapDataTabHidden, toggleMapDataHidden] = useState<boolean>(false);
-  const [ifGeneralDataTabHidden, toggleGeneralDataHidden] =
+  const [ifSelectionDataTabHidden, toggleSelectionDataHidden] =
+    useState<boolean>(false);
+  const [ifIndividualDataTabHidden, toggleIndividualDataHidden] =
     useState<boolean>(false);
   useState<boolean>(false);
   const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
@@ -85,7 +86,7 @@ const DataPanel: React.FC<DataPanelProps> = ({
   // Returns a button if the "button" value is set to 1
   const renderDetailsButton = (params: GridRenderCellParams) => {
     const dataObject = params.row as DatasetItem;
-    if (dataObject.mapId !== "") {
+    if (dataObject.datasetID !== "") {
       return (
         <strong>
           <Tooltip arrow title="Open a map ">
@@ -93,7 +94,7 @@ const DataPanel: React.FC<DataPanelProps> = ({
               aria-label="open as map"
               size="small"
               onClick={() => {
-                openDatasetFromMapIcon(dataObject.mapId);
+                openDatasetFromMapIcon(dataObject.datasetID);
               }}
             >
               <MapTrifold />
@@ -130,12 +131,12 @@ const DataPanel: React.FC<DataPanelProps> = ({
         <div
           className="data-panel-title"
           onClick={() => {
-            toggleMapDataHidden(!ifMapDataTabHidden);
+            toggleSelectionDataHidden(!ifSelectionDataTabHidden);
           }}
         >
           <CaretDown
             className={`data-panel-toggle-icon ${
-              ifMapDataTabHidden ? "data-panel-toggle-icon-hidden" : ""
+              ifSelectionDataTabHidden ? "data-panel-toggle-icon-hidden" : ""
             }`}
           />
           {listTitle}
@@ -146,12 +147,12 @@ const DataPanel: React.FC<DataPanelProps> = ({
           item
           style={{ width: "100%" }}
           className={`data-panel-grid ${
-            ifMapDataTabHidden ? "data-panel-grid-hidden" : ""
+            ifSelectionDataTabHidden ? "data-panel-grid-hidden" : ""
           }`}
         >
           <DataGrid
             getRowId={(row: DatasetItem) => {
-              return row.key + row.value;
+              return row.displayName + row.coordinate;
             }}
             hideFooter={true}
             disableColumnMenu
@@ -195,12 +196,12 @@ const DataPanel: React.FC<DataPanelProps> = ({
         <div
           className="data-panel-title"
           onClick={() => {
-            toggleGeneralDataHidden(!ifGeneralDataTabHidden);
+            toggleIndividualDataHidden(!ifIndividualDataTabHidden);
           }}
         >
           <CaretDown
             className={`data-panel-toggle-icon ${
-              ifGeneralDataTabHidden ? "data-panel-toggle-icon-hidden" : ""
+              ifIndividualDataTabHidden ? "data-panel-toggle-icon-hidden" : ""
             }`}
           />
           Individual Data
@@ -211,12 +212,12 @@ const DataPanel: React.FC<DataPanelProps> = ({
           container
           spacing={2}
           className={`data-panel-grid ${
-            ifGeneralDataTabHidden ? "data-panel-grid-hidden" : ""
+            ifIndividualDataTabHidden ? "data-panel-grid-hidden" : ""
           }`}
         >
           <DataGrid
             getRowId={(row: DatasetItem) => {
-              return row.key + row.value;
+              return row.displayName + row.coordinate;
             }}
             hideFooter={true}
             disableColumnMenu
