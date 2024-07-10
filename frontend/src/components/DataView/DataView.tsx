@@ -1,19 +1,36 @@
-import DataPanel from "./DataPanel";
 import "./DataView.css";
-import { Fragment, useContext, useEffect, useState } from "react";
+import React, { Fragment, useContext, useEffect, useState } from "react";
+import {
+  Box,
+  TextField,
+  Tooltip,
+  CircularProgress,
+  Table,
+  TableBody,
+  TableContainer,
+  Collapse,
+} from "@mui/material";
+import {
+  CaretDown,
+  CaretUp,
+  Funnel,
+  MapPin,
+  MapPinLine,
+} from "@phosphor-icons/react";
 import { TabsContext } from "../../contexts/TabsContext";
-import { Box, TextField, Tooltip } from "@mui/material";
-import { Funnel, MapPin, MapPinLine } from "@phosphor-icons/react";
 import { MapContext } from "../../contexts/MapContext";
 import LoadDataButton from "./LoadDataButton";
-import { LocationDataResponse } from "../../types/LocationDataTypes";
+import {
+  LocationDataResponse,
+  DatasetItem,
+} from "../../types/LocationDataTypes";
 import { fetchLocationData } from "../../services/locationDataService";
 import {
   MarkerSelection,
   PolygonSelection,
 } from "../../types/MapSelectionTypes";
 import { MultiPolygon, Position } from "geojson";
-import { CircularProgress } from "@mui/material";
+import DataRow from "./DataRow";
 
 // Function to filter and return an array of outer polygons
 function getOuterPolygons(multiPolygon: MultiPolygon): Position[][] {
@@ -21,13 +38,15 @@ function getOuterPolygons(multiPolygon: MultiPolygon): Position[][] {
   return multiPolygon.coordinates.map((polygon) => polygon[0]);
 }
 
-function DataView() {
+const DataView = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { currentTabsCache, getCurrentTab } = useContext(TabsContext);
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
   const [filterValue, setFilterValue] = useState("");
   const [ifNeedsReloading, setIfNeedsReloading] = useState(false);
   const [data, setData] = useState<LocationDataResponse | undefined>();
+  const [showSelectionData, setShowSelectionData] = useState(true);
+  const [showIndividualData, setShowIndividualData] = useState(true);
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilterValue(event.target.value);
@@ -104,10 +123,15 @@ function DataView() {
     setIsLoading(false);
   };
 
+  const filterData = (items: DatasetItem[]) =>
+    items.filter((item) =>
+      item.displayName.toLowerCase().includes(filterValue.toLowerCase())
+    );
+
   return (
     <div className="dataview-container">
       {currentMapCache.loadedCoordinates ? (
-        <Fragment>
+        <div className="datapanels-container">
           <div className="dataview-header-container">
             <b className="dataview-header-title">
               <MapPin size={20} />
@@ -155,14 +179,46 @@ function DataView() {
               <CircularProgress />
             </div>
           ) : (
-            <DataPanel
-              listTitle={"Selection data"}
-              filterValue={filterValue}
-              mapRows={data?.selectionData ?? []}
-              genericRows={data?.individualData ?? []}
-            />
+            <Fragment>
+              <p
+                onClick={() => setShowSelectionData(!showSelectionData)}
+                className="data-panel-title"
+              >
+                {showSelectionData ? <CaretUp /> : <CaretDown />}
+                Selection Data
+              </p>
+              <Collapse in={showSelectionData} timeout="auto" unmountOnExit>
+                <TableContainer>
+                  <Table>
+                    <TableBody>
+                      {filterData(data?.selectionData ?? []).map((row) => (
+                        <DataRow key={row.datasetID} row={row} />
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Collapse>
+              <p
+                onClick={() => setShowIndividualData(!showIndividualData)}
+                className="data-panel-title"
+              >
+                {showIndividualData ? <CaretUp /> : <CaretDown />}
+                Individual Data
+              </p>
+              <Collapse in={showIndividualData} timeout="auto" unmountOnExit>
+                <TableContainer>
+                  <Table>
+                    <TableBody>
+                      {filterData(data?.individualData ?? []).map((row) => (
+                        <DataRow key={row.datasetID} row={row} />
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Collapse>
+            </Fragment>
           )}
-          {ifNeedsReloading ? (
+          {ifNeedsReloading && (
             <div className="load-data-container">
               <div className="load-data-button" onClick={reloadData}>
                 <LoadDataButton
@@ -171,15 +227,13 @@ function DataView() {
                 />
               </div>
             </div>
-          ) : (
-            <Fragment />
           )}
-        </Fragment>
+        </div>
       ) : (
         <div className="dataview-empty">
           <MapPinLine size={100} />
           <h2>No coordinates selected</h2>
-          <span>Click on the map, to select a new location</span>
+          <span>Click on the map to select a new location</span>
           <div className="dataview-empty-button">
             <div onClick={reloadData}>
               <LoadDataButton
@@ -192,6 +246,6 @@ function DataView() {
       )}
     </div>
   );
-}
+};
 
 export default DataView;

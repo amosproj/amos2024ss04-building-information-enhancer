@@ -1,5 +1,3 @@
-import { LatLng } from "leaflet";
-
 export interface LocationDataResponse {
   individualData: DatasetItem[];
   selectionData: DatasetItem[];
@@ -13,6 +11,6 @@ export interface SubdataItem {
 export interface DatasetItem {
   displayName: string;
   datasetID: string;
-  coordinate: LatLng;
+  coordinate: number[];
   subdata: SubdataItem[];
 }

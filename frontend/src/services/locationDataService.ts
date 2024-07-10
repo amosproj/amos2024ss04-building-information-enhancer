@@ -2,6 +2,7 @@ import axios from "axios";
 import { LocationDataResponse } from "../types/LocationDataTypes";
 import { getAPIGatewayURL } from "../utils/apiGatewayURL";
 import { Position } from "geojson";
+import locationData from "./location_data_response.json";
 
 /**
  * Fetches the data from a specific location
@@ -18,32 +19,34 @@ export const fetchLocationData = async (
     datasetId: datasetId,
     location: location,
   };
-  try {
-    console.log(requestBody);
-    const response = await axios.put<LocationDataResponse>(
-      getAPIGatewayURL() + "/api/loadLocationData",
-      requestBody
-    );
+  const locData: LocationDataResponse = locationData;
+  return locData;
+  // try {
+  //   console.log(requestBody);
+  //   const response = await axios.put<LocationDataResponse>(
+  //     getAPIGatewayURL() + "/api/loadLocationData",
+  //     requestBody
+  //   );
 
-    if (response.status === 200) {
-      return response.data;
-    } else {
-      console.error(
-        `Error loading location data, status code: ${response.status}, message: ${response.statusText}`
-      );
-      return undefined;
-    }
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      console.error(
-        `Error loading location data, status code: ${error.response.status}, message: ${error.response.statusText}`,
-        error.response.data
-      );
-    } else if (axios.isAxiosError(error)) {
-      console.error("Axios error loading location data:", error.message);
-    } else {
-      console.error("Unknown error loading location data", error);
-    }
-    return undefined;
-  }
+  //   if (response.status === 200) {
+  //     return response.data;
+  //   } else {
+  //     console.error(
+  //       `Error loading location data, status code: ${response.status}, message: ${response.statusText}`
+  //     );
+  //     return undefined;
+  //   }
+  // } catch (error) {
+  //   if (axios.isAxiosError(error) && error.response) {
+  //     console.error(
+  //       `Error loading location data, status code: ${error.response.status}, message: ${error.response.statusText}`,
+  //       error.response.data
+  //     );
+  //   } else if (axios.isAxiosError(error)) {
+  //     console.error("Axios error loading location data:", error.message);
+  //   } else {
+  //     console.error("Unknown error loading location data", error);
+  //   }
+  //   return undefined;
+  // }
 };
