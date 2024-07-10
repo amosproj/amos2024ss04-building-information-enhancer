@@ -175,19 +175,15 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
           }).on("click", () => {
             handleMarkerClick(_feature, latlng) 
             // Select a marker on the map
-            //console.log("changed");
             const markerSelection = new MarkerSelection(
               latlng,
               "map marker",
               true
               );
-              console.log(currentMapCache.loadedCoordinates);
               setCurrentMapCache((prevCache) => ({
                 ...prevCache,
                 selectedCoordinates: markerSelection,
               }));
-              console.log(currentMapCache.loadedCoordinates);
-              console.log();
           });
           return marker;
         },
