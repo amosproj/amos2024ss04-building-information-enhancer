@@ -4,9 +4,10 @@ import "./MapOptions.css";
 import { Polygon, StackSimple, ThreeD } from "@phosphor-icons/react";
 import SearchBar from "../SearchBar/SearchBar";
 import { MapContext } from "../../contexts/MapContext";
+import { MapTypes } from "../../types/MapTypes";
 
 interface MapOptionsProps {
-  onMapTypeChange: (type: "normal" | "satellite" | "parcel" | "aerial") => void;
+  onMapTypeChange: (type: MapTypes) => void;
   if3D: boolean;
   toggle3D: () => void;
 }
@@ -27,9 +28,7 @@ const MapOptions: React.FC<MapOptionsProps> = ({
     setAnchorEl(null);
   };
 
-  const handleMapTypeChange = (
-    type: "normal" | "satellite" | "parcel" | "aerial"
-  ) => {
+  const handleMapTypeChange = (type: MapTypes) => {
     onMapTypeChange(type);
     handleClose();
   };
@@ -126,7 +125,7 @@ const MapOptions: React.FC<MapOptionsProps> = ({
                   width="50"
                   height="50"
                   onClick={() => {
-                    handleMapTypeChange("normal");
+                    handleMapTypeChange(MapTypes.Normal);
                     handleClose();
                   }}
                 />
@@ -144,7 +143,7 @@ const MapOptions: React.FC<MapOptionsProps> = ({
                   width="50"
                   height="50"
                   onClick={() => {
-                    handleMapTypeChange("satellite");
+                    handleMapTypeChange(MapTypes.Satellite);
                     handleClose();
                   }}
                 />
@@ -162,7 +161,7 @@ const MapOptions: React.FC<MapOptionsProps> = ({
                   width="50"
                   height="50"
                   onClick={() => {
-                    handleMapTypeChange("aerial");
+                    handleMapTypeChange(MapTypes.Aerial);
                     handleClose();
                   }}
                 />

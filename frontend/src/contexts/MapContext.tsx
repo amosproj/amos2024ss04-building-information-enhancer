@@ -1,6 +1,7 @@
 import L, { LatLng, LatLngBounds } from "leaflet";
 import React, { createContext, useState, ReactNode } from "react";
 import { MarkerSelection, PolygonSelection } from "../types/MapSelectionTypes";
+import { MapTypes } from "../types/MapTypes";
 
 //// TYPES ////
 
@@ -12,6 +13,7 @@ export type MapCacheProps = {
   currentTabID: null | string;
   mapCenter: LatLng;
   mapBounds: LatLngBounds;
+  mapType: MapTypes;
   zoom: number;
   isDrawing: boolean;
   drawnItems: L.FeatureGroup | null;
@@ -38,6 +40,7 @@ const defaultMapCache: MapCacheProps = {
   currentTabID: null, // The currently loaded tab ID
   mapCenter: L.latLng([49.5732, 11.0288]),
   mapBounds: L.latLngBounds([49.5732, 11.0288], [49.5732, 11.0288]),
+  mapType: MapTypes.Normal,
   zoom: 13,
   isDrawing: false,
   drawnItems: null,

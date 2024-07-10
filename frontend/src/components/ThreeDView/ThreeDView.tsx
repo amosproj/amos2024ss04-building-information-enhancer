@@ -10,10 +10,9 @@ import LeafletMap from "../MapView/LeafletMap";
 
 interface ThreeDViewProps {
   datasetId: string;
-  mapType: string;
 }
 
-const ThreeDView: React.FC<ThreeDViewProps> = ({ datasetId, mapType }) => {
+const ThreeDView: React.FC<ThreeDViewProps> = ({ datasetId }) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const threedMapRef = useRef<HTMLDivElement>(null);
 
@@ -144,7 +143,7 @@ const ThreeDView: React.FC<ThreeDViewProps> = ({ datasetId, mapType }) => {
           height: "100%",
         }}
       >
-        <LeafletMap datasetId={datasetId} mapType={mapType} if3D={true} />
+        <LeafletMap datasetId={datasetId} if3D={true} />
       </div>
     </div>
   );

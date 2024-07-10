@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
@@ -10,6 +10,8 @@ import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import MapOptions from "./MapOptions";
 import LeafletMap from "./LeafletMap";
 import ThreeDView from "../ThreeDView/ThreeDView";
+import { MapTypes } from "../../types/MapTypes";
+import { MapContext } from "../../contexts/MapContext";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -25,18 +27,14 @@ interface MapViewProps {
 
 const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
   const [if3D, setIf3D] = useState<boolean>(false);
-  const [mapType, setMapType] = useState<
-    "normal" | "satellite" | "parcel" | "aerial"
-  >("normal");
+  const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
 
   /**
    * Changes the layer type
    * @param type type of the layer
    */
-  const handleMapTypeChange = (
-    type: "normal" | "satellite" | "parcel" | "aerial"
-  ) => {
-    setMapType(type);
+  const handleMapTypeChange = (type: MapTypes) => {
+    setCurrentMapCache({ ...currentMapCache, mapType: type });
   };
 
   /**
@@ -49,9 +47,9 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
   return (
     <div className="tab-map-container">
       {if3D ? (
-        <ThreeDView datasetId={datasetId} mapType={mapType} />
+        <ThreeDView datasetId={datasetId} />
       ) : (
-        <LeafletMap datasetId={datasetId} mapType={mapType} if3D={false} />
+        <LeafletMap datasetId={datasetId} if3D={false} />
       )}
       <MapOptions
         onMapTypeChange={handleMapTypeChange}

@@ -34,15 +34,10 @@ import {
 
 interface LeafletMapProps {
   datasetId: string;
-  mapType: string;
   if3D: boolean;
 }
 
-const LeafletMap: React.FC<LeafletMapProps> = ({
-  datasetId,
-  mapType,
-  if3D,
-}) => {
+const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, if3D }) => {
   const { currentTabsCache, getCurrentTab, getOrFetchMetadata } =
     useContext(TabsContext);
   const [map, setMap] = useState<L.Map | null>(null);
@@ -228,10 +223,10 @@ const LeafletMap: React.FC<LeafletMapProps> = ({
           </div>
         )}
         <MapEventsHandler />
-        {mapType === "satellite" && <SatelliteMap />}
-        {mapType === "aerial" && <AerialMap />}
-        {mapType === "normal" && <NormalMap />}
-        {mapType === "parcel" && <ParcelMap />}
+        {currentMapCache.mapType === "satellite" && <SatelliteMap />}
+        {currentMapCache.mapType === "aerial" && <AerialMap />}
+        {currentMapCache.mapType === "normal" && <NormalMap />}
+        {currentMapCache.mapType === "parcel" && <ParcelMap />}
         <ZoomWarningLabel />
       </MapContainer>
     </div>
