@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { Fragment, useContext, useState } from "react";
 import { Paper, Popover, Grid, Typography, Box, Tooltip } from "@mui/material";
 import "./MapOptions.css";
 import { Polygon, StackSimple, ThreeD } from "@phosphor-icons/react";
@@ -7,11 +7,13 @@ import { MapContext } from "../../contexts/MapContext";
 
 interface MapOptionsProps {
   onMapTypeChange: (type: "normal" | "satellite" | "parcel" | "aerial") => void;
+  if3D: boolean;
   toggle3D: () => void;
 }
 
 const MapOptions: React.FC<MapOptionsProps> = ({
   onMapTypeChange,
+  if3D,
   toggle3D,
 }) => {
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
@@ -69,6 +71,18 @@ const MapOptions: React.FC<MapOptionsProps> = ({
           <Polygon className="options-icons" />
         </div>
       </Tooltip>
+      {if3D ? (
+        <Fragment>
+          <div className="zoom-in-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom">
+            +
+          </div>
+          <div className="zoom-out-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom">
+            -
+          </div>
+        </Fragment>
+      ) : (
+        <Fragment />
+      )}
       <Popover
         id={id}
         open={open}

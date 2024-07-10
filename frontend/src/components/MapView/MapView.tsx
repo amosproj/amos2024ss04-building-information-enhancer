@@ -54,7 +54,11 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
       ) : (
         <LeafletMap datasetId={datasetId} mapType={mapType} />
       )}
-      <MapOptions onMapTypeChange={handleMapTypeChange} toggle3D={toggle3D} />
+      <MapOptions
+        onMapTypeChange={handleMapTypeChange}
+        if3D={if3D}
+        toggle3D={toggle3D}
+      />
     </div>
   );
 };
