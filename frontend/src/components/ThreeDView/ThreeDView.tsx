@@ -131,11 +131,7 @@ const ThreeDView: React.FC<ThreeDViewProps> = ({ datasetId, mapType }) => {
   }, []);
 
   return (
-    <>
-      <div
-        ref={mountRef}
-        style={{ width: "100%", height: "100vh", position: "relative" }}
-      />
+    <div ref={mountRef} className="tab-map-container">
       <div
         ref={threedMapRef}
         style={{
@@ -147,7 +143,7 @@ const ThreeDView: React.FC<ThreeDViewProps> = ({ datasetId, mapType }) => {
       >
         <LeafletMap datasetId={datasetId} mapType={mapType} />
       </div>
-    </>
+    </div>
   );
 };
 
