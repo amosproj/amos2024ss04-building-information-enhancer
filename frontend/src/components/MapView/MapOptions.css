@@ -112,7 +112,7 @@
 
 .zoom-in-icon-container {
   width: 2.1rem;
-  height: 2.1rem;
+  height: 2rem;
   position: absolute;
   top: 0.6rem;
   right: 0.6rem;
@@ -127,6 +127,7 @@
   box-shadow: none;
   text-align: center;
   font-size: 1.65rem;
+  border-bottom-width: 1px;
 }
 
 .zoom-out-icon-container {
@@ -146,4 +147,5 @@
   box-shadow: none;
   text-align: center;
   font-size: 2rem;
+  border-top-width: 1px;
 }

@@ -61,6 +61,7 @@ const ThreeDView: React.FC<ThreeDViewProps> = ({ datasetId, mapType }) => {
 
     // Set up MapControls
     const controls = new MapControls(camera, cssRenderer.domElement);
+
     controls.enableDamping = true; // Enable damping (inertia)
     controls.dampingFactor = 0.05; // Damping factor
     controls.screenSpacePanning = false; // Prevent camera from moving vertically in screen space
@@ -84,6 +85,13 @@ const ThreeDView: React.FC<ThreeDViewProps> = ({ datasetId, mapType }) => {
       RIGHT: THREE.MOUSE.ROTATE,
     };
     controls.enableZoom = false;
+
+    // Disable right-click context menu
+    const disableContextMenu = (event: MouseEvent) => {
+      event.preventDefault();
+    };
+
+    mount.addEventListener("contextmenu", disableContextMenu);
 
     // Resize handler
     const handleResize = () => {
@@ -109,24 +117,31 @@ const ThreeDView: React.FC<ThreeDViewProps> = ({ datasetId, mapType }) => {
     // Cleanup on component unmount
     return () => {
       resizeObserver.unobserve(mount);
+      controls.dispose();
+      scene.clear();
+      renderer.dispose();
+      renderer.forceContextLoss();
       mount.removeChild(renderer.domElement);
       mount.removeChild(cssRenderer.domElement);
+      cssObject.position.set(0, 0, 0);
+
+      // Additional cleanup for CSS3DObject
+      if (cssObject.element.parentNode) {
+        cssObject.element.parentNode.removeChild(cssObject.element);
+      }
+
+      // Remove the context menu event listener
+      mount.removeEventListener("contextmenu", disableContextMenu);
     };
   }, []);
 
   return (
-    <div
-      ref={mountRef}
-      className="tab-map-container"
-      style={{ position: "relative", width: "100%", height: "100%" }}
-    >
+    <div ref={mountRef} className="tab-map-container">
       <div
         ref={threedMapRef}
         style={{
           width: "100%",
           height: "100%",
-          position: "absolute",
-          zIndex: -1,
         }}
       >
         <LeafletMap datasetId={datasetId} mapType={mapType} if3D={true} />
