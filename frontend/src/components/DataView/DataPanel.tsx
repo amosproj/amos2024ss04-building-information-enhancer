@@ -14,6 +14,7 @@ import { Dataset } from "../../types/DatasetTypes";
 import L from "leaflet";
 import CustomSvgIcon from "../DatasetsList/CustomSvgIcon";
 import { svgIconDefault } from "../DatasetsList/DatasetsList";
+import { v4 } from "uuid";
 
 function MyCustomToolbar(props: GridToolbarProps) {
   return <GridToolbar {...props} />;
@@ -151,8 +152,8 @@ const DataPanel: React.FC<DataPanelProps> = ({
           }`}
         >
           <DataGrid
-            getRowId={(row: DatasetItem) => {
-              return row.displayName + row.coordinate;
+            getRowId={() => {
+              return v4();
             }}
             hideFooter={true}
             disableColumnMenu
@@ -183,7 +184,11 @@ const DataPanel: React.FC<DataPanelProps> = ({
             }}
             filterModel={{
               items: [
-                { field: "key", operator: "contains", value: filterValue },
+                {
+                  field: "displayName",
+                  operator: "contains",
+                  value: filterValue,
+                },
               ],
             }}
             density="compact"
@@ -216,8 +221,8 @@ const DataPanel: React.FC<DataPanelProps> = ({
           }`}
         >
           <DataGrid
-            getRowId={(row: DatasetItem) => {
-              return row.displayName + row.coordinate;
+            getRowId={() => {
+              return v4();
             }}
             hideFooter={true}
             disableColumnMenu
@@ -248,7 +253,11 @@ const DataPanel: React.FC<DataPanelProps> = ({
             }}
             filterModel={{
               items: [
-                { field: "key", operator: "contains", value: filterValue },
+                {
+                  field: "displayName",
+                  operator: "contains",
+                  value: filterValue,
+                },
               ],
             }}
             density="compact"
