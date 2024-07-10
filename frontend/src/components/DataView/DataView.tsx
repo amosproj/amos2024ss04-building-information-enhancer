@@ -50,11 +50,17 @@ function DataView() {
    */
   useEffect(() => {
     // Check if different coordinates were selected
+    console.log("dataview if");
+    console.log(ifNeedsReloading);
+    console.log(currentMapCache.loadedCoordinates);
+    console.log(currentMapCache.selectedCoordinates);
+    console.log("dataview if end")
     if (
       !ifNeedsReloading &&
       currentMapCache.selectedCoordinates !== null &&
       currentMapCache.loadedCoordinates !== currentMapCache.selectedCoordinates
     ) {
+      console.log("now selected coordinates different than loaded");
       setIfNeedsReloading(true);
       // Check if tab was switched
     } else if (

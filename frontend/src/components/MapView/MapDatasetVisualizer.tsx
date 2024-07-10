@@ -1,5 +1,5 @@
 import { useMap } from "react-leaflet";
-import { useCallback, useContext, useEffect , useState} from "react";
+import { useCallback, useContext, useEffect , useState, useRef} from "react";
 import { FeatureCollection } from "geojson";
 import { MapContext } from "../../contexts/MapContext";
 import { TabsContext } from "../../contexts/TabsContext";
@@ -21,7 +21,6 @@ import {
 } from "../../types/MapSelectionTypes";
 
 
-
 interface MapDatasetVisualizerProps {
   dataset: Dataset;
 }
@@ -37,7 +36,7 @@ const renderToHtml = (Component: React.FC) => {
 };
 
 const divIcondefault: DivIcon = L.divIcon({
-  html: renderToHtml(() => <MapPin size={32} weight="duotone" />),
+  html: renderToHtml(() => <MapPin size={32} weight="duotone"/>),
   className: "", // Optional: add a custom class name
   iconSize: [34, 34],
   iconAnchor: [17, 17], // Adjust the anchor point as needed
@@ -47,7 +46,8 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
   dataset,
 }) => {
   const map = useMap();
-  const { currentMapCache } = useContext(MapContext);
+  const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
+
   const { setCurrentTabsCache } = useContext(TabsContext);
   const [popupData, setPopupData] = useState<any>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -90,6 +90,18 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
     setPopupData(feature);
     setIsPopupOpen(true);
     setLatLngCoordinates(latlng);
+
+    const markerSelection = new MarkerSelection(
+      latlng,
+      'map marker',
+      true
+    );
+
+    setCurrentMapCache((prevCache) => ({
+      ...prevCache,
+      selectedCoordinates: markerSelection,
+    }));
+
   };
 
   useEffect(() => {
@@ -121,7 +133,7 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
         // Add the markers to the map instead
         const geojsonLayer = L.geoJson(markerData, {
           pointToLayer: function (_feature, latlng) {
-            return L.marker(latlng, {
+            const marker = L.marker(latlng, {
               icon: dataset.metaData
                 ? createDivIcon(dataset.metaData.icon)
                 : divIcondefault,
@@ -131,10 +143,14 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
               const markerSelection = new MarkerSelection(
                 latlng,
                 "map polygon",
-                true
+                false
                 );
-                currentMapCache.selectedCoordinates = markerSelection;
+                setCurrentMapCache((prevCache) => ({
+                  ...prevCache,
+                  selectedCoordinates: markerSelection,
+                }));
             });
+            return marker;
           },
 
           style: { fillOpacity: 0.1 },
@@ -152,20 +168,28 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
     } else {
       const geojsonLayer = L.geoJson(geoData, {
         pointToLayer: function (_feature, latlng) {
-          return L.marker(latlng, {
+          const marker = L.marker(latlng, {
             icon: dataset.metaData
               ? createDivIcon(dataset.metaData.icon)
               : divIcondefault,
           }).on("click", () => {
             handleMarkerClick(_feature, latlng) 
             // Select a marker on the map
+            //console.log("changed");
             const markerSelection = new MarkerSelection(
               latlng,
               "map marker",
               true
               );
-              currentMapCache.selectedCoordinates = markerSelection;
-          });;
+              console.log(currentMapCache.loadedCoordinates);
+              setCurrentMapCache((prevCache) => ({
+                ...prevCache,
+                selectedCoordinates: markerSelection,
+              }));
+              console.log(currentMapCache.loadedCoordinates);
+              console.log();
+          });
+          return marker;
         },
 
         style: { fillOpacity: 0.1 },
