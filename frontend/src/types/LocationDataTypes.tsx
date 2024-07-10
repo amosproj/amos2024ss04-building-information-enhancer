@@ -1,11 +1,18 @@
+import { LatLng } from "leaflet";
+
 export interface LocationDataResponse {
-  currentDatasetData: DatasetItem[];
-  generalData: DatasetItem[];
-  extraRows: DatasetItem[];
+  individualData: DatasetItem[];
+  selectionData: DatasetItem[];
+}
+
+export interface SubdataItem {
+  key: string;
+  value: string;
 }
 
 export interface DatasetItem {
-  key: string;
-  value: string;
-  mapId: string;
+  displayName: string;
+  datasetID: string;
+  coordinate: LatLng;
+  subdata: SubdataItem[];
 }
