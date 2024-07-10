@@ -110,6 +110,15 @@
   color: #535bf2;
 }
 
+.draw-polygon-icon-disabled {
+  background-color: rgb(215, 215, 215) !important;
+}
+
+.draw-polygon-icon-disabled:hover {
+  background-color: rgb(215, 215, 215) !important;
+  color: black !important;
+}
+
 .zoom-in-icon-container {
   width: 2.1rem;
   height: 2rem;

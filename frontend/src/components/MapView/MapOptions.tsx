@@ -61,12 +61,16 @@ const MapOptions: React.FC<MapOptionsProps> = ({
       <Tooltip title="Select a polygon" arrow placement="right">
         <div
           onClick={() => {
-            setCurrentMapCache({
-              ...currentMapCache,
-              isDrawing: !currentMapCache.isDrawing,
-            });
+            if (!if3D) {
+              setCurrentMapCache({
+                ...currentMapCache,
+                isDrawing: !currentMapCache.isDrawing,
+              });
+            }
           }}
-          className="draw-polygon-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom"
+          className={`draw-polygon-icon-container ${
+            if3D ? "draw-polygon-icon-disabled" : ""
+          } leaflet-touch leaflet-bar leaflet-control leaflet-control-custom`}
         >
           <Polygon className="options-icons" />
         </div>
