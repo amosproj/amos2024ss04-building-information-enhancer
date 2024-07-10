@@ -16,7 +16,7 @@ export type MapCacheProps = {
   mapType: MapTypes;
   zoom: number;
   isDrawing: boolean;
-  drawnItems: L.FeatureGroup | null;
+  drawnItems: L.FeatureGroup;
 };
 
 // Map Context Type
@@ -43,7 +43,7 @@ const defaultMapCache: MapCacheProps = {
   mapType: MapTypes.Normal,
   zoom: 13,
   isDrawing: false,
-  drawnItems: null,
+  drawnItems: new L.FeatureGroup(),
 };
 
 // Actual value of the context
