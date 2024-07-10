@@ -85,36 +85,6 @@ const ThreeDView: React.FC<ThreeDViewProps> = ({ datasetId, mapType }) => {
     };
     controls.enableZoom = false;
 
-    // Function to forward events to Leaflet map
-    const forwardEventToMap = (event: Event) => {
-      if (event instanceof WheelEvent) {
-        if (event.deltaY < 0) {
-          // Simulate zoom in
-          const simulatedEvent = new WheelEvent(event.type, {
-            ...event,
-            deltaY: -1,
-          });
-          mapElement.dispatchEvent(simulatedEvent);
-        } else {
-          // Simulate zoom out
-          const simulatedEvent = new WheelEvent(event.type, {
-            ...event,
-            deltaY: 1,
-          });
-          mapElement.dispatchEvent(simulatedEvent);
-        }
-      }
-    };
-
-    // Add event listeners to forward events
-    const events: (keyof HTMLElementEventMap)[] = ["wheel"];
-    events.forEach((eventName) => {
-      renderer.domElement.addEventListener(
-        eventName,
-        forwardEventToMap as EventListener
-      );
-    });
-
     // Resize handler
     const handleResize = () => {
       camera.aspect = mount.clientWidth / mount.clientHeight;
