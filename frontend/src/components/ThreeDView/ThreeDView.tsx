@@ -50,8 +50,8 @@ const ThreeDView: React.FC<ThreeDViewProps> = ({ datasetId, mapType }) => {
     mapElement.style.pointerEvents = "auto"; // Ensure the element can consume events
 
     const cssObject = new CSS3DObject(mapElement);
-    cssObject.rotation.x = -Math.PI / 2; // Rotate to lie flat
-    cssObject.position.set(0, 0, 0); // Position at ground level
+    cssObject.rotation.x = -Math.PI / 2;
+    cssObject.position.set(0, 0, 0);
     scene.add(cssObject);
 
     // Light
@@ -67,6 +67,15 @@ const ThreeDView: React.FC<ThreeDViewProps> = ({ datasetId, mapType }) => {
     controls.minDistance = 10; // Minimum zoom distance
     controls.maxDistance = 500; // Maximum zoom distance
     controls.maxPolarAngle = Math.PI / 2; // Limit angle from the top
+
+    // Prevent camera from going below a certain height
+    const minCameraY = 50;
+
+    controls.addEventListener("change", () => {
+      if (camera.position.y < minCameraY) {
+        camera.position.y = minCameraY;
+      }
+    });
 
     // Configure controls to respond only to right-click
     controls.mouseButtons = {
@@ -94,20 +103,11 @@ const ThreeDView: React.FC<ThreeDViewProps> = ({ datasetId, mapType }) => {
           });
           mapElement.dispatchEvent(simulatedEvent);
         }
-      } else if (event instanceof MouseEvent && event.button !== 2) {
-        // Prevent right-click events from being forwarded
-        const simulatedEvent = new MouseEvent(event.type, {
-          bubbles: true,
-          cancelable: true,
-          clientX: event.clientX - 1,
-          clientY: event.clientY - 1,
-        });
-        mapElement.dispatchEvent(simulatedEvent);
       }
     };
 
     // Add event listeners to forward events
-    const events: (keyof HTMLElementEventMap)[] = ["mousedown", "wheel"];
+    const events: (keyof HTMLElementEventMap)[] = ["wheel"];
     events.forEach((eventName) => {
       renderer.domElement.addEventListener(
         eventName,
@@ -130,7 +130,7 @@ const ThreeDView: React.FC<ThreeDViewProps> = ({ datasetId, mapType }) => {
     // Animate
     const animate = () => {
       requestAnimationFrame(animate);
-      controls.update(); // Update controls
+      controls.update();
       renderer.render(scene, camera);
       cssRenderer.render(scene, camera);
     };
@@ -139,7 +139,6 @@ const ThreeDView: React.FC<ThreeDViewProps> = ({ datasetId, mapType }) => {
     // Cleanup on component unmount
     return () => {
       resizeObserver.unobserve(mount);
-      window.removeEventListener("resize", handleResize);
       mount.removeChild(renderer.domElement);
       mount.removeChild(cssRenderer.domElement);
     };

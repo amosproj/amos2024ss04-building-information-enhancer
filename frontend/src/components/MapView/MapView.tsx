@@ -43,7 +43,6 @@ const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
    * Toggles the 3D View
    */
   const toggle3D = () => {
-    console.log("3D");
     setIf3D(!if3D);
   };
 
