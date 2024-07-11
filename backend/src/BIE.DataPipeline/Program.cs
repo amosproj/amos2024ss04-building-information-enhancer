@@ -77,7 +77,7 @@ try
 
         case "SHAPE":
             importer = new ShapeImporter(description);
-            dbHelper.SetInfo(description.table_name, "Location ,Area");
+            dbHelper.SetInfo(description.table_name, "Location, Area");
             break;
         case "CITYGML":
             importer = new CityGmlImporter(description, dbHelper);
