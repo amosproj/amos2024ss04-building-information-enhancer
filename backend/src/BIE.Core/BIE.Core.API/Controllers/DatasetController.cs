@@ -129,7 +129,7 @@ namespace BIE.Core.API.Controllers
         /// <param name="request">Contains the current dataset id and the list of coordinates. 
         /// In case of a single point a list with a single element.</param>
         /// <returns>Data for the specified point/polygon as a list of key/values.</returns>
-        [HttpPut("loadLocationData")]
+        /*[HttpPut("loadLocationData")]
         [ProducesResponseType(typeof(LocationDataResponse), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
@@ -318,6 +318,190 @@ namespace BIE.Core.API.Controllers
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
+        }*/
+
+        /// <summary>
+        /// Loads the location data for the given point or polygon.
+        /// </summary>
+        /// <param name="request">Contains the current dataset id and the list of coordinates. 
+        /// In case of a single point a list with a single element.</param>
+        /// <returns>Data for the specified point/polygon as a list of key/values.</returns>
+        [HttpPut("loadLocationData")]
+        [ProducesResponseType(typeof(LocationDataResponse), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public IActionResult LoadLocationData([FromBody, Required] LocationDataRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            bool onlySinglePoint = request.Location.Count == 1 && request.Location.ElementAt(0).Count == 1;
+            if (onlySinglePoint)
+                return loadLocationDataForSinglePoint(request);
+            else
+                return loadLocationDataforPolygons(request);
+        }
+
+        private IActionResult loadLocationDataforPolygons(LocationDataRequest request)
+        {
+            if (request.Location.Count < 1 || request.Location.First().Count <= 1)
+                return BadRequest("Polygon data can't be retrieved with the amount of request objects");
+
+            var generalData = new List<DatasetItem>();
+            var individualData = new List<DatasetItem>();
+
+            // the input order of long/latt is correct for directly querying stuff
+            // but incorrect for area!
+            var polygons = ApiHelper.ConvertToWktPolygons(request.Location);
+            WKTReader reader = new WKTReader();
+            double totalAreaSearchPolygon = 0.0;
+            foreach (var polygonWkt in polygons)
+            {
+                Geometry geometry = reader.Read(polygonWkt);
+                if (geometry is Polygon polygon)
+                    totalAreaSearchPolygon += ApiHelper.getArea(polygon);
+            }
+            generalData.Insert(0, new DatasetItem
+            {
+                Id = "Searched area",
+                Key = "Searched area",
+                Value = totalAreaSearchPolygon.ToString("0.##") + "m²",
+                MapId = ""
+            });
+
+            var housefootprints = new List<Dictionary<String, String>>();
+            foreach (var polygonWkt in polygons)
+            {
+                // then go through house footprints
+                var metadata = MetadataDbHelper.GetMetadata("house_footprints");
+                if (metadata != null)
+                {
+                    _logger.LogInformation("metadata from housefootprints retrieved");
+                    foreach (var table in metadata.additionalData.Tables)
+                    {
+                        var sqlQuery = $"SELECT Id, Location.STAsText() AS Location" +
+                            ApiHelper.FromTableIntersectsPolygon(table.Name, polygonWkt);
+                        _logger.LogInformation(sqlQuery);
+                        housefootprints.AddRange(DbHelper.GetData(sqlQuery));
+                    }
+                }
+
+            }
+
+            var housefootprintsData = housefootprints.Select(h => new DatasetItem
+            {
+                Id = h.ContainsKey("Id") ? h["Id"] : null,
+                Key = "House footprints",
+                Value = h.ContainsKey("Location") ? ApiHelper.getArea(GeoReader.Read(h["Location"]) as Polygon).ToString("0.##") + "m²" : "-1",
+                MapId = "House footprints",
+            });
+            individualData.AddRange(housefootprintsData);
+
+            long totalCountHouseFootprints = housefootprints.Count();
+            double totalBuildingArea = 0.0;
+            foreach (var hdata in housefootprints)
+                totalBuildingArea += hdata.ContainsKey("Location") ? ApiHelper.getArea(GeoReader.Read(hdata["Location"]) as Polygon) : 0;
+            
+            generalData.Add(new DatasetItem
+            {
+                Id = "Total number of buildings in area",
+                Key = "Total number of buildings in area",
+                Value = totalCountHouseFootprints.ToString(),
+                MapId = ""
+            });
+            generalData.Add(new DatasetItem
+            {
+                Id = "Total building",
+                Key = "Total building area",
+                Value = totalBuildingArea.ToString("0.##") + "m²",
+                MapId = ""
+            });
+            generalData.Add(new DatasetItem
+            {
+                Id = "Potential Area for geothermal use",
+                Key = "Potential Area for geothermal use",
+                Value = Math.Max(totalAreaSearchPolygon - totalBuildingArea, 0).ToString("0.##") + "m²",
+                MapId = ""
+            });
+
+
+
+            LocationDataResponse locationDataResponse = new()
+            {
+                IndividualData = individualData,
+                GeneralData = generalData
+            };
+
+            return Ok(locationDataResponse);
+        }
+
+        private IActionResult loadLocationDataForSinglePoint(LocationDataRequest request)
+        {
+            var generalData = new List<DatasetItem>();
+
+
+            if(request.Location.Count != 1 || request.Location.First().Count != 1)
+                return BadRequest("Single point location data can't be retrieved with the amount of request objects");
+
+            var p = request.Location.First().First();
+            Point pointForCalculations = new Point(p.ElementAt(0), p.ElementAt(1));
+
+            // closest charging stations and number of charging stations
+            var radius = 10000000; // Define the radius as needed
+            var columns = new HashSet<string> { "operator", "Id", "rated_power_kw" };
+            var metadata = MetadataDbHelper.GetMetadata("EV_charging_stations");
+            if (metadata != null)
+            {
+                var tables = metadata.additionalData.Tables;
+                if (tables.Count == 1)
+                {
+                    var chargingStations = getNclosestObjects(tables[0].Name, pointForCalculations.Y, pointForCalculations.X, radius, 3, columns);
+
+                    // Log chargingStations to inspect the content
+                    foreach (var station in chargingStations)
+                    {
+                        _logger.LogInformation($"Station data: {string.Join(", ", station.Select(kv => $"{kv.Key}: {kv.Value}"))}");
+                    }
+
+                    var chargingStationsData = chargingStations.Select(h => new DatasetItem
+                    {
+                        Id = h.ContainsKey("Id") ? h["Id"] : null,
+                        Key = "Charging station: " + (h.ContainsKey("operator") ? h["operator"] : "No operator defined"),
+                        Value = (h.ContainsKey("Distance") ? h["Distance"] + "m" : "-1") + " | " + (h.ContainsKey("rated_power_kw") ? h["rated_power_kw"] + "kw" : "-1"),
+                        MapId = "EV_charging_stations",
+                    });
+
+                    generalData.AddRange(chargingStationsData);
+                }
+            }
+
+
+            var housefootprints = new List<Dictionary<String, String>>();
+            
+            // Additional section for house footprints 
+            columns = new HashSet<string> { "Id" };
+            metadata = MetadataDbHelper.GetMetadata("house_footprints");
+            if (metadata != null)
+            {
+                foreach (var table in metadata.additionalData.Tables)
+                    housefootprints.AddRange(getMatchingObjects(table.Name, pointForCalculations.Y, pointForCalculations.X, columns));
+            }
+            var housefootprintsData = housefootprints.Select(h => new DatasetItem
+            {
+                Id = h.ContainsKey("Id") ? h["Id"] : null,
+                Key = "House footprint",
+                Value = h.ContainsKey("Location") ? ApiHelper.getArea(GeoReader.Read(h["Location"]) as Polygon).ToString("0.##") + "m²" : "-1",
+                MapId = "House_footprints",
+            });
+            generalData.AddRange(housefootprintsData);
+
+            LocationDataResponse locationDataResponse = new()
+            {
+                GeneralData = generalData
+            };
+            return Ok(locationDataResponse);
         }
 
         private IEnumerable<Dictionary<string, string>> getNclosestObjects(string datasetId, double longitude, double latitude, double radius, int n, IEnumerable<string> columns)
