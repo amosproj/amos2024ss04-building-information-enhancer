@@ -105,6 +105,7 @@ namespace BIE.Core.API.Controllers
             IDatasetHandler handler;
             switch (metadata.additionalData.DataType)
             {
+                case "CITYGML":
                 case "SHAPE":
                     handler = new ShapeDatasetHandler(metadata);
                     break;
