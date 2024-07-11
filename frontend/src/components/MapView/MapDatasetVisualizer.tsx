@@ -1,6 +1,6 @@
 import { useMap } from "react-leaflet";
-import { useCallback, useContext, useEffect , useState, useRef} from "react";
-import { FeatureCollection } from "geojson";
+import { Fragment, useCallback, useContext, useEffect, useState } from "react";
+import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson";
 import { MapContext } from "../../contexts/MapContext";
 import { TabsContext } from "../../contexts/TabsContext";
 import GeoDataFetcher from "./GeoDataFetcher";
@@ -11,15 +11,12 @@ import "proj4";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import { MapPin } from "@phosphor-icons/react";
-import { Dataset } from "../../types/DatasetTypes";
+import { Dataset, DisplayProperty } from "../../types/DatasetTypes";
 import { MarkersTypes } from "../../types/MarkersTypes";
 import { createDivIcon } from "../../utils/mergeIcons";
 import { convertPolygonsToMarkers } from "../../utils/polgonsToMarkers";
 import { Popup } from "react-leaflet/Popup";
-import {
-  MarkerSelection
-} from "../../types/MapSelectionTypes";
-
+import { MarkerSelection } from "../../types/MapSelectionTypes";
 
 interface MapDatasetVisualizerProps {
   dataset: Dataset;
@@ -36,7 +33,7 @@ const renderToHtml = (Component: React.FC) => {
 };
 
 const divIcondefault: DivIcon = L.divIcon({
-  html: renderToHtml(() => <MapPin size={32} weight="duotone"/>),
+  html: renderToHtml(() => <MapPin size={32} weight="duotone" />),
   className: "", // Optional: add a custom class name
   iconSize: [34, 34],
   iconAnchor: [17, 17], // Adjust the anchor point as needed
@@ -49,9 +46,14 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
 
   const { setCurrentTabsCache } = useContext(TabsContext);
-  const [popupData, setPopupData] = useState<any>(null);
+  const [popupData, setPopupData] = useState<Feature<
+    Point,
+    GeoJsonProperties
+  > | null>(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [latLngCoordinates, setLatLngCoordinates] = useState<LatLng>(new LatLng(51.505, -0.09));
+  const [latLngCoordinates, setLatLngCoordinates] = useState<LatLng>(
+    new LatLng(51.505, -0.09)
+  );
 
   const updateDatasetData = useCallback(
     (newData: FeatureCollection, bounds: LatLngBounds) => {
@@ -84,25 +86,6 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
     currentMapCache.zoom,
     updateDatasetData
   );
-
-
-  const handleMarkerClick = (feature: any, latlng: LatLng) => {
-    setPopupData(feature);
-    setIsPopupOpen(true);
-    setLatLngCoordinates(latlng);
-
-    const markerSelection = new MarkerSelection(
-      latlng,
-      'map marker',
-      true
-    );
-
-    setCurrentMapCache((prevCache) => ({
-      ...prevCache,
-      selectedCoordinates: markerSelection,
-    }));
-
-  };
 
   useEffect(() => {
     // Check if data has been fetched
@@ -137,22 +120,9 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
               icon: dataset.metaData
                 ? createDivIcon(dataset.metaData.icon)
                 : divIcondefault,
-            }).on("click", () => {
-              handleMarkerClick(_feature, latlng) 
-              // TODO change to PolygonSelection
-              const markerSelection = new MarkerSelection(
-                latlng,
-                "map polygon",
-                false
-                );
-                setCurrentMapCache((prevCache) => ({
-                  ...prevCache,
-                  selectedCoordinates: markerSelection,
-                }));
             });
             return marker;
           },
-
           style: { fillOpacity: 0.1 },
         });
         const markerClusterGroup = L.markerClusterGroup();
@@ -167,27 +137,28 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
       // For Markers type datasets
     } else {
       const geojsonLayer = L.geoJson(geoData, {
-        pointToLayer: function (_feature, latlng) {
+        pointToLayer: function (feature, latlng) {
           const marker = L.marker(latlng, {
             icon: dataset.metaData
               ? createDivIcon(dataset.metaData.icon)
               : divIcondefault,
           }).on("click", () => {
-            handleMarkerClick(_feature, latlng) 
+            setPopupData(feature);
+            setIsPopupOpen(true);
+            setLatLngCoordinates(latlng);
             // Select a marker on the map
             const markerSelection = new MarkerSelection(
               latlng,
-              "map marker",
+              "Custom Marker",
               true
-              );
-              setCurrentMapCache((prevCache) => ({
-                ...prevCache,
-                selectedCoordinates: markerSelection,
-              }));
+            );
+            setCurrentMapCache((prevCache) => ({
+              ...prevCache,
+              selectedCoordinates: markerSelection,
+            }));
           });
           return marker;
         },
-
         style: { fillOpacity: 0.1 },
       });
       const markerClusterGroup = L.markerClusterGroup();
@@ -199,35 +170,61 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
         map.removeLayer(markerClusterGroup);
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataset, currentMapCache.zoom, map, geoData]);
 
+  /**
+   * Creates a list of the properties for the popup data
+   * @param popupData the popup data object
+   * @param displayProperties the list of properties to display with displayName and value fields
+   * @returns a list of strings
+   */
+  const listProperties = (popupData: GeoJsonProperties): DisplayProperty[] => {
+    const listOfProperties: DisplayProperty[] = [];
+    if (popupData && dataset.metaData) {
+      for (const property in popupData.properties) {
+        if (
+          Object.prototype.hasOwnProperty.call(popupData.properties, property)
+        ) {
+          // Check if the property is in the displayProperties list
+          const displayProperty = dataset.metaData.displayProperty.find(
+            (dp) => dp.value === property
+          );
+          // If it is, format and push to the list
+          if (displayProperty) {
+            listOfProperties.push({
+              displayName: displayProperty.displayName,
+              value: String(popupData.properties[property]),
+            });
+          }
+        }
+      }
+    }
+    return listOfProperties;
+  };
 
-  // PopUp marker
-  // dataset.metaData.displayProperty (set in backend/metadata-database/init-db.js) list of properties that should be shown
-  // popupData.properties | list of objects { {displayName: "displayName1", propertyName: "propertyName1"}, {…}, …}
   return (
     <>
       {isPopupOpen && popupData && (
-    
-      <Popup position={latLngCoordinates} offset={[0, -10]}> 
-        {popupData.properties && popupData.properties.length > 0 ? (
-        popupData.properties
-          .filter((property: any) => dataset.metaData?.displayProperty.includes(property.propertyName))
-          .map((property: any, index: number) => (
-            <div key={index}>
-              <strong>{property.propertyName}:</strong> <span>{property.displayName}</span>
-            </div>
-          ))
-      ) : (
-        <p>No data available</p>
+        <Popup position={latLngCoordinates} offset={[0, -25]}>
+          {popupData.properties ? (
+            <Fragment>
+              {listProperties(popupData).map((displayProperty) => {
+                return (
+                  <div key={displayProperty.displayName}>
+                    <b>{displayProperty.displayName}: </b>
+                    <span>{displayProperty.value}</span>
+                  </div>
+                );
+              })}
+            </Fragment>
+          ) : (
+            <p>No data available</p>
+          )}
+        </Popup>
       )}
-      </Popup>
-
-    )}
     </>
   );
-
 };
 
 export default MapDatasetVisualizer;
-
