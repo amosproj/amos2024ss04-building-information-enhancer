@@ -153,6 +153,7 @@ export const TabsContextProvider: React.FC<TabsContextProviderProps> = ({
   /**
    * Opens a new tab if necessary and/or switched to already existing one.
    * @param dataset dataset to change to or open
+   * @return if switched
    */
   const changeToOrOpenNewTab = (dataset: Dataset) => {
     // Open the tab if it does not exist
@@ -160,10 +161,11 @@ export const TabsContextProvider: React.FC<TabsContextProviderProps> = ({
       !currentTabsCache.openedTabs.some((tab) => tab.dataset.id === dataset.id)
     ) {
       openNewTab(dataset);
+      return true;
     } else {
       // Switch to that tab
       const tabID = currentTabsCache.openedTabs.find((tab) => {
-        tab.dataset.id === dataset.id;
+        return tab.dataset.id === dataset.id;
       });
       if (tabID) {
         setCurrentTabsCache({
@@ -171,8 +173,8 @@ export const TabsContextProvider: React.FC<TabsContextProviderProps> = ({
           currentTabID: tabID.id,
         });
       }
+      return false;
     }
-    return true;
   };
 
   const value = {

@@ -1,6 +1,6 @@
-import { Fragment } from "react/jsx-runtime";
+import { Fragment, useState, useEffect } from "react";
 import { DatasetItem } from "../../types/LocationDataTypes";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import {
   Box,
   Collapse,
@@ -28,9 +28,21 @@ interface RowProps {
 
 const DataRow: React.FC<RowProps> = ({ row }) => {
   const [open, setOpen] = useState(false);
+  const [shouldFlyTo, setShouldFlyTo] = useState<LatLng | null>(null);
   const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
   const { changeToOrOpenNewTab } = useContext(TabsContext);
   const { currentMapCache } = useContext(MapContext);
+
+  /**
+   * Triggers fly to on the next map change
+   */
+  useEffect(() => {
+    if (shouldFlyTo && currentMapCache.mapInstance) {
+      currentMapCache.mapInstance.flyTo(shouldFlyTo);
+      setShouldFlyTo(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentMapCache.mapInstance]);
 
   const openDatasetFromMapIcon = async (
     mapId: string | null,
@@ -61,14 +73,15 @@ const DataRow: React.FC<RowProps> = ({ row }) => {
         // Open the map
         const ifSwitched = changeToOrOpenNewTab(datasetToOpenTransformed);
         // If provided fly to the coordinates
-        if (
-          ifSwitched &&
-          coordinates &&
-          coordinates.length === 2 &&
-          currentMapCache.mapInstance
-        ) {
+        if (coordinates && coordinates.length === 2) {
           const latLng = new LatLng(coordinates[0], coordinates[1]);
-          currentMapCache.mapInstance.flyTo(latLng);
+          if (ifSwitched) {
+            setShouldFlyTo(latLng);
+          } else {
+            if (currentMapCache.mapInstance) {
+              currentMapCache.mapInstance.flyTo(latLng);
+            }
+          }
         }
       } else {
         // Display alert
