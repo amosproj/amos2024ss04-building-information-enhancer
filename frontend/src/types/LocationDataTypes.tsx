@@ -10,7 +10,8 @@ export interface SubdataItem {
 
 export interface DatasetItem {
   displayName: string;
-  datasetID: string;
-  coordinate: number[];
+  value: string | null;
+  datasetID: string | null;
+  coordinate: number[] | null;
   subdata: SubdataItem[];
 }

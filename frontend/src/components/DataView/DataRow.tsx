@@ -1,6 +1,6 @@
 import { Fragment } from "react/jsx-runtime";
 import { DatasetItem } from "../../types/LocationDataTypes";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import {
   Box,
   Collapse,
@@ -9,9 +9,18 @@ import {
   TableBody,
   TableCell,
   TableRow,
+  Tooltip,
 } from "@mui/material";
-import { CaretDown, CaretUp } from "@phosphor-icons/react";
+import { CaretDown, CaretUp, MapPin } from "@phosphor-icons/react";
 import "./DataRow.css";
+import { fetchDatasets } from "../../services/datasetsService";
+import { Dataset } from "../../types/DatasetTypes";
+import CustomSvgIcon from "../DatasetsList/CustomSvgIcon";
+import { svgIconDefault } from "../DatasetsList/DatasetsList";
+import { AlertContext } from "../../contexts/AlertContext";
+import L, { LatLng } from "leaflet";
+import { TabsContext } from "../../contexts/TabsContext";
+import { MapContext } from "../../contexts/MapContext";
 
 interface RowProps {
   row: DatasetItem;
@@ -19,6 +28,59 @@ interface RowProps {
 
 const DataRow: React.FC<RowProps> = ({ row }) => {
   const [open, setOpen] = useState(false);
+  const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
+  const { changeToOrOpenNewTab } = useContext(TabsContext);
+  const { currentMapCache } = useContext(MapContext);
+
+  const openDatasetFromMapIcon = async (
+    mapId: string | null,
+    coordinates: number[] | null
+  ) => {
+    const datasetsData = await fetchDatasets();
+    if (datasetsData) {
+      const datasetToOpen = datasetsData.find(
+        (dataset) => dataset.datasetId === mapId
+      );
+      if (datasetToOpen) {
+        const datasetToOpenTransformed: Dataset = {
+          id: datasetToOpen.datasetId,
+          displayName: datasetToOpen.name,
+          shortDescription: datasetToOpen.shortDescription,
+          datasetIcon: datasetToOpen.icon ? (
+            <CustomSvgIcon svgString={datasetToOpen.icon} size={24} />
+          ) : (
+            <CustomSvgIcon svgString={svgIconDefault} size={24} />
+          ),
+          metaData: undefined,
+          data: {
+            type: "FeatureCollection",
+            features: [],
+          },
+          lastDataRequestBounds: L.latLngBounds(L.latLng(0, 0), L.latLng(0, 0)),
+        };
+        // Open the map
+        const ifSwitched = changeToOrOpenNewTab(datasetToOpenTransformed);
+        // If provided fly to the coordinates
+        if (
+          ifSwitched &&
+          coordinates &&
+          coordinates.length === 2 &&
+          currentMapCache.mapInstance
+        ) {
+          const latLng = new LatLng(coordinates[0], coordinates[1]);
+          currentMapCache.mapInstance.flyTo(latLng);
+        }
+      } else {
+        // Display alert
+        setCurrentAlertCache({
+          ...currentAlertCache,
+          isAlertOpened: true,
+          text: "Dataset with provided ID does not exist.",
+        });
+        console.error("Dataset with provided ID does not exist.");
+      }
+    }
+  };
 
   return (
     <Fragment>
@@ -34,9 +96,8 @@ const DataRow: React.FC<RowProps> = ({ row }) => {
             </IconButton>
           </TableCell>
         ) : (
-          <TableCell></TableCell>
+          <TableCell />
         )}
-
         <TableCell
           component="th"
           scope="row"
@@ -45,6 +106,35 @@ const DataRow: React.FC<RowProps> = ({ row }) => {
         >
           {row.displayName}
         </TableCell>
+        {row.value && row.value !== "" ? (
+          <TableCell
+            component="th"
+            scope="row"
+            size="small"
+            className="data-row-value"
+          >
+            {row.value}
+          </TableCell>
+        ) : (
+          <TableCell />
+        )}
+        {row.datasetID && row.datasetID != "" ? (
+          <TableCell className="toggle-column" size="small">
+            <Tooltip title="Locate on the map" arrow placement="left">
+              <IconButton
+                aria-label="open on the map"
+                size="small"
+                onClick={() => {
+                  openDatasetFromMapIcon(row.datasetID, row.coordinate);
+                }}
+              >
+                <MapPin />
+              </IconButton>
+            </Tooltip>
+          </TableCell>
+        ) : (
+          <TableCell />
+        )}
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>

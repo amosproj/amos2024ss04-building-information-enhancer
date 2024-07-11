@@ -2,7 +2,8 @@
   "individualData": [
     {
       "displayName": "Location_22",
-      "datasetID": "ID_24",
+      "datasetID": "EV_charging_stations",
+      "value": "Test",
       "coordinate": [67.47326087656165, 68.66789203109832],
       "subdata": []
     },
@@ -10,6 +11,7 @@
       "displayName": "Location_79",
       "datasetID": "ID_54",
       "coordinate": [-153.8015366197477, 60.72947223636345],
+      "value": "Test2",
       "subdata": [
         {
           "key": "key_42",
@@ -35,7 +37,7 @@
   "selectionData": [
     {
       "displayName": "Location_14",
-      "datasetID": "ID_29",
+      "datasetID": "EV_charging_stations",
       "coordinate": [-11.636436692793325, -26.03179483172533],
       "subdata": [
         {
@@ -54,7 +56,7 @@
     },
     {
       "displayName": "Location_22",
-      "datasetID": "ID_13",
+      "datasetID": "house_footprints",
       "coordinate": [124.75995564607109, -58.085713596555834],
       "subdata": [
         {
@@ -69,7 +71,7 @@
     },
     {
       "displayName": "Location_91",
-      "datasetID": "ID_14",
+      "datasetID": "actual_use",
       "coordinate": [-155.22762742587116, -78.55297532214685],
       "subdata": [
         {

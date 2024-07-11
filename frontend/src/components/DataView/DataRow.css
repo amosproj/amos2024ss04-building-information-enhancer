@@ -5,3 +5,7 @@
 .data-row {
   height: 40px;
 }
+
+.data-row-value {
+  text-align: end !important;
+}
