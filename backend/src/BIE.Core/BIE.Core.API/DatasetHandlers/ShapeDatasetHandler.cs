@@ -43,9 +43,6 @@ public class ShapeDatasetHandler : IDatasetHandler
 
             if (!ApiHelper.BoxIntersection(boundingBox, table.BoundingBox.Value))
             {
-                var bb = table.BoundingBox.Value;
-                // Console.WriteLine($"request-- x: {boundingBox.minX}, y: {boundingBox.minY} || x: {boundingBox.maxX}, y: {boundingBox.maxY}");
-                // Console.WriteLine($"x: {bb.minX}, y: {bb.minY} || x: {bb.maxX}, y: {bb.maxY}");
                 continue;
             }
 
@@ -53,10 +50,10 @@ public class ShapeDatasetHandler : IDatasetHandler
             // get data
 
             // SQL Query to find intersecting points
-
             var sqlQuery = $"SELECT top 1000  Location.AsTextZM() AS Location, Location.STGeometryType() AS Type" +
                            ApiHelper.FromTableIntersectsPolygon(table.Name, polygon);
 
+            // create feature object
             foreach (var row in DbHelper.GetData(sqlQuery))
             {
                 var feature = new Dictionary<string, object>
