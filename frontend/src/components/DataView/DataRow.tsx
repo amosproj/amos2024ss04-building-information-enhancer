@@ -25,6 +25,9 @@ interface RowProps {
   currentDatasets: DatasetBasicData[];
 }
 
+/**
+ * A single data row for the data view.
+ */
 const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
   const [open, setOpen] = useState(false);
   const [shouldFlyTo, setShouldFlyTo] = useState<LatLng | null>(null);

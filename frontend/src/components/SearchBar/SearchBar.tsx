@@ -1,4 +1,10 @@
-import React, { useContext, useState, useEffect, useMemo } from "react";
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+  Fragment,
+} from "react";
 import { Autocomplete, Box, TextField, IconButton, Grid } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
 import { MagnifyingGlass } from "@phosphor-icons/react";
@@ -22,6 +28,9 @@ declare module "leaflet-geosearch/dist/providers/openStreetMapProvider.js" {
   }
 }
 
+/**
+ * Search bar used for searching locations on the map and selecting them.
+ */
 const SearchBar: React.FC = () => {
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState<Array<MapSelection>>([]);
@@ -74,6 +83,10 @@ const SearchBar: React.FC = () => {
     };
   }, [inputValue, fetch]);
 
+  /**
+   * Adds a location to favourites list.
+   * @param newLocation location to add
+   */
   const addToFavourites = (newLocation: MapSelection) => {
     if (
       !currentSearchCache.favourites.some((fav) =>
@@ -98,12 +111,20 @@ const SearchBar: React.FC = () => {
     });
   };
 
+  /**
+   * Flies to the selected location after some timeout
+   * @param item map selection to fly to
+   */
   const onItemSelected = (item: MapSelection) => {
     setTimeout(() => {
       flyToLocation(item);
     }, 400);
   };
 
+  /**
+   * Flies to the selected location
+   * @param item map selection to fly to
+   */
   const flyToLocation = (item: MapSelection) => {
     const targetPosition = new LatLng(
       item.coordinates.lat,
@@ -161,6 +182,9 @@ const SearchBar: React.FC = () => {
     return Array.from(uniqueOptions.values());
   };
 
+  /**
+   * Handler for clicking on result
+   */
   const handleSearchIconClick = () => {
     if (options.length > 0) {
       onItemSelected(options[0]);
@@ -170,7 +194,7 @@ const SearchBar: React.FC = () => {
   };
 
   return (
-    <>
+    <Fragment>
       <Autocomplete
         id="search-popup"
         noOptionsText="No locations"
@@ -317,7 +341,7 @@ const SearchBar: React.FC = () => {
           );
         }}
       />
-    </>
+    </Fragment>
   );
 };
 

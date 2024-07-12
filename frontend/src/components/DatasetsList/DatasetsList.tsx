@@ -21,6 +21,10 @@ interface DatasetsListProps {
   closeDialog: () => void;
 }
 
+/**
+ * Component for listing all available datasets.
+ * @returns
+ */
 const DatasetsList: React.FC<DatasetsListProps> = ({ closeDialog }) => {
   const [datasets, setDatasets] = useState<Dataset[]>([]);
   const { openNewTab } = useContext(TabsContext);

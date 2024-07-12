@@ -25,6 +25,9 @@ interface MapViewProps {
   datasetId: string;
 }
 
+/**
+ * One of the main components on the website. Displays the map on the left side of the page.
+ */
 const MapView: React.FC<MapViewProps> = ({ datasetId }) => {
   const [if3D, setIf3D] = useState<boolean>(false);
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
