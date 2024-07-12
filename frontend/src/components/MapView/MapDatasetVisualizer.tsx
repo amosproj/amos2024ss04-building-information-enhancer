@@ -96,6 +96,7 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
    * @returns the color to use
    */
   const getColor = (usageType: string) => {
+    console.log(usageType);
     if (dataset.metaData && dataset.metaData.polygonColoring) {
       const coloring = dataset.metaData.polygonColoring;
       for (const colorRule of coloring.colors) {

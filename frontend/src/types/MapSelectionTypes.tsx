@@ -1,7 +1,9 @@
 import { LatLng } from "leaflet";
 import { MultiPolygon } from "geojson";
 
-// Define PolygonSelection class
+/**
+ * A map selection of a polygon. Either by manualy drawing it or by search bar.
+ */
 export class PolygonSelection {
   polygon: MultiPolygon;
   displayName: string;
@@ -18,7 +20,9 @@ export class PolygonSelection {
   }
 }
 
-// An interface for a single marker selection
+/**
+ * A map selection of a single location/marker.
+ */
 export class MarkerSelection {
   marker: LatLng;
   displayName: string;
