@@ -77,7 +77,7 @@ try
 
         case "SHAPE":
             importer = new ShapeImporter(description);
-            dbHelper.SetInfo(description.table_name, "Location");
+            dbHelper.SetInfo(description.table_name, importer.GetInsertHeader());
             break;
         case "CITYGML":
             importer = new CityGmlImporter(description);
@@ -96,7 +96,7 @@ catch (Exception e)
     return 1;
 }
 
-if (!dbHelper.CreateTable(description))
+if (!dbHelper.CreateTable(description, importer.GetCreationHeader()))
 {
     return 0;
 }

@@ -129,6 +129,16 @@ namespace BIE.DataPipeline.Import
             }
         }
 
+        public string GetCreationHeader()
+        {
+            return "";
+        }
+
+        public string GetInsertHeader()
+        {
+            return "";
+        }
+
         private Geometry UtmCoordinatesToGeometry(string utmCoordinates)
         {
             //Console.WriteLine(utmCoordinates);
