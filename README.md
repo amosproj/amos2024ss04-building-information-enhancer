@@ -1,6 +1,10 @@
 <div align="center">
   <div align="center" style="background-color:#0d1117; padding-bottom: 20px; border-radius:10px">
-    <img src="https://github.com/amosproj/amos2024ss04-building-information-enhancer/blob/main/Deliverables/sprint-01/team-logo.png?raw=true" width="400" alt="Code.ing Group Logo">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://github.com/amosproj/amos2024ss04-building-information-enhancer/blob/main/Deliverables/sprint-01/team-logo.png?raw=true">
+        <source media="(prefers-color-scheme: light)" srcset="https://github.com/amosproj/amos2024ss04-building-information-enhancer/blob/main/Deliverables/sprint-01/team-logo-black.png?raw=true">
+        <img src="https://github.com/amosproj/amos2024ss04-building-information-enhancer/blob/main/Deliverables/sprint-01/team-logo.png?raw=true" width="500" alt="Code.ing Group Logo">
+    </picture>
     </br>
   </div>
   <h1 style="padding:15px;border-bottom: 0;">Building Information Enhancer (AMOS SS 2024)</h1>
