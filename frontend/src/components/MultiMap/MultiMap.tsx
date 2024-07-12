@@ -41,7 +41,7 @@ const MultiMap = () => {
   };
 
   return (
-    <div className="multimap-container">
+    <div className="multimap-inner-container">
       <TabContext value={currentTabsCache.currentTabID}>
         <div className="tab-list-container">
           <TabList

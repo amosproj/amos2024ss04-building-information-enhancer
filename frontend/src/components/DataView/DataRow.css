@@ -1,0 +1,20 @@
+.toggle-column {
+  width: 2rem;
+}
+
+.data-row {
+  height: 40px;
+  background-color: rgb(251, 251, 251);
+}
+
+.data-row-title-container {
+  padding-left: 0 !important;
+}
+
+.data-row-value {
+  text-align: end !important;
+}
+
+.subdata-rows-container > *:last-child > * {
+  border-bottom: none;
+}
