@@ -312,6 +312,7 @@ BEGIN
         GroundArea FLOAT,
         BuildingVolume FLOAT,
         BuildingWallHeight FLOAT,
+        WallArea FLOAT,
         LivingArea FLOAT,
         RoofArea FLOAT,
     );

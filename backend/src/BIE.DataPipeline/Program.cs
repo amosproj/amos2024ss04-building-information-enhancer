@@ -81,7 +81,7 @@ try
             break;
         case "CITYGML":
             importer = new CityGmlImporter(description, dbHelper);
-            dbHelper.SetInfo(description.table_name, "Location, XmlData, GroundHeight, DistrictKey, CheckDate, GroundArea, BuildingVolume, BuildingWallHeight, LivingArea, RoofArea");
+            dbHelper.SetInfo(description.table_name, "Location, XmlData, GroundHeight, DistrictKey, CheckDate, GroundArea, BuildingVolume, BuildingWallHeight, WallArea, LivingArea, RoofArea");
             break;
 
         default:

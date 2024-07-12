@@ -123,6 +123,7 @@ namespace BIE.DataPipeline.Import
                 string checkDate = GetBuildingCheckDate(buildingNode);
                 float groundArea = GetBuildingGroundArea(buildingNode);
                 float buildingWallHeight = GetBuildingWallHeight(buildingNode);
+                float wallArea = GetWallArea(buildingNode);
                 float buildingVolume = GetBuildingVolume(buildingNode, groundArea, buildingWallHeight);
                 float livingArea = GetLivingArea(buildingNode, groundArea, buildingWallHeight);
                 float roofArea = GetRoofArea(buildingNode);
@@ -135,6 +136,7 @@ namespace BIE.DataPipeline.Import
                 nextLine += string.Format(",{0}", groundArea.ToString(culture));
                 nextLine += string.Format(",{0}", buildingVolume.ToString(culture));
                 nextLine += string.Format(",{0}", buildingWallHeight.ToString(culture));
+                nextLine += string.Format(",{0}", wallArea.ToString(culture));
                 nextLine += string.Format(",{0}", livingArea.ToString(culture));
                 nextLine += string.Format(",{0}", roofArea.ToString(culture));
 
@@ -330,6 +332,22 @@ namespace BIE.DataPipeline.Import
             {
                 return niedrigsteTraufeDesGebaeudes - hoeheGrund;
             }
+        }
+
+        private float GetWallArea(XmlNode buildingNode)
+        {
+            XmlNodeList wallNodes = buildingNode.SelectNodes(".//bldg:WallSurface", this.nsmgr);
+            float wallArea = 0;
+            foreach (XmlNode wallNode in wallNodes)
+            {
+                float wallTileArea = GetStringAttributeValue(wallNode, "Flaeche");
+                if (wallTileArea != -1)
+                {
+                    wallArea += wallTileArea;
+                }
+            }
+
+            return wallArea;
         }
 
         private float GetLivingArea(XmlNode buildingNode, float groundArea, float buildingWallHeight)
