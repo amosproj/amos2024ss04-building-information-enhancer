@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using BIE.Data;
 using BIE.DataPipeline.Import;
 using BieMetadata;
@@ -20,6 +21,7 @@ namespace BIE.DataPipeline
         {
             ConfigureEnvironmentVariables();
             mStringBuilder = new StringBuilder();
+            cityGMLStringBuilder = new StringBuilder();
         }
 
         /// <summary>
@@ -45,6 +47,10 @@ namespace BIE.DataPipeline
             if (description.options.if_table_exists == InsertBehaviour.replace)
             {
                 Console.WriteLine($"Dropping table {description.table_name} if it exists.");
+                if(description.source.data_format == "CITYGML")
+                {
+                    DropCityGMLTable(description.table_name);
+                }
                 db.ExecuteScalar(db.CreateCommand($"DROP TABLE IF EXISTS {description.table_name}"));
             }
 
@@ -286,7 +292,8 @@ IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{desc
 BEGIN
     CREATE TABLE {description.table_name} (
         Id INT PRIMARY KEY IDENTITY(1,1),
-        {header}
+        {header},
+        Area FLOAT
     );
 END";
             }
@@ -304,6 +311,9 @@ BEGIN
         DistrictKey VARCHAR(255),
         CheckDate DATE,
         GroundArea FLOAT,
+        BuildingWallHeight FLOAT,
+        LivingArea FLOAT,
+        RoofArea FLOAT,
     );
 END";
             }
@@ -368,6 +378,10 @@ BEGIN CREATE TABLE {description.table_name} (";
                 throw;
             }
 
+            if(cityGMLStringBuilder.Length > 0)
+            {
+                PushRoofData();
+            }
             mCount = 0;
             mStringBuilder.Clear();
             mStringBuilder.Append(mInputQueryString);
@@ -400,5 +414,107 @@ BEGIN CREATE TABLE {description.table_name} (";
                                                   dbPassword,
                                                   dbTrusted);
         }
+
+        #region Extra functions for CityGML additional tables
+
+        private readonly StringBuilder cityGMLStringBuilder;
+
+        private int cityGMLCount;
+        private string cityGMLInputQueryString;
+        public bool CreatCityGMLRoofTable(string mainTableName)
+        {
+
+            try
+            {
+                Console.WriteLine("Creating Roof Table...");
+                var db = Database.Instance;
+
+                string tableName = string.Format("{0}_roofs", mainTableName);
+                string columnNames = "Building_id, Area, Orientation, Angle";
+                cityGMLInputQueryString = $"INSERT INTO {tableName} ( {columnNames} )  VALUES ";
+
+                var query = $@"
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{tableName}')
+BEGIN
+    CREATE TABLE {tableName} (
+        Id INT PRIMARY KEY IDENTITY(1,1),
+        Building_Id INT NOT NULL,
+        Area FLOAT,
+        Orientation FLOAT,
+        Angle FLOAT,
+        FOREIGN KEY (Building_Id) REFERENCES {mainTableName}(Id)
+    );
+END";
+
+                var cmd = db.CreateCommand(query);
+                db.Execute(cmd);
+
+                Console.WriteLine("Table created.");
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error while creating Table:");
+                Console.Error.WriteLine(e);
+                return false;
+            }
+        }
+
+        public void InsertRoofData(string building, string area, string orientation, string angle)
+        {
+            if (cityGMLCount > 0)
+            {
+                cityGMLStringBuilder.Append(',');
+            }
+            else
+            {
+                cityGMLStringBuilder.Clear();
+                cityGMLStringBuilder.Append(cityGMLInputQueryString);
+            }
+
+            cityGMLStringBuilder.Append($"({building}, {area}, {orientation}, {angle})");
+
+            cityGMLCount++;
+
+            if(cityGMLCount >= MaxCount)
+            {
+                mCount = MaxCount;
+            }
+        }
+
+        private void PushRoofData()
+        {
+            cityGMLStringBuilder.Append(';');
+            var query = cityGMLStringBuilder.ToString();
+
+            try
+            {
+                var db = Database.Instance;
+                var cmd = db.CreateCommand(query);
+                db.Execute(cmd);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Failed with:\n" + query);
+                throw;
+            }
+
+            cityGMLCount = 0;
+            cityGMLStringBuilder.Clear();
+            cityGMLStringBuilder.Append(cityGMLInputQueryString);
+        }
+
+        private static void DropCityGMLTable(string tableName)
+        {
+            var db = Database.Instance;
+            string roofTableName = string.Format("{0}_roofs", tableName);
+
+            db.ExecuteScalar(db.CreateCommand($"DROP TABLE IF EXISTS {roofTableName}"));
+            db.ExecuteScalar(db.CreateCommand($"DROP TABLE IF EXISTS {tableName}"));
+        }
+
+        #endregion
+
     }
 }

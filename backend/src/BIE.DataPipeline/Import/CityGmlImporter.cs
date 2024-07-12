@@ -21,10 +21,12 @@ namespace BIE.DataPipeline.Import
         private XmlNodeList buildingNodes;
         private XmlNamespaceManager nsmgr;
         private CultureInfo culture = new CultureInfo("en-US");
+        private DbHelper db;
+        private bool firstRead = true;
 
         private readonly ICoordinateTransformation? mTransformation;
 
-        public CityGmlImporter(DataSourceDescription description)
+        public CityGmlImporter(DataSourceDescription description, DbHelper db)
         {
             // Define the source and target coordinate systems
             var utmZone32 = CoordinateSystemWktReader
@@ -41,6 +43,7 @@ namespace BIE.DataPipeline.Import
             mTransformation =
                 new CoordinateTransformationFactory().CreateFromCoordinateSystems((CoordinateSystem)utmZone32, wgs84);
             this.description = description;
+            this.db = db;
             this.buildingNodes = ReadBuildings();
         }
 
@@ -85,6 +88,14 @@ namespace BIE.DataPipeline.Import
         /// <returns>SQL Polygon, xml data</returns>
         public bool ReadLine(out string nextLine)
         {
+            if (firstRead)
+            {
+                //create roof table during the first read process.
+                //Cant be done in the constructor because the main table does not exist jet.
+                db.CreatCityGMLRoofTable(description.table_name);
+                firstRead = false;
+            }
+
             if(this.buildingIndex < buildingNodes.Count)
             {
                 XmlNode buildingNode = buildingNodes[this.buildingIndex];
@@ -111,6 +122,9 @@ namespace BIE.DataPipeline.Import
                 string districtKey = GetBuildingDistrictKey(buildingNode);
                 string checkDate = GetBuildingCheckDate(buildingNode);
                 float groundArea = GetBuildingGroundArea(buildingNode);
+                float buildingWallHeight = GetBuildingWallHeight(buildingNode);
+                float livingArea = GetLivingArea(buildingNode, groundArea, buildingWallHeight);
+                float roofArea = GetRoofArea(buildingNode);
 
                 nextLine = $"geography::STGeomFromText('{geometry.AsText()}', 4326)";
                 nextLine += string.Format(",'{0}'", buildingNode.InnerXml);
@@ -118,6 +132,9 @@ namespace BIE.DataPipeline.Import
                 nextLine += string.Format(",'{0}'", districtKey);
                 nextLine += string.Format(",'{0}'", checkDate);
                 nextLine += string.Format(",{0}", groundArea.ToString(culture));
+                nextLine += string.Format(",{0}", buildingWallHeight.ToString(culture));
+                nextLine += string.Format(",{0}", livingArea.ToString(culture));
+                nextLine += string.Format(",{0}", roofArea.ToString(culture));
 
                 this.buildingIndex++;
                 return true;
@@ -283,6 +300,70 @@ namespace BIE.DataPipeline.Import
                 res += ParseArea(groundSurface);
             }
             return res;
+        }
+
+        private float GetBuildingWallHeight(XmlNode buildingNode)
+        {
+            float hoeheGrund = GetStringAttributeValue(buildingNode, "HoeheGrund");
+            float niedrigsteTraufeDesGebaeudes = GetStringAttributeValue(buildingNode, "NiedrigsteTraufeDesGebaeudes");
+            if(hoeheGrund == -1 || niedrigsteTraufeDesGebaeudes == -1)
+            {
+                return -1;
+            }
+            else
+            {
+                return niedrigsteTraufeDesGebaeudes - hoeheGrund;
+            }
+        }
+
+        private float GetLivingArea(XmlNode buildingNode, float groundArea, float buildingWallHeight)
+        {
+            if(groundArea == -1 || buildingWallHeight == -1)
+            {
+                return -1;
+            }
+
+            const float averageFloorHeight = 2.85f;
+            return groundArea * (float)Math.Ceiling(buildingWallHeight / averageFloorHeight);
+        }
+
+        private float GetRoofArea(XmlNode buildingNode)
+        {
+            XmlNodeList roofNodes = buildingNode.SelectNodes(".//bldg:RoofSurface", this.nsmgr);
+            float roofArea = 0;
+            foreach(XmlNode roofNode in roofNodes)
+            {
+                float roofTileArea = GetStringAttributeValue(roofNode, "Flaeche");
+                float roofTileAngle = GetStringAttributeValue(roofNode, "Dachneigung");
+                float roofTileOrientation = GetStringAttributeValue(roofNode, "Dachorientierung");
+                db.InsertRoofData((this.buildingIndex + 1).ToString(culture), roofTileArea.ToString(culture), roofTileOrientation.ToString(culture), roofTileAngle.ToString(culture));
+                if(roofTileArea != -1)
+                {
+                    roofArea += roofTileArea;
+                }
+            }
+
+            return roofArea;
+        }
+
+        private float GetStringAttributeValue(XmlNode buildingNode, string name, float defaultValue = -1)
+        {
+            XmlNode groundHeightNode = buildingNode.SelectSingleNode(".//gen:stringAttribute[@name='" + name + "']/gen:value", this.nsmgr);
+
+            if (groundHeightNode == null)
+            {
+                Console.WriteLine("No " + name + " value");
+                return defaultValue;
+            }
+
+            float result = 0;
+            if (!float.TryParse(groundHeightNode.InnerText, NumberStyles.Any, culture, out result))
+            {
+                Console.WriteLine("Unable to parse " + name);
+                return defaultValue;
+            }
+
+            return result;
         }
 
         private float ParseArea(XmlNode node)

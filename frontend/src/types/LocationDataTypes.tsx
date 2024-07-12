@@ -1,7 +1,6 @@
 export interface LocationDataResponse {
-  currentDatasetData: DatasetItem[];
+  individualData: DatasetItem[];
   generalData: DatasetItem[];
-  extraRows: DatasetItem[];
 }
 
 export interface DatasetItem {

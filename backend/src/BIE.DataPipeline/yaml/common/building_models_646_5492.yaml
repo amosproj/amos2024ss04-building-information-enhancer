@@ -1,0 +1,11 @@
+dataset: building_models
+options:
+    discard_null_rows: false
+    if_table_exists: skip
+    skip_lines: 0
+source:
+    data_format: CITYGML
+    location: https://download1.bayernwolke.de/a/lod2/citygml/646_5492.gml
+    type: URL
+table_cols: []
+table_name: building_models_646_5492
