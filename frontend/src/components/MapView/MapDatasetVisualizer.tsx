@@ -87,18 +87,16 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
     updateDatasetData
   );
 
-  // Function to determine the color based on enum type
+  // Function to determine the color based on usageType using PolygonColoring from metadata
   const getColor = (usageType: string) => {
-    switch (usageType) {
-      case "field":
-        return "yellow";
-      case "commercial area":
-        return "blue";
-      case "residential area":
-        return "darkred";
-      default:
-        return "#3388ff";
+    if (dataset.metaData && dataset.metaData.polygonColoring) {
+      for (const coloring of dataset.metaData.polygonColoring) {
+        if (coloring.values.includes(usageType)) {
+          return coloring.color;
+        }
+      }
     }
+    return "#3388ff";
   };
 
   useEffect(() => {
