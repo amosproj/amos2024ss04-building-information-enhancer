@@ -166,7 +166,7 @@ const MapOptions: React.FC<MapOptionsProps> = ({
                   }}
                 />
                 <Typography variant="body2" sx={{ marginTop: 0.5 }}>
-                  Aerial
+                  dop40c
                 </Typography>
               </Box>
             </Grid>
