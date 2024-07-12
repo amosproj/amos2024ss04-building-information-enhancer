@@ -84,7 +84,7 @@ const datasets = [
       DataType: "SHAPE",
       LongDescription: `The Actual Use map describes the use of the earth's surface in four main groups (settlement, traffic, vegetation and water bodies). The division of these main groups into almost 140 different types of use, such as residential areas, road traffic, agriculture or flowing water, enables detailed evaluations and analyses of the use of the earth's surface.`,
       MinZoomLevel: 11,
-      MarkersThreshold: 17,
+      MarkersThreshold: 15,
       DisplayProperty: [],
       PolygonColoring: [
         { color: "darkred", values: ["halde", "friedhof", "wohnbaufläche"] },
