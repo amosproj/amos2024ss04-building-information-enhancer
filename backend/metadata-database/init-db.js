@@ -105,13 +105,14 @@ const datasets = [
           },
           {
             color: "green",
+            values: ["Wald", "Gehölz", "Sumpf"],
+          },
+          {
+            color: "yellow",
             values: [
               "Landwirtschaft",
-              "Wald",
-              "Gehölz",
               "Heide",
               "Moor",
-              "Sumpf",
               "Unland/Vegetationslose Fläche",
             ],
           },
