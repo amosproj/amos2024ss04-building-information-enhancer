@@ -77,11 +77,13 @@ try
 
         case "SHAPE":
             importer = new ShapeImporter(description);
-            dbHelper.SetInfo(description.table_name, "Location ,Area");
+            dbHelper.SetInfo(description.table_name, importer.GetInsertHeader() + ",Area");
             break;
+        
         case "CITYGML":
             importer = new CityGmlImporter(description, dbHelper);
-            dbHelper.SetInfo(description.table_name, "Location, XmlData, GroundHeight, DistrictKey, CheckDate, GroundArea, BuildingWallHeight, LivingArea, RoofArea");
+            dbHelper.SetInfo(description.table_name,
+                             "Location, XmlData, GroundHeight, DistrictKey, CheckDate, GroundArea, BuildingWallHeight, LivingArea, RoofArea");
             break;
 
         default:
