@@ -47,7 +47,7 @@ const datasets = [
       LongDescription: `A map of EV charging stations displays the locations of electric vehicle charging points located in Germany, helping drivers plan routes and manage charging needs. It is essential for supporting the adoption and convenience of electric vehicles.`,
       MinZoomLevel: 11,
       MarkersThreshold: -1,
-      DisplayProperty: [{ displayName: "Operator", value: "text" }],
+      DisplayProperty: [{ displayName: "Operator", value: "operator" }],
       PolygonColoring: [],
       Tables: [],
     },
