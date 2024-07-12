@@ -31,6 +31,8 @@ import {
 } from "../../types/MapSelectionTypes";
 import { MultiPolygon, Position } from "geojson";
 import DataRow from "./DataRow";
+import { fetchDatasets } from "../../services/datasetsService";
+import { DatasetBasicData } from "../../types/DatasetTypes";
 
 // Function to filter and return an array of outer polygons
 function getOuterPolygons(multiPolygon: MultiPolygon): Position[][] {
@@ -47,6 +49,22 @@ const DataView = () => {
   const [data, setData] = useState<LocationDataResponse | undefined>();
   const [showSelectionData, setShowSelectionData] = useState(true);
   const [showIndividualData, setShowIndividualData] = useState(true);
+  const [currentDatasets, setCurrentDatasets] = useState<DatasetBasicData[]>(
+    []
+  );
+
+  /**
+   * Fetch the current datasets
+   */
+  useEffect(() => {
+    const fetchCurrentDatasets = async () => {
+      const datasets = await fetchDatasets();
+      if (datasets) {
+        setCurrentDatasets(datasets);
+      }
+    };
+    fetchCurrentDatasets();
+  });
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilterValue(event.target.value);
@@ -192,7 +210,11 @@ const DataView = () => {
                   <Table>
                     <TableBody>
                       {filterData(data?.selectionData ?? []).map((row) => (
-                        <DataRow key={row.datasetID} row={row} />
+                        <DataRow
+                          key={row.datasetID}
+                          row={row}
+                          currentDatasets={currentDatasets}
+                        />
                       ))}
                     </TableBody>
                   </Table>
@@ -210,7 +232,11 @@ const DataView = () => {
                   <Table>
                     <TableBody>
                       {filterData(data?.individualData ?? []).map((row) => (
-                        <DataRow key={row.datasetID} row={row} />
+                        <DataRow
+                          key={row.datasetID}
+                          row={row}
+                          currentDatasets={currentDatasets}
+                        />
                       ))}
                     </TableBody>
                   </Table>

@@ -13,8 +13,7 @@ import {
 } from "@mui/material";
 import { CaretDown, CaretUp, MapPin } from "@phosphor-icons/react";
 import "./DataRow.css";
-import { fetchDatasets } from "../../services/datasetsService";
-import { Dataset } from "../../types/DatasetTypes";
+import { Dataset, DatasetBasicData } from "../../types/DatasetTypes";
 import CustomSvgIcon from "../DatasetsList/CustomSvgIcon";
 import { svgIconDefault } from "../DatasetsList/DatasetsList";
 import { AlertContext } from "../../contexts/AlertContext";
@@ -24,9 +23,10 @@ import { MapContext } from "../../contexts/MapContext";
 
 interface RowProps {
   row: DatasetItem;
+  currentDatasets: DatasetBasicData[];
 }
 
-const DataRow: React.FC<RowProps> = ({ row }) => {
+const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
   const [open, setOpen] = useState(false);
   const [shouldFlyTo, setShouldFlyTo] = useState<LatLng | null>(null);
   const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
@@ -38,7 +38,7 @@ const DataRow: React.FC<RowProps> = ({ row }) => {
    */
   useEffect(() => {
     if (shouldFlyTo && currentMapCache.mapInstance) {
-      currentMapCache.mapInstance.flyTo(shouldFlyTo);
+      currentMapCache.mapInstance.flyTo(shouldFlyTo, currentMapCache.zoom);
       setShouldFlyTo(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -48,9 +48,8 @@ const DataRow: React.FC<RowProps> = ({ row }) => {
     mapId: string | null,
     coordinates: number[] | null
   ) => {
-    const datasetsData = await fetchDatasets();
-    if (datasetsData) {
-      const datasetToOpen = datasetsData.find(
+    if (currentDatasets) {
+      const datasetToOpen = currentDatasets.find(
         (dataset) => dataset.datasetId === mapId
       );
       if (datasetToOpen) {
@@ -79,7 +78,7 @@ const DataRow: React.FC<RowProps> = ({ row }) => {
             setShouldFlyTo(latLng);
           } else {
             if (currentMapCache.mapInstance) {
-              currentMapCache.mapInstance.flyTo(latLng);
+              currentMapCache.mapInstance.flyTo(latLng, currentMapCache.zoom);
             }
           }
         }
