@@ -7,7 +7,7 @@ public class MetadataDbHelper
     private string mMetaDataDbUrl;
 
     private IMongoDatabase mDatabase;
-    
+
     public bool Connected { get; private set; }
 
     public MetadataDbHelper()
@@ -58,7 +58,7 @@ public class MetadataDbHelper
         return metadataObject;
     }
 
-    public bool UpdateMetadata(string dataset, string tableName, int numberOfLines, BoundingBox boundingBox)
+    public bool UpdateMetadata(string dataset, MetadataObject.TableData tableData)
     {
         // Load the collection
         var collection = mDatabase.GetCollection<MetadataObject>("datasets");
@@ -74,31 +74,28 @@ public class MetadataDbHelper
             return false;
         }
 
-        // Load the existing table
-        var existingTable = metadataObject.additionalData.Tables.Find(t => t.Name == tableName);
-        if (existingTable == null)
+        // Load and remove any existing table
+        var existingTable = metadataObject.additionalData.Tables.Find(t => t.Name == tableData.Name);
+        if (existingTable != null)
         {
-            // Create a new table object if not present
-            var newTable = new MetadataObject.TableData()
-            {
-                Name = tableName,
-                NumberOfLines = numberOfLines,
-                BoundingBox = boundingBox
-            };
-            metadataObject.additionalData.Tables.Add(newTable);
-            collection.ReplaceOne(g => g.basicData.DatasetId == dataset, metadataObject);
-            return true;
+            metadataObject.additionalData.Tables.Remove(existingTable);
         }
 
-        // Table info already exists, for now just choose the larger number of lines number.
-        existingTable.NumberOfLines = existingTable.NumberOfLines < numberOfLines
-            ? numberOfLines
-            : existingTable.NumberOfLines;
-
-        // always write the current Bounding box
-        existingTable.BoundingBox = boundingBox;
-
+        // Insert the new Table object.
+        metadataObject.additionalData.Tables.Add(tableData);
         collection.ReplaceOne(g => g.basicData.DatasetId == dataset, metadataObject);
         return true;
+    }
+
+    public bool UpdateMetadata(string dataset, string tableName, int numberOfLines, BoundingBox boundingBox)
+    {
+        return UpdateMetadata(dataset,
+                       new MetadataObject.TableData()
+                       {
+                           Name = tableName,
+                           NumberOfLines = numberOfLines,
+                           BoundingBox = new BoundingBox(),
+                           RowHeaders = new List<string>()
+                       });
     }
 }

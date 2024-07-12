@@ -71,20 +71,16 @@ namespace BIE.DataPipeline.Import
             shpStream.Position = 0;
             dbfStream.Position = 0;
 
-            mParser = Shapefile.CreateDataReader(
-                                                 new ShapefileStreamProviderRegistry(
-                                                                                     new ByteStreamProvider(StreamTypes
-                                                                                                                .Shape,
-                                                                                                            shpStream),
-                                                                                     new ByteStreamProvider(StreamTypes
-                                                                                                                .Data,
-                                                                                                            dbfStream),
-                                                                                     true,
-                                                                                     true),
-                                                 GeometryFactory.Default);
+            var shpByteStream = new ByteStreamProvider(StreamTypes.Shape, shpStream);
+            var dbfByteStream = new ByteStreamProvider(StreamTypes.Data, dbfStream);
+            var providerRegistry = new ShapefileStreamProviderRegistry(shpByteStream,
+                                                                       dbfByteStream,
+                                                                       true,
+                                                                       true);
+            
+            mParser = Shapefile.CreateDataReader(providerRegistry, GeometryFactory.Default);
 
             mHeader = mParser.DbaseHeader;
-
         }
 
         private void ExtractShapeFilesFromZip(ZipArchive zipArchive, MemoryStream shpStream, MemoryStream dbfStream)
@@ -128,13 +124,6 @@ namespace BIE.DataPipeline.Import
             // Append geometry as WKT (Well-Known Text)
             var geometry = mParser.Geometry;
             geometry = ConvertUtmToLatLong(geometry);
-            
-            
-            // for (int i = 1; i < mHeader.Fields.Length; i++)
-            // {
-            //     Console.Write($" {mParser.GetValue(i)};");
-            // }
-            // Console.WriteLine();
 
             nextLine = $"GEOMETRY::STGeomFromText('{geometry.AsText()}', 4326)";
             // nextLine = $"GEOMETRY::STGeomFromText('POLYGON (11.060226859896797 49.496927347229494, 11.060276626123832 49.49695803564076)')', 4326)";
@@ -149,6 +138,7 @@ namespace BIE.DataPipeline.Import
 
             return true;
         }
+
         /// <summary>
         /// Calculates Area of Polygon
         /// </summary>
@@ -169,7 +159,8 @@ namespace BIE.DataPipeline.Import
 
             for (int i = 0; i < coordinates.Length; i++)
             {
-                double[] transformed = transform.MathTransform.Transform(new double[] { coordinates[i].X, coordinates[i].Y });
+                double[] transformed =
+                    transform.MathTransform.Transform(new double[] { coordinates[i].X, coordinates[i].Y });
                 transformedCoordinates[i] = new Coordinate(transformed[0], transformed[1]);
             }
 
@@ -196,7 +187,8 @@ namespace BIE.DataPipeline.Import
         /// <returns></returns>
         public string GetCreationHeader()
         {
-            return mHeader.Fields.Aggregate("Location GEOMETRY", (current, field) => current + $", {field.Name} VARCHAR(255)");
+            return mHeader.Fields.Aggregate("Location GEOMETRY",
+                                            (current, field) => current + $", {field.Name} VARCHAR(255)");
         }
 
         /// <summary>
@@ -207,7 +199,7 @@ namespace BIE.DataPipeline.Import
         {
             return mHeader.Fields.Aggregate("Location", (current, field) => current + $", {field.Name}");
         }
-        
+
         /// <summary>
         /// Conver UTM coordinates to Latitude and Longitude
         /// </summary>
