@@ -205,7 +205,12 @@ const DataView = () => {
                 {showSelectionData ? <CaretUp /> : <CaretDown />}
                 Selection Data
               </p>
-              <Collapse in={showSelectionData} timeout="auto" unmountOnExit>
+              <Collapse
+                in={showSelectionData}
+                timeout="auto"
+                unmountOnExit
+                className="data-collapse-table"
+              >
                 <TableContainer>
                   <Table>
                     <TableBody>

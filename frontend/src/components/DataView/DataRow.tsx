@@ -2,7 +2,6 @@ import { Fragment, useState, useEffect } from "react";
 import { DatasetItem } from "../../types/LocationDataTypes";
 import { useContext } from "react";
 import {
-  Box,
   Collapse,
   IconButton,
   Table,
@@ -113,8 +112,8 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
         <TableCell
           component="th"
           scope="row"
-          className="data-row-title"
           size="small"
+          className="data-row-title-container"
         >
           {row.displayName}
         </TableCell>
@@ -130,7 +129,7 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
         ) : (
           <TableCell />
         )}
-        {row.datasetID && row.datasetID != "" ? (
+        {row.datasetID && row.datasetID !== "" ? (
           <TableCell className="toggle-column" size="small">
             <Tooltip title="Locate on the map" arrow placement="left">
               <IconButton
@@ -151,20 +150,18 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box margin={1}>
-              <Table size="small" aria-label="subdata">
-                <TableBody>
-                  {row.subdata.map((subItem) => (
-                    <TableRow key={subItem.key}>
-                      <TableCell component="th" scope="row" size="small">
-                        {subItem.key}
-                      </TableCell>
-                      <TableCell size="small">{subItem.value}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Box>
+            <Table size="small" aria-label="subdata">
+              <TableBody className="subdata-rows-container">
+                {row.subdata.map((subItem) => (
+                  <TableRow key={subItem.key}>
+                    <TableCell component="th" scope="row" size="small">
+                      {subItem.key}
+                    </TableCell>
+                    <TableCell size="small">{subItem.value}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </Collapse>
         </TableCell>
       </TableRow>
