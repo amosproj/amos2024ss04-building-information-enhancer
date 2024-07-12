@@ -2,7 +2,7 @@
   "profiles": {
     "BIE.DataPipeline": {
       "commandName": "Project",
-      "commandLineArgs": "--behavior=replace common/actual_use_Kreisfreie_Stadt_Nuernberg.yaml",
+      "commandLineArgs": "--behavior=replace not_used/hausumringe_mittelfranken.yaml",
       "workingDirectory": "yaml",
       "environmentVariables": {
         "DB_SERVER": "localhost",

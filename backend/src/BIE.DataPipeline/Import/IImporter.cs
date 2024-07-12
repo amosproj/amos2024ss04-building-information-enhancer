@@ -13,5 +13,7 @@ namespace BIE.DataPipeline.Import
         public string GetCreationHeader();
 
         public string GetInsertHeader();
+
+        public IEnumerable<string> GetHeaders();
     }
 }

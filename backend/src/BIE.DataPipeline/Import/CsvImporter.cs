@@ -206,6 +206,11 @@ namespace BIE.DataPipeline.Import
             return headerString;
         }
 
+        public IEnumerable<string> GetHeaders()
+        {
+            return headerString.Split(",").Select(s => s.Trim());
+        }
+
 
         private static string RemoveLastComma(string input)
         {

@@ -86,12 +86,25 @@ public class MetadataObject
     /// </summary>
     public class TableData
     {
-        // The name of the .yaml file
+        /// <summary>
+        /// the name of the table
+        /// </summary>
         public string Name { get; set; } = string.Empty;
-        // The number of lines of data in that file.
+        
+        /// <summary>
+        /// the number of lines in the table
+        /// </summary>
         public int NumberOfLines { get; set; } = 0;
         
+        /// <summary>
+        /// the bounding box of the geomtry data in the table
+        /// </summary>
         public BoundingBox? BoundingBox { get; set; }
+        
+        /// <summary>
+        /// the headers of the dataset. Should NOT include the special Location header.
+        /// </summary>
+        public List<string> RowHeaders { get; set; }
     }
 
     /// <summary>

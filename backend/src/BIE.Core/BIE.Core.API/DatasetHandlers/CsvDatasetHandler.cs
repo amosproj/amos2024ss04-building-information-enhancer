@@ -37,7 +37,7 @@ public class CsvDatasetHandler : IDatasetHandler
         var tableName = mMetadata.additionalData.Tables[0].Name;
 
         var query = "SELECT top 1000  operator, Location.AsTextZM() AS Location" +
-                    ApiHelper.FromTableIntersectsPolygon(tableName, polygon);
+                    ApiHelper.FromTableWhereIntersectsPolygon(tableName, polygon);
 
         // the list of features from combined datasets.
         var features = new List<Dictionary<string, object>>();

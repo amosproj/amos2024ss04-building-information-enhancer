@@ -128,6 +128,7 @@ namespace BIE.DataPipeline
             WHERE t.name = '" + description.table_name + "' AND c.name = 'Location' AND ty.name = 'geometry';";
             var db = Database.Instance;
 
+
             using (var command = db.CreateCommand(query))
             {
                 var (reader, connection) = db.ExecuteReader(command);
@@ -305,7 +306,7 @@ IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{desc
 BEGIN
     CREATE TABLE {description.table_name} (
         Id INT PRIMARY KEY IDENTITY(1,1),
-        Location GEOGRAPHY,
+        Location Geometry,
         XmlData XML,
         GroundHeight FLOAT,
         DistrictKey VARCHAR(255),
