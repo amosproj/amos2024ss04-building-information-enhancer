@@ -3,7 +3,7 @@
     <picture>
         <source media="(prefers-color-scheme: dark)" srcset="https://github.com/amosproj/amos2024ss04-building-information-enhancer/blob/main/Deliverables/sprint-01/team-logo.png?raw=true">
         <source media="(prefers-color-scheme: light)" srcset="https://github.com/amosproj/amos2024ss04-building-information-enhancer/blob/main/Deliverables/sprint-01/team-logo-black.png?raw=true">
-        <img src="https://github.com/amosproj/amos2024ss04-building-information-enhancer/blob/main/Deliverables/sprint-01/team-logo.png?raw=true" width="500" alt="Code.ing Group Logo">
+        <img src="https://github.com/amosproj/amos2024ss04-building-information-enhancer/blob/main/Deliverables/sprint-01/team-logo.png?raw=true" width="400" alt="Code.ing Group Logo">
     </picture>
     </br>
   </div>
