@@ -310,6 +310,7 @@ BEGIN
         DistrictKey VARCHAR(255),
         CheckDate DATE,
         GroundArea FLOAT,
+        BuildingVolume FLOAT,
         BuildingWallHeight FLOAT,
         LivingArea FLOAT,
         RoofArea FLOAT,

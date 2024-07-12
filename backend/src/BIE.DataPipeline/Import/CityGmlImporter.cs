@@ -123,6 +123,7 @@ namespace BIE.DataPipeline.Import
                 string checkDate = GetBuildingCheckDate(buildingNode);
                 float groundArea = GetBuildingGroundArea(buildingNode);
                 float buildingWallHeight = GetBuildingWallHeight(buildingNode);
+                float buildingVolume = GetBuildingVolume(buildingNode, groundArea, buildingWallHeight);
                 float livingArea = GetLivingArea(buildingNode, groundArea, buildingWallHeight);
                 float roofArea = GetRoofArea(buildingNode);
 
@@ -132,6 +133,7 @@ namespace BIE.DataPipeline.Import
                 nextLine += string.Format(",'{0}'", districtKey);
                 nextLine += string.Format(",'{0}'", checkDate);
                 nextLine += string.Format(",{0}", groundArea.ToString(culture));
+                nextLine += string.Format(",{0}", buildingVolume.ToString(culture));
                 nextLine += string.Format(",{0}", buildingWallHeight.ToString(culture));
                 nextLine += string.Format(",{0}", livingArea.ToString(culture));
                 nextLine += string.Format(",{0}", roofArea.ToString(culture));
@@ -292,6 +294,30 @@ namespace BIE.DataPipeline.Import
             return res;
         }
 
+        private float GetBuildingVolume(XmlNode buildingNode, float groundArea, float wallHeight)
+        {
+            float wallVolume = groundArea * wallHeight;
+            float roofHeight = GetBuildingRoofHeight(buildingNode);
+            float averageRoofAngle = GetAverageRoofAngle(buildingNode);
+            float roofFactor = (1 - (averageRoofAngle / 90)); //scale the averageRoofange between 0 and 1 where 0 is 90 degress (flat roof) and 1 is 0 degree (steep roof)
+            float roofVolume = groundArea * roofHeight * roofFactor;
+            return wallVolume + roofVolume;
+        }
+
+        private float GetBuildingRoofHeight(XmlNode buildingNode)
+        {
+            float niedrigsteTraufeDesGebaeudes = GetStringAttributeValue(buildingNode, "NiedrigsteTraufeDesGebaeudes");
+            float hoeheDach = GetStringAttributeValue(buildingNode, "HoeheDach");
+            if (hoeheDach == -1 || niedrigsteTraufeDesGebaeudes == -1)
+            {
+                return -1;
+            }
+            else
+            {
+                return hoeheDach - niedrigsteTraufeDesGebaeudes;
+            }
+        }
+
         private float GetBuildingWallHeight(XmlNode buildingNode)
         {
             float hoeheGrund = GetStringAttributeValue(buildingNode, "HoeheGrund");
@@ -315,6 +341,24 @@ namespace BIE.DataPipeline.Import
 
             const float averageFloorHeight = 2.85f;
             return groundArea * (float)Math.Ceiling(buildingWallHeight / averageFloorHeight);
+        }
+
+        private float GetAverageRoofAngle(XmlNode buildingNode)
+        {
+            XmlNodeList roofNodes = buildingNode.SelectNodes(".//bldg:RoofSurface", this.nsmgr);
+            float roofAngle = 0;
+            float numAngle = 0;
+            foreach (XmlNode roofNode in roofNodes)
+            {
+                float roofTileAngle = GetStringAttributeValue(roofNode, "Dachneigung");
+                if (roofTileAngle != -1)
+                {
+                    numAngle++;
+                    roofAngle += roofTileAngle;
+                }
+            }
+
+            return roofAngle / numAngle;
         }
 
         private float GetRoofArea(XmlNode buildingNode)
