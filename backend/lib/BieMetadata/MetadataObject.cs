@@ -76,9 +76,10 @@ public class MetadataObject
         public List<TableData> Tables { get; set; } = new List<TableData>();
 
         /// <summary>
-        /// A list of polygon coloring rules for different values.
+        /// A polygon coloring rule for different values.
         /// </summary>
-        public List<PolygonColoring> PolygonColoring { get; set; } = new List<PolygonColoring>();
+        [BsonIgnoreIfNull] // Add this attribute to ignore null values
+        public PolygonColoring? PolygonColoring { get; set; }
     }
     
     /// <summary>
@@ -122,6 +123,12 @@ public class MetadataObject
     /// Polygon coloring rules
     /// </summary>
     public class PolygonColoring
+    {
+        public string attributeName { get; set; } = string.Empty;
+        public List<PolygonColor> colors { get; set; } = new List<PolygonColor>();
+    }
+
+    public class PolygonColor
     {
         public string color { get; set; } = string.Empty;
         public List<string> values { get; set; } = new List<string>();

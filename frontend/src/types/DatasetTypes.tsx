@@ -36,7 +36,7 @@ export interface DatasetMetaData {
   markersThreshold: number;
   displayProperty: DisplayProperty[];
   tables: Table[];
-  polygonColoring: PolygonColoring[];
+  polygonColoring: PolygonColoring | null;
 }
 
 /**
@@ -59,6 +59,14 @@ export interface Table {
  * The map of types of colors for the polygons.
  */
 export interface PolygonColoring {
+  attributeName: string;
+  colors: PolygonColor[];
+}
+
+/**
+ * Individual entry in the color map.
+ */
+export interface PolygonColor {
   color: string;
   values: string[];
 }

@@ -90,9 +90,10 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
   // Function to determine the color based on usageType using PolygonColoring from metadata
   const getColor = (usageType: string) => {
     if (dataset.metaData && dataset.metaData.polygonColoring) {
-      for (const coloring of dataset.metaData.polygonColoring) {
-        if (coloring.values.includes(usageType)) {
-          return coloring.color;
+      const coloring = dataset.metaData.polygonColoring;
+      for (const colorRule of coloring.colors) {
+        if (colorRule.values.includes(usageType)) {
+          return colorRule.color;
         }
       }
     }
@@ -116,9 +117,16 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
           const geojsonLayer = L.geoJson(geoData, {
             style: (feature) => {
               return {
-                color: feature
-                  ? getColor(feature.properties.usageType)
-                  : "#3388ff",
+                color:
+                  feature &&
+                  dataset.metaData &&
+                  dataset.metaData.polygonColoring
+                    ? getColor(
+                        feature.properties[
+                          dataset.metaData.polygonColoring.attributeName
+                        ]
+                      )
+                    : "#3388ff",
                 fillOpacity: 0.2,
               };
             },
