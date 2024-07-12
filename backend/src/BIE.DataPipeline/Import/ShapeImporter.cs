@@ -145,7 +145,7 @@ namespace BIE.DataPipeline.Import
                 nextLine += $",  \'{(value != "" ? value : "null")}\'";
             }
 
-            nextline += CalculateAreaInSquareMeters(geometry);
+            nextLine += CalculateAreaInSquareMeters(geometry);
 
             return true;
         }
