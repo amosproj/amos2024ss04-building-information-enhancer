@@ -137,7 +137,8 @@ namespace BIE.DataPipeline.Import
             {
                 var value = mParser.GetValue(i);
                 mStringBuilder.Append(", '");
-                mStringBuilder.Append(value);
+                var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(value?.ToString() ?? "");
+                mStringBuilder.Append(Encoding.UTF8.GetString(bytes));
                 mStringBuilder.Append("'");
                 // nextLine += $",  \'{(value != "" ? value : "null")}\'";
             }
@@ -198,7 +199,7 @@ namespace BIE.DataPipeline.Import
         public string GetCreationHeader()
         {
             return mHeader.Fields.Aggregate("Location GEOMETRY",
-                                            (current, field) => current + $", {field.Name} VARCHAR(255)");
+                                            (current, field) => current + $", {field.Name} NVARCHAR(255)");
         }
 
         /// <summary>
