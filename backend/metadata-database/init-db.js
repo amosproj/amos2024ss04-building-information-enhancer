@@ -99,7 +99,7 @@ const datasets = [
       LongDescription: `The building models have a 3D object of each building plus additional information on its dimentions.`,
       MinZoomLevel: 11,
       MarkersThreshold: 17,
-      DisplayProperty: "",
+      DisplayProperty: [],
       Tables: [],
     },
   },
