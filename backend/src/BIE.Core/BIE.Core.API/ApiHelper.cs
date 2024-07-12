@@ -40,8 +40,9 @@ public static class ApiHelper
                         AUTHORITY[""ESRI"",""102008""]
                         "; // see http://epsg.io/27700
     private static ICoordinateTransformation mTransformation = new CoordinateTransformationFactory().
-        CreateFromCoordinateSystems(GeographicCoordinateSystem.WGS84, 
-        (CoordinateSystem)CoordinateSystemWktReader.Parse(epsg27700));
+        CreateFromCoordinateSystems(GeographicCoordinateSystem.WGS84, ProjectedCoordinateSystem.WGS84_UTM(32, true));
+    private static ICoordinateTransformation transform = new CoordinateTransformationFactory().CreateFromCoordinateSystems(GeographicCoordinateSystem.WGS84, ProjectedCoordinateSystem.WGS84_UTM(32, true));
+
 
     public static double getDistance(double longitude, double latitude, Point p)
     {
@@ -58,28 +59,32 @@ public static class ApiHelper
 
     public static double getArea(Polygon p)
     {
-        // convert each point of the polygon into a new coordinate (revert x and y
-        // convert it into EPSG27700
-        // return area
+
         var coordinates = p.Coordinates;
-        Console.WriteLine($"coordinates {coordinates}");
+       
         var transformedCoordinates = new Coordinate[coordinates.Length];
         // Transform each coordinate
         for (int i = 0; i < coordinates.Length; i++)
         {
-            double[] pointWGS84 = { coordinates[i].Y, coordinates[i].X }; // Switch X and Y
-            double[] pointEPSG27700 = mTransformation.MathTransform.Transform(pointWGS84);
+            //Console.WriteLine($"FIRST X THEN Y coordinates before transformation (but switched xy) {coordinates[i].X},{coordinates[i].Y}");
+            double[] pointWGS84 = { coordinates[i].X, coordinates[i].Y };
+            double[] pointEPSG27700 = transform.MathTransform.Transform(pointWGS84);
             transformedCoordinates[i] = new Coordinate(pointEPSG27700[0], pointEPSG27700[1]);
-            Console.WriteLine($"transformedCoordinates[i] {transformedCoordinates[i]}");
+            //Console.WriteLine($"transformedCoordinates[i] {transformedCoordinates[i]}");
         }
-        var geometryFactory = new GeometryFactory(new PrecisionModel(), 27700);
-        var transformedPolygon = new Polygon(new LinearRing(transformedCoordinates), geometryFactory);
-        Console.WriteLine($"area {transformedPolygon.Area}");
-        Console.WriteLine($"transformed coords {transformedPolygon.Coordinates}");
 
+        // Ensure the polygon is closed
+        if (!transformedCoordinates[0].Equals2D(transformedCoordinates[transformedCoordinates.Length - 1]))
+        {
+            Array.Resize(ref transformedCoordinates, transformedCoordinates.Length + 1);
+            transformedCoordinates[transformedCoordinates.Length - 1] = transformedCoordinates[0];
+        }
 
+        // Create a polygon with transformed coordinates
+        var geometryFactory = new GeometryFactory();
+        var transformedPolygon = geometryFactory.CreatePolygon(transformedCoordinates);
 
-        // Return the area of the transformed polygon
+        // Calculate and return the area
         return transformedPolygon.Area;
     }
 
@@ -132,23 +137,23 @@ public static class ApiHelper
         foreach (var polygon in locations)
         {
             var wktString = "POLYGON((";
-            foreach (var point in polygon)
+            for (int i = 0; i < polygon.Count; i++)
             {
+                var point = polygon[i];
                 if (point.Count != 2)
                 {
                     throw new ArgumentException("Each point should have exactly two coordinates.");
                 }
 
-                var longitude = point[0].ToString(culture);
-                var latitude = point[1].ToString(culture);
-                wktString += $"{longitude} {latitude}, ";
+                var longitude = point[0].ToString(sCultureInfo);
+                var latitude = point[1].ToString(sCultureInfo);
+                wktString += $"{longitude} {latitude}";
+                if (i < polygon.Count - 1)
+                {
+                    wktString += ", ";
+                }
             }
-
-            // Close the polygon by repeating the first point
-            var firstPoint = polygon[0];
-            var firstLongitude = firstPoint[0].ToString(culture);
-            var firstLatitude = firstPoint[1].ToString(culture);
-            wktString += $"{firstLongitude} {firstLatitude}))";
+            wktString += "))";
 
             wktPolygons.Add(wktString);
         }
@@ -198,7 +203,7 @@ public static class ApiHelper
     /// <param name="tableName">the name of the table to filter</param>
     /// <param name="polygon">the polygon string</param>
     /// <returns></returns>
-    public static string FromTableIntersectsPolygon(string tableName, string polygon)
+    public static string FromTableWhereIntersectsPolygon(string tableName, string polygon)
     {
         return $@"
 FROM dbo.{tableName}
