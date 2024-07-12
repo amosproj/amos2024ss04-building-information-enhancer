@@ -63,23 +63,34 @@ namespace BIE.Core.API
             });
 
             var housefootprints = new List<Dictionary<String, String>>();
+            var columns = new HashSet<string> { "Id" };
+            var datasetId = "house_footprints";
             foreach (var polygonWkt in polygons)
+                getDataInPolygon(housefootprints, columns, datasetId, polygonWkt);
+
+            AggregateDataForHousefootprints(generalData, individualData, totalAreaSearchPolygon, housefootprints);
+
+            var lod2buildings = new List<Dictionary<String, String>>();
+            foreach (var polygonWkt in polygons)
+                getDataInPolygon(lod2buildings, new() { "Id", "GroundArea", "BuildingWallHeight", "LivingArea", "RoofArea" }, "building_models", polygonWkt);
+
+            AggregateDataForLod2Citygml(generalData, individualData, totalAreaSearchPolygon, lod2buildings);
+
+            LocationDataResponse locationDataResponse = new()
             {
-                // then go through house footprints
-                var metadata = MetadataDbHelper.GetMetadata("house_footprints");
-                if (metadata != null)
-                {
-                    foreach (var table in metadata.additionalData.Tables)
-                    {
-                        var sqlQuery = $"SELECT Id, Location.STAsText() AS Location" +
-                            ApiHelper.FromTableIntersectsPolygon(table.Name, polygonWkt);
-                        housefootprints.AddRange(DbHelper.GetData(sqlQuery));
-                    }
-                }
+                SelectionData = generalData,
+                IndividualData = individualData.Take(500).ToList()
 
-            }
+            };
 
+            return locationDataResponse;
+        }
+
+        private static void AggregateDataForHousefootprints(List<DatasetItem> generalData, List<DatasetItem> individualData, double totalAreaSearchPolygon, List<Dictionary<string, string>> housefootprints)
+        {
             long totalCountHouseFootprints = housefootprints.Count();
+            if (totalCountHouseFootprints == 0)
+                return;
             double totalBuildingArea = 0.0;
             List<double> totalBuildingAreas = new List<double>();
             foreach (var h in housefootprints)
@@ -108,29 +119,103 @@ namespace BIE.Core.API
             });
             generalData.Add(new DatasetItem
             {
-                DisplayName = "Total number of buildings in area",
+                DisplayName = "Total number of buildings",
                 Value = totalCountHouseFootprints.ToString()
+            });
+            if(totalBuildingAreas.Count > 0)
+                generalData.Add(GenerateDatalistStatisticsEntry(totalBuildingAreas, "Total building area"));
+
+        }
+
+        private static void AggregateDataForLod2Citygml(List<DatasetItem> generalData, List<DatasetItem> individualData, double totalAreaSearchPolygon, List<Dictionary<string, string>> citygmldata)
+        {
+            long totalCountLod2Buildings = citygmldata.Count();
+            if (totalCountLod2Buildings == 0)
+                return;
+
+            // GroundHeight, DistrictKey, CheckDate, GroundArea, BuildingWallHeight, LivingArea, RoofArea
+            List<double> totalBuildingAreas = new();
+            List<double> totalBuildingLivingAreas = new();
+            List<double> totalBuildingRoofAreas = new();
+            foreach (var h in citygmldata)
+            {
+                double area = double.Parse(h["GroundArea"]);
+                totalBuildingAreas.Add(area);
+
+                double livingArea = double.Parse(h["LivingArea"]);
+                totalBuildingLivingAreas.Add(livingArea);
+
+                double roofArea = double.Parse(h["RoofArea"]);
+                totalBuildingRoofAreas.Add(roofArea);
+
+                double wallHeight = double.Parse(h["BuildingWallHeight"]);
+                totalBuildingRoofAreas.Add(roofArea);
+
+                Point p = (GeoReader.Read(h["Location"]) as Polygon).Centroid;
+                var item = new DatasetItem
+                {
+                    DisplayName = "Building model: " + (h.ContainsKey("Id") ? h["Id"] : ""),
+                    DatasetId = "building_models",
+                    Value = area.ToString("0.##") + "m²",
+                    Coordinate = new double[] { p.X, p.Y },
+                    Subdata = new List<SubdataItem>
+                    {
+                        new() { Key = "Ground area", Value = area.ToString("0.##") + "m²" },
+                        new() { Key = "Living area", Value = livingArea.ToString("0.##") + "m²" },
+                        new() { Key = "Roof surface", Value = roofArea.ToString("0.##") + "m²" },
+                        new() { Key = "Building wall height", Value = wallHeight.ToString("0.##") + "m" }
+                    }
+                };
+                individualData.Add(item);
+            }
+
+            double totalBuildingArea = totalBuildingAreas.Sum();
+            generalData.Add(new DatasetItem
+            {
+                DisplayName = "Potential Area for geothermal use",
+                Value = Math.Max(totalAreaSearchPolygon - totalBuildingArea, 0).ToString("0.##") + "m²",
             });
             generalData.Add(new DatasetItem
             {
-                DisplayName = "Total building area",
-                Value = totalBuildingArea.ToString("0.##") + "m²",
+                DisplayName = "Total number of LOD2 buildings",
+                Value = totalCountLod2Buildings.ToString()
+            });
+            if (totalBuildingAreas.Count > 0)
+                generalData.Add(GenerateDatalistStatisticsEntry(totalBuildingAreas, "Total ground area"));
+            if (totalBuildingLivingAreas.Count > 0)
+                generalData.Add(GenerateDatalistStatisticsEntry(totalBuildingLivingAreas, "Total living area"));
+            if (totalBuildingRoofAreas.Count > 0)
+                generalData.Add(GenerateDatalistStatisticsEntry(totalBuildingRoofAreas, "Total roof surface"));
+        }
+
+        private static DatasetItem GenerateDatalistStatisticsEntry(List<double> listOfDataValues, string displayText)
+        {
+            return new DatasetItem
+            {
+                DisplayName = displayText,
+                Value = listOfDataValues.Sum().ToString("0.##") + "m²",
                 Subdata = new List<SubdataItem>
                 {
-                    new() { Key = "Average", Value = totalBuildingAreas.Average().ToString() },
-                    new() { Key = "Median", Value = totalBuildingAreas.Median().ToString() },
-                    new() { Key = "Variance", Value = totalBuildingAreas.Variance().ToString() }
+                    new() { Key = "Average", Value = listOfDataValues.Average().ToString() + "m²" },
+                    new() { Key = "Median", Value = listOfDataValues.Median().ToString() + "m²"},
+                    new() { Key = "Variance", Value = listOfDataValues.Variance().ToString()}
                 }
-            });
-
-            LocationDataResponse locationDataResponse = new()
-            {
-                SelectionData = generalData,
-                IndividualData = individualData.Take(500).ToList()
-
             };
+        }
 
-            return locationDataResponse;
+        private static void getDataInPolygon(List<Dictionary<string, string>> housefootprints, HashSet<string> columns, string datasetId, string polygonWkt)
+        {
+            var metadata = MetadataDbHelper.GetMetadata(datasetId);
+            if (metadata != null)
+            {
+                foreach (var table in metadata.additionalData.Tables)
+                {
+                    var sqlQuery = $"SELECT {string.Join(", ", columns)}, Location.STAsText() AS Location" +
+                        ApiHelper.FromTableIntersectsPolygon(table.Name, polygonWkt);
+                    Console.WriteLine(sqlQuery);
+                    housefootprints.AddRange(DbHelper.GetData(sqlQuery));
+                }
+            }
         }
 
         public static LocationDataResponse loadLocationDataForSinglePoint(LocationDataRequest request)
@@ -193,10 +278,10 @@ namespace BIE.Core.API
         }
 
         private static IEnumerable<Dictionary<string, string>> getMatchingObjects(
-            string datasetId,
-            double longitude,
-            double latitude,
-            IEnumerable<string> columns)
+        string datasetId,
+        double longitude,
+        double latitude,
+        IEnumerable<string> columns)
         {
             // Convert the columns set to a comma-separated string
             string columnsString = string.Join(", ", columns);

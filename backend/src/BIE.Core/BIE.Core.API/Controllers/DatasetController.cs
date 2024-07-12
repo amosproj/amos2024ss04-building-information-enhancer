@@ -152,7 +152,7 @@ namespace BIE.Core.API.Controllers
                 return Ok(data);
             } catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(ex.ToString());
             }
         }
 
