@@ -67,9 +67,9 @@ public class MetadataObject
         public int MarkersThreshold { get; set; } = 0;
 
         /// <summary>
-        /// A list of display properties that should be shown in a marker popup.
+        /// The display property is the property that should be shown in a popup.
         /// </summary>
-        public List<DisplayProperty> DisplayProperty { get; set; } = new List<DisplayProperty>();
+        public string DisplayProperty { get; set; } = string.Empty;
 
         /// <summary>
         /// Table data populated by the data pipeline. Contains the name and the size of the all .yaml files correlated to that specific dataset.
@@ -88,16 +88,5 @@ public class MetadataObject
         public int NumberOfLines { get; set; } = 0;
         
         public BoundingBox? BoundingBox { get; set; }
-    }
-
-    /// <summary>
-    /// A list of display values to show for the markers on the map
-    /// </summary>
-    public class DisplayProperty
-    {
-        // The display name to show
-        public string displayName { get; set; } = string.Empty;
-        // The value to show
-        public string value { get; set; } = string.Empty;
     }
 }

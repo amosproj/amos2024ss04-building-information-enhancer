@@ -137,7 +137,7 @@ const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
                   }}
                 />
                 <Typography variant="body2" sx={{ marginTop: 0.5 }}>
-                  dop40c
+                  Aerial
                 </Typography>
               </Box>
             </Grid>

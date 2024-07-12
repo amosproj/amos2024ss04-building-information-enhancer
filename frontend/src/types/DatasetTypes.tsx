@@ -26,13 +26,8 @@ export interface DatasetMetaData {
   longDescription: string;
   minZoomLevel: number;
   markersThreshold: number;
-  displayProperty: DisplayProperty[];
+  displayProperty: string;
   tables: Table[];
-}
-
-export interface DisplayProperty {
-  displayName: string;
-  value: string;
 }
 
 export interface Table {

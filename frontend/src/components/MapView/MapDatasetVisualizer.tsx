@@ -1,22 +1,20 @@
 import { useMap } from "react-leaflet";
-import { Fragment, useCallback, useContext, useEffect, useState } from "react";
-import { Feature, FeatureCollection, GeoJsonProperties, Point } from "geojson";
+import { useCallback, useContext, useEffect } from "react";
+import { FeatureCollection } from "geojson";
 import { MapContext } from "../../contexts/MapContext";
 import { TabsContext } from "../../contexts/TabsContext";
 import GeoDataFetcher from "./GeoDataFetcher";
-import L, { DivIcon, LatLng } from "leaflet";
+import L, { DivIcon } from "leaflet";
 import { LatLngBounds } from "leaflet";
 import "proj4leaflet";
 import "proj4";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import { MapPin } from "@phosphor-icons/react";
-import { Dataset, DisplayProperty } from "../../types/DatasetTypes";
+import { Dataset } from "../../types/DatasetTypes";
 import { MarkersTypes } from "../../types/MarkersTypes";
 import { createDivIcon } from "../../utils/mergeIcons";
 import { convertPolygonsToMarkers } from "../../utils/polgonsToMarkers";
-import { Popup } from "react-leaflet/Popup";
-import { MarkerSelection } from "../../types/MapSelectionTypes";
 
 interface MapDatasetVisualizerProps {
   dataset: Dataset;
@@ -43,17 +41,8 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
   dataset,
 }) => {
   const map = useMap();
-  const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
-
+  const { currentMapCache } = useContext(MapContext);
   const { setCurrentTabsCache } = useContext(TabsContext);
-  const [popupData, setPopupData] = useState<Feature<
-    Point,
-    GeoJsonProperties
-  > | null>(null);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [latLngCoordinates, setLatLngCoordinates] = useState<LatLng>(
-    new LatLng(51.505, -0.09)
-  );
 
   const updateDatasetData = useCallback(
     (newData: FeatureCollection, bounds: LatLngBounds) => {
@@ -112,17 +101,16 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
       } else {
         // Convert polygons to markers
         const markerData = convertPolygonsToMarkers(geoData);
-
         // Add the markers to the map instead
         const geojsonLayer = L.geoJson(markerData, {
           pointToLayer: function (_feature, latlng) {
-            const marker = L.marker(latlng, {
+            return L.marker(latlng, {
               icon: dataset.metaData
                 ? createDivIcon(dataset.metaData.icon)
                 : divIcondefault,
             });
-            return marker;
           },
+
           style: { fillOpacity: 0.1 },
         });
         const markerClusterGroup = L.markerClusterGroup();
@@ -137,28 +125,14 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
       // For Markers type datasets
     } else {
       const geojsonLayer = L.geoJson(geoData, {
-        pointToLayer: function (feature, latlng) {
-          const marker = L.marker(latlng, {
+        pointToLayer: function (_feature, latlng) {
+          return L.marker(latlng, {
             icon: dataset.metaData
               ? createDivIcon(dataset.metaData.icon)
               : divIcondefault,
-          }).on("click", () => {
-            setPopupData(feature);
-            setIsPopupOpen(true);
-            setLatLngCoordinates(latlng);
-            // Select a marker on the map
-            const markerSelection = new MarkerSelection(
-              latlng,
-              "Custom Marker",
-              true
-            );
-            setCurrentMapCache((prevCache) => ({
-              ...prevCache,
-              selectedCoordinates: markerSelection,
-            }));
           });
-          return marker;
         },
+
         style: { fillOpacity: 0.1 },
       });
       const markerClusterGroup = L.markerClusterGroup();
@@ -170,61 +144,9 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
         map.removeLayer(markerClusterGroup);
       };
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataset, currentMapCache.zoom, map, geoData]);
 
-  /**
-   * Creates a list of the properties for the popup data
-   * @param popupData the popup data object
-   * @param displayProperties the list of properties to display with displayName and value fields
-   * @returns a list of strings
-   */
-  const listProperties = (popupData: GeoJsonProperties): DisplayProperty[] => {
-    const listOfProperties: DisplayProperty[] = [];
-    if (popupData && dataset.metaData) {
-      for (const property in popupData.properties) {
-        if (
-          Object.prototype.hasOwnProperty.call(popupData.properties, property)
-        ) {
-          // Check if the property is in the displayProperties list
-          const displayProperty = dataset.metaData.displayProperty.find(
-            (dp) => dp.value === property
-          );
-          // If it is, format and push to the list
-          if (displayProperty) {
-            listOfProperties.push({
-              displayName: displayProperty.displayName,
-              value: String(popupData.properties[property]),
-            });
-          }
-        }
-      }
-    }
-    return listOfProperties;
-  };
-
-  return (
-    <>
-      {isPopupOpen && popupData && (
-        <Popup position={latLngCoordinates} offset={[0, -25]}>
-          {popupData.properties ? (
-            <Fragment>
-              {listProperties(popupData).map((displayProperty) => {
-                return (
-                  <div key={displayProperty.displayName}>
-                    <b>{displayProperty.displayName}: </b>
-                    <span>{displayProperty.value}</span>
-                  </div>
-                );
-              })}
-            </Fragment>
-          ) : (
-            <p>No data available</p>
-          )}
-        </Popup>
-      )}
-    </>
-  );
+  return null;
 };
 
 export default MapDatasetVisualizer;
