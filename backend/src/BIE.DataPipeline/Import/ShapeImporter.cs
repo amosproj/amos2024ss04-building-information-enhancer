@@ -16,12 +16,14 @@ namespace BIE.DataPipeline.Import
         private DbaseFileHeader mHeader;
         private readonly ICoordinateTransformation? mTransformation;
 
+        private StringBuilder mStringBuilder;
+
         public ShapeImporter(DataSourceDescription? dataSourceDescription)
         {
             // YAML Arguments:
-            this.mDataSourceDescription = dataSourceDescription;
+            mDataSourceDescription = dataSourceDescription;
 
-            new StringBuilder();
+            mStringBuilder = new StringBuilder();
 
             SetupParser();
 
@@ -114,6 +116,7 @@ namespace BIE.DataPipeline.Import
         /// <returns></returns>
         public bool ReadLine(out string nextLine)
         {
+            mStringBuilder.Clear();
             nextLine = "";
             if (!mParser.Read())
             {
@@ -125,16 +128,23 @@ namespace BIE.DataPipeline.Import
             var geometry = mParser.Geometry;
             geometry = ConvertUtmToLatLong(geometry);
 
-            nextLine = $"GEOMETRY::STGeomFromText('{geometry.AsText()}', 4326)";
+            mStringBuilder.Append($"GEOMETRY::STGeomFromText('");
+            mStringBuilder.Append(geometry.AsText());
+            mStringBuilder.Append("', 4326)");
             // nextLine = $"GEOMETRY::STGeomFromText('POLYGON (11.060226859896797 49.496927347229494, 11.060276626123832 49.49695803564076)')', 4326)";
 
             for (int i = 1; i < mHeader.Fields.Length + 1; i++)
             {
-                var value = (string)mParser.GetValue(i);
-                nextLine += $",  \'{(value != "" ? value : "null")}\'";
+                var value = mParser.GetValue(i);
+                mStringBuilder.Append(", '");
+                mStringBuilder.Append(value);
+                mStringBuilder.Append("'");
+                // nextLine += $",  \'{(value != "" ? value : "null")}\'";
             }
 
-            nextLine += $",{CalculateAreaInSquareMeters(geometry)}";
+            mStringBuilder.Append($",{CalculateAreaInSquareMeters(geometry)}");
+            // nextLine += $",{CalculateAreaInSquareMeters(geometry)}";
+            nextLine = mStringBuilder.ToString();
 
             return true;
         }
@@ -198,6 +208,11 @@ namespace BIE.DataPipeline.Import
         public string GetInsertHeader()
         {
             return mHeader.Fields.Aggregate("Location", (current, field) => current + $", {field.Name}");
+        }
+
+        public IEnumerable<string> GetHeaders()
+        {
+            return mHeader.Fields.Select(field => field.Name).Append("Area");
         }
 
         /// <summary>

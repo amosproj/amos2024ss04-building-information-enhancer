@@ -136,8 +136,19 @@ try
     }
 
     Console.WriteLine("Updating the metadata...");
+    
     var boundingBox = dbHelper.GetBoundingBox(description.table_name);
-    if (!metadataDbHelper.UpdateMetadata(description.dataset, description.table_name, count, boundingBox))
+    var rowHeaders = importer.GetHeaders();
+
+    var tableData = new MetadataObject.TableData()
+    {
+        Name = description.table_name,
+        NumberOfLines = count,
+        BoundingBox = boundingBox,
+        RowHeaders = rowHeaders.ToList()
+    };
+    
+    if (!metadataDbHelper.UpdateMetadata(description.dataset, tableData))
     {
         return 1;
     }

@@ -203,7 +203,7 @@ public static class ApiHelper
     /// <param name="tableName">the name of the table to filter</param>
     /// <param name="polygon">the polygon string</param>
     /// <returns></returns>
-    public static string FromTableIntersectsPolygon(string tableName, string polygon)
+    public static string FromTableWhereIntersectsPolygon(string tableName, string polygon)
     {
         return $@"
 FROM dbo.{tableName}
