@@ -90,7 +90,7 @@ const datasets = [
         attributeName: "nutzart",
         colors: [
           {
-            color: "Plum",
+            color: "DarkOrchid",
             values: [
               "Wohnbaufläche",
               "Industrie- und Gewerbefläche",
@@ -104,7 +104,7 @@ const datasets = [
             ],
           },
           {
-            color: "LightGreen",
+            color: "green",
             values: [
               "Landwirtschaft",
               "Wald",
@@ -127,7 +127,7 @@ const datasets = [
             ],
           },
           {
-            color: "SkyBlue",
+            color: "Cyan",
             values: ["Fließgewässer", "Hafenbecken", "Stehendes Gewässer"],
           },
         ],
