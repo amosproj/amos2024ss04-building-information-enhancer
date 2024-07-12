@@ -110,7 +110,7 @@ public class MetadataObject
     /// </summary>
     public class PolygonColoring
     {
-        public string Color { get; set; } = string.Empty;
-        public List<string> Values { get; set; } = new List<string>();
+        public string color { get; set; } = string.Empty;
+        public List<string> values { get; set; } = new List<string>();
     }
 }
