@@ -89,7 +89,47 @@ const datasets = [
       PolygonColoring: {
         attributeName: "nutzart",
         colors: [
-          { color: "darkred", values: ["halde", "friedhof", "wohnbaufläche"] },
+          {
+            color: "Plum",
+            values: [
+              "Wohnbaufläche",
+              "Industrie- und Gewerbefläche",
+              "Halde",
+              "Bergbaubetrieb",
+              "Tagebau, Grube Steinbruch",
+              "Fläche gemischter Nutzung",
+              "Fläche besonderer funktionaler Prägung",
+              "Sport-, Freizeit- und Erholungsfläche",
+              "Friedhof",
+            ],
+          },
+          {
+            color: "LightGreen",
+            values: [
+              "Landwirtschaft",
+              "Wald",
+              "Gehölz",
+              "Heide",
+              "Moor",
+              "Sumpf",
+              "Unland/Vegetationslose Fläche",
+            ],
+          },
+          {
+            color: "RosyBrown",
+            values: [
+              "Straßenverkehr",
+              "Weg",
+              "Platz",
+              "Bahnverkehr",
+              "Flugverkehr",
+              "Schiffsverkehr",
+            ],
+          },
+          {
+            color: "SkyBlue",
+            values: ["Fließgewässer", "Hafenbecken", "Stehendes Gewässer"],
+          },
         ],
       },
       Tables: [],

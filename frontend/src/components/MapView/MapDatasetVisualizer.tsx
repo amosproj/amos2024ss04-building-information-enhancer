@@ -55,6 +55,9 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
     new LatLng(51.505, -0.09)
   );
 
+  /**
+   * Updates the data for a specific dataset.
+   */
   const updateDatasetData = useCallback(
     (newData: FeatureCollection, bounds: LatLngBounds) => {
       setCurrentTabsCache((prevCache) => {
@@ -87,7 +90,11 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
     updateDatasetData
   );
 
-  // Function to determine the color based on usageType using PolygonColoring from metadata
+  /**
+   * Function to determine the color based on usageType using PolygonColoring from metadata
+   * @param usageType the usage type string
+   * @returns the color to use
+   */
   const getColor = (usageType: string) => {
     if (dataset.metaData && dataset.metaData.polygonColoring) {
       const coloring = dataset.metaData.polygonColoring;
@@ -100,6 +107,9 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
     return "#3388ff";
   };
 
+  /**
+   * Fetches the data for current viewport.
+   */
   useEffect(() => {
     // Check if data has been fetched
     if (!geoData || !dataset.metaData) return;
