@@ -87,6 +87,20 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
     updateDatasetData
   );
 
+  // Function to determine the color based on enum type
+  const getColor = (usageType: string) => {
+    switch (usageType) {
+      case "field":
+        return "yellow";
+      case "commercial area":
+        return "blue";
+      case "residential area":
+        return "darkred";
+      default:
+        return "#3388ff";
+    }
+  };
+
   useEffect(() => {
     // Check if data has been fetched
     if (!geoData || !dataset.metaData) return;
@@ -101,7 +115,16 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
       if (currentMapCache.zoom > dataset.metaData.markersThreshold) {
         // Add the polygons to the map
         try {
-          const geojsonLayer = L.geoJson(geoData);
+          const geojsonLayer = L.geoJson(geoData, {
+            style: (feature) => {
+              return {
+                color: feature
+                  ? getColor(feature.properties.usageType)
+                  : "#3388ff",
+                fillOpacity: 0.2,
+              };
+            },
+          });
           geojsonLayer.addTo(map);
           return () => {
             map.removeLayer(geojsonLayer);
