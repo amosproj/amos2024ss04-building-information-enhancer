@@ -25,8 +25,6 @@ namespace BIE.DataPipeline.Import
 
             SetupParser();
 
-            ReadFileHeader();
-
             // Define the source and target coordinate systems
             var utmZone32 = CoordinateSystemWktReader
                 .Parse("PROJCS[\"WGS 84 / UTM zone 32N\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS" +
@@ -74,14 +72,19 @@ namespace BIE.DataPipeline.Import
             dbfStream.Position = 0;
 
             mParser = Shapefile.CreateDataReader(
-                new ShapefileStreamProviderRegistry(
-                    new ByteStreamProvider(StreamTypes.Shape, shpStream),
-                    new ByteStreamProvider(StreamTypes.Data, dbfStream),
-                    true,
-                    true),
-                GeometryFactory.Default);
+                                                 new ShapefileStreamProviderRegistry(
+                                                                                     new ByteStreamProvider(StreamTypes
+                                                                                                                .Shape,
+                                                                                                            shpStream),
+                                                                                     new ByteStreamProvider(StreamTypes
+                                                                                                                .Data,
+                                                                                                            dbfStream),
+                                                                                     true,
+                                                                                     true),
+                                                 GeometryFactory.Default);
 
             mHeader = mParser.DbaseHeader;
+
         }
 
         private void ExtractShapeFilesFromZip(ZipArchive zipArchive, MemoryStream shpStream, MemoryStream dbfStream)
@@ -125,10 +128,24 @@ namespace BIE.DataPipeline.Import
             // Append geometry as WKT (Well-Known Text)
             var geometry = mParser.Geometry;
             geometry = ConvertUtmToLatLong(geometry);
+            
+            
+            // for (int i = 1; i < mHeader.Fields.Length; i++)
+            // {
+            //     Console.Write($" {mParser.GetValue(i)};");
+            // }
+            // Console.WriteLine();
 
-            var area = CalculateAreaInSquareMeters(geometry);
+            nextLine = $"GEOMETRY::STGeomFromText('{geometry.AsText()}', 4326)";
+            // nextLine = $"GEOMETRY::STGeomFromText('POLYGON (11.060226859896797 49.496927347229494, 11.060276626123832 49.49695803564076)')', 4326)";
 
-            nextLine = $"GEOMETRY::STGeomFromText('{geometry.AsText()}', 4326),"+area;
+            for (int i = 1; i < mHeader.Fields.Length + 1; i++)
+            {
+                var value = (string)mParser.GetValue(i);
+                nextLine += $",  \'{(value != "" ? value : "null")}\'";
+            }
+
+            nextLine += CalculateAreaInSquareMeters(geometry);
 
             return true;
         }
@@ -172,20 +189,25 @@ namespace BIE.DataPipeline.Import
         }
 
 
-        private string[] ReadFileHeader()
+        /// <summary>
+        /// Returns the Header needed for Table creation
+        /// starts with a comma
+        /// </summary>
+        /// <returns></returns>
+        public string GetCreationHeader()
         {
-            var fieldCount = mHeader.NumFields;
-            var res = new string[fieldCount];
-
-            // Append column names
-            for (int i = 0; i < fieldCount; i++)
-            {
-                res[i] = mHeader.Fields[i].Name;
-            }
-
-            return res;
+            return mHeader.Fields.Aggregate("Location GEOMETRY", (current, field) => current + $", {field.Name} VARCHAR(255)");
         }
 
+        /// <summary>
+        /// get the header used for inserting
+        /// </summary>
+        /// <returns></returns>
+        public string GetInsertHeader()
+        {
+            return mHeader.Fields.Aggregate("Location", (current, field) => current + $", {field.Name}");
+        }
+        
         /// <summary>
         /// Conver UTM coordinates to Latitude and Longitude
         /// </summary>

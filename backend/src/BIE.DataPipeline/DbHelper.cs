@@ -88,7 +88,8 @@ namespace BIE.DataPipeline
         /// Creates a Table in the database based on the name given in the description. Returns false if unable to.
         /// </summary>
         /// <param name="description"></param>
-        internal bool CreateTable(DataSourceDescription description)
+        /// <param name="header"> the header string to be used in creation (only used for SHAPE)</param>
+        internal bool CreateTable(DataSourceDescription description, string header)
         {
             try
             {
@@ -96,7 +97,7 @@ namespace BIE.DataPipeline
                 var db = Database.Instance;
 
 
-                var query = GetCreationQuery(description);
+                var query = GetCreationQuery(description, header);
 
                 var cmd = db.CreateCommand(query);
                 db.Execute(cmd);
@@ -232,7 +233,7 @@ namespace BIE.DataPipeline
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error while creating Table:");
+                Console.WriteLine("Error while creating Indexes:");
                 Console.Error.WriteLine(e);
                 return false;
             }
@@ -283,7 +284,7 @@ namespace BIE.DataPipeline
         }
 
 
-        private string GetCreationQuery(DataSourceDescription description)
+        private string GetCreationQuery(DataSourceDescription description, string header)
         {
             if (description.source.data_format == "SHAPE")
             {
@@ -292,7 +293,7 @@ IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{desc
 BEGIN
     CREATE TABLE {description.table_name} (
         Id INT PRIMARY KEY IDENTITY(1,1),
-        Location GEOMETRY,
+        {header},
         Area FLOAT
     );
 END";
