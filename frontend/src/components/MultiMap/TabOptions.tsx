@@ -12,6 +12,9 @@ interface TabOptionsProps {
   currentTab: TabProps | undefined;
 }
 
+/**
+ * Tab options popup, allows for seeing additional data of the tab, closing it and pinning.
+ */
 const TabOptions: React.FC<TabOptionsProps> = ({
   anchorElementTabOptions,
   handleClose,

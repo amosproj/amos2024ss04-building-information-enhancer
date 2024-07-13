@@ -55,6 +55,9 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
     new LatLng(51.505, -0.09)
   );
 
+  /**
+   * Updates the data for a specific dataset.
+   */
   const updateDatasetData = useCallback(
     (newData: FeatureCollection, bounds: LatLngBounds) => {
       setCurrentTabsCache((prevCache) => {
@@ -87,6 +90,27 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
     updateDatasetData
   );
 
+  /**
+   * Function to determine the color based on usageType using PolygonColoring from metadata
+   * @param usageType the usage type string
+   * @returns the color to use
+   */
+  const getColor = (usageType: string) => {
+    console.log(usageType);
+    if (dataset.metaData && dataset.metaData.polygonColoring) {
+      const coloring = dataset.metaData.polygonColoring;
+      for (const colorRule of coloring.colors) {
+        if (colorRule.values.includes(usageType)) {
+          return colorRule.color;
+        }
+      }
+    }
+    return "#3388ff";
+  };
+
+  /**
+   * Fetches the data for current viewport.
+   */
   useEffect(() => {
     // Check if data has been fetched
     if (!geoData || !dataset.metaData) return;
@@ -101,7 +125,23 @@ const MapDatasetVisualizer: React.FC<MapDatasetVisualizerProps> = ({
       if (currentMapCache.zoom > dataset.metaData.markersThreshold) {
         // Add the polygons to the map
         try {
-          const geojsonLayer = L.geoJson(geoData);
+          const geojsonLayer = L.geoJson(geoData, {
+            style: (feature) => {
+              return {
+                color:
+                  feature &&
+                  dataset.metaData &&
+                  dataset.metaData.polygonColoring
+                    ? getColor(
+                        feature.properties[
+                          dataset.metaData.polygonColoring.attributeName
+                        ]
+                      )
+                    : "#3388ff",
+                fillOpacity: 0.2,
+              };
+            },
+          });
           geojsonLayer.addTo(map);
           return () => {
             map.removeLayer(geojsonLayer);

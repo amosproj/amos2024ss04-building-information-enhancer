@@ -12,6 +12,9 @@ interface MapOptionsProps {
   toggle3D: () => void;
 }
 
+/**
+ * Additional options buttons visible in the top right corner of the map.
+ */
 const MapOptions: React.FC<MapOptionsProps> = ({
   onMapTypeChange,
   if3D,

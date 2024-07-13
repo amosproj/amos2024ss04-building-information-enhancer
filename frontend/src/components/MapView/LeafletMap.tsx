@@ -37,6 +37,9 @@ interface LeafletMapProps {
   if3D: boolean;
 }
 
+/**
+ * Leaflet map visible in the map view on the left side of the page.
+ */
 const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, if3D }) => {
   const { currentTabsCache, getCurrentTab, getOrFetchMetadata } =
     useContext(TabsContext);

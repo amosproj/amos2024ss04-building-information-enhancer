@@ -12,6 +12,9 @@ interface ThreeDViewProps {
   datasetId: string;
 }
 
+/**
+ * The 3D view component of the map.
+ */
 const ThreeDView: React.FC<ThreeDViewProps> = ({ datasetId }) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const threedMapRef = useRef<HTMLDivElement>(null);

@@ -17,11 +17,15 @@ interface PopUpProps {
   titleIcon: JSX.Element | undefined;
 }
 
-// This is the partent component for all PopUps.
-// - ifOpenedDialog - a boolean storing if the popup is currently opened.
-// - onClose - on close function handler
-// - title - the title of the PopUp
-// - children - all children JSX components
+/**
+ * This is the partent component for all PopUps.
+ * @param ifOpenedDialog - a boolean storing if the popup is currently opened.
+ * @param onClose - on close function handler
+ * @param title - the title of the PopUp
+ * @param children - all children JSX components
+ * @param titleIcon - the icon displayed in front of the title
+ * @returns
+ */
 const PopUp: React.FC<PopUpProps> = ({
   ifOpenedDialog,
   onClose,

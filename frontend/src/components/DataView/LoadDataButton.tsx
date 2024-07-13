@@ -8,6 +8,9 @@ interface LoadDataButtonProps {
   disabled: boolean;
 }
 
+/**
+ * A reload button for fetching the newest location data.
+ */
 const LoadDataButton: React.FC<LoadDataButtonProps> = ({
   ifNeedsReloading,
   disabled,

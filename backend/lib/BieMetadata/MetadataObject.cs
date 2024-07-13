@@ -1,6 +1,5 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-// ReSharper disable InconsistentNaming
 
 namespace BieMetadata;
 
@@ -75,6 +74,12 @@ public class MetadataObject
         /// Table data populated by the data pipeline. Contains the name and the size of the all .yaml files correlated to that specific dataset.
         /// </summary>
         public List<TableData> Tables { get; set; } = new List<TableData>();
+
+        /// <summary>
+        /// A polygon coloring rule for different values.
+        /// </summary>
+        [BsonIgnoreIfNull] // Add this attribute to ignore null values
+        public PolygonColoring? PolygonColoring { get; set; }
     }
     
     /// <summary>
@@ -112,5 +117,20 @@ public class MetadataObject
         public string displayName { get; set; } = string.Empty;
         // The value to show
         public string value { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// Polygon coloring rules
+    /// </summary>
+    public class PolygonColoring
+    {
+        public string attributeName { get; set; } = string.Empty;
+        public List<PolygonColor> colors { get; set; } = new List<PolygonColor>();
+    }
+
+    public class PolygonColor
+    {
+        public string color { get; set; } = string.Empty;
+        public List<string> values { get; set; } = new List<string>();
     }
 }

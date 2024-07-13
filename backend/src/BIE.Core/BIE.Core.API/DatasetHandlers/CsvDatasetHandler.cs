@@ -71,7 +71,7 @@ public class CsvDatasetHandler : IDatasetHandler
                 {
                     "properties", new Dictionary<string, object>
                     {
-                        { "text", $"{row["operator"]}" }
+                        { "operator", $"{row["operator"]}" }
                     }
                 }
             };
