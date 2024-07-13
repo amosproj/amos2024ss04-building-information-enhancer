@@ -141,10 +141,10 @@ const datasets = [
       DatasetId: "building_models",
       Name: "Building Models",
       ShortDescription: `Simplified 3D building models.`,
-      Icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><rect width="256" height="256" fill="none"/><path d="M104,216V152h48v64h64V120a8,8,0,0,0-2.34-5.66l-80-80a8,8,0,0,0-11.32,0l-80,80A8,8,0,0,0,40,120v96Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/></svg>',
+      Icon: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M232,228H204V28h12a4,4,0,0,0,0-8H40a4,4,0,0,0,0,8H52V228H24a4,4,0,0,0,0,8H232a4,4,0,0,0,0-8ZM60,28H196V228H156V184a4,4,0,0,0-4-4H104a4,4,0,0,0-4,4v44H60Zm88,200H108V188h40ZM92,64a4,4,0,0,1,4-4h16a4,4,0,0,1,0,8H96A4,4,0,0,1,92,64Zm48,0a4,4,0,0,1,4-4h16a4,4,0,0,1,0,8H144A4,4,0,0,1,140,64ZM92,104a4,4,0,0,1,4-4h16a4,4,0,0,1,0,8H96A4,4,0,0,1,92,104Zm48,0a4,4,0,0,1,4-4h16a4,4,0,0,1,0,8H144A4,4,0,0,1,140,104ZM96,148a4,4,0,0,1,0-8h16a4,4,0,0,1,0,8Zm44-4a4,4,0,0,1,4-4h16a4,4,0,0,1,0,8H144A4,4,0,0,1,140,144Z"></path></svg>',
     },
     additionalData: {
-      Icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><rect width="256" height="256" fill="none"/><path d="M104,216V152h48v64h64V120a8,8,0,0,0-2.34-5.66l-80-80a8,8,0,0,0-11.32,0l-80,80A8,8,0,0,0,40,120v96Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/></svg>',
+      Icon: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M232,228H204V28h12a4,4,0,0,0,0-8H40a4,4,0,0,0,0,8H52V228H24a4,4,0,0,0,0,8H232a4,4,0,0,0,0-8ZM60,28H196V228H156V184a4,4,0,0,0-4-4H104a4,4,0,0,0-4,4v44H60Zm88,200H108V188h40ZM92,64a4,4,0,0,1,4-4h16a4,4,0,0,1,0,8H96A4,4,0,0,1,92,64Zm48,0a4,4,0,0,1,4-4h16a4,4,0,0,1,0,8H144A4,4,0,0,1,140,64ZM92,104a4,4,0,0,1,4-4h16a4,4,0,0,1,0,8H96A4,4,0,0,1,92,104Zm48,0a4,4,0,0,1,4-4h16a4,4,0,0,1,0,8H144A4,4,0,0,1,140,104ZM96,148a4,4,0,0,1,0-8h16a4,4,0,0,1,0,8Zm44-4a4,4,0,0,1,4-4h16a4,4,0,0,1,0,8H144A4,4,0,0,1,140,144Z"></path></svg>',
       Type: "areas",
       DataType: "CITYGML",
       LongDescription: `The building models have a 3D object of each building plus additional information on its dimentions.`,

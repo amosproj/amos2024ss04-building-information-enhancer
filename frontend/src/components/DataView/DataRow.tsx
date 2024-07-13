@@ -10,7 +10,7 @@ import {
   TableRow,
   Tooltip,
 } from "@mui/material";
-import { CaretDown, CaretUp, MapPin } from "@phosphor-icons/react";
+import { CaretDown, CaretUp, DotOutline, MapPin } from "@phosphor-icons/react";
 import "./DataRow.css";
 import { Dataset, DatasetBasicData } from "../../types/DatasetTypes";
 import CustomSvgIcon from "../DatasetsList/CustomSvgIcon";
@@ -108,7 +108,7 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
         return <CustomSvgIcon svgString={dataset.icon} size={18} />;
       }
     }
-    return <div className="mock-icon" />;
+    return <DotOutline size={18} />;
   };
 
   return (
@@ -134,8 +134,10 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
           className="data-row-title-container"
         >
           <div className="data-row-title-flex">
-            {getDatasetIcon(row.datasetID)}
-            {row.displayName}
+            <div className="data-row-title-icon">
+              {getDatasetIcon(row.datasetId)}
+            </div>
+            <div>{row.displayName}</div>
           </div>
         </TableCell>
         {row.value && row.value !== "" ? (
@@ -150,8 +152,8 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
         ) : (
           <TableCell />
         )}
-        {row.datasetID &&
-        row.datasetID !== "" &&
+        {row.datasetId &&
+        row.datasetId !== "" &&
         row.coordinate &&
         row.coordinate.length === 2 ? (
           <TableCell className="toggle-column" size="small">
@@ -160,7 +162,7 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
                 aria-label="open on the map"
                 size="small"
                 onClick={() => {
-                  openDatasetFromMapIcon(row.datasetID, row.coordinate);
+                  openDatasetFromMapIcon(row.datasetId, row.coordinate);
                 }}
               >
                 <MapPin />
