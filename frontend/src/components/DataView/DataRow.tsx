@@ -156,16 +156,25 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
             <Table size="small" aria-label="subdata">
               <TableBody className="subdata-rows-container">
                 {row.subdata ? (
-                  <div>
+                  <Fragment>
                     {row.subdata.map((subItem) => (
                       <TableRow key={subItem.key}>
-                        <TableCell component="th" scope="row" size="small">
+                        <TableCell className="subrow-filler" />
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          size="small"
+                          className="subrow-key"
+                        >
                           {subItem.key}
                         </TableCell>
-                        <TableCell size="small">{subItem.value}</TableCell>
+                        <TableCell size="small" className="subrow-value">
+                          {subItem.value}
+                        </TableCell>
+                        <TableCell className="subrow-filler" />
                       </TableRow>
                     ))}
-                  </div>
+                  </Fragment>
                 ) : (
                   <div></div>
                 )}

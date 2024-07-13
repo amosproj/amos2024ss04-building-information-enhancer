@@ -228,28 +228,36 @@ const DataView = () => {
                   </Table>
                 </TableContainer>
               </Collapse>
-              <p
-                onClick={() => setShowIndividualData(!showIndividualData)}
-                className="data-panel-title"
-              >
-                {showIndividualData ? <CaretUp /> : <CaretDown />}
-                Individual Data
-              </p>
-              <Collapse in={showIndividualData} timeout="auto" unmountOnExit>
-                <TableContainer>
-                  <Table>
-                    <TableBody>
-                      {filterData(data?.individualData ?? []).map((row) => (
-                        <DataRow
-                          key={row.displayName + row.value + row.coordinate}
-                          row={row}
-                          currentDatasets={currentDatasets}
-                        />
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Collapse>
+              {data?.individualData && (
+                <Fragment>
+                  <p
+                    onClick={() => setShowIndividualData(!showIndividualData)}
+                    className="data-panel-title"
+                  >
+                    {showIndividualData ? <CaretUp /> : <CaretDown />}
+                    Individual Data
+                  </p>
+                  <Collapse
+                    in={showIndividualData}
+                    timeout="auto"
+                    unmountOnExit
+                  >
+                    <TableContainer>
+                      <Table>
+                        <TableBody>
+                          {filterData(data?.individualData ?? []).map((row) => (
+                            <DataRow
+                              key={row.displayName + row.value + row.coordinate}
+                              row={row}
+                              currentDatasets={currentDatasets}
+                            />
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Collapse>
+                </Fragment>
+              )}
             </Fragment>
           )}
           {ifNeedsReloading && (

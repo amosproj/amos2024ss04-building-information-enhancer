@@ -18,3 +18,9 @@
 .subdata-rows-container > *:last-child > * {
   border-bottom: none;
 }
+
+.subrow-value {
+  text-align: end;
+  display: flex !important;
+  justify-content: end;
+}
