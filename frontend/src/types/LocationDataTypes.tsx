@@ -12,7 +12,7 @@ export interface LocationDataResponse {
 export interface DatasetItem {
   displayName: string;
   value: string | null;
-  datasetID: string | null;
+  datasetId: string | null;
   coordinate: number[] | null;
   subdata: SubdataItem[] | null;
 }
