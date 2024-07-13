@@ -35,6 +35,7 @@ public class CsvDatasetHandler : IDatasetHandler
 
         var polygon = ApiHelper.GetPolygonFromBoundingBox(boundingBox);
         var tableName = mMetadata.additionalData.Tables[0].Name;
+        var rowHeaders = mMetadata.additionalData.Tables[0].RowHeaders;
 
         var query = "SELECT top 1000  operator, Location.AsTextZM() AS Location" +
                     ApiHelper.FromTableWhereIntersectsPolygon(tableName, polygon);
@@ -56,6 +57,13 @@ public class CsvDatasetHandler : IDatasetHandler
             var longitude = float.Parse(coordinates[0],culture);
             var latitude = float.Parse(coordinates[1],culture);
 
+
+            var properties = new Dictionary<string, string>();
+            foreach (var header in rowHeaders)
+            {
+                properties[header] = row[header];
+            }
+
             var feature = new Dictionary<string, object>
             {
                 { "type", "Feature" },
@@ -69,10 +77,7 @@ public class CsvDatasetHandler : IDatasetHandler
                     }
                 },
                 {
-                    "properties", new Dictionary<string, object>
-                    {
-                        { "operator", $"{row["operator"]}" }
-                    }
+                    "properties", properties
                 }
             };
 
