@@ -359,6 +359,14 @@ BEGIN CREATE TABLE {description.table_name} (";
             }
         }
 
+        public void FinalExecute()
+        {
+            if (mCount > 0)
+            {
+                ExecuteInsert();
+            }
+        }
+
         /// <summary>
         /// Execute the Actual Insert Statement.
         /// </summary>
