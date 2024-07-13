@@ -152,6 +152,7 @@ namespace BIE.Core.API.Controllers
                 return Ok(data);
             } catch (Exception ex)
             {
+                _logger.LogError(ex, "Failed to get data");
                 return BadRequest(ex.ToString());
             }
         }
@@ -444,7 +445,7 @@ namespace BIE.Core.API.Controllers
 
         public double[] Coordinate { get; set; }
         public List<double[]> PolygonCoordinates { get; set; }
-        public List<SubdataItem> Subdata { get; set; }
+        public List<SubdataItem> Subdata { get; set; } = new();
         public string Value { get; set; } // some items may not have subdata and should instead be directly displayed with a value
 
     }
