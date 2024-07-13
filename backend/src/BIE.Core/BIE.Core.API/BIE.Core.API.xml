@@ -33,7 +33,7 @@
             <param name="box2"></param>
             <returns></returns>
         </member>
-        <member name="M:BIE.Core.API.ApiHelper.FromTableIntersectsPolygon(System.String,System.String)">
+        <member name="M:BIE.Core.API.ApiHelper.FromTableWhereIntersectsPolygon(System.String,System.String)">
             <summary>
             Gets the Query to filter a table via polygon Intersection. Presents the FROM part of a Query.
             </summary>
@@ -73,13 +73,6 @@
             <param name="request">Contains the current dataset id and the list of coordinates. 
             In case of a single point a list with a single element.</param>
             <returns>Data for the specified point/polygon as a list of key/values.</returns>
-        </member>
-        <member name="M:BIE.Core.API.Controllers.DatasetController.GetActualUseData(BIE.Core.API.Controllers.DatasetController.QueryParameters)">
-            <summary>
-            WIP: DO NOT USE, Get a record
-            </summary>
-            <param name="id"></param>
-            <returns></returns>
         </member>
         <member name="M:BIE.Core.API.Controllers.DatasetController.GetHausumringeClusteredData(BIE.Core.API.Controllers.DatasetController.QueryParameters)">
             <summary>
@@ -156,6 +149,13 @@
             </summary>
             <param name="dataset"></param>
             <param name="boundingBox"></param>
+            <returns></returns>
+        </member>
+        <member name="M:BIE.Core.API.DatasetHandlers.ShapeDatasetHandler.GetFeatureFromRow(System.Collections.Generic.Dictionary{System.String,System.String},BieMetadata.MetadataObject.TableData)">
+            <summary>
+            Get the GeoJson Feature Object corresponding to the object
+            </summary>
+            <param name="row"></param>
             <returns></returns>
         </member>
         <member name="T:BIE.Core.API.Global">

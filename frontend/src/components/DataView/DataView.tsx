@@ -40,6 +40,9 @@ function getOuterPolygons(multiPolygon: MultiPolygon): Position[][] {
   return multiPolygon.coordinates.map((polygon) => polygon[0]);
 }
 
+/**
+ * Data view component for the right side of the main page.
+ */
 const DataView = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { currentTabsCache, getCurrentTab } = useContext(TabsContext);

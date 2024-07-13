@@ -156,6 +156,11 @@ namespace BIE.DataPipeline.Import
             return "";
         }
 
+        public IEnumerable<string> GetHeaders()
+        {
+            return new List<string>();
+        }
+
         private Geometry UtmCoordinatesToGeometry(string utmCoordinates)
         {
             //Console.WriteLine(utmCoordinates);

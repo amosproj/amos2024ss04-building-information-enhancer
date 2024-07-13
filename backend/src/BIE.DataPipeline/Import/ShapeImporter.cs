@@ -16,12 +16,14 @@ namespace BIE.DataPipeline.Import
         private DbaseFileHeader mHeader;
         private readonly ICoordinateTransformation? mTransformation;
 
+        private StringBuilder mStringBuilder;
+
         public ShapeImporter(DataSourceDescription? dataSourceDescription)
         {
             // YAML Arguments:
-            this.mDataSourceDescription = dataSourceDescription;
+            mDataSourceDescription = dataSourceDescription;
 
-            new StringBuilder();
+            mStringBuilder = new StringBuilder();
 
             SetupParser();
 
@@ -71,20 +73,16 @@ namespace BIE.DataPipeline.Import
             shpStream.Position = 0;
             dbfStream.Position = 0;
 
-            mParser = Shapefile.CreateDataReader(
-                                                 new ShapefileStreamProviderRegistry(
-                                                                                     new ByteStreamProvider(StreamTypes
-                                                                                                                .Shape,
-                                                                                                            shpStream),
-                                                                                     new ByteStreamProvider(StreamTypes
-                                                                                                                .Data,
-                                                                                                            dbfStream),
-                                                                                     true,
-                                                                                     true),
-                                                 GeometryFactory.Default);
+            var shpByteStream = new ByteStreamProvider(StreamTypes.Shape, shpStream);
+            var dbfByteStream = new ByteStreamProvider(StreamTypes.Data, dbfStream);
+            var providerRegistry = new ShapefileStreamProviderRegistry(shpByteStream,
+                                                                       dbfByteStream,
+                                                                       true,
+                                                                       true);
+            
+            mParser = Shapefile.CreateDataReader(providerRegistry, GeometryFactory.Default);
 
             mHeader = mParser.DbaseHeader;
-
         }
 
         private void ExtractShapeFilesFromZip(ZipArchive zipArchive, MemoryStream shpStream, MemoryStream dbfStream)
@@ -118,6 +116,7 @@ namespace BIE.DataPipeline.Import
         /// <returns></returns>
         public bool ReadLine(out string nextLine)
         {
+            mStringBuilder.Clear();
             nextLine = "";
             if (!mParser.Read())
             {
@@ -128,27 +127,29 @@ namespace BIE.DataPipeline.Import
             // Append geometry as WKT (Well-Known Text)
             var geometry = mParser.Geometry;
             geometry = ConvertUtmToLatLong(geometry);
-            
-            
-            // for (int i = 1; i < mHeader.Fields.Length; i++)
-            // {
-            //     Console.Write($" {mParser.GetValue(i)};");
-            // }
-            // Console.WriteLine();
 
-            nextLine = $"GEOMETRY::STGeomFromText('{geometry.AsText()}', 4326)";
+            mStringBuilder.Append($"GEOMETRY::STGeomFromText('");
+            mStringBuilder.Append(geometry.AsText());
+            mStringBuilder.Append("', 4326)");
             // nextLine = $"GEOMETRY::STGeomFromText('POLYGON (11.060226859896797 49.496927347229494, 11.060276626123832 49.49695803564076)')', 4326)";
 
             for (int i = 1; i < mHeader.Fields.Length + 1; i++)
             {
-                var value = (string)mParser.GetValue(i);
-                nextLine += $",  \'{(value != "" ? value : "null")}\'";
+                var value = mParser.GetValue(i);
+                mStringBuilder.Append(", '");
+                var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(value?.ToString() ?? "");
+                mStringBuilder.Append(Encoding.UTF8.GetString(bytes));
+                mStringBuilder.Append("'");
+                // nextLine += $",  \'{(value != "" ? value : "null")}\'";
             }
 
-            nextLine += $", {CalculateAreaInSquareMeters(geometry)}";
+            mStringBuilder.Append($",{CalculateAreaInSquareMeters(geometry)}");
+            // nextLine += $",{CalculateAreaInSquareMeters(geometry)}";
+            nextLine = mStringBuilder.ToString();
 
             return true;
         }
+
         /// <summary>
         /// Calculates Area of Polygon
         /// </summary>
@@ -169,7 +170,8 @@ namespace BIE.DataPipeline.Import
 
             for (int i = 0; i < coordinates.Length; i++)
             {
-                double[] transformed = transform.MathTransform.Transform(new double[] { coordinates[i].X, coordinates[i].Y });
+                double[] transformed =
+                    transform.MathTransform.Transform(new double[] { coordinates[i].X, coordinates[i].Y });
                 transformedCoordinates[i] = new Coordinate(transformed[0], transformed[1]);
             }
 
@@ -196,7 +198,8 @@ namespace BIE.DataPipeline.Import
         /// <returns></returns>
         public string GetCreationHeader()
         {
-            return mHeader.Fields.Aggregate("Location GEOMETRY", (current, field) => current + $", {field.Name} VARCHAR(255)");
+            return mHeader.Fields.Aggregate("Location GEOMETRY",
+                                            (current, field) => current + $", {field.Name} NVARCHAR(255)");
         }
 
         /// <summary>
@@ -207,7 +210,12 @@ namespace BIE.DataPipeline.Import
         {
             return mHeader.Fields.Aggregate("Location", (current, field) => current + $", {field.Name}");
         }
-        
+
+        public IEnumerable<string> GetHeaders()
+        {
+            return mHeader.Fields.Select(field => field.Name).Append("Area");
+        }
+
         /// <summary>
         /// Conver UTM coordinates to Latitude and Longitude
         /// </summary>
