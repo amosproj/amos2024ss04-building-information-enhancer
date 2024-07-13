@@ -167,7 +167,7 @@ const datasets = [
       DataType: "CSV",
       Icon: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M240,208H224V96a16,16,0,0,0-16-16H144V32a16,16,0,0,0-24.88-13.32L39.12,72A16,16,0,0,0,32,85.34V208H16a8,8,0,0,0,0,16H240a8,8,0,0,0,0-16ZM208,96V208H144V96ZM48,85.34,128,32V208H48ZM112,112v16a8,8,0,0,1-16,0V112a8,8,0,1,1,16,0Zm-32,0v16a8,8,0,0,1-16,0V112a8,8,0,1,1,16,0Zm0,56v16a8,8,0,0,1-16,0V168a8,8,0,0,1,16,0Zm32,0v16a8,8,0,0,1-16,0V168a8,8,0,0,1,16,0Z"></path></svg>',
       LongDescription: ` The air quality dataset provides air measurements from stations across Germany. This data includes various air pollutants, such as particulate matter (PM10 and PM2'5) and nitrogen dioxide (NO2). This data is essential for monitoring environmental health and guiding policy decisions for air quality improvement.`,
-      MinZoomLevel: 11,
+      MinZoomLevel: 6,
       MarkersThreshold: -1,
       DisplayProperty: [
         { displayName: "Station Name", value: "station_name" },
