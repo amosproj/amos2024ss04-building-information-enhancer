@@ -219,7 +219,7 @@ const DataView = () => {
                     <TableBody>
                       {filterData(data?.selectionData ?? []).map((row) => (
                         <DataRow
-                          key={row.datasetID}
+                          key={row.displayName + row.value + row.coordinate}
                           row={row}
                           currentDatasets={currentDatasets}
                         />
@@ -241,7 +241,7 @@ const DataView = () => {
                     <TableBody>
                       {filterData(data?.individualData ?? []).map((row) => (
                         <DataRow
-                          key={row.datasetID}
+                          key={row.displayName + row.value + row.coordinate}
                           row={row}
                           currentDatasets={currentDatasets}
                         />
