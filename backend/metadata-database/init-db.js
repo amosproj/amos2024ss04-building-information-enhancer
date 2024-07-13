@@ -170,9 +170,10 @@ const datasets = [
       MinZoomLevel: 11,
       MarkersThreshold: -1,
       DisplayProperty: [
-        { displayName: "NO2", value: "no2" },
-        { displayName: "PM10", value: "pm10" },
-        { displayName: "PM2'5", value: "pm2_5" },
+        { displayName: "Station Name", value: "station_name" },
+        { displayName: "Nitrogen Dioxide (NO2)", value: "no2" },
+        { displayName: "Particulate Matter (PM10)", value: "pm10" },
+        { displayName: "Particulate Matter (PM2'5)", value: "pm2_5" },
       ],
       PolygonColoring: null,
       Tables: [],
