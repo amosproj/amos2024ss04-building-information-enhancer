@@ -11,6 +11,11 @@
   padding-left: 0 !important;
 }
 
+.data-row-title-flex {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .data-row-value {
   text-align: end !important;
 }
@@ -23,4 +28,9 @@
   text-align: end;
   display: flex !important;
   justify-content: end;
+}
+
+.mock-icon {
+  width: 18px;
+  height: 18px;
 }

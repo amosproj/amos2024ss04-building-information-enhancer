@@ -96,6 +96,21 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
     }
   };
 
+  /**
+   * Returns an icon for a specific dataset
+   * @param datasetID the dataset for the icon
+   * @returns
+   */
+  const getDatasetIcon = (datasetID: string | null) => {
+    if (datasetID) {
+      const dataset = currentDatasets.find((ds) => ds.datasetId === datasetID);
+      if (dataset && dataset.icon) {
+        return <CustomSvgIcon svgString={dataset.icon} size={18} />;
+      }
+    }
+    return <div className="mock-icon" />;
+  };
+
   return (
     <Fragment>
       <TableRow className="data-row">
@@ -118,7 +133,10 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
           size="small"
           className="data-row-title-container"
         >
-          {row.displayName}
+          <div className="data-row-title-flex">
+            {getDatasetIcon(row.datasetID)}
+            {row.displayName}
+          </div>
         </TableCell>
         {row.value && row.value !== "" ? (
           <TableCell
@@ -132,7 +150,10 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
         ) : (
           <TableCell />
         )}
-        {row.datasetID && row.datasetID !== "" ? (
+        {row.datasetID &&
+        row.datasetID !== "" &&
+        row.coordinate &&
+        row.coordinate.length === 2 ? (
           <TableCell className="toggle-column" size="small">
             <Tooltip title="Locate on the map" arrow placement="left">
               <IconButton

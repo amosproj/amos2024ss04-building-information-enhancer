@@ -67,7 +67,7 @@ const DataView = () => {
       }
     };
     fetchCurrentDatasets();
-  });
+  }, []);
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilterValue(event.target.value);
