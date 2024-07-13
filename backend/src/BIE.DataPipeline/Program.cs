@@ -126,6 +126,9 @@ try
         }
     }
 
+    //To insert data when dataset have row less than max count
+    dbHelper.FinalExecute();
+
     Console.WriteLine($"Finished inserting {count} lines of data.");
 
     if (dbHelper.CheckIfColumnExists(description))
