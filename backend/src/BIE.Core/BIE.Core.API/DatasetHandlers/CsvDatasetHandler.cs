@@ -72,9 +72,9 @@ public class CsvDatasetHandler : IDatasetHandler
             if (mMetadata.basicData.DatasetId == "air_pollutants")
             {
                 properties["station_name"] = row["station_name"];
-                properties["pm10"] = row["pm10"];
-                properties["pm2_5"] = row["pm2_5"];
-                properties["no2"] = row["no2"];
+                properties["pm10"] = row["pm10"] + " µg/m3^3";
+                properties["pm2_5"] = row["pm2_5"] + " µg/m3^3";
+                properties["no2"] = row["no2"] + " µg/m3^3";
             }
             else if (mMetadata.basicData.DatasetId == "EV_charging_stations")
             {
