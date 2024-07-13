@@ -99,7 +99,7 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
   return (
     <Fragment>
       <TableRow className="data-row">
-        {row.subdata.length > 0 ? (
+        {row.subdata && row.subdata.length > 0 ? (
           <TableCell className="toggle-column" size="small">
             <IconButton
               aria-label="expand row"
@@ -155,14 +155,20 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Table size="small" aria-label="subdata">
               <TableBody className="subdata-rows-container">
-                {row.subdata.map((subItem) => (
-                  <TableRow key={subItem.key}>
-                    <TableCell component="th" scope="row" size="small">
-                      {subItem.key}
-                    </TableCell>
-                    <TableCell size="small">{subItem.value}</TableCell>
-                  </TableRow>
-                ))}
+                {row.subdata ? (
+                  <div>
+                    {row.subdata.map((subItem) => (
+                      <TableRow key={subItem.key}>
+                        <TableCell component="th" scope="row" size="small">
+                          {subItem.key}
+                        </TableCell>
+                        <TableCell size="small">{subItem.value}</TableCell>
+                      </TableRow>
+                    ))}
+                  </div>
+                ) : (
+                  <div></div>
+                )}
               </TableBody>
             </Table>
           </Collapse>

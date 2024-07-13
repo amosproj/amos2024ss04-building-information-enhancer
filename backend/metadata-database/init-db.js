@@ -146,6 +146,7 @@ const datasets = [
     additionalData: {
       Icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><rect width="256" height="256" fill="none"/><path d="M104,216V152h48v64h64V120a8,8,0,0,0-2.34-5.66l-80-80a8,8,0,0,0-11.32,0l-80,80A8,8,0,0,0,40,120v96Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="16"/></svg>',
       Type: "areas",
+      DataType: "CITYGML",
       LongDescription: `The building models have a 3D object of each building plus additional information on its dimentions.`,
       MinZoomLevel: 11,
       MarkersThreshold: 17,

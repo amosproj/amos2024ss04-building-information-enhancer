@@ -14,7 +14,7 @@ export interface DatasetItem {
   value: string | null;
   datasetID: string | null;
   coordinate: number[] | null;
-  subdata: SubdataItem[];
+  subdata: SubdataItem[] | null;
 }
 
 /**

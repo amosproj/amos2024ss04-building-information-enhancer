@@ -106,11 +106,12 @@ namespace BIE.Core.API.Controllers
             switch (metadata.additionalData.DataType)
             {
                 case "CITYGML":
+                    handler = new ShapeDatasetHandler(metadata);
+                    break;
                 case "SHAPE":
                     handler = new ShapeDatasetHandler(metadata);
                     break;
                 case "CSV":
-                    // TODO
                     handler = new CsvDatasetHandler(metadata);
                     break;
                 default:
@@ -151,7 +152,7 @@ namespace BIE.Core.API.Controllers
                 return Ok(data);
             } catch (Exception ex)
             {
-                return BadRequest(ex);
+                return BadRequest(ex.ToString());
             }
         }
 
