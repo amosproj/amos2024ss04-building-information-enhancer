@@ -315,6 +315,7 @@ BEGIN
         WallArea FLOAT,
         LivingArea FLOAT,
         RoofArea FLOAT,
+        SolarPotential FLOAT,
     );
 END";
             }

@@ -127,6 +127,7 @@ namespace BIE.DataPipeline.Import
                 float buildingVolume = GetBuildingVolume(buildingNode, groundArea, buildingWallHeight);
                 float livingArea = GetLivingArea(buildingNode, groundArea, buildingWallHeight);
                 float roofArea = GetRoofArea(buildingNode);
+                float solarPotential = GetSolarPotential(buildingNode, roofArea);
 
                 nextLine = $"geography::STGeomFromText('{geometry.AsText()}', 4326)";
                 nextLine += string.Format(",'{0}'", buildingNode.InnerXml);
@@ -139,6 +140,7 @@ namespace BIE.DataPipeline.Import
                 nextLine += string.Format(",{0}", wallArea.ToString(culture));
                 nextLine += string.Format(",{0}", livingArea.ToString(culture));
                 nextLine += string.Format(",{0}", roofArea.ToString(culture));
+                nextLine += string.Format(",{0}", solarPotential.ToString(culture));
 
                 this.buildingIndex++;
                 return true;
@@ -435,6 +437,11 @@ namespace BIE.DataPipeline.Import
             }
 
             return result;
+        }
+
+        private float GetSolarPotential(XmlNode node, float roofArea)
+        {
+            return roofArea * 0.5f; //dummy function
         }
     }
 }
