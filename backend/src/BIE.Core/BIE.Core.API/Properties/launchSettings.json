@@ -8,7 +8,7 @@
         "DB_NAME": "BIEDB",
         "DB_PASSWORD": "MyPass@1234",
         "DB_TYPE": "SQL",
-        "TRUSTED": "False",
+        "TRUSTED": "True",
         "DB_USERNAME": "db_user1",
         "METADATA_DB_URL": "localhost:27017"
       },

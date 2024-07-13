@@ -138,27 +138,6 @@ namespace BIE.Core.API.Controllers
             
         }
 
-        // Helper method to generate mock data
-        private List<DatasetItem> GenerateMockData(string mapId, int count)
-        {
-            var random = new Random();
-            var data = new List<DatasetItem>();
-
-            for (int i = 0; i < count; i++)
-            {
-                var item = new DatasetItem
-                {
-                    Id = Guid.NewGuid().ToString(), // Generate a unique ID
-                    Key = $"{mapId} Item {i + 1} (distance)",
-                    Value = $"{random.Next(50, 1000)} m",
-                    MapId = mapId
-                };
-                data.Add(item);
-            }
-
-            return data;
-        }
-
         /// <summary>
         /// Gets the dataset viewport data based on the provided parameters.
         /// </summary>
