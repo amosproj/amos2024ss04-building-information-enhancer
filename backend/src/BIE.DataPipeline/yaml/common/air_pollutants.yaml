@@ -15,11 +15,11 @@ options:
     name_in_table: location
     index_lon: 3
     index_lat: 4
-table_name: Air_pollutants
-dataset: Air_Pollutants
+table_name: air_pollutants
+dataset: air_pollutants
 delimiter: ","
 
-table_cols: 
+table_cols:
   - name: Bundesland / Messnetz
     name_in_table: state
   - name: Stationscode
