@@ -154,27 +154,30 @@ const datasets = [
       PolygonColoring: null,
       Tables: [],
     },
+  },
+  {
+    basicData: {
+      DatasetId: "air_pollutants",
+      Name: "Air Pollutants",
+      ShortDescription: `Air measurements from stations across Germany.`,
+      Icon: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M180,184a28,28,0,0,1-28,28c-12.09,0-23.76-7.83-27.75-18.61a4,4,0,1,1,7.5-2.78C134.58,198.24,143.28,204,152,204a20,20,0,0,0,0-40H40a4,4,0,0,1,0-8H152A28,28,0,0,1,180,184ZM148,72a28,28,0,0,0-28-28c-12.09,0-23.76,7.83-27.75,18.61a4,4,0,0,0,7.5,2.78C102.58,57.76,111.28,52,120,52a20,20,0,0,1,0,40H24a4,4,0,0,0,0,8h96A28,28,0,0,0,148,72Zm60,4c-12.09,0-23.76,7.83-27.75,18.61a4,4,0,1,0,7.5,2.78C190.58,89.76,199.28,84,208,84a20,20,0,0,1,0,40H32a4,4,0,0,0,0,8H208a28,28,0,0,0,0-56Z"></path></svg>',
     },
-    {
-        basicData: {
-            DatasetId: "air_pollutants",
-            Name: "Air Pollutants",
-            ShortDescription: `Air measurements from stations across Germany.`,
-            Icon: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M180,184a28,28,0,0,1-28,28c-12.09,0-23.76-7.83-27.75-18.61a4,4,0,1,1,7.5-2.78C134.58,198.24,143.28,204,152,204a20,20,0,0,0,0-40H40a4,4,0,0,1,0-8H152A28,28,0,0,1,180,184ZM148,72a28,28,0,0,0-28-28c-12.09,0-23.76,7.83-27.75,18.61a4,4,0,0,0,7.5,2.78C102.58,57.76,111.28,52,120,52a20,20,0,0,1,0,40H24a4,4,0,0,0,0,8h96A28,28,0,0,0,148,72Zm60,4c-12.09,0-23.76,7.83-27.75,18.61a4,4,0,1,0,7.5,2.78C190.58,89.76,199.28,84,208,84a20,20,0,0,1,0,40H32a4,4,0,0,0,0,8H208a28,28,0,0,0,0-56Z"></path></svg>',
-
-        },
-        additionalData: {
-            Type: "markers",
-            DataType: "CSV",
-            Icon: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M240,212H220V96a12,12,0,0,0-12-12H140V32a12,12,0,0,0-18.66-10l-80,53.33a12,12,0,0,0-5.34,10V212H16a4,4,0,0,0,0,8H240a4,4,0,0,0,0-8ZM208,92a4,4,0,0,1,4,4V212H140V92ZM44,85.34A4,4,0,0,1,45.78,82l80-53.33A4,4,0,0,1,132,32V212H44ZM108,112v16a4,4,0,0,1-8,0V112a4,4,0,0,1,8,0Zm-32,0v16a4,4,0,0,1-8,0V112a4,4,0,0,1,8,0Zm0,56v16a4,4,0,0,1-8,0V168a4,4,0,0,1,8,0Zm32,0v16a4,4,0,0,1-8,0V168a4,4,0,0,1,8,0Z"></path></svg>',
-            LongDescription: ` The air quality dataset provides air measurements from stations across Germany. This data includes various air pollutants, such as particulate matter (PM10 and PM2'5) and nitrogen dioxide (NO2). This data is essential for monitoring environmental health and guiding policy decisions for air quality improvement.`,
-            MinZoomLevel: 11,
-            MarkersThreshold: -1,
-            DisplayProperty: [{ displayName: "NO2", value: "no2" }, { displayName: "PM10", value: "pm10" }, { displayName: "PM2'5", value: "pm2_5" }],
-            PolygonColoring: null,
-            Tables: [],
-        },
-    }
+    additionalData: {
+      Type: "markers",
+      DataType: "CSV",
+      Icon: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000000" viewBox="0 0 256 256"><path d="M240,212H220V96a12,12,0,0,0-12-12H140V32a12,12,0,0,0-18.66-10l-80,53.33a12,12,0,0,0-5.34,10V212H16a4,4,0,0,0,0,8H240a4,4,0,0,0,0-8ZM208,92a4,4,0,0,1,4,4V212H140V92ZM44,85.34A4,4,0,0,1,45.78,82l80-53.33A4,4,0,0,1,132,32V212H44ZM108,112v16a4,4,0,0,1-8,0V112a4,4,0,0,1,8,0Zm-32,0v16a4,4,0,0,1-8,0V112a4,4,0,0,1,8,0Zm0,56v16a4,4,0,0,1-8,0V168a4,4,0,0,1,8,0Zm32,0v16a4,4,0,0,1-8,0V168a4,4,0,0,1,8,0Z"></path></svg>',
+      LongDescription: ` The air quality dataset provides air measurements from stations across Germany. This data includes various air pollutants, such as particulate matter (PM10 and PM2'5) and nitrogen dioxide (NO2). This data is essential for monitoring environmental health and guiding policy decisions for air quality improvement.`,
+      MinZoomLevel: 11,
+      MarkersThreshold: -1,
+      DisplayProperty: [
+        { displayName: "NO2", value: "no2" },
+        { displayName: "PM10", value: "pm10" },
+        { displayName: "PM2'5", value: "pm2_5" },
+      ],
+      PolygonColoring: null,
+      Tables: [],
+    },
+  },
 ];
 
 // Iterate over datasets and insert only if DatasetId does not exist
