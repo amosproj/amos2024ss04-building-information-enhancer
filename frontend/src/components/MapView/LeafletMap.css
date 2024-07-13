@@ -16,3 +16,8 @@
   background-color: #ff0000 !important;
   border-radius: 1rem;
 }
+
+.leaflet-interactive {
+  stroke-opacity: 1 !important;
+  stroke-width: 1.5 !important;
+}

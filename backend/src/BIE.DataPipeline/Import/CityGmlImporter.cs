@@ -126,7 +126,7 @@ namespace BIE.DataPipeline.Import
                 float livingArea = GetLivingArea(buildingNode, groundArea, buildingWallHeight);
                 float roofArea = GetRoofArea(buildingNode);
 
-                nextLine = $"geography::STGeomFromText('{geometry.AsText()}', 4326)";
+                nextLine = $"geometry::STGeomFromText('{geometry.AsText()}', 4326)";
                 nextLine += string.Format(",'{0}'", buildingNode.InnerXml);
                 nextLine += string.Format(",'{0}'", groundHeight.ToString(culture));
                 nextLine += string.Format(",'{0}'", districtKey);
@@ -144,6 +144,21 @@ namespace BIE.DataPipeline.Import
                 nextLine = "";
                 return false;
             }
+        }
+
+        public string GetCreationHeader()
+        {
+            return "";
+        }
+
+        public string GetInsertHeader()
+        {
+            return "";
+        }
+
+        public IEnumerable<string> GetHeaders()
+        {
+            return new List<string>();
         }
 
         private Geometry UtmCoordinatesToGeometry(string utmCoordinates)

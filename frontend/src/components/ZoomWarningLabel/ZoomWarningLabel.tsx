@@ -5,6 +5,9 @@ import { TabsContext } from "../../contexts/TabsContext";
 import "./ZoomWarningLabel.css";
 import { Warning } from "@phosphor-icons/react";
 
+/**
+ * Displays a zoom warning label if the user zoomed out too much to see the data.
+ */
 const ZoomWarningLabel: React.FC = () => {
   const map = useMap();
   const { getCurrentTab } = useContext(TabsContext);

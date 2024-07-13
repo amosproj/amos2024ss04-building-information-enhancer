@@ -11,13 +11,12 @@ import { TabsContext } from "./contexts/TabsContext";
 import MainMenu from "./components/MainMenu/MainMenu";
 import ErrorAlert from "./components/Alerts/ErrorAlert";
 
-import Tooltip from '@mui/material/Tooltip';
+import Tooltip from "@mui/material/Tooltip";
 import { CaretDoubleLeft, CaretDoubleRight } from "@phosphor-icons/react";
 
 import { MapContext } from "./contexts/MapContext";
 
 function App() {
-
   const { currentMapCache } = useContext(MapContext);
 
   const { currentTabsCache } = useContext(TabsContext);
@@ -27,7 +26,9 @@ function App() {
   const toggleDataView = () => {
     setDataViewVisible((prevVisible) => !prevVisible);
     const { mapInstance } = currentMapCache;
-    setTimeout(function(){ mapInstance?.invalidateSize()}, 400);
+    setTimeout(function () {
+      mapInstance?.invalidateSize();
+    }, 400);
   };
 
   return (
@@ -37,24 +38,30 @@ function App() {
       ) : (
         <Fragment>
           <div className="content-container">
-          <div className={`multi-map ${!dataViewVisible ? "full-width" : ""}`}>
-          <div className="multimap-container">
-          
-          <Tooltip title={dataViewVisible ? "Hide Data View" : "Show Data View"} arrow>
-                  <button onClick={toggleDataView} className="toggle-button">
+            <div
+              className={`multi-map ${!dataViewVisible ? "full-width" : ""}`}
+            >
+              <div className="multimap-container">
+                <Tooltip
+                  title={dataViewVisible ? "Hide Data View" : "Show Data View"}
+                  arrow
+                >
+                  <button
+                    onClick={toggleDataView}
+                    className="toggle-data-view-button"
+                  >
                     {dataViewVisible ? (
-                      <CaretDoubleRight/>
+                      <CaretDoubleRight />
                     ) : (
                       <CaretDoubleLeft />
                     )}
                   </button>
                 </Tooltip>
-      
-            <MultiMap />
-            </div>
+                <MultiMap />
+              </div>
             </div>
             <div className={`data-view ${!dataViewVisible ? "hidden" : ""}`}>
-            <DataView />
+              <DataView />
             </div>
           </div>
         </Fragment>

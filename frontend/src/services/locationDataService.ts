@@ -19,12 +19,10 @@ export const fetchLocationData = async (
     location: location,
   };
   try {
-    console.log(requestBody);
     const response = await axios.put<LocationDataResponse>(
       getAPIGatewayURL() + "/api/loadLocationData",
       requestBody
     );
-
     if (response.status === 200) {
       return response.data;
     } else {

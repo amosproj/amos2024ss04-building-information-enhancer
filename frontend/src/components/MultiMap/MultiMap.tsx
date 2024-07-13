@@ -11,11 +11,16 @@ import { TabProps, TabsContext } from "../../contexts/TabsContext";
 import NewTabButton from "./NewTabButton";
 import TabOptions from "./TabOptions";
 
+/**
+ * Main tabs component allowing for opening and saving of new map tabs.
+ */
 const MultiMap = () => {
   // Access the tabs context
   const { currentTabsCache, setCurrentTabsCache } = useContext(TabsContext);
 
-  // Dropdown menu for the tab options
+  /**
+   * Dropdown menu for the tab options
+   */
   const [anchorElementTabOptions, setAnchorElementTabOptions] =
     useState<null | HTMLElement>(null);
 
@@ -35,13 +40,16 @@ const MultiMap = () => {
 
   const [selectedTabId, setSelectedTabId] = useState<string | null>(null);
 
-  // Handles the change of the current tab id
+  /**
+   * Handles the change of the current tab id
+   * @param newTabID new current tab
+   */
   const handleChange = (newTabID: string) => {
     setCurrentTabsCache({ ...currentTabsCache, currentTabID: newTabID });
   };
 
   return (
-    <div className="multimap-container">
+    <div className="multimap-inner-container">
       <TabContext value={currentTabsCache.currentTabID}>
         <div className="tab-list-container">
           <TabList

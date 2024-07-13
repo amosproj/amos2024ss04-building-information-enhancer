@@ -6,6 +6,9 @@ import DatasetsList from "../DatasetsList/DatasetsList";
 
 import "./MainMenu.css";
 
+/**
+ * The main menu of the website.
+ */
 const MainMenu = () => {
   return (
     <Fragment>

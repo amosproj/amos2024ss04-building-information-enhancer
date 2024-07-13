@@ -27,6 +27,7 @@ type TabsContextValue = {
     datasetID: string
   ) => Promise<DatasetMetaData | undefined>;
   openNewTab: (datasetID: Dataset) => boolean;
+  changeToOrOpenNewTab: (datasetID: Dataset) => boolean;
 };
 
 // Provider component props type
@@ -49,6 +50,7 @@ export const TabsContext = createContext<TabsContextValue>({
   getCurrentTab: () => undefined,
   getOrFetchMetadata: async () => undefined,
   openNewTab: () => false,
+  changeToOrOpenNewTab: () => false,
 });
 
 // Provider component
@@ -148,12 +150,44 @@ export const TabsContextProvider: React.FC<TabsContextProviderProps> = ({
     return true;
   };
 
+  /**
+   * Opens a new tab if necessary and/or switched to already existing one.
+   * @param dataset dataset to change to or open
+   * @return if switched to a different tab
+   */
+  const changeToOrOpenNewTab = (dataset: Dataset) => {
+    // Check if the provided tab is the current one
+    const currentTab = getCurrentTab();
+    if (currentTab?.dataset.id === dataset.id) {
+      return false;
+    }
+    // Open the tab if it does not exist
+    if (
+      !currentTabsCache.openedTabs.some((tab) => tab.dataset.id === dataset.id)
+    ) {
+      openNewTab(dataset);
+    } else {
+      // Switch to that tab
+      const tabID = currentTabsCache.openedTabs.find((tab) => {
+        return tab.dataset.id === dataset.id;
+      });
+      if (tabID) {
+        setCurrentTabsCache({
+          ...currentTabsCache,
+          currentTabID: tabID.id,
+        });
+      }
+    }
+    return true;
+  };
+
   const value = {
     currentTabsCache,
     setCurrentTabsCache,
     getCurrentTab,
     getOrFetchMetadata,
     openNewTab,
+    changeToOrOpenNewTab,
   };
 
   return <TabsContext.Provider value={value}>{children}</TabsContext.Provider>;
