@@ -211,7 +211,7 @@ namespace BIE.Core.API
                 foreach (var table in metadata.additionalData.Tables)
                 {
                     var sqlQuery = $"SELECT {string.Join(", ", columns)}, Location.STAsText() AS Location" +
-                        ApiHelper.FromTableIntersectsPolygon(table.Name, polygonWkt);
+                        ApiHelper.FromTableWhereIntersectsPolygon(table.Name, polygonWkt);
                     Console.WriteLine(sqlQuery);
                     housefootprints.AddRange(DbHelper.GetData(sqlQuery));
                 }
