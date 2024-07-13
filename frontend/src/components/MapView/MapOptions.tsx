@@ -1,15 +1,22 @@
-import React, { useContext, useState } from "react";
+import React, { Fragment, useContext, useState } from "react";
 import { Paper, Popover, Grid, Typography, Box, Tooltip } from "@mui/material";
 import "./MapOptions.css";
-import { Polygon, StackSimple } from "@phosphor-icons/react";
+import { Polygon, StackSimple, ThreeD } from "@phosphor-icons/react";
 import SearchBar from "../SearchBar/SearchBar";
 import { MapContext } from "../../contexts/MapContext";
+import { MapTypes } from "../../types/MapTypes";
 
 interface MapOptionsProps {
-  onMapTypeChange: (type: "normal" | "satellite" | "parcel" | "aerial") => void;
+  onMapTypeChange: (type: MapTypes) => void;
+  if3D: boolean;
+  toggle3D: () => void;
 }
 
-const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
+const MapOptions: React.FC<MapOptionsProps> = ({
+  onMapTypeChange,
+  if3D,
+  toggle3D,
+}) => {
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
 
@@ -21,9 +28,7 @@ const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
     setAnchorEl(null);
   };
 
-  const handleMapTypeChange = (
-    type: "normal" | "satellite" | "parcel" | "aerial"
-  ) => {
+  const handleMapTypeChange = (type: MapTypes) => {
     onMapTypeChange(type);
     handleClose();
   };
@@ -44,19 +49,43 @@ const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
           <StackSimple aria-describedby={id} className="options-icons" />
         </div>
       </Tooltip>
+      <Tooltip title="Toggle 3D view" arrow placement="right">
+        <div
+          onClick={toggle3D}
+          className="threed-map-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom"
+        >
+          <ThreeD className="options-icons" />
+        </div>
+      </Tooltip>
       <Tooltip title="Select a polygon" arrow placement="right">
         <div
           onClick={() => {
-            setCurrentMapCache({
-              ...currentMapCache,
-              isDrawing: !currentMapCache.isDrawing,
-            });
+            if (!if3D) {
+              setCurrentMapCache({
+                ...currentMapCache,
+                isDrawing: !currentMapCache.isDrawing,
+              });
+            }
           }}
-          className="draw-polygon-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom"
+          className={`draw-polygon-icon-container ${
+            if3D ? "draw-polygon-icon-disabled" : ""
+          } leaflet-touch leaflet-bar leaflet-control leaflet-control-custom`}
         >
           <Polygon className="options-icons" />
         </div>
       </Tooltip>
+      {if3D ? (
+        <Fragment>
+          <div className="zoom-in-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom">
+            +
+          </div>
+          <div className="zoom-out-icon-container leaflet-touch leaflet-bar leaflet-control leaflet-control-custom">
+            -
+          </div>
+        </Fragment>
+      ) : (
+        <Fragment />
+      )}
       <Popover
         id={id}
         open={open}
@@ -96,7 +125,7 @@ const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
                   width="50"
                   height="50"
                   onClick={() => {
-                    handleMapTypeChange("normal");
+                    handleMapTypeChange(MapTypes.Normal);
                     handleClose();
                   }}
                 />
@@ -114,7 +143,7 @@ const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
                   width="50"
                   height="50"
                   onClick={() => {
-                    handleMapTypeChange("satellite");
+                    handleMapTypeChange(MapTypes.Satellite);
                     handleClose();
                   }}
                 />
@@ -132,7 +161,7 @@ const MapOptions: React.FC<MapOptionsProps> = ({ onMapTypeChange }) => {
                   width="50"
                   height="50"
                   onClick={() => {
-                    handleMapTypeChange("aerial");
+                    handleMapTypeChange(MapTypes.Aerial);
                     handleClose();
                   }}
                 />

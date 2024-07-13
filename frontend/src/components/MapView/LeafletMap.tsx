@@ -34,10 +34,10 @@ import {
 
 interface LeafletMapProps {
   datasetId: string;
-  mapType: string;
+  if3D: boolean;
 }
 
-const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
+const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, if3D }) => {
   const { currentTabsCache, getCurrentTab, getOrFetchMetadata } =
     useContext(TabsContext);
   const [map, setMap] = useState<L.Map | null>(null);
@@ -102,7 +102,6 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
       const initialBounds = map.getBounds();
       const initialCenter = map.getCenter();
       const initialZoom = map.getZoom();
-      const drawnItems = new L.FeatureGroup();
 
       setCurrentMapCache((prevCache) => ({
         ...prevCache,
@@ -110,10 +109,9 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
         mapCenter: initialCenter,
         mapBounds: initialBounds,
         zoom: initialZoom,
-        drawnItems: drawnItems,
       }));
       // Allow for drawing polygons
-      map.addLayer(drawnItems);
+      map.addLayer(currentMapCache.drawnItems);
       // Define the options for the polygon drawer
       const polygonOptions = {
         shapeOptions: {
@@ -127,39 +125,36 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
       map.on(L.Draw.Event.CREATED, (event: LeafletEvent) => {
         const drawnObject = (event as L.DrawEvents.Created).layer;
         if (drawnObject instanceof L.Polygon) {
-          if (drawnItems) {
-            drawnItems.addLayer(drawnObject);
-            const geoJsonObject = drawnObject.toGeoJSON() as Feature<
-              Geometry,
-              GeoJsonProperties
-            >;
-            let multiPolygon: MultiPolygon;
+          currentMapCache.drawnItems.addLayer(drawnObject);
+          const geoJsonObject = drawnObject.toGeoJSON() as Feature<
+            Geometry,
+            GeoJsonProperties
+          >;
+          let multiPolygon: MultiPolygon;
 
-            // we will probably always encounter only polygons but in a istant future it may be interesting to have multi polygon selection
-            if (geoJsonObject.geometry.type === "Polygon") {
-              const polygon = geoJsonObject.geometry
-                .coordinates as Position[][];
-              multiPolygon = {
-                type: "MultiPolygon",
-                coordinates: [polygon],
-              };
-            } else if (geoJsonObject.geometry.type === "MultiPolygon") {
-              multiPolygon = geoJsonObject.geometry as MultiPolygon;
-            } else {
-              throw new Error("Unsupported geometry type");
-            }
-            const polygonSelection = new PolygonSelection(
-              multiPolygon,
-              "Custom Polygon",
-              true
-            );
-
-            setCurrentMapCache({
-              ...currentMapCacheRef.current,
-              selectedCoordinates: polygonSelection,
-              isDrawing: false,
-            });
+          // we will probably always encounter only polygons but in a istant future it may be interesting to have multi polygon selection
+          if (geoJsonObject.geometry.type === "Polygon") {
+            const polygon = geoJsonObject.geometry.coordinates as Position[][];
+            multiPolygon = {
+              type: "MultiPolygon",
+              coordinates: [polygon],
+            };
+          } else if (geoJsonObject.geometry.type === "MultiPolygon") {
+            multiPolygon = geoJsonObject.geometry as MultiPolygon;
+          } else {
+            throw new Error("Unsupported geometry type");
           }
+          const polygonSelection = new PolygonSelection(
+            multiPolygon,
+            "Custom Polygon",
+            true
+          );
+
+          setCurrentMapCache({
+            ...currentMapCacheRef.current,
+            selectedCoordinates: polygonSelection,
+            isDrawing: false,
+          });
         }
       });
     }
@@ -209,7 +204,7 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
         maxBounds={L.latLngBounds([47.1512, 5.6259], [54.967, 15.4446])}
         minZoom={6}
       >
-        <ZoomControl position="topright" />
+        {!if3D && <ZoomControl position="topright" />}
         {isGrayscale ? (
           <Fragment />
         ) : (
@@ -223,10 +218,10 @@ const LeafletMap: React.FC<LeafletMapProps> = ({ datasetId, mapType }) => {
           </div>
         )}
         <MapEventsHandler />
-        {mapType === "satellite" && <SatelliteMap />}
-        {mapType === "aerial" && <AerialMap />}
-        {mapType === "normal" && <NormalMap />}
-        {mapType === "parcel" && <ParcelMap />}
+        {currentMapCache.mapType === "satellite" && <SatelliteMap />}
+        {currentMapCache.mapType === "aerial" && <AerialMap />}
+        {currentMapCache.mapType === "normal" && <NormalMap />}
+        {currentMapCache.mapType === "parcel" && <ParcelMap />}
         <ZoomWarningLabel />
       </MapContainer>
     </div>
