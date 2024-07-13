@@ -36,10 +36,17 @@ public class CsvDatasetHandler : IDatasetHandler
         var polygon = ApiHelper.GetPolygonFromBoundingBox(boundingBox);
         var tableName = mMetadata.additionalData.Tables[0].Name;
         var rowHeaders = mMetadata.additionalData.Tables[0].RowHeaders;
-
-        var query = "SELECT top 1000  operator, Location.AsTextZM() AS Location" +
+        var query = "";
+        if (mMetadata.additionalData.Tables[0].Name == "air_pollutants")
+        {
+            query = "SELECT top 1000  pm10,pm2_5,no2,Location.AsTextZM() AS Location" +
                     ApiHelper.FromTableWhereIntersectsPolygon(tableName, polygon);
-
+        }
+        else
+        {
+            query = "SELECT top 1000  operator,Location.AsTextZM() AS Location" +
+                        ApiHelper.FromTableWhereIntersectsPolygon(tableName, polygon);
+        }
         // the list of features from combined datasets.
         var features = new List<Dictionary<string, object>>();
         var culture = new CultureInfo("en-US");
