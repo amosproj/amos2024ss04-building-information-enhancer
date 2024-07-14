@@ -11,6 +11,9 @@ interface TabInfoPopUpProps {
   currentTab: TabProps;
 }
 
+/**
+ * Pop-up for the tab info panel.
+ */
 const TabInfoPopUp: React.FC<TabInfoPopUpProps> = ({
   onToggleIfOpenedDialog,
   ifOpenedDialog,

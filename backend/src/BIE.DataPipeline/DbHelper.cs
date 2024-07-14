@@ -47,7 +47,7 @@ namespace BIE.DataPipeline
             if (description.options.if_table_exists == InsertBehaviour.replace)
             {
                 Console.WriteLine($"Dropping table {description.table_name} if it exists.");
-                if(description.source.data_format == "CITYGML")
+                if (description.source.data_format == "CITYGML")
                 {
                     DropCityGMLTable(description.table_name);
                 }
@@ -88,7 +88,8 @@ namespace BIE.DataPipeline
         /// Creates a Table in the database based on the name given in the description. Returns false if unable to.
         /// </summary>
         /// <param name="description"></param>
-        internal bool CreateTable(DataSourceDescription description)
+        /// <param name="header"> the header string to be used in creation (only used for SHAPE)</param>
+        internal bool CreateTable(DataSourceDescription description, string header)
         {
             try
             {
@@ -96,7 +97,7 @@ namespace BIE.DataPipeline
                 var db = Database.Instance;
 
 
-                var query = GetCreationQuery(description);
+                var query = GetCreationQuery(description, header);
 
                 var cmd = db.CreateCommand(query);
                 db.Execute(cmd);
@@ -126,6 +127,7 @@ namespace BIE.DataPipeline
             JOIN sys.types ty ON c.user_type_id = ty.user_type_id
             WHERE t.name = '" + description.table_name + "' AND c.name = 'Location' AND ty.name = 'geometry';";
             var db = Database.Instance;
+
 
             using (var command = db.CreateCommand(query))
             {
@@ -231,7 +233,7 @@ namespace BIE.DataPipeline
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error while creating Table:");
+                Console.WriteLine("Error while creating Indexes:");
                 Console.Error.WriteLine(e);
                 return false;
             }
@@ -263,7 +265,7 @@ namespace BIE.DataPipeline
             var bboxCmd = db.CreateCommand(bboxQuery);
             var (bboxReader, bboxConnection) = db.ExecuteReader(bboxCmd);
 
-            float minX = 0 , minY = 0, maxX = 0, maxY = 0;
+            float minX = 0, minY = 0, maxX = 0, maxY = 0;
 
             if (bboxReader.Read())
             {
@@ -282,7 +284,7 @@ namespace BIE.DataPipeline
         }
 
 
-        private string GetCreationQuery(DataSourceDescription description)
+        private string GetCreationQuery(DataSourceDescription description, string header)
         {
             if (description.source.data_format == "SHAPE")
             {
@@ -291,7 +293,7 @@ IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{desc
 BEGIN
     CREATE TABLE {description.table_name} (
         Id INT PRIMARY KEY IDENTITY(1,1),
-        Location GEOMETRY,
+        {header},
         Area FLOAT
     );
 END";
@@ -304,20 +306,23 @@ IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{desc
 BEGIN
     CREATE TABLE {description.table_name} (
         Id INT PRIMARY KEY IDENTITY(1,1),
-        Location GEOGRAPHY,
+        Location Geometry,
         XmlData XML,
         GroundHeight FLOAT,
         DistrictKey VARCHAR(255),
         CheckDate DATE,
         GroundArea FLOAT,
+        BuildingVolume FLOAT,
         BuildingWallHeight FLOAT,
+        WallArea FLOAT,
         LivingArea FLOAT,
         RoofArea FLOAT,
+        SolarPotential FLOAT,
     );
 END";
             }
 
-                var query = $@"
+            var query = $@"
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{description.table_name}')
 BEGIN CREATE TABLE {description.table_name} (";
 
@@ -357,6 +362,14 @@ BEGIN CREATE TABLE {description.table_name} (";
             }
         }
 
+        public void FinalExecute()
+        {
+            if (mCount > 0)
+            {
+                ExecuteInsert();
+            }
+        }
+
         /// <summary>
         /// Execute the Actual Insert Statement.
         /// </summary>
@@ -377,7 +390,7 @@ BEGIN CREATE TABLE {description.table_name} (";
                 throw;
             }
 
-            if(cityGMLStringBuilder.Length > 0)
+            if (cityGMLStringBuilder.Length > 0)
             {
                 PushRoofData();
             }
@@ -476,7 +489,7 @@ END";
 
             cityGMLCount++;
 
-            if(cityGMLCount >= MaxCount)
+            if (cityGMLCount >= MaxCount)
             {
                 mCount = MaxCount;
             }

@@ -7,6 +7,9 @@ interface DatasetsPopUpProps {
   ifOpenedDialog: boolean;
 }
 
+/**
+ * Pop-up for list of the datasets.
+ */
 const DatasetsPopUp: React.FC<DatasetsPopUpProps> = ({
   onToggleIfOpenedDialog,
   ifOpenedDialog,

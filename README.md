@@ -17,7 +17,7 @@
 
 ## 📢 About the Project
 
-Welcome to the official repository for the `CODE.ING` group, developing an open-source `Building Information Enhancer` software for the `BUILD.ING` partner as a part of the `AMOS 2024` project. 
+Welcome to the official repository for the `CODE.ING` group, developing an open-source `Building Information Enhancer` software for the `BUILD.ING` partner as a part of the `AMOS 2024` project.
 
 The `BCI Building Information Enhancer` is a platform for individual building owners or industry professionals, allowing them to access information about specific addresses, locations, or regions. This information can be used for a variety of applications, from sustainability certifications for buildings, over calculating the solar power potential, up to aiding in district planning. In general, the BCI building information enhancer offers significant benefits for various stakeholders in the property market.
 
@@ -25,7 +25,7 @@ For our project mission, the team agreed to create an MVP for the BCI Building I
 
 ## 🚀 Setup & Deployment
 
-`BCI Building Information Enhancer` project is integrated with a full [CI-CD pipeline](https://github.com/amosproj/amos2024ss04-building-information-enhancer/wiki/CI%E2%80%90CD-Pipeline) and thus deployed  automatically for public use as a [BCI website](http://prod.amos.b-ci.de/) using servers provided by the industry partner. However, production servers might be turned off in the future, so it is also possible to deploy a production-ready system on your local machine using the provided Docker compose file.
+`BCI Building Information Enhancer` project is integrated with a full [CI-CD pipeline](https://github.com/amosproj/amos2024ss04-building-information-enhancer/wiki/CI%E2%80%90CD-Pipeline) and thus deployed automatically for public use as a [BCI website](http://prod.amos.b-ci.de/) using servers provided by the industry partner. However, production servers might be turned off in the future, so it is also possible to deploy a production-ready system on your local machine using the provided Docker compose file.
 
 ## 📦 Deployment using Docker
 

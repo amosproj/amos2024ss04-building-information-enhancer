@@ -1,4 +1,4 @@
-import React, { Fragment, useContext } from "react";
+import React, { useContext } from "react";
 import { Marker } from "react-leaflet";
 import { useMapEvents } from "react-leaflet/hooks";
 import { MapContext } from "../../contexts/MapContext";
@@ -7,8 +7,11 @@ import { MapPin } from "@phosphor-icons/react";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import { MarkerSelection } from "../../types/MapSelectionTypes";
+import "./MapEventsHandler.css";
 
-// Utility function to render a React component to HTML string
+/**
+ * Utility function to render a React component to HTML string
+ */
 const renderToHtml = (Component: React.FC) => {
   const div = document.createElement("div");
   const root = createRoot(div);
@@ -18,13 +21,21 @@ const renderToHtml = (Component: React.FC) => {
   return div.innerHTML;
 };
 
+/**
+ * Returns a MapPin div for one map marker.
+ */
 const divIconMarker: DivIcon = L.divIcon({
-  html: renderToHtml(() => <MapPin size={36} color="#ff0000" weight="fill" />),
-  className: "", // Optional: add a custom class name
+  html: renderToHtml(() => (
+    <MapPin size={36} color="#ff0000" weight="fill" style={{ zIndex: "-10" }} />
+  )),
+  className: "selection-icon", // Optional: add a custom class name
   iconSize: [36, 36],
   iconAnchor: [18, 36], // Adjust the anchor point as needed
 });
 
+/**
+ * Takes care of the leaflet map events and renders a single selection marker
+ */
 const MapEventsHandler: React.FC = () => {
   const { currentMapCache, setCurrentMapCache } = useContext(MapContext);
 
@@ -53,13 +64,15 @@ const MapEventsHandler: React.FC = () => {
     },
   });
 
-  return currentMapCache.selectedCoordinates instanceof MarkerSelection ? (
-    <Marker
-      position={currentMapCache.selectedCoordinates.marker}
-      icon={divIconMarker}
-    />
-  ) : (
-    <Fragment />
+  return (
+    currentMapCache.selectedCoordinates instanceof MarkerSelection && (
+      <div className="selection-marker">
+        <Marker
+          position={currentMapCache.selectedCoordinates.marker}
+          icon={divIconMarker}
+        />
+      </div>
+    )
   );
 };
 

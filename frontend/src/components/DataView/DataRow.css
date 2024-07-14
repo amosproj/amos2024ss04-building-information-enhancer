@@ -1,0 +1,52 @@
+.toggle-column {
+  width: 2rem;
+}
+
+.data-row {
+  height: 40px;
+  background-color: rgb(251, 251, 251);
+}
+
+.data-row-title-container {
+  padding-left: 0 !important;
+}
+
+.data-row-title-flex {
+  display: flex;
+  gap: 0.5rem;
+  vertical-align: middle;
+  height: 100%;
+  align-items: center;
+}
+
+.data-row-value {
+  text-align: end !important;
+}
+
+.subdata-rows-container > *:last-child > * {
+  border-bottom: none;
+}
+
+.subrow-value {
+  text-align: end;
+  display: flex !important;
+  justify-content: end;
+}
+
+.mock-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.data-row-title-icon {
+  max-width: 1rem;
+  align-items: center;
+  vertical-align: middle;
+  text-align: center;
+  display: flex;
+}
+
+.subrow-filler {
+  max-width: 4rem !important;
+  width: 4rem;
+}

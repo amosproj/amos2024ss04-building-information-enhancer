@@ -7,6 +7,9 @@ interface CustomSvgIconProps extends SvgIconProps {
   size?: number;
 }
 
+/**
+ * Custom svg icon for the map markers.
+ */
 const CustomSvgIcon: React.FC<CustomSvgIconProps> = ({
   svgString,
   size = 32,

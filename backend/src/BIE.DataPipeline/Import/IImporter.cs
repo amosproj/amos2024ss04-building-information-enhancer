@@ -9,5 +9,11 @@ namespace BIE.DataPipeline.Import
     internal interface IImporter
     {
         public bool ReadLine(out string nextLine);
+
+        public string GetCreationHeader();
+
+        public string GetInsertHeader();
+
+        public IEnumerable<string> GetHeaders();
     }
 }

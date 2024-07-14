@@ -196,6 +196,21 @@ namespace BIE.DataPipeline.Import
             }
         }
 
+        public string GetCreationHeader()
+        {
+            return headerString;
+        }
+
+        public string GetInsertHeader()
+        {
+            return headerString;
+        }
+
+        public IEnumerable<string> GetHeaders()
+        {
+            return headerString.Split(",").Select(s => s.Trim());
+        }
+
 
         private static string RemoveLastComma(string input)
         {
