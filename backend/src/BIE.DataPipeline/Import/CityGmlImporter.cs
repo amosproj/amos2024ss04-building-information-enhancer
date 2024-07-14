@@ -341,13 +341,14 @@ namespace BIE.DataPipeline.Import
         {
             float hoeheGrund = GetStringAttributeValue(buildingNode, "HoeheGrund");
             float niedrigsteTraufeDesGebaeudes = GetStringAttributeValue(buildingNode, "NiedrigsteTraufeDesGebaeudes");
-            if(hoeheGrund == -1 || niedrigsteTraufeDesGebaeudes == -1)
+            float hoeheDach = GetStringAttributeValue(buildingNode, "HoeheDach");
+            if(hoeheGrund == -1 || niedrigsteTraufeDesGebaeudes == -1 || hoeheDach == -1)
             {
                 return -1;
             }
             else
             {
-                return niedrigsteTraufeDesGebaeudes - hoeheGrund;
+                return ((niedrigsteTraufeDesGebaeudes - hoeheGrund) + (hoeheDach - hoeheGrund)) / 2f;
             }
         }
 
