@@ -146,9 +146,9 @@ namespace BIE.Core.API.Controllers
             {
                 LocationDataResponse data;
                 if (onlySinglePoint)
-                    data = LoadLocationHelper.loadLocationDataForSinglePoint(request);
+                    data = LoadLocationHelper.LoadLocationDataForSinglePoint(request);
                 else
-                    data = LoadLocationHelper.loadLocationDataforPolygons(request);
+                    data = LoadLocationHelper.LoadLocationDataforPolygons(request);
                 return Ok(data);
             } catch (Exception ex)
             {

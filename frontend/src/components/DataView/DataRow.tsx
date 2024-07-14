@@ -10,7 +10,12 @@ import {
   TableRow,
   Tooltip,
 } from "@mui/material";
-import { CaretDown, CaretUp, DotOutline, MapPin } from "@phosphor-icons/react";
+import {
+  CaretDown,
+  CaretUp,
+  MapPinSimpleArea,
+  MapPin,
+} from "@phosphor-icons/react";
 import "./DataRow.css";
 import { Dataset, DatasetBasicData } from "../../types/DatasetTypes";
 import CustomSvgIcon from "../DatasetsList/CustomSvgIcon";
@@ -108,7 +113,7 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
         return <CustomSvgIcon svgString={dataset.icon} size={18} />;
       }
     }
-    return <DotOutline size={18} />;
+    return <MapPinSimpleArea size={18} />;
   };
 
   return (

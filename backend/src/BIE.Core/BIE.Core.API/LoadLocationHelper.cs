@@ -20,6 +20,12 @@ namespace BIE.Core.API
         private static readonly WKTReader GeoReader = new(new NtsGeometryServices(new PrecisionModel(), 4326));
         private static readonly GeometryFactory GeometryFactory = new(new PrecisionModel(), 4326);
 
+        private static readonly HashSet<string> cityGmlColumns = new() { "Id", "GroundArea", "BuildingWallHeight", "LivingArea", "RoofArea", "BuildingVolume", "RoofArea", "SolarPotential" };
+        private static readonly HashSet<string> airPollutionColumns = new() { "station_name", "pm10", "pm2_5", "no2" };
+        private static readonly HashSet<string> chargingStationsColumns = new() { "operator", "Id", "rated_power_kw", "charging_equipment_type" };
+        private static readonly HashSet<string> actualUseColumns = new() { "nutzart" };
+        private static readonly HashSet<string> houseFootprintsColumns = new() { "Id" };
+
 
         private static MetadataDbHelper MetadataDbHelper
         {
@@ -41,7 +47,63 @@ namespace BIE.Core.API
             }
         }
 
-        public static LocationDataResponse loadLocationDataforPolygons(LocationDataRequest request)
+        /// <summary>
+        /// Returns data from the data lake that is associated with the given point.
+        /// This can be intersecting polygons and/or closest Points of Interest.
+        /// </summary>
+        /// <param name="request">Must only contain 1 entry with 1 single point</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static LocationDataResponse LoadLocationDataForSinglePoint(LocationDataRequest request)
+        {
+            var indivData = new List<DatasetItem>();
+
+            var p = request.Location.First().First();
+            Point pointForCalculations = new Point(p.ElementAt(0), p.ElementAt(1));
+
+            if (request.Location.Count != 1 || request.Location.First().Count != 1)
+                throw new ArgumentException("Single point location data can't be retrieved with the amount of request objects");
+
+            // the aggregation functions generate individual response items for each object and summary objects.
+            // the summary objects are placed in the first parameter list.
+            // since we only have a single point here, a summary would be unnecessary so we ignore it
+            var housefootprints = new List<Dictionary<String, String>>();
+            GetDataForPoint(housefootprints, houseFootprintsColumns, "house_footprints", pointForCalculations.Y, pointForCalculations.X);
+            AggregateDataForHousefootprints(new(), indivData, 0.0, housefootprints);
+
+            var lod2buildings = new List<Dictionary<String, String>>();
+            GetDataForPoint(lod2buildings, cityGmlColumns, "building_models", pointForCalculations.Y, pointForCalculations.X);
+            AggregateDataForLod2Citygml(new(), indivData, 0.0, lod2buildings);
+
+            var actualUse = new List<Dictionary<String, String>>();
+            GetDataForPoint(actualUse, actualUseColumns, "actual_use", pointForCalculations.Y, pointForCalculations.X);
+            AggregateDataForActualUse(new(), indivData, 0.0, actualUse);
+
+            // closest charging stations and number of charging stations
+            var chargingStations = new List<Dictionary<String, String>>();
+            GetNClosestDataForPoint(chargingStations, chargingStationsColumns, "EV_charging_stations", pointForCalculations.Y, pointForCalculations.X, 3);
+            AggregateDataForChargingStations(new(), indivData, chargingStations, true);
+
+            var pollutantStations = new List<Dictionary<String, String>>();
+            GetNClosestDataForPoint(pollutantStations, airPollutionColumns, "air_pollutants", pointForCalculations.Y, pointForCalculations.X, 3);
+            AggregateDataForAirPollutant(new(), indivData, pollutantStations, true);
+
+            LocationDataResponse locationDataResponse = new()
+            {
+                SelectionData = indivData
+            };
+            return locationDataResponse;
+        }
+
+        /// <summary>
+        /// Returns data from the data lake that is associated with the given polygons.
+        /// This can be data that intersects with given polygons or Points of Interest in the polygons.
+        /// Data will also be aggregated for array and added in the response.
+        /// </summary>
+        /// <param name="request">Must contain at least one object with more than 2 points</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static LocationDataResponse LoadLocationDataforPolygons(LocationDataRequest request)
         {
             if (request.Location.Count < 1 || request.Location.First().Count <= 1)
                 throw new ArgumentException("Polygon data cannot be retrieved with the amount of request objects");
@@ -66,27 +128,27 @@ namespace BIE.Core.API
 
             var pollutantStations = new List<Dictionary<String, String>>();
             foreach (var polygonWkt in polygons)
-                GetDataInPolygon(pollutantStations, new() { "station_name", "pm10", "pm2_5", "no2" }, "air_pollutants", polygonWkt);
+                GetDataInPolygon(pollutantStations, airPollutionColumns, "air_pollutants", polygonWkt);
             AggregateDataForAirPollutant(generalData, individualData, pollutantStations, true);
 
             var chargingStations = new List<Dictionary<String, String>>();
             foreach (var polygonWkt in polygons)
-                GetDataInPolygon(chargingStations, new() { "operator", "Id", "rated_power_kw", "charging_equipment_type" }, "EV_charging_stations", polygonWkt);
+                GetDataInPolygon(chargingStations, chargingStationsColumns, "EV_charging_stations", polygonWkt);
             AggregateDataForChargingStations(generalData, individualData, chargingStations);
 
             var actualUse = new List<Dictionary<String, String>>();
             foreach (var polygonWkt in polygons)
-                GetDataInPolygon(actualUse, new() { "nutzart" }, "actual_use", polygonWkt);
+                GetDataInPolygon(actualUse, actualUseColumns, "actual_use", polygonWkt);
             AggregateDataForActualUse(generalData, individualData, totalAreaSearchPolygon, actualUse);
 
             var lod2buildings = new List<Dictionary<String, String>>();
             foreach (var polygonWkt in polygons)
-                GetDataInPolygon(lod2buildings, new() { "Id", "GroundArea", "BuildingWallHeight", "LivingArea", "RoofArea" }, "building_models", polygonWkt);
+                GetDataInPolygon(lod2buildings, cityGmlColumns, "building_models", polygonWkt);
             AggregateDataForLod2Citygml(generalData, individualData, totalAreaSearchPolygon, lod2buildings);
 
             var housefootprints = new List<Dictionary<String, String>>();
             foreach (var polygonWkt in polygons)
-                GetDataInPolygon(housefootprints, new() { "Id" }, "house_footprints", polygonWkt);
+                GetDataInPolygon(housefootprints, houseFootprintsColumns, "house_footprints", polygonWkt);
             AggregateDataForHousefootprints(generalData, individualData, totalAreaSearchPolygon, housefootprints);
 
             LocationDataResponse locationDataResponse = new()
@@ -101,6 +163,10 @@ namespace BIE.Core.API
 
         private static void AggregateDataForChargingStations(List<DatasetItem> generalData, List<DatasetItem> individualData, List<Dictionary<string, string>> chargingStations, bool addDistance = false)
         {
+            long count = chargingStations.Count;
+            if (count == 0)
+                return;
+
             var chargingStationsItems = new List<DatasetItem>();
             foreach (var h in chargingStations)
             {
@@ -123,9 +189,9 @@ namespace BIE.Core.API
                         }
                     }
                 };
-                if(addDistance && h.ContainsKey("Distance"))
+                if (addDistance && h.ContainsKey("Distance"))
                     item.Value = "Distance: " + h["Distance"] + "m";
-                
+
                 chargingStationsItems.Add(item);
             }
             individualData.AddRange(chargingStationsItems);
@@ -138,6 +204,10 @@ namespace BIE.Core.API
         }
         private static void AggregateDataForAirPollutant(List<DatasetItem> generalData, List<DatasetItem> individualData, List<Dictionary<string, string>> airPollutants, bool addDistance = false)
         {
+            long count = airPollutants.Count;
+            if (count == 0)
+                return;
+
             var airPollutionItems = new List<DatasetItem>();
             List<double> avgPm10 = new();
             List<double> avgPm25 = new();
@@ -150,7 +220,7 @@ namespace BIE.Core.API
                 double no2 = double.Parse(h["no2"]);
 
                 List<SubdataItem> subdataItems = new();
-                if(pm10 > 0)
+                if (pm10 > 0)
                 {
                     avgPm10.Add(pm10);
                     subdataItems.Add(new()
@@ -159,7 +229,7 @@ namespace BIE.Core.API
                         Value = h["pm10"] + "μg/m³"
                     });
                 }
-                if(pm25 > 0)
+                if (pm25 > 0)
                 {
                     avgPm25.Add(pm25);
                     subdataItems.Add(new()
@@ -168,7 +238,7 @@ namespace BIE.Core.API
                         Value = h["pm2_5"] + "μg/m³"
                     });
                 }
-                if(no2 > 0)
+                if (no2 > 0)
                 {
                     avgNo2.Add(no2);
                     subdataItems.Add(new()
@@ -224,7 +294,7 @@ namespace BIE.Core.API
 
         private static void AggregateDataForActualUse(List<DatasetItem> generalData, List<DatasetItem> individualData, double totalAreaSearchPolygon, List<Dictionary<string, string>> dataEntries)
         {
-            long count = dataEntries.Count();
+            long count = dataEntries.Count;
             if (count == 0)
                 return;
 
@@ -273,20 +343,6 @@ namespace BIE.Core.API
 
         }
 
-        private static void AppendLimitedEntries(List<DatasetItem> individualData, List<DatasetItem> allEntriesForindividualData, string datasetId)
-        {
-            if (allEntriesForindividualData.Count > 15)
-            {
-                individualData.AddRange(allEntriesForindividualData.Take(15));
-                individualData.Add(new()
-                {
-                    DisplayName = $"Skipped {allEntriesForindividualData.Count - 15} additional elements",
-                    DatasetId = datasetId,
-                });
-            }
-            else
-                individualData.AddRange(allEntriesForindividualData);
-        }
 
         private static void AggregateDataForHousefootprints(List<DatasetItem> generalData, List<DatasetItem> individualData, double totalAreaSearchPolygon, List<Dictionary<string, string>> housefootprints)
         {
@@ -338,10 +394,12 @@ namespace BIE.Core.API
             if (totalCountLod2Buildings == 0)
                 return;
 
-            // GroundHeight, DistrictKey, CheckDate, GroundArea, BuildingWallHeight, LivingArea, RoofArea
+            // list of values for statistics
             List<double> totalBuildingAreas = new();
             List<double> totalBuildingLivingAreas = new();
             List<double> totalBuildingRoofAreas = new();
+            List<double> totalBuildingVolumes = new();
+            List<double> totalSolarPotentials = new();
 
             List<DatasetItem> allItems = new();
 
@@ -357,7 +415,12 @@ namespace BIE.Core.API
                 totalBuildingRoofAreas.Add(roofArea);
 
                 double wallHeight = double.Parse(h["BuildingWallHeight"]);
-                totalBuildingRoofAreas.Add(roofArea);
+
+                double buildingVolume = double.Parse(h["BuildingVolume"]);
+                totalBuildingVolumes.Add(buildingVolume);
+
+                double solarPotential = double.Parse(h["SolarPotential"]);
+                totalSolarPotentials.Add(solarPotential);
 
                 Point p = (GeoReader.Read(h["Location"]) as Polygon).Centroid;
                 var item = new DatasetItem
@@ -370,8 +433,10 @@ namespace BIE.Core.API
                     {
                         new() { Key = "Ground area", Value = area.ToString("N2") + "m²" },
                         new() { Key = "Living area", Value = livingArea.ToString("N2") + "m²" },
+                        new() { Key = "Building wall height", Value = wallHeight.ToString("N2") + "m" },
+                        new() { Key = "Building volume", Value = buildingVolume.ToString("N2") + "m³" },
                         new() { Key = "Roof surface", Value = roofArea.ToString("N2") + "m²" },
-                        new() { Key = "Building wall height", Value = wallHeight.ToString("N2") + "m" }
+                        new() { Key = "Usable Area for Solar Panels", Value = solarPotential.ToString("N2") + "m²" }
                     }
                 };
                 allItems.Add(item);
@@ -397,14 +462,34 @@ namespace BIE.Core.API
                 generalData.Add(GenerateDatalistStatisticsEntry(totalBuildingLivingAreas, "Total living area", "building_models"));
             if (totalBuildingRoofAreas.Count > 0)
                 generalData.Add(GenerateDatalistStatisticsEntry(totalBuildingRoofAreas, "Total roof surface", "building_models"));
+            if (totalBuildingVolumes.Count > 0)
+                generalData.Add(GenerateDatalistStatisticsEntry(totalBuildingVolumes, "Total building volume", "building_models", "m³"));
+            if (totalSolarPotentials.Count > 0)
+                generalData.Add(GenerateDatalistStatisticsEntry(totalSolarPotentials, "Total usable Area for Solar Panels", "building_models"));
+
         }
 
-        private static DatasetItem GenerateDatalistStatisticsEntry(List<double> listOfDataValues, string displayText, string id)
+        private static void AppendLimitedEntries(List<DatasetItem> individualData, List<DatasetItem> allEntriesForindividualData, string datasetId)
+        {
+            if (allEntriesForindividualData.Count > 15)
+            {
+                individualData.AddRange(allEntriesForindividualData.Take(15));
+                individualData.Add(new()
+                {
+                    DisplayName = $"Skipped {allEntriesForindividualData.Count - 15} additional elements",
+                    DatasetId = datasetId,
+                });
+            }
+            else
+                individualData.AddRange(allEntriesForindividualData);
+        }
+
+        private static DatasetItem GenerateDatalistStatisticsEntry(List<double> listOfDataValues, string displayText, string id, string unit = "m²")
         {
             var subdata = new List<SubdataItem>
             {
-                new() { Key = "Average", Value = listOfDataValues.Average().ToString("N2") + "m²" },
-                new() { Key = "Median", Value = listOfDataValues.Median().ToString("N2") + "m²"}
+                new() { Key = "Average", Value = listOfDataValues.Average().ToString("N2") + unit },
+                new() { Key = "Median", Value = listOfDataValues.Median().ToString("N2") + unit}
             };
 
             // Add Variance only if the list contains more than 2 elements
@@ -415,7 +500,7 @@ namespace BIE.Core.API
             {
                 DisplayName = displayText,
                 DatasetId = id,
-                Value = listOfDataValues.Sum().ToString("N2") + "m²",
+                Value = listOfDataValues.Sum().ToString("N2") + unit,
                 Subdata = subdata
             };
         }
@@ -495,72 +580,6 @@ namespace BIE.Core.API
                 // Add the top n results to the target list
                 targetList.AddRange(sortedResults);
             }
-        }
-
-        public static LocationDataResponse loadLocationDataForSinglePoint(LocationDataRequest request)
-        {
-            var indivData = new List<DatasetItem>();
-
-            var p = request.Location.First().First();
-            Point pointForCalculations = new Point(p.ElementAt(0), p.ElementAt(1));
-
-            if (request.Location.Count != 1 || request.Location.First().Count != 1)
-                throw new ArgumentException("Single point location data can't be retrieved with the amount of request objects");
-
-            var housefootprints = new List<Dictionary<String, String>>();
-            GetDataForPoint(housefootprints, new() { "Id" }, "house_footprints", pointForCalculations.Y, pointForCalculations.X);
-            AggregateDataForHousefootprints(new(), indivData, 0.0, housefootprints);
-
-            var lod2buildings = new List<Dictionary<String, String>>();
-            GetDataForPoint(lod2buildings, new() { "Id", "GroundArea", "BuildingWallHeight", "LivingArea", "RoofArea" }, "building_models", pointForCalculations.Y, pointForCalculations.X);
-            AggregateDataForLod2Citygml(new(), indivData, 0.0, lod2buildings);
-
-            var actualUse = new List<Dictionary<String, String>>();
-            GetDataForPoint(actualUse, new() { "nutzart" }, "actual_use", pointForCalculations.Y, pointForCalculations.X);
-            AggregateDataForActualUse(new(), indivData, 0.0, actualUse);
-
-            // closest charging stations and number of charging stations
-            var chargingStations = new List<Dictionary<String, String>>();
-            GetNClosestDataForPoint(chargingStations, new() { "operator", "Id", "rated_power_kw", "charging_equipment_type" }, "EV_charging_stations", pointForCalculations.Y, pointForCalculations.X, 3);
-            AggregateDataForChargingStations(new(), indivData, chargingStations, true);
-
-            var pollutantStations = new List<Dictionary<String, String>>();
-            GetNClosestDataForPoint(pollutantStations, new() { "station_name", "pm10", "pm2_5", "no2" }, "air_pollutants", pointForCalculations.Y, pointForCalculations.X, 3);
-            AggregateDataForAirPollutant(new(), indivData, pollutantStations, true);
-
-            LocationDataResponse locationDataResponse = new()
-            {
-                SelectionData = indivData
-            };
-            return locationDataResponse;
-        }
-
-        private static IEnumerable<Dictionary<string, string>> getNclosestObjects(string datasetId, double longitude, double latitude, double radius, int n, IEnumerable<string> columns)
-        {
-            string columnsString = string.Join(", ", columns);
-
-            string command = $@"
-                SELECT TOP {n}
-                    {columnsString},
-                    Location.STAsText() AS Location
-                FROM 
-                    dbo.{datasetId}
-                WHERE
-                    geometry::Point({latitude}, {longitude}, 4326).STBuffer({radius}).STIntersects(Location) = 1
-                ORDER BY 
-                    geometry::Point({latitude}, {longitude}, 4326).STDistance(Location);";
-
-            var results = DbHelper.GetData(command).ToList();
-
-            foreach (var result in results)
-            {
-                var wkt = result["Location"];
-                var point2_wrong = GeoReader.Read(wkt) as Point;
-                var distance = ApiHelper.getDistance(longitude, latitude, point2_wrong);
-                result["Distance"] = distance.ToString("N2");
-            }
-
-            return results;
         }
     }
 
