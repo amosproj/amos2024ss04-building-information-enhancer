@@ -14,7 +14,7 @@ namespace BIE.DataPipeline
         private readonly StringBuilder mStringBuilder;
 
         private int mCount;
-        private const int MaxCount = 900;
+        private const int MaxCount = 999;
 
 
         public DbHelper()
@@ -312,9 +312,12 @@ BEGIN
         DistrictKey VARCHAR(255),
         CheckDate DATE,
         GroundArea FLOAT,
+        BuildingVolume FLOAT,
         BuildingWallHeight FLOAT,
+        WallArea FLOAT,
         LivingArea FLOAT,
         RoofArea FLOAT,
+        SolarPotential FLOAT,
     );
 END";
             }
