@@ -8,10 +8,15 @@ import "./Alerts.css";
 import { useContext, useEffect } from "react";
 import { AlertContext } from "../../contexts/AlertContext";
 
+/**
+ * A component handling error alert on the bottom edge of the screen.
+ */
 const ErrorAlert: React.FC = () => {
   const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
 
-  // Auto-hide
+  /**
+   * Auto-hiding of the component after some time.
+   */
   useEffect(() => {
     const timeId = setTimeout(() => {
       // After 3 seconds set the show value to false

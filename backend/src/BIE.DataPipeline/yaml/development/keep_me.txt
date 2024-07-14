@@ -1,0 +1,5 @@
+A simple file to keep the `development` folder inside git.
+This folder will be only run in development and on local machines.
+
+Replace this file with .yaml files to be loaded in the development environment.
+All not used .yaml files are stored in the `yaml/not_used` folder.

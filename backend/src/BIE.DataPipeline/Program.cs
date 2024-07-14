@@ -77,8 +77,11 @@ try
 
         case "SHAPE":
             importer = new ShapeImporter(description);
-            dbHelper.SetInfo(description.table_name, "Location ,Area");
+
+            dbHelper.SetInfo(description.table_name, importer.GetInsertHeader() + ",Area");
+
             break;
+        
         case "CITYGML":
             importer = new CityGmlImporter(description, dbHelper);
             dbHelper.SetInfo(description.table_name, "Location, XmlData, GroundHeight, DistrictKey, CheckDate, GroundArea, BuildingVolume, BuildingWallHeight, WallArea, LivingArea, RoofArea, SolarPotential");
@@ -96,7 +99,7 @@ catch (Exception e)
     return 1;
 }
 
-if (!dbHelper.CreateTable(description))
+if (!dbHelper.CreateTable(description, importer.GetCreationHeader()))
 {
     return 0;
 }
@@ -126,6 +129,9 @@ try
         }
     }
 
+    //To insert data when dataset have row less than max count
+    dbHelper.FinalExecute();
+
     Console.WriteLine($"Finished inserting {count} lines of data.");
 
     if (dbHelper.CheckIfColumnExists(description))
@@ -134,8 +140,19 @@ try
     }
 
     Console.WriteLine("Updating the metadata...");
+    
     var boundingBox = dbHelper.GetBoundingBox(description.table_name);
-    if (!metadataDbHelper.UpdateMetadata(description.dataset, description.table_name, count, boundingBox))
+    var rowHeaders = importer.GetHeaders();
+
+    var tableData = new MetadataObject.TableData()
+    {
+        Name = description.table_name,
+        NumberOfLines = count,
+        BoundingBox = boundingBox,
+        RowHeaders = rowHeaders.ToList()
+    };
+    
+    if (!metadataDbHelper.UpdateMetadata(description.dataset, tableData))
     {
         return 1;
     }

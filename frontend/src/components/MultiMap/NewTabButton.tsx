@@ -4,9 +4,16 @@ import { useState } from "react";
 import DatasetsPopUp from "../PopUp/DatasetsPopUp";
 import "./NewTabButton.css";
 
+/**
+ * The new tab button for adding a new tab.
+ */
 const NewTabButton = () => {
   // Stores the state of if the datasets popup is open
   const [ifOpenedDialog, setIfOpenedDialog] = useState(false);
+
+  /**
+   * Toggles the new tab dialog.
+   */
   const toggleIfOpenedDialog = () => {
     setIfOpenedDialog(!ifOpenedDialog);
   };

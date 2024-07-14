@@ -16,16 +16,16 @@ namespace BIE.DataPipeline.Import
         private DbaseFileHeader mHeader;
         private readonly ICoordinateTransformation? mTransformation;
 
+        private StringBuilder mStringBuilder;
+
         public ShapeImporter(DataSourceDescription? dataSourceDescription)
         {
             // YAML Arguments:
-            this.mDataSourceDescription = dataSourceDescription;
+            mDataSourceDescription = dataSourceDescription;
 
-            new StringBuilder();
+            mStringBuilder = new StringBuilder();
 
             SetupParser();
-
-            ReadFileHeader();
 
             // Define the source and target coordinate systems
             var utmZone32 = CoordinateSystemWktReader
@@ -73,13 +73,14 @@ namespace BIE.DataPipeline.Import
             shpStream.Position = 0;
             dbfStream.Position = 0;
 
-            mParser = Shapefile.CreateDataReader(
-                new ShapefileStreamProviderRegistry(
-                    new ByteStreamProvider(StreamTypes.Shape, shpStream),
-                    new ByteStreamProvider(StreamTypes.Data, dbfStream),
-                    true,
-                    true),
-                GeometryFactory.Default);
+            var shpByteStream = new ByteStreamProvider(StreamTypes.Shape, shpStream);
+            var dbfByteStream = new ByteStreamProvider(StreamTypes.Data, dbfStream);
+            var providerRegistry = new ShapefileStreamProviderRegistry(shpByteStream,
+                                                                       dbfByteStream,
+                                                                       true,
+                                                                       true);
+            
+            mParser = Shapefile.CreateDataReader(providerRegistry, GeometryFactory.Default);
 
             mHeader = mParser.DbaseHeader;
         }
@@ -115,6 +116,7 @@ namespace BIE.DataPipeline.Import
         /// <returns></returns>
         public bool ReadLine(out string nextLine)
         {
+            mStringBuilder.Clear();
             nextLine = "";
             if (!mParser.Read())
             {
@@ -126,12 +128,28 @@ namespace BIE.DataPipeline.Import
             var geometry = mParser.Geometry;
             geometry = ConvertUtmToLatLong(geometry);
 
-            var area = CalculateAreaInSquareMeters(geometry);
+            mStringBuilder.Append($"GEOMETRY::STGeomFromText('");
+            mStringBuilder.Append(geometry.AsText());
+            mStringBuilder.Append("', 4326)");
+            // nextLine = $"GEOMETRY::STGeomFromText('POLYGON (11.060226859896797 49.496927347229494, 11.060276626123832 49.49695803564076)')', 4326)";
 
-            nextLine = $"GEOMETRY::STGeomFromText('{geometry.AsText()}', 4326),"+area;
+            for (int i = 1; i < mHeader.Fields.Length + 1; i++)
+            {
+                var value = mParser.GetValue(i);
+                mStringBuilder.Append(", '");
+                var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(value?.ToString() ?? "");
+                mStringBuilder.Append(Encoding.UTF8.GetString(bytes));
+                mStringBuilder.Append("'");
+                // nextLine += $",  \'{(value != "" ? value : "null")}\'";
+            }
+
+            mStringBuilder.Append($",{CalculateAreaInSquareMeters(geometry)}");
+            // nextLine += $",{CalculateAreaInSquareMeters(geometry)}";
+            nextLine = mStringBuilder.ToString();
 
             return true;
         }
+
         /// <summary>
         /// Calculates Area of Polygon
         /// </summary>
@@ -152,7 +170,8 @@ namespace BIE.DataPipeline.Import
 
             for (int i = 0; i < coordinates.Length; i++)
             {
-                double[] transformed = transform.MathTransform.Transform(new double[] { coordinates[i].X, coordinates[i].Y });
+                double[] transformed =
+                    transform.MathTransform.Transform(new double[] { coordinates[i].X, coordinates[i].Y });
                 transformedCoordinates[i] = new Coordinate(transformed[0], transformed[1]);
             }
 
@@ -172,18 +191,29 @@ namespace BIE.DataPipeline.Import
         }
 
 
-        private string[] ReadFileHeader()
+        /// <summary>
+        /// Returns the Header needed for Table creation
+        /// starts with a comma
+        /// </summary>
+        /// <returns></returns>
+        public string GetCreationHeader()
         {
-            var fieldCount = mHeader.NumFields;
-            var res = new string[fieldCount];
+            return mHeader.Fields.Aggregate("Location GEOMETRY",
+                                            (current, field) => current + $", {field.Name} NVARCHAR(255)");
+        }
 
-            // Append column names
-            for (int i = 0; i < fieldCount; i++)
-            {
-                res[i] = mHeader.Fields[i].Name;
-            }
+        /// <summary>
+        /// get the header used for inserting
+        /// </summary>
+        /// <returns></returns>
+        public string GetInsertHeader()
+        {
+            return mHeader.Fields.Aggregate("Location", (current, field) => current + $", {field.Name}");
+        }
 
-            return res;
+        public IEnumerable<string> GetHeaders()
+        {
+            return mHeader.Fields.Select(field => field.Name).Append("Area");
         }
 
         /// <summary>

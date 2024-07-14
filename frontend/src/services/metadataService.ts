@@ -14,7 +14,6 @@ export const fetchMetadataForDataset = async (
   const params = {
     datasetID: datasetID,
   };
-
   try {
     // Make the API call
     const response = await axios.get<DatasetMetaData>(
