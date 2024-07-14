@@ -39,7 +39,7 @@ public class CsvDatasetHandler : IDatasetHandler
         var query = "";
         if (mMetadata.basicData.DatasetId == "air_pollutants")
         {
-            query = "SELECT top 1000  station_name,pm10,pm2_5,no2,Location.AsTextZM() AS Location" +
+            query = "SELECT top 1000  station_name,pm10,pm2_5,no2,co,o3,unit,time,date,Location.AsTextZM() AS Location" +
                     ApiHelper.FromTableWhereIntersectsPolygon(tableName, polygon);
         }
         else if (mMetadata.basicData.DatasetId == "EV_charging_stations")
@@ -72,9 +72,13 @@ public class CsvDatasetHandler : IDatasetHandler
             if (mMetadata.basicData.DatasetId == "air_pollutants")
             {
                 properties["station_name"] = row["station_name"];
-                properties["pm10"] = row["pm10"] + " µg/m3^3";
-                properties["pm2_5"] = row["pm2_5"] + " µg/m3^3";
-                properties["no2"] = row["no2"] + " µg/m3^3";
+                properties["pm10"] = row["pm10"] + row["unit"];
+                properties["pm2_5"] = row["pm2_5"] + row["unit"];
+                properties["no2"] = row["no2"] + row["unit"];
+                properties["o3"] = row["o3"] + row["unit"];
+                properties["co"] = row["co"] + row["unit"];
+                properties["date"] = row["date"];
+                properties["time"] = row["time"];
             }
             else if (mMetadata.basicData.DatasetId == "EV_charging_stations")
             {
