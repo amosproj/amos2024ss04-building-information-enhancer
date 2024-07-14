@@ -10,7 +10,7 @@ import {
   TableRow,
   Tooltip,
 } from "@mui/material";
-import { CaretDown, CaretUp, MapPin } from "@phosphor-icons/react";
+import { CaretDown, CaretUp, DotOutline, MapPin } from "@phosphor-icons/react";
 import "./DataRow.css";
 import { Dataset, DatasetBasicData } from "../../types/DatasetTypes";
 import CustomSvgIcon from "../DatasetsList/CustomSvgIcon";
@@ -96,6 +96,21 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
     }
   };
 
+  /**
+   * Returns an icon for a specific dataset
+   * @param datasetID the dataset for the icon
+   * @returns
+   */
+  const getDatasetIcon = (datasetID: string | null) => {
+    if (datasetID) {
+      const dataset = currentDatasets.find((ds) => ds.datasetId === datasetID);
+      if (dataset && dataset.icon) {
+        return <CustomSvgIcon svgString={dataset.icon} size={18} />;
+      }
+    }
+    return <DotOutline size={18} />;
+  };
+
   return (
     <Fragment>
       <TableRow className="data-row">
@@ -118,7 +133,12 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
           size="small"
           className="data-row-title-container"
         >
-          {row.displayName}
+          <div className="data-row-title-flex">
+            <div className="data-row-title-icon">
+              {getDatasetIcon(row.datasetId)}
+            </div>
+            <div>{row.displayName}</div>
+          </div>
         </TableCell>
         {row.value && row.value !== "" ? (
           <TableCell
@@ -132,14 +152,17 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
         ) : (
           <TableCell />
         )}
-        {row.datasetID && row.datasetID !== "" ? (
+        {row.datasetId &&
+        row.datasetId !== "" &&
+        row.coordinate &&
+        row.coordinate.length === 2 ? (
           <TableCell className="toggle-column" size="small">
             <Tooltip title="Locate on the map" arrow placement="left">
               <IconButton
                 aria-label="open on the map"
                 size="small"
                 onClick={() => {
-                  openDatasetFromMapIcon(row.datasetID, row.coordinate);
+                  openDatasetFromMapIcon(row.datasetId, row.coordinate);
                 }}
               >
                 <MapPin />
@@ -156,16 +179,25 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
             <Table size="small" aria-label="subdata">
               <TableBody className="subdata-rows-container">
                 {row.subdata ? (
-                  <div>
+                  <Fragment>
                     {row.subdata.map((subItem) => (
                       <TableRow key={subItem.key}>
-                        <TableCell component="th" scope="row" size="small">
+                        <TableCell className="subrow-filler" />
+                        <TableCell
+                          component="th"
+                          scope="row"
+                          size="small"
+                          className="subrow-key"
+                        >
                           {subItem.key}
                         </TableCell>
-                        <TableCell size="small">{subItem.value}</TableCell>
+                        <TableCell size="small" className="subrow-value">
+                          {subItem.value}
+                        </TableCell>
+                        <TableCell className="subrow-filler" />
                       </TableRow>
                     ))}
-                  </div>
+                  </Fragment>
                 ) : (
                   <div></div>
                 )}
