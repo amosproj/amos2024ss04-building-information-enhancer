@@ -1,51 +1,56 @@
-Bundesland / Messnetz,Stationscode,Stationsname,Breitengrad,Längengrad,PM10,PM2'5,NO2
-Bayern,DEBY001,Ansbach/Residenzstraße,49.30,10.58,11,7,12
-Bayern,DEBY002,Arzberg/Egerstraße,50.06,12.19,5,0,0
-Bayern,DEBY004,Kleinwallstadt/Hofstetter Straße,49.87,9.17,8,0,6
-Bayern,DEBY005,Aschaffenburg/Bussardweg,49.99,9.12,6,0,5
-Bayern,DEBY006,Augsburg/Königsplatz,48.37,10.89,12,0,7
-Bayern,DEBY007,Augsburg/Bourges-Platz,48.38,10.89,11,6,6
-Bayern,DEBY009,Bamberg/Löwenbrücke,49.90,10.89,12,7,6
-Bayern,DEBY012,Burghausen/Marktler Straße,48.17,12.83,11,9,4
-Bayern,DEBY013,Mehring/Sportplatz,49.79,6.83,0,5,3
-Bayern,DEBY014,Coburg/Lossaustraße,50.26,10.96,0,12,0
-Bayern,DEBY020,Hof/LfU,50.32,11.90,0,0,3
-Bayern,DEBY030,Saal a.d. Donau/Regensburger Straße,48.90,11.94,0,0,9
-Bayern,DEBY031,Kempten (Allgäu)/Westendstraße,47.73,10.31,0,6,5
-Bayern,DEBY032,Kulmbach/Konrad-Adenauer-Straße,50.10,11.44,8,0,3
-Bayern,DEBY033,Landshut/Podewilsstraße,48.54,12.16,10,0,10
-Bayern,DEBY035,Lindau (Bodensee)/Friedrichshafener Straße,47.56,9.68,8,6,12
-Bayern,DEBY037,München/Stachus,48.14,11.57,13,6,13
-Bayern,DEBY039,München/Lothstraße,48.15,11.55,11,6,7
-Bayern,DEBY049,Neustadt a.d. Donau/Eining,48.86,11.77,0,5,3
-Bayern,DEBY052,Neu-Ulm/Gabelsbergerstraße,48.40,10.01,12,8,12
-Bayern,DEBY053,Nürnberg/Bahnhof,49.45,11.08,0,9,5
-Bayern,DEBY056,Fürth/Theresienstraße,49.47,10.98,8,0,7
-Bayern,DEBY058,Nürnberg/Muggenhof,49.47,11.02,0,6,14
-Bayern,DEBY063,Regensburg/Rathaus,49.02,12.09,6,0,4
-Bayern,DEBY067,Schwandorf/Wackersdorfer Straße,49.32,12.13,0,0,9
-Bayern,DEBY068,Schweinfurt/Obertor,50.05,10.23,8,0,3
-Bayern,DEBY072,Tiefenbach/Altenschneeberg,49.44,12.56,5,4,7
-Bayern,DEBY075,Weiden i.d.OPf./Nikolaistraße,49.68,12.16,0,8,3
-Bayern,DEBY077,Würzburg/Kopfklinik,49.80,9.96,13,7,3
-Bayern,DEBY088,Trostberg/Schwimmbadstraße,48.02,12.54,11,6,3
-Bayern,DEBY089,München/Johanneskirchen,48.17,11.64,18,7,0
-Bayern,DEBY093,Sulzbach-Rosenberg/Lohe,48.17,11.64,8,0,2
-Bayern,DEBY099,Augsburg/LfU,48.33,10.90,8,6,2
-Bayern,DEBY109,Andechs/Rothenfeld,47.97,11.22,8,5,19
-Bayern,DEBY110,Augsburg/Karlstraße,48.37,10.90,12,0,5
-Bayern,DEBY111,Bayreuth/Hohenzollernring,49.95,11.58,9,0,3
-Bayern,DEBY115,München/Landshuter Allee,48.17,11.54,10,6,37
-Bayern,DEBY118,Passau/Stelzhamerstraße,48.57,13.42,15,10,15
-Bayern,DEBY119,Würzburg/Stadtring Süd,49.79,9.94,11,0,27
-Bayern,DEBY120,Nürnberg/Von-der-Tann-Straße,49.44,11.04,14,0,10
-Bayern,DEBY121,Oberaudorf/Inntal-Autobahn,49.02,12.06,11,7,22
-Bayern,DEBY122,Bad Hindelang/Unterjoch,47.54,10.43,0,0,2
-Bayern,DEBY124,Burgbernheim/Grüne Au,49.44,10.32,12,12,2
-Bayern,DEBY187,Oettingen/Goethestraße,48.95,10.60,0,3,5
-Bayern,DEBY188,Schwabach/Angerstraße,49.32,11.03,8,8,5
-Bayern,DEBY189,München/Allach,48.19,11.47,0,0,2
-Bayern,DEBY196,Garmisch-Partenkirchen/Wasserwerk,48.25,11.37,0,0,1
-Bayern,DEBY198,Ingolstadt/Münchener Str.,48.74,11.44,13,7,18
-Bayern,DEBY199,Neustadt a.d. Aisch/An der Weißen Marter,49.58,10.62,0,0,4
-Bayern,DEBY200,Passau/Angerstr.,48.58,13.46,15,9,37
+Bundesland / Messnetz,Stationscode,Stationsname,Breitengrad,Längengrad,PM10,PM2'5,NO2,O3,CO,Unit,Time,Date
+Bayern,DEBY001,Ansbach/Residenzstraße,49.30,10.58,11,7,12,-,"0,2062",µg/m³,12:00,05.07.2024
+Bayern,DEBY002,Arzberg/Egerstraße,50.06,12.19,5,-,-,92,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY004,Kleinwallstadt/Hofstetter Straße,49.87,9.17,8,-,6,90,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY005,Aschaffenburg/Bussardweg,49.99,9.12,6,-,5,88,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY006,Augsburg/Königsplatz,48.37,10.89,12,-,7,-,"0,1687",µg/m³,12:00,05.07.2024
+Bayern,DEBY007,Augsburg/Bourges-Platz,48.38,10.89,11,6,6,77,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY009,Bamberg/Löwenbrücke,49.90,10.89,12,7,6,-,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY012,Burghausen/Marktler Straße,48.17,12.83,11,9,4,83,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY013,Mehring/Sportplatz,49.79,6.83,-,5,3,96,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY014,Coburg/Lossaustraße,50.26,10.96,-,12,-,-,"0,1762",µg/m³,12:00,05.07.2024
+Bayern,DEBY020,Hof/LfU,50.32,11.90,-,-,3,95,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY026,Vohburg a.d. Donau/Alter Wöhrer Weg,48.76,11.63,-,-,-,81,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY030,Saal a.d. Donau/Regensburger Straße,48.90,11.94,-,-,9,76,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY031,Kempten (Allgäu)/Westendstraße,47.73,10.31,-,6,5,83,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY032,Kulmbach/Konrad-Adenauer-Straße,50.10,11.44,8,-,3,-,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY033,Landshut/Podewilsstraße,48.54,12.16,1-,-,1-,-,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY035,Lindau (Bodensee)/Friedrichshafener Straße,47.56,9.68,8,6,12,-,"0,1975",µg/m³,12:00,05.07.2024
+Bayern,DEBY037,München/Stachus,48.14,11.57,13,6,13,-,"0,1912",µg/m³,12:00,05.07.2024
+Bayern,DEBY039,München/Lothstraße,48.15,11.55,11,6,7,79,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY047,Naila/Selbitzer Berg,50.32,11.72,-,-,-,93,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY049,Neustadt a.d. Donau/Eining,48.86,11.77,-,5,3,83,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY052,Neu-Ulm/Gabelsbergerstraße,48.40,10.01,12,8,12,74,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY053,Nürnberg/Bahnhof,49.45,11.08,-,9,5,-,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY056,Fürth/Theresienstraße,49.47,10.98,8,-,7,-,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY058,Nürnberg/Muggenhof,49.47,11.02,-,6,14,92,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY062,Regen/Bodenmaiser Straße,48.98,13.13,-,-,-,75,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY063,Regensburg/Rathaus,49.02,12.09,6,-,4,-,"0,1912",µg/m³,12:00,05.07.2024
+Bayern,DEBY067,Schwandorf/Wackersdorfer Straße,49.32,12.13,-,-,9,88,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY068,Schweinfurt/Obertor,50.05,10.23,8,-,3,88,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY072,Tiefenbach/Altenschneeberg,49.44,12.56,5,4,7,91,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY075,Weiden i.d.OPf./Nikolaistraße,49.68,12.16,-,8,3,90,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY077,Würzburg/Kopfklinik,49.80,9.96,13,7,3,95,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY079,Bad Reichenhall/Kirchholzstraße,47.73,12.90,-,-,-,88,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY088,Trostberg/Schwimmbadstraße,48.02,12.54,11,6,3,91,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY089,München/Johanneskirchen,48.17,11.64,18,7,-,78,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY093,Sulzbach-Rosenberg/Lohe,48.17,11.64,8,-,2,92,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY099,Augsburg/LfU,48.33,10.90,8,6,2,83,"0,1475",µg/m³,12:00,05.07.2024
+Bayern,DEBY109,Andechs/Rothenfeld,47.97,11.22,8,5,19,86,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY110,Augsburg/Karlstraße,48.37,10.90,12,-,5,-,"0,2225",µg/m³,12:00,05.07.2024
+Bayern,DEBY111,Bayreuth/Hohenzollernring,49.95,11.58,9,-,3,-,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY113,Erlangen/Kraepelinstraße,49.61,10.96,-,-,-,92,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY115,München/Landshuter Allee,48.17,11.54,1-,6,37,-,"0,36",µg/m³,12:00,05.07.2024
+Bayern,DEBY118,Passau/Stelzhamerstraße,48.57,13.42,15,1-,15,-,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY119,Würzburg/Stadtring Süd,49.79,9.94,11,-,27,-,"0,1413",µg/m³,12:00,05.07.2024
+Bayern,DEBY120,Nürnberg/Von-der-Tann-Straße,49.44,11.04,14,-,1-,-,"0,1425",µg/m³,12:00,05.07.2024
+Bayern,DEBY121,Oberaudorf/Inntal-Autobahn,49.02,12.06,11,7,22,-,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY122,Bad Hindelang/Unterjoch,47.54,10.43,-,-,2,101,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY124,Burgbernheim/Grüne Au,49.44,10.32,12,12,2,96,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY187,Oettingen/Goethestraße,48.95,10.60,-,3,5,84,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY188,Schwabach/Angerstraße,49.32,11.03,8,8,5,89,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY189,München/Allach,48.19,11.47,-,-,2,73,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY196,Garmisch-Partenkirchen/Wasserwerk,48.25,11.37,-,-,1,76,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY198,Ingolstadt/Münchener Str.,48.74,11.44,13,7,18,-,"0,2062",µg/m³,12:00,05.07.2024
+Bayern,DEBY199,Neustadt a.d. Aisch/An der Weißen Marter,49.58,10.62,-,-,4,95,-,µg/m³,12:00,05.07.2024
+Bayern,DEBY200,Passau/Angerstr.,48.58,13.46,15,9,37,-,"0,275",µg/m³,12:00,05.07.2024

@@ -34,10 +34,18 @@ table_cols:
     type: DECIMAL(9,6)
   - name: PM10
     name_in_table: pm10
-    type: INT
   - name: PM2'5
     name_in_table: pm2_5
-    type: INT
   - name: NO2
     name_in_table: no2
-    type: INT
+  - name: O3
+    name_in_table: o3
+  - name: CO
+    name_in_table: co
+  - name: Unit
+    name_in_table: unit
+  - name: Time
+    name_in_table: time
+  - name: Date
+    name_in_table: date
+
