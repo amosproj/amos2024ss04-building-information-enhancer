@@ -21,7 +21,7 @@ namespace BIE.Core.API
         private static readonly GeometryFactory GeometryFactory = new(new PrecisionModel(), 4326);
 
         private static readonly HashSet<string> cityGmlColumns = new() { "Id", "GroundArea", "BuildingWallHeight", "LivingArea", "RoofArea", "BuildingVolume", "RoofArea", "SolarPotential" };
-        private static readonly HashSet<string> airPollutionColumns = new() { "station_name", "pm10", "pm2_5", "no2" };
+        private static readonly HashSet<string> airPollutionColumns = new() { "station_name", "pm10", "pm2_5", "no2", "o3", "co" };
         private static readonly HashSet<string> chargingStationsColumns = new() { "operator", "Id", "rated_power_kw", "charging_equipment_type" };
         private static readonly HashSet<string> actualUseColumns = new() { "nutzart" };
         private static readonly HashSet<string> houseFootprintsColumns = new() { "Id" };
@@ -212,39 +212,61 @@ namespace BIE.Core.API
             List<double> avgPm10 = new();
             List<double> avgPm25 = new();
             List<double> avgNo2 = new();
+            List<double> avgO3 = new();
+            List<double> avgCo = new();
+
             foreach (var h in airPollutants)
             {
                 Point location = GeoReader.Read(h["Location"]) as Point;
-                double pm10 = double.Parse(h["pm10"]);
-                double pm25 = double.Parse(h["pm2_5"]);
-                double no2 = double.Parse(h["no2"]);
-
                 List<SubdataItem> subdataItems = new();
-                if (pm10 > 0)
+
+                if (h.TryGetValue("pm10", out var pm10Value) && double.TryParse(pm10Value, out var pm10) && pm10 > 0)
                 {
                     avgPm10.Add(pm10);
                     subdataItems.Add(new()
                     {
                         Key = "Particulate matter PM₁₀",
-                        Value = h["pm10"] + "μg/m³"
+                        Value = pm10 + "μg/m³"
                     });
                 }
-                if (pm25 > 0)
+
+                if (h.TryGetValue("pm2_5", out var pm25Value) && double.TryParse(pm25Value, out var pm25) && pm25 > 0)
                 {
                     avgPm25.Add(pm25);
                     subdataItems.Add(new()
                     {
                         Key = "Fine particulate matter PM₂,₅",
-                        Value = h["pm2_5"] + "μg/m³"
+                        Value = pm25 + "μg/m³"
                     });
                 }
-                if (no2 > 0)
+
+                if (h.TryGetValue("no2", out var no2Value) && double.TryParse(no2Value, out var no2) && no2 > 0)
                 {
                     avgNo2.Add(no2);
                     subdataItems.Add(new()
                     {
                         Key = "Nitrogen oxide NO₂",
-                        Value = h["no2"] + "μg/m³"
+                        Value = no2 + "μg/m³"
+                    });
+                }
+
+                if (h.TryGetValue("o3", out var o3Value) && double.TryParse(o3Value, out var o3) && o3 > 0)
+                {
+                    avgO3.Add(o3);
+                    subdataItems.Add(new()
+                    {
+                        Key = "Ozone O₃",
+                        Value = o3 + "μg/m³"
+                    });
+                }
+
+                if (h.TryGetValue("co", out var coValue) && double.TryParse(coValue, out var co) && co > 0)
+                {
+                    avgCo.Add(co);
+                    subdataItems.Add(new()
+                    {
+                        Key = "Carbon monoxide CO",
+                        Value = co + "μg/m³"
                     });
                 }
 
@@ -260,13 +282,16 @@ namespace BIE.Core.API
 
                 airPollutionItems.Add(item);
             }
+
             individualData.AddRange(airPollutionItems);
+
             generalData.Add(new DatasetItem
             {
                 DatasetId = "air_pollutants",
                 DisplayName = "Total number of air pollution measuring stations",
                 Value = airPollutionItems.Count.ToString()
             });
+
             generalData.Add(new DatasetItem
             {
                 DatasetId = "air_pollutants",
@@ -276,21 +301,32 @@ namespace BIE.Core.API
                     new()
                     {
                         Key = "Average Particulate matter PM₁₀",
-                        Value = avgPm10.Average().ToString("N2") + "μg/m³"
+                        Value = avgPm10.Count > 0 ? avgPm10.Average().ToString("N2") + "μg/m³" : "-"
                     },
                     new()
                     {
                         Key = "Average Fine particulate matter PM₂.₅",
-                        Value = avgPm25.Average().ToString("N2") + "μg/m³"
+                        Value = avgPm25.Count > 0 ? avgPm25.Average().ToString("N2") + "μg/m³" : "-"
                     },
                     new()
                     {
                         Key = "Average Nitrogen oxide NO₂",
-                        Value = avgNo2.Average().ToString("N2") + "μg/m³"
+                        Value = avgNo2.Count > 0 ? avgNo2.Average().ToString("N2") + "μg/m³" : "-"
+                    },
+                    new()
+                    {
+                        Key = "Average Ozone O₃",
+                        Value = avgO3.Count > 0 ? avgO3.Average().ToString("N2") + "μg/m³" : "-"
+                    },
+                    new()
+                    {
+                        Key = "Average Carbon monoxide CO",
+                        Value = avgCo.Count > 0 ? avgCo.Average().ToString("N2") + "μg/m³" : "-"
                     }
                 }
             });
         }
+
 
         private static void AggregateDataForActualUse(List<DatasetItem> generalData, List<DatasetItem> individualData, double totalAreaSearchPolygon, List<Dictionary<string, string>> dataEntries)
         {
