@@ -123,8 +123,11 @@ namespace BIE.DataPipeline.Import
                 string checkDate = GetBuildingCheckDate(buildingNode);
                 float groundArea = GetBuildingGroundArea(buildingNode);
                 float buildingWallHeight = GetBuildingWallHeight(buildingNode);
+                float wallArea = GetWallArea(buildingNode);
+                float buildingVolume = GetBuildingVolume(buildingNode, groundArea, buildingWallHeight);
                 float livingArea = GetLivingArea(buildingNode, groundArea, buildingWallHeight);
                 float roofArea = GetRoofArea(buildingNode);
+                float solarPotential = GetSolarPotential(buildingNode, roofArea);
 
                 nextLine = $"geometry::STGeomFromText('{geometry.AsText()}', 4326)";
                 nextLine += string.Format(",'{0}'", buildingNode.InnerXml);
@@ -132,9 +135,12 @@ namespace BIE.DataPipeline.Import
                 nextLine += string.Format(",'{0}'", districtKey);
                 nextLine += string.Format(",'{0}'", checkDate);
                 nextLine += string.Format(",{0}", groundArea.ToString(culture));
+                nextLine += string.Format(",{0}", buildingVolume.ToString(culture));
                 nextLine += string.Format(",{0}", buildingWallHeight.ToString(culture));
+                nextLine += string.Format(",{0}", wallArea.ToString(culture));
                 nextLine += string.Format(",{0}", livingArea.ToString(culture));
                 nextLine += string.Format(",{0}", roofArea.ToString(culture));
+                nextLine += string.Format(",{0}", solarPotential.ToString(culture));
 
                 this.buildingIndex++;
                 return true;
@@ -307,18 +313,59 @@ namespace BIE.DataPipeline.Import
             return res;
         }
 
-        private float GetBuildingWallHeight(XmlNode buildingNode)
+        private float GetBuildingVolume(XmlNode buildingNode, float groundArea, float wallHeight)
         {
-            float hoeheGrund = GetStringAttributeValue(buildingNode, "HoeheGrund");
+            float wallVolume = groundArea * wallHeight;
+            float roofHeight = GetBuildingRoofHeight(buildingNode);
+            float averageRoofAngle = GetAverageRoofAngle(buildingNode);
+            float roofFactor = (1 - (averageRoofAngle / 90)); //scale the averageRoofange between 0 and 1 where 0 is 90 degress (flat roof) and 1 is 0 degree (steep roof)
+            float roofVolume = groundArea * roofHeight * roofFactor;
+            return wallVolume + roofVolume;
+        }
+
+        private float GetBuildingRoofHeight(XmlNode buildingNode)
+        {
             float niedrigsteTraufeDesGebaeudes = GetStringAttributeValue(buildingNode, "NiedrigsteTraufeDesGebaeudes");
-            if(hoeheGrund == -1 || niedrigsteTraufeDesGebaeudes == -1)
+            float hoeheDach = GetStringAttributeValue(buildingNode, "HoeheDach");
+            if (hoeheDach == -1 || niedrigsteTraufeDesGebaeudes == -1)
             {
                 return -1;
             }
             else
             {
-                return niedrigsteTraufeDesGebaeudes - hoeheGrund;
+                return hoeheDach - niedrigsteTraufeDesGebaeudes;
             }
+        }
+
+        private float GetBuildingWallHeight(XmlNode buildingNode)
+        {
+            float hoeheGrund = GetStringAttributeValue(buildingNode, "HoeheGrund");
+            float niedrigsteTraufeDesGebaeudes = GetStringAttributeValue(buildingNode, "NiedrigsteTraufeDesGebaeudes");
+            float hoeheDach = GetStringAttributeValue(buildingNode, "HoeheDach");
+            if(hoeheGrund == -1 || niedrigsteTraufeDesGebaeudes == -1 || hoeheDach == -1)
+            {
+                return -1;
+            }
+            else
+            {
+                return ((niedrigsteTraufeDesGebaeudes - hoeheGrund) + (hoeheDach - hoeheGrund)) / 2f;
+            }
+        }
+
+        private float GetWallArea(XmlNode buildingNode)
+        {
+            XmlNodeList wallNodes = buildingNode.SelectNodes(".//bldg:WallSurface", this.nsmgr);
+            float wallArea = 0;
+            foreach (XmlNode wallNode in wallNodes)
+            {
+                float wallTileArea = GetStringAttributeValue(wallNode, "Flaeche");
+                if (wallTileArea != -1)
+                {
+                    wallArea += wallTileArea;
+                }
+            }
+
+            return wallArea;
         }
 
         private float GetLivingArea(XmlNode buildingNode, float groundArea, float buildingWallHeight)
@@ -330,6 +377,24 @@ namespace BIE.DataPipeline.Import
 
             const float averageFloorHeight = 2.85f;
             return groundArea * (float)Math.Ceiling(buildingWallHeight / averageFloorHeight);
+        }
+
+        private float GetAverageRoofAngle(XmlNode buildingNode)
+        {
+            XmlNodeList roofNodes = buildingNode.SelectNodes(".//bldg:RoofSurface", this.nsmgr);
+            float roofAngle = 0;
+            float numAngle = 0;
+            foreach (XmlNode roofNode in roofNodes)
+            {
+                float roofTileAngle = GetStringAttributeValue(roofNode, "Dachneigung");
+                if (roofTileAngle != -1)
+                {
+                    numAngle++;
+                    roofAngle += roofTileAngle;
+                }
+            }
+
+            return roofAngle / numAngle;
         }
 
         private float GetRoofArea(XmlNode buildingNode)
@@ -388,6 +453,11 @@ namespace BIE.DataPipeline.Import
             }
 
             return result;
+        }
+
+        private float GetSolarPotential(XmlNode node, float roofArea)
+        {
+            return roofArea * 0.5f; //dummy function
         }
     }
 }
