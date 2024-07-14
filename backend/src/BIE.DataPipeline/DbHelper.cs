@@ -312,9 +312,12 @@ BEGIN
         DistrictKey VARCHAR(255),
         CheckDate DATE,
         GroundArea FLOAT,
+        BuildingVolume FLOAT,
         BuildingWallHeight FLOAT,
+        WallArea FLOAT,
         LivingArea FLOAT,
         RoofArea FLOAT,
+        SolarPotential FLOAT,
     );
 END";
             }
