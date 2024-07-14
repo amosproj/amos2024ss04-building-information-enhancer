@@ -14,7 +14,7 @@ namespace BIE.DataPipeline
         private readonly StringBuilder mStringBuilder;
 
         private int mCount;
-        private const int MaxCount = 999;
+        private const int MaxCount = 900;
 
 
         public DbHelper()
@@ -47,7 +47,7 @@ namespace BIE.DataPipeline
             if (description.options.if_table_exists == InsertBehaviour.replace)
             {
                 Console.WriteLine($"Dropping table {description.table_name} if it exists.");
-                if(description.source.data_format == "CITYGML")
+                if (description.source.data_format == "CITYGML")
                 {
                     DropCityGMLTable(description.table_name);
                 }
@@ -265,7 +265,7 @@ namespace BIE.DataPipeline
             var bboxCmd = db.CreateCommand(bboxQuery);
             var (bboxReader, bboxConnection) = db.ExecuteReader(bboxCmd);
 
-            float minX = 0 , minY = 0, maxX = 0, maxY = 0;
+            float minX = 0, minY = 0, maxX = 0, maxY = 0;
 
             if (bboxReader.Read())
             {
@@ -322,7 +322,7 @@ BEGIN
 END";
             }
 
-                var query = $@"
+            var query = $@"
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{description.table_name}')
 BEGIN CREATE TABLE {description.table_name} (";
 
@@ -390,7 +390,7 @@ BEGIN CREATE TABLE {description.table_name} (";
                 throw;
             }
 
-            if(cityGMLStringBuilder.Length > 0)
+            if (cityGMLStringBuilder.Length > 0)
             {
                 PushRoofData();
             }
@@ -489,7 +489,7 @@ END";
 
             cityGMLCount++;
 
-            if(cityGMLCount >= MaxCount)
+            if (cityGMLCount >= MaxCount)
             {
                 mCount = MaxCount;
             }

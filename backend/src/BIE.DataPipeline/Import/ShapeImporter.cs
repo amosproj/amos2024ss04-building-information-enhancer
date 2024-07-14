@@ -79,7 +79,7 @@ namespace BIE.DataPipeline.Import
                                                                        dbfByteStream,
                                                                        true,
                                                                        true);
-            
+
             mParser = Shapefile.CreateDataReader(providerRegistry, GeometryFactory.Default);
 
             mHeader = mParser.DbaseHeader;
@@ -131,21 +131,18 @@ namespace BIE.DataPipeline.Import
             mStringBuilder.Append($"GEOMETRY::STGeomFromText('");
             mStringBuilder.Append(geometry.AsText());
             mStringBuilder.Append("', 4326)");
-            // nextLine = $"GEOMETRY::STGeomFromText('POLYGON (11.060226859896797 49.496927347229494, 11.060276626123832 49.49695803564076)')', 4326)";
 
             for (int i = 1; i < mHeader.Fields.Length + 1; i++)
             {
                 var value = mParser.GetValue(i);
                 mStringBuilder.Append(", '");
-                var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(value?.ToString() ?? "");
-                var str = Encoding.UTF8.GetString(bytes).Replace("'", "_");
+                var bytes = Encoding.GetEncoding("Windows-1252").GetBytes(value?.ToString() ?? "");
+                var str = Encoding.UTF8.GetString(bytes).Replace("'", "''");
                 mStringBuilder.Append(str);
                 mStringBuilder.Append('\'');
-                // nextLine += $",  \'{(value != "" ? value : "null")}\'";
             }
 
             mStringBuilder.Append($",{CalculateAreaInSquareMeters(geometry)}");
-            // nextLine += $",{CalculateAreaInSquareMeters(geometry)}";
             nextLine = mStringBuilder.ToString();
 
             return true;

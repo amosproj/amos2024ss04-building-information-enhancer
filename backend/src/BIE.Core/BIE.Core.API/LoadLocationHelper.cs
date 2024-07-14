@@ -194,7 +194,7 @@ namespace BIE.Core.API
 
                 chargingStationsItems.Add(item);
             }
-            individualData.AddRange(chargingStationsItems);
+            AppendLimitedEntries(individualData, chargingStationsItems, "EV_charging_stations");
             generalData.Add(new DatasetItem
             {
                 DatasetId = "EV_charging_stations",
@@ -373,13 +373,13 @@ namespace BIE.Core.API
 
             generalData.Add(new DatasetItem
             {
-                DisplayName = "Potential Area for geothermal use",
+                DisplayName = "Potential area for Geothermal Use",
                 DatasetId = "house_footprints",
                 Value = Math.Max(totalAreaSearchPolygon - totalBuildingArea, 0).ToString("N2") + "m²",
             });
             generalData.Add(new DatasetItem
             {
-                DisplayName = "Total number of buildings",
+                DisplayName = "Total building number",
                 DatasetId = "house_footprints",
                 Value = totalCountHouseFootprints.ToString()
             });
@@ -447,12 +447,12 @@ namespace BIE.Core.API
             double totalBuildingArea = totalBuildingAreas.Sum();
             generalData.Add(new DatasetItem
             {
-                DisplayName = "Potential Area for geothermal use",
+                DisplayName = "Potential area for geothermal use",
                 Value = Math.Max(totalAreaSearchPolygon - totalBuildingArea, 0).ToString("N2") + "m²",
             });
             generalData.Add(new DatasetItem
             {
-                DisplayName = "Total number of LOD2 buildings",
+                DisplayName = "Total building number (LOD2)",
                 DatasetId = "building_models",
                 Value = totalCountLod2Buildings.ToString()
             });
@@ -465,18 +465,18 @@ namespace BIE.Core.API
             if (totalBuildingVolumes.Count > 0)
                 generalData.Add(GenerateDatalistStatisticsEntry(totalBuildingVolumes, "Total building volume", "building_models", "m³"));
             if (totalSolarPotentials.Count > 0)
-                generalData.Add(GenerateDatalistStatisticsEntry(totalSolarPotentials, "Total usable Area for Solar Panels", "building_models"));
+                generalData.Add(GenerateDatalistStatisticsEntry(totalSolarPotentials, "Total usable area for Solar Panels", "building_models"));
 
         }
 
         private static void AppendLimitedEntries(List<DatasetItem> individualData, List<DatasetItem> allEntriesForindividualData, string datasetId)
         {
-            if (allEntriesForindividualData.Count > 15)
+            if (allEntriesForindividualData.Count > 10)
             {
-                individualData.AddRange(allEntriesForindividualData.Take(15));
+                individualData.AddRange(allEntriesForindividualData.Take(10));
                 individualData.Add(new()
                 {
-                    DisplayName = $"Skipped {allEntriesForindividualData.Count - 15} additional elements",
+                    DisplayName = $"Skipped {allEntriesForindividualData.Count - 10} additional entries",
                     DatasetId = datasetId,
                 });
             }

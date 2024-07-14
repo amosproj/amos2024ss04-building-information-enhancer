@@ -148,8 +148,18 @@ const SearchBar: React.FC = () => {
             },
           });
           drawPolygon.addTo(currentMapCache.drawnItems!);
+          let newMultiPolygon: MultiPolygon;
+          if (item.polygon.type === "Polygon") {
+            newMultiPolygon = {
+              type: "MultiPolygon",
+              coordinates: [item.polygon.coordinates],
+            };
+          } else {
+            newMultiPolygon = item.polygon as MultiPolygon;
+          }
+          console.log(newMultiPolygon);
           const polygonSelection = new PolygonSelection(
-            item.polygon as MultiPolygon,
+            newMultiPolygon,
             item.displayName,
             false
           );
@@ -165,7 +175,10 @@ const SearchBar: React.FC = () => {
           item.displayName,
           false
         );
-        currentMapCache.selectedCoordinates = markerSelection;
+        setCurrentMapCache({
+          ...currentMapCache,
+          selectedCoordinates: markerSelection,
+        });
         mapInstance.flyTo(targetPosition, currentMapCache.zoom, {
           animate: true,
           duration: 5,
