@@ -34,7 +34,7 @@ export interface DatasetMetaData {
   longDescription: string;
   minZoomLevel: number;
   markersThreshold: number;
-  displayProperty: string;
+  displayProperty: DisplayProperty[];
   tables: Table[];
   polygonColoring: PolygonColoring | null;
 }

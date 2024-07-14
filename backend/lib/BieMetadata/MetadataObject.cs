@@ -7,13 +7,13 @@ public class MetadataObject
 {
     [BsonRepresentation(BsonType.ObjectId)]
     public string _id { get; set; } = string.Empty;
-
+    
     [BsonElement("basicData")]
     public BasicData basicData { get; set; } = new BasicData();
 
     [BsonElement("additionalData")]
     public AdditionalData additionalData { get; set; } = new AdditionalData();
-
+    
     /// <summary>
     /// The general and most important data about a dataset.
     /// </summary>
@@ -23,17 +23,17 @@ public class MetadataObject
         /// The Id of the dataset
         /// </summary>
         public string DatasetId { get; set; } = string.Empty;
-
+        
         /// <summary>
         /// The displayname of the dataset
         /// </summary>
         public string Name { get; set; } = string.Empty;
-
+        
         /// <summary>
         /// a short description of the dataset
         /// </summary>
         public string ShortDescription { get; set; } = string.Empty;
-
+        
         /// <summary>
         /// the icon used to display dataset
         /// </summary>
@@ -59,16 +59,16 @@ public class MetadataObject
         /// Zoom level is higher the closer you look at something. If current zoom level is below this, it shouldn't display any value.
         /// </summary>
         public int MinZoomLevel { get; set; } = 0;
-
+        
         /// <summary>
         /// The zoom threshold where areas start to turn into markers
         /// </summary>
         public int MarkersThreshold { get; set; } = 0;
 
         /// <summary>
-        /// The display property is the property that should be shown in a popup.
+        /// A list of display properties that should be shown in a marker popup.
         /// </summary>
-        public string DisplayProperty { get; set; } = string.Empty;
+        public List<DisplayProperty> DisplayProperty { get; set; } = new List<DisplayProperty>();
 
         /// <summary>
         /// Table data populated by the data pipeline. Contains the name and the size of the all .yaml files correlated to that specific dataset.
@@ -81,7 +81,7 @@ public class MetadataObject
         [BsonIgnoreIfNull] // Add this attribute to ignore null values
         public PolygonColoring? PolygonColoring { get; set; }
     }
-
+    
     /// <summary>
     /// Table data populated by the data pipeline. Contains the name and the size of the all .yaml files correlated to that specific dataset.
     /// </summary>
@@ -91,17 +91,17 @@ public class MetadataObject
         /// the name of the table
         /// </summary>
         public string Name { get; set; } = string.Empty;
-
+        
         /// <summary>
         /// the number of lines in the table
         /// </summary>
         public int NumberOfLines { get; set; } = 0;
-
+        
         /// <summary>
         /// the bounding box of the geomtry data in the table
         /// </summary>
         public BoundingBox? BoundingBox { get; set; }
-
+        
         /// <summary>
         /// the headers of the dataset. Should NOT include the special Location header.
         /// </summary>
