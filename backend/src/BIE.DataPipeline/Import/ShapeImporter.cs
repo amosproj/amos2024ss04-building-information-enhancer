@@ -138,8 +138,9 @@ namespace BIE.DataPipeline.Import
                 var value = mParser.GetValue(i);
                 mStringBuilder.Append(", '");
                 var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(value?.ToString() ?? "");
-                mStringBuilder.Append(Encoding.UTF8.GetString(bytes));
-                mStringBuilder.Append("'");
+                var str = Encoding.UTF8.GetString(bytes).Replace("'", "_");
+                mStringBuilder.Append(str);
+                mStringBuilder.Append('\'');
                 // nextLine += $",  \'{(value != "" ? value : "null")}\'";
             }
 
