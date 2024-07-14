@@ -8,6 +8,7 @@ using LinqStatistics;
 using BieMetadata;
 using System.Linq;
 using NetTopologySuite;
+using NetTopologySuite.Algorithm;
 
 
 namespace BIE.Core.API
@@ -129,6 +130,7 @@ namespace BIE.Core.API
                 return;
 
             var usageAreaMap = new Dictionary<string, double>();
+            List<DatasetItem> allEntriesForindividualData = new();
             foreach (var h in dataEntries)
             {
                 Polygon p = GeoReader.Read(h["Location"]) as Polygon;
@@ -148,9 +150,10 @@ namespace BIE.Core.API
                     Value = area.ToString("N2") + "m²",
                     Coordinate = new double[] { p.Centroid.Y, p.Centroid.X }
                 };
-                individualData.Add(item);
+                allEntriesForindividualData.Add(item);
             }
 
+            appendLimitedEntries(individualData, allEntriesForindividualData, "actual_use");
 
             var usageCount = usageAreaMap.Keys.Count;
             var summaryItemActualUse = new DatasetItem
@@ -171,13 +174,29 @@ namespace BIE.Core.API
 
         }
 
+        private static void appendLimitedEntries(List<DatasetItem> individualData, List<DatasetItem> allEntriesForindividualData, string datasetId)
+        {
+            if (allEntriesForindividualData.Count > 15)
+            {
+                individualData.AddRange(allEntriesForindividualData.Take(15));
+                individualData.Add(new()
+                {
+                    DisplayName = $"Skipped {allEntriesForindividualData.Count - 15} additional elements",
+                    DatasetId = datasetId,
+                });
+            }
+            else
+                individualData.AddRange(allEntriesForindividualData);
+        }
+
         private static void AggregateDataForHousefootprints(List<DatasetItem> generalData, List<DatasetItem> individualData, double totalAreaSearchPolygon, List<Dictionary<string, string>> housefootprints)
         {
-            long totalCountHouseFootprints = housefootprints.Count();
+            long totalCountHouseFootprints = housefootprints.Count;
             if (totalCountHouseFootprints == 0)
                 return;
             double totalBuildingArea = 0.0;
             List<double> totalBuildingAreas = new List<double>();
+            List<DatasetItem> allItems = new();
             foreach (var h in housefootprints)
             {
                 Polygon p = GeoReader.Read(h["Location"]) as Polygon;
@@ -193,8 +212,9 @@ namespace BIE.Core.API
                     Value = area.ToString("N2") + "m²",
                     Coordinate = new double[] { p.Centroid.Y, p.Centroid.X }
                 };
-                individualData.Add(item);
+                allItems.Add(item);
             }
+            appendLimitedEntries(individualData, allItems, "house_footprints");
 
             generalData.Add(new DatasetItem
             {
@@ -223,6 +243,9 @@ namespace BIE.Core.API
             List<double> totalBuildingAreas = new();
             List<double> totalBuildingLivingAreas = new();
             List<double> totalBuildingRoofAreas = new();
+
+            List<DatasetItem> allItems = new();
+
             foreach (var h in citygmldata)
             {
                 double area = double.Parse(h["GroundArea"]);
@@ -252,8 +275,10 @@ namespace BIE.Core.API
                         new() { Key = "Building wall height", Value = wallHeight.ToString("N2") + "m" }
                     }
                 };
-                individualData.Add(item);
+                allItems.Add(item);
             }
+
+            appendLimitedEntries(individualData, allItems, "building_models");
 
             double totalBuildingArea = totalBuildingAreas.Sum();
             generalData.Add(new DatasetItem
