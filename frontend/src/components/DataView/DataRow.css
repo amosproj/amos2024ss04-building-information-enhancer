@@ -45,3 +45,8 @@
   text-align: center;
   display: flex;
 }
+
+.subrow-filler {
+  max-width: 4rem !important;
+  width: 4rem;
+}

@@ -24,6 +24,7 @@ import { AlertContext } from "../../contexts/AlertContext";
 import L, { LatLng } from "leaflet";
 import { TabsContext } from "../../contexts/TabsContext";
 import { MapContext } from "../../contexts/MapContext";
+import { MarkerSelection } from "../../types/MapSelectionTypes";
 
 interface RowProps {
   row: DatasetItem;
@@ -36,24 +37,39 @@ interface RowProps {
 const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
   const [open, setOpen] = useState(false);
   const [shouldFlyTo, setShouldFlyTo] = useState<LatLng | null>(null);
+  const [shouldFlyToName, setShouldFlyToName] = useState<string | null>(null);
   const { currentAlertCache, setCurrentAlertCache } = useContext(AlertContext);
   const { changeToOrOpenNewTab } = useContext(TabsContext);
-  const { currentMapCache } = useContext(MapContext);
+  const { setCurrentMapCache, currentMapCache } = useContext(MapContext);
 
   /**
    * Triggers fly to on the next map change
    */
   useEffect(() => {
-    if (shouldFlyTo && currentMapCache.mapInstance) {
-      currentMapCache.mapInstance.flyTo(shouldFlyTo, currentMapCache.zoom);
+    if (shouldFlyTo && shouldFlyToName && currentMapCache.mapInstance) {
+      currentMapCache.mapInstance.flyTo(shouldFlyTo, 16, {
+        animate: true,
+        duration: 5,
+      });
+      // Change the selection
+      setCurrentMapCache({
+        ...currentMapCache,
+        selectedCoordinates: new MarkerSelection(
+          shouldFlyTo,
+          shouldFlyToName,
+          false
+        ),
+      });
       setShouldFlyTo(null);
+      setShouldFlyToName(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentMapCache.mapInstance]);
 
   const openDatasetFromMapIcon = async (
     mapId: string | null,
-    coordinates: number[] | null
+    coordinates: number[] | null,
+    displayName: string
   ) => {
     if (currentDatasets) {
       const datasetToOpen = currentDatasets.find(
@@ -83,9 +99,22 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
           const latLng = new LatLng(coordinates[0], coordinates[1]);
           if (ifSwitched) {
             setShouldFlyTo(latLng);
+            setShouldFlyToName(displayName);
           } else {
             if (currentMapCache.mapInstance) {
-              currentMapCache.mapInstance.flyTo(latLng, currentMapCache.zoom);
+              currentMapCache.mapInstance.flyTo(latLng, 16, {
+                animate: true,
+                duration: 5,
+              });
+              // Change the selection
+              setCurrentMapCache({
+                ...currentMapCache,
+                selectedCoordinates: new MarkerSelection(
+                  latLng,
+                  displayName,
+                  false
+                ),
+              });
             }
           }
         }
@@ -167,7 +196,11 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
                 aria-label="open on the map"
                 size="small"
                 onClick={() => {
-                  openDatasetFromMapIcon(row.datasetId, row.coordinate);
+                  openDatasetFromMapIcon(
+                    row.datasetId,
+                    row.coordinate,
+                    row.displayName
+                  );
                 }}
               >
                 <MapPin />

@@ -72,11 +72,11 @@ public class CsvDatasetHandler : IDatasetHandler
             if (mMetadata.basicData.DatasetId == "air_pollutants")
             {
                 properties["station_name"] = row["station_name"];
-                properties["pm10"] = row["pm10"] + row["unit"];
-                properties["pm2_5"] = row["pm2_5"] + row["unit"];
-                properties["no2"] = row["no2"] + row["unit"];
-                properties["o3"] = row["o3"] + row["unit"];
-                properties["co"] = row["co"] + row["unit"];
+                properties["pm10"] = row["pm10"] == "-" ? row["pm10"] : row["pm10"] + row["unit"];
+                properties["pm2_5"] = row["pm2_5"] == "-" ? row["pm2_5"] : row["pm2_5"] + row["unit"];
+                properties["no2"] = row["no2"] == "-" ? row["no2"] : row["no2"] + row["unit"];
+                properties["o3"] = row["o3"] == "-" ? row["o3"] : row["o3"] + row["unit"];
+                properties["co"] = row["co"] == "-" ? row["co"] : row["co"] + row["unit"];
                 properties["date"] = row["date"];
                 properties["time"] = row["time"];
             }
