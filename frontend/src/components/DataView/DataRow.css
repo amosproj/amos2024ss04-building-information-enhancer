@@ -29,7 +29,6 @@
 
 .subrow-value {
   text-align: end;
-  display: flex !important;
   justify-content: end;
 }
 

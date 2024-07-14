@@ -229,8 +229,8 @@ const DataRow: React.FC<RowProps> = ({ row, currentDatasets }) => {
                         >
                           {subItem.key}
                         </TableCell>
-                        <TableCell size="small" className="subrow-value">
-                          {subItem.value}
+                        <TableCell size="small">
+                          <div className="subrow-value">{subItem.value}</div>
                         </TableCell>
                         <TableCell className="subrow-filler" />
                       </TableRow>
