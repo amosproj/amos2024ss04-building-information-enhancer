@@ -1,5 +1,5 @@
 import React, { Fragment, useContext, useState } from "react";
-import { Paper, Popover, Grid, Typography, Box, Tooltip } from "@mui/material";
+import { Popover, Typography, Box, Tooltip } from "@mui/material";
 import "./MapOptions.css";
 import { Polygon, StackSimple, ThreeD } from "@phosphor-icons/react";
 import SearchBar from "../SearchBar/SearchBar";
@@ -103,78 +103,56 @@ const MapOptions: React.FC<MapOptionsProps> = ({
           horizontal: "right",
         }}
       >
-        <Paper
-          elevation={3}
-          sx={{
-            padding: "25px",
-            borderRadius: "8px",
-            backgroundColor: "#f9f9f9",
-            width: "250px",
-            height: "100px",
-          }}
-        >
-          <Grid
-            container
-            spacing={2}
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Grid item>
-              <Box textAlign="center" sx={{ marginLeft: 2 }}>
-                <img
-                  className="image-hover-effect"
-                  src="/normal_view.png"
-                  alt="Normal"
-                  width="50"
-                  height="50"
-                  onClick={() => {
-                    handleMapTypeChange(MapTypes.Normal);
-                    handleClose();
-                  }}
-                />
-                <Typography variant="body2" sx={{ marginTop: 0.5 }}>
-                  Normal
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item>
-              <Box textAlign="center" sx={{ marginLeft: 2 }}>
-                <img
-                  className="image-hover-effect"
-                  src="/satellite_view.png"
-                  alt="Satellite"
-                  width="50"
-                  height="50"
-                  onClick={() => {
-                    handleMapTypeChange(MapTypes.Satellite);
-                    handleClose();
-                  }}
-                />
-                <Typography variant="body2" sx={{ marginTop: 0.5 }}>
-                  Satellite
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item>
-              <Box textAlign="center" sx={{ marginLeft: 2 }}>
-                <img
-                  className="image-hover-effect"
-                  src="/aerial_view.png"
-                  alt="Aerial"
-                  width="50"
-                  height="50"
-                  onClick={() => {
-                    handleMapTypeChange(MapTypes.Aerial);
-                    handleClose();
-                  }}
-                />
-                <Typography variant="body2" sx={{ marginTop: 0.5 }}>
-                  dop40c
-                </Typography>
-              </Box>
-            </Grid>
-          </Grid>
-        </Paper>
+        <div className="layers-container">
+          <Box textAlign="center">
+            <img
+              className="image-hover-effect"
+              src="/normal_view.png"
+              alt="Normal"
+              width="50"
+              height="50"
+              onClick={() => {
+                handleMapTypeChange(MapTypes.Normal);
+                handleClose();
+              }}
+            />
+            <Typography variant="body2" sx={{ marginTop: 0.5 }}>
+              Normal
+            </Typography>
+          </Box>
+          <Box textAlign="center">
+            <img
+              className="image-hover-effect"
+              src="/satellite_view.png"
+              alt="Satellite"
+              width="50"
+              height="50"
+              onClick={() => {
+                handleMapTypeChange(MapTypes.Satellite);
+                handleClose();
+              }}
+            />
+            <Typography variant="body2" sx={{ marginTop: 0.5 }}>
+              Satellite
+            </Typography>
+          </Box>
+          <Box textAlign="center">
+            <img
+              className="image-hover-effect"
+              src="/aerial_view.png"
+              alt="Aerial"
+              width="50"
+              height="50"
+              onClick={() => {
+                handleMapTypeChange(MapTypes.Aerial);
+                handleClose();
+              }}
+            />
+            <Typography variant="body2" sx={{ marginTop: 0.5 }}>
+              dop40c
+            </Typography>
+          </Box>
+        </div>
       </Popover>
     </div>
   );

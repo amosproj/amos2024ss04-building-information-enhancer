@@ -158,3 +158,9 @@
   font-size: 2rem;
   border-top-width: 1px;
 }
+
+.layers-container {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+}
