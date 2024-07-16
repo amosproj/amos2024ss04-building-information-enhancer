@@ -1,5 +1,5 @@
 <div align="center">
-  <div align="center" style="background-color:#0d1117; padding-bottom: 20px; border-radius:10px">
+  <div align="center" style="padding-bottom: 20px; border-radius:10px">
     <picture>
         <source media="(prefers-color-scheme: dark)" srcset="https://github.com/amosproj/amos2024ss04-building-information-enhancer/blob/main/Deliverables/sprint-01/team-logo.png?raw=true">
         <source media="(prefers-color-scheme: light)" srcset="https://github.com/amosproj/amos2024ss04-building-information-enhancer/blob/main/Deliverables/sprint-01/team-logo-black.png?raw=true">
